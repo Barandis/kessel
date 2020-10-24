@@ -5,7 +5,7 @@
 
 import { expect } from 'chai'
 
-import { parse } from 'kessel/parser'
+import { parse } from 'kessel/core'
 
 export function pass(parser, test, expected) {
   const state = parse(parser, test)

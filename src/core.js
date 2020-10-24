@@ -47,7 +47,7 @@ function ParserState(input) {
     index: 0,
     success: true,
     result: null,
-    expected: null,
+    expected: [],
     actual: null,
   }
 }
@@ -77,7 +77,7 @@ export function success(state, {
     index,
     success: true,
     result,
-    expected: null,
+    expected: [],
     actual: null,
   }
 }

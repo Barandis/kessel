@@ -21,8 +21,13 @@
 // recognize any text, so it's these two parsers that can be composed
 // for new parsing functions.
 
-import { failure, Parser, success } from './parser'
-import { charLength, stringToView, viewToString } from './util'
+import { failure, Parser, success } from './core'
+import {
+  charLength,
+  nextChar,
+  stringToView,
+  viewToString,
+} from './util'
 
 // Parses a particular string from the current position in the text. The
 // `fn` parameter is a comparision function; it returns true if its two
@@ -46,8 +51,8 @@ const StringParser = (str, fn) => Parser(state => {
 
   if (index + width > view.byteLength) {
     return failure(state, {
-      expected: str,
-      actual: viewToString(index, view.byteLength - index, view),
+      expected: [`"${str}"`],
+      actual: `"${viewToString(index, view.byteLength - index, view)}"`,
     })
   }
 
@@ -56,7 +61,7 @@ const StringParser = (str, fn) => Parser(state => {
   if (fn(str, actual)) {
     return success(state, { index: index + width, result: actual })
   }
-  return failure(state, { expected: str, actual })
+  return failure(state, { expected: [`"${str}"`], actual: `"${actual}"` })
 })
 
 // Parses a string from the current location in the input. The string
@@ -89,15 +94,16 @@ export const stringi = str =>
 // `length` is the length of the returned `actual` state property upon
 // failure. If it's not provided, the length will be the same as the
 // length of the regular expression's source.
-const RegexParser = (re, expected, length = null) => Parser(state => {
+const RegexParser = (re, length = null) => Parser(state => {
   if (!state.success) return state
 
   const { index, view } = state
   const rest = viewToString(index, view.byteLength - index, view)
+  const expected = [`a string matching ${re}`]
 
   // Check to see if there's anything to match against
   if (rest.length === 0) {
-    return failure(state, { expected, actual: '' })
+    return failure(state, { expected, actual: 'EOF' })
   }
 
   const match = rest.match(re)
@@ -110,7 +116,7 @@ const RegexParser = (re, expected, length = null) => Parser(state => {
   const len = length ?? charLength(re.source) - 1 // to ignore anchor
   return failure(state, {
     expected,
-    actual: [...rest].slice(0, len).join(''),
+    actual: `"${[...rest].slice(0, len).join('')}"`,
   })
 })
 
@@ -154,5 +160,110 @@ export const regex = re => {
     regex = new RegExp(newSource, flags)
   }
 
-  return RegexParser(regex, `string matching ${regex}`)
+  return RegexParser(regex)
 }
+
+// Reads one character and results in that character. Fails only at EOF.
+export const any = Parser(state => {
+  if (!state.success) return state
+
+  const { index, view } = state
+  if (index === view.byteLength) {
+    return failure(state, { expected: ['any character'], actual: 'EOF' })
+  }
+  const { width, next } = nextChar(index, view)
+  return success(state, {
+    index: index + width,
+    result: next,
+  })
+})
+
+// Reads the remainder of the input text and results in that text.
+// Succeeds if already at EOF, resulting in an empty string.
+export const all = Parser(state => {
+  if (!state.success) return state
+
+  const { index, view } = state
+  const width = view.byteLength - index
+  return success(state, {
+    index: index + width,
+    result: viewToString(index, width, view),
+  })
+})
+
+// Reads one character and succeeds if that character does not exist
+// (i.e., if the index is already at the end of the text). Consumes
+// nothing on either success or failure.
+export const eof = Parser(state => {
+  if (!state.success) return state
+
+  const { index, view } = state
+  if (index === view.byteLength) {
+    return success(state, { result: null })
+  }
+  const { _, next } = nextChar(index, view)
+  return failure(state, {
+    expected: ['EOF'],
+    actual: `"${next}"`,
+  })
+})
+
+// Reads the next character and passes it into the supplied predicate
+// function. If that function returns `true`, the parser succeeds with
+// that character as the result.
+export const satisfies = predicate => Parser(state => {
+  if (!state.success) return state
+
+  const type = Object.prototype.toString.call(predicate)
+  if (type !== '[object Function]') {
+    throw new TypeError(`satisfies parser requires a function; got ${type}`)
+  }
+
+  const name = predicate.name.length ? predicate.name : '<anonymous>'
+  const { index, view } = state
+  const expected = [`a character satisfying function ${name}`]
+
+  if (index >= view.byteLength) {
+    return failure(state, { expected, actual: 'EOF' })
+  }
+
+  const { width, next } = nextChar(index, view)
+
+  if (predicate(next)) {
+    return success(state, { result: next, index: index + width })
+  }
+  return failure(state, { expected, actual: `"${next}"` })
+})
+
+// Reads a character and compares it against each of the characters in
+// the provided string. Succeeds if the read character is one of the
+// characters in the string.
+export const oneOf = str => Parser(state => {
+  if (!state.success) return state
+
+  const { index, view } = state
+  const { width, next } = nextChar(index, view)
+
+  if (str.includes(next)) {
+    return success(state, { result: next, index: index + width })
+  }
+  return failure(state, { expected: [`one of "${str}"`], actual: `"${next}"` })
+})
+
+// Reads a character and compares it against each of the characters in
+// the provided string. Succeeds if the read character is *not* one of
+// the characters in the string.
+export const noneOf = str => Parser(state => {
+  if (!state.success) return state
+
+  const { index, view } = state
+  const { width, next } = nextChar(index, view)
+
+  if (str.includes(next)) {
+    return failure(state, {
+      expected: [`none of "${str}"`],
+      actual: `"${next}"`,
+    })
+  }
+  return success(state, { result: next, index: index + width })
+})

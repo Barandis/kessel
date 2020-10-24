@@ -64,3 +64,23 @@ export function stringToView(str) {
 export function charLength(str) {
   return [...str].length
 }
+
+export function nextCharWidth(index, view) {
+  const byte = view.getUint8(index)
+  if ((byte & 0x80) >> 7 === 0) return 1
+  if ((byte & 0xe0) >> 5 === 0b110) return 2
+  if ((byte & 0xf0) >> 4 === 0b1110) return 3
+  if ((byte & 0xf0) >> 4 === 0b1111) return 4
+  // Hopefully shouldn't happen, but here in case one of those high
+  // ascii codes is used
+  return 1
+}
+
+export function nextChar(index, view) {
+  const width = nextCharWidth(index, view)
+  return { width, next: viewToString(index, width, view) }
+}
+
+export function push(array, value) {
+  return [...array, value]
+}
