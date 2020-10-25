@@ -31,16 +31,220 @@ import {
   crlf,
   newline,
   end,
+  char,
+  chari,
 } from 'kessel/parsers'
 import { error, fail, pass } from 'test/helper'
 
-describe('Recognizers', () => {
+describe('Parsers', () => {
+  describe('char', () => {
+    it('fails if the supplied value is not a one-character string', () => {
+      error(
+        char(23), 'some text', '[char]: expected single character; received 23'
+      )
+      error(
+        char('str'),
+        'some text',
+        '[char]: expected single character; received str'
+      )
+    })
+
+    context('1-byte characters', () => {
+      const parser = char('O')
+
+      it('succeeds if the next character matches', () => {
+        pass(parser, 'Onomatopoeia', 'O')
+      })
+      it('fails if the next character does not match', () => {
+        fail(parser, 'topoeia', '"t"')
+      })
+      it('fails if the case does not match', () => {
+        fail(parser, 'onomatopoeia', '"o"')
+      })
+      it('fails at EOF', () => {
+        fail(parser, '', 'EOF')
+      })
+    })
+
+    context('2-byte characters', () => {
+      const parser = char('З')
+
+      it('succeeds if the next character matches', () => {
+        pass(parser, 'Звукоподражание', 'З')
+      })
+      it('fails if the next character does not match', () => {
+        fail(parser, 'подражание', '"п"')
+      })
+      it('fails if the case does not match', () => {
+        fail(parser, 'звукоподражание', '"з"')
+      })
+      it('fails at EOF', () => {
+        fail(parser, '', 'EOF')
+      })
+    })
+
+    context('3-byte characters', () => {
+      const parser = char('ค')
+
+      it('succeeds if the next character matches', () => {
+        pass(parser, 'คำเลียนเสียง', 'ค')
+      })
+      it('fails if the next character does not match', () => {
+        fail(parser, 'ยนเสียง', '"ย"')
+      })
+      it('fails at EOF', () => {
+        fail(parser, '', 'EOF')
+      })
+    })
+
+    context('4-byte characters', () => {
+      const parser = char('𝑂')
+
+      it('succeeds if the next character matches', () => {
+        pass(parser, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', '𝑂')
+      })
+      it('fails if the next character does not match', () => {
+        fail(parser, '𝑡𝑜𝑝𝑜𝑒𝑖𝑎', '"𝑡"')
+      })
+      it('fails at EOF', () => {
+        fail(parser, '', 'EOF')
+      })
+    })
+  })
+
+  describe('chari', () => {
+    it('fails if the supplied value is not a one-character string', () => {
+      error(
+        chari(23),
+        'some text',
+        '[chari]: expected single character; received 23'
+      )
+      error(
+        chari('str'),
+        'some text',
+        '[chari]: expected single character; received str'
+      )
+    })
+
+    context('1-byte characters', () => {
+      const parser = chari('O')
+
+      it('succeeds if the next character matches', () => {
+        pass(parser, 'Onomatopoeia', 'O')
+      })
+      it('fails if the next character does not match', () => {
+        fail(parser, 'topoeia', '"t"')
+      })
+      it('succeeds if the case does not match', () => {
+        pass(parser, 'onomatopoeia', 'o')
+      })
+      it('fails at EOF', () => {
+        fail(parser, '', 'EOF')
+      })
+    })
+
+    context('2-byte characters', () => {
+      const parser = chari('З')
+
+      it('succeeds if the next character matches', () => {
+        pass(parser, 'Звукоподражание', 'З')
+      })
+      it('fails if the next character does not match', () => {
+        fail(parser, 'подражание', '"п"')
+      })
+      it('fails if the case does not match', () => {
+        pass(parser, 'звукоподражание', 'з')
+      })
+      it('fails at EOF', () => {
+        fail(parser, '', 'EOF')
+      })
+    })
+
+    context('3-byte characters', () => {
+      const parser = chari('ค')
+
+      it('succeeds if the next character matches', () => {
+        pass(parser, 'คำเลียนเสียง', 'ค')
+      })
+      it('fails if the next character does not match', () => {
+        fail(parser, 'ยนเสียง', '"ย"')
+      })
+      it('fails at EOF', () => {
+        fail(parser, '', 'EOF')
+      })
+    })
+
+    context('4-byte characters', () => {
+      const parser = chari('𝑂')
+
+      it('succeeds if the next character matches', () => {
+        pass(parser, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', '𝑂')
+      })
+      it('fails if the next character does not match', () => {
+        fail(parser, '𝑡𝑜𝑝𝑜𝑒𝑖𝑎', '"𝑡"')
+      })
+      it('fails at EOF', () => {
+        fail(parser, '', 'EOF')
+      })
+    })
+  })
+
+  describe('satisfies', () => {
+    it('fails if the supplied value is not a function', () => {
+      error(
+        satisfies(23),
+        'some text',
+        '[satisfies]: expected function; received 23'
+      )
+    })
+
+    const fn = char => char === char.toUpperCase()
+
+    it('tests the next 1-byte character', () => {
+      pass(satisfies(fn), 'Onomatopoeia', { result: 'O', index: 1 })
+      fail(satisfies(fn), 'onomatopoeia', {
+        expected: ['a character that satisfies function "fn"'],
+        actual: '"o"',
+      })
+    })
+
+    it('tests the next 2-byte character', () => {
+      pass(satisfies(fn), 'Звукоподражание', { result: 'З', index: 2 })
+      fail(satisfies(fn), 'звукоподражание', {
+        expected: ['a character that satisfies function "fn"'],
+        actual: '"з"',
+      })
+    })
+
+    it('tests the next 3-byte character', () => {
+      pass(satisfies(fn), 'คำเลียนเสียง', { result: 'ค', index: 3 })
+    })
+
+    it('tests the next 4-byte character', () => {
+      pass(satisfies(fn), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂', index: 4 })
+    })
+
+    it('names an unnamed function <anonymous>', () => {
+      fail(satisfies(char => char === char.toUpperCase()), 'onomatopoeia', {
+        expected: ['a character that satisfies function "<anonymous>"'],
+        actual: '"o"',
+      })
+    })
+
+    it('fails automatically at EOF', () => {
+      fail(satisfies(fn), '', {
+        expected: ['a character that satisfies function "fn"'],
+        actual: 'EOF',
+      })
+    })
+  })
+
   describe('string', () => {
     it('throws an error if a non-string is passed in', () => {
       error(
         string(23),
         'some text',
-        'String parser requires string input; got [object Number]'
+        '[string]: expected string; received 23'
       )
     })
 
@@ -53,15 +257,22 @@ describe('Recognizers', () => {
       it('fails if case does not match', () => {
         fail(parser, 'onomatopoeia', {
           expected: ['"Onoma"'],
-          actual: '"onoma"',
+          actual: '"o"',
           index: 0,
+        })
+      })
+      it('consumes input up until a failure', () => {
+        fail(parser, 'Onosho', {
+          expected: ['"Onoma"'],
+          actual: '"Onos"',
+          index: 3,
         })
       })
       it('fails if the string is longer than the remaining text', () => {
         fail(parser, 'Ono', {
           expected: ['"Onoma"'],
           actual: '"Ono"',
-          index: 0,
+          index: 3,
         })
       })
       it('succeeds with an empty string', () => {
@@ -76,10 +287,10 @@ describe('Recognizers', () => {
         pass(parser, 'Звукоподражание', { result: 'Звуко', index: 10 })
       })
       it('fails if case does not match', () => {
-        fail(parser, 'звукоподражание', { actual: '"звуко"', index: 0 })
+        fail(parser, 'звукоподражание', { actual: '"з"', index: 0 })
       })
       it('fails if the string is longer than the remaining text', () => {
-        fail(parser, 'Зву', { actual: '"Зву"', index: 0 })
+        fail(parser, 'Зву', { actual: '"Зву"', index: 6 })
       })
       it('succeeds with an empty string', () => {
         pass(string(''), 'Звукоподражание', { result: '', index: 0 })
@@ -93,7 +304,7 @@ describe('Recognizers', () => {
         pass(parser, 'คำเลียนเสียง', { result: 'คำเลี', index: 15 })
       })
       it('fails if the string is longer than the remaining text', () => {
-        fail(parser, 'คำเ', { actual: '"คำเ"', index: 0 })
+        fail(parser, 'คำเ', { actual: '"คำเ"', index: 9 })
       })
       it('succeeds with an empty string', () => {
         pass(string(''), 'คำเลียนเสียง', { result: '', index: 0 })
@@ -107,7 +318,7 @@ describe('Recognizers', () => {
         pass(parser, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂𝑛𝑜𝑚𝑎', index: 20 })
       })
       it('fails if the string is longer than the remaining text', () => {
-        fail(parser, '𝑂𝑛𝑜', { actual: '"𝑂𝑛𝑜"', index: 0 })
+        fail(parser, '𝑂𝑛𝑜', { actual: '"𝑂𝑛𝑜"', index: 12 })
       })
       it('succeeds with an empty string', () => {
         pass(string(''), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '', index: 0 })
@@ -120,7 +331,7 @@ describe('Recognizers', () => {
       error(
         stringi(23),
         'some text',
-        'String parser requires string input; got [object Number]'
+        '[stringi]: expected string; received 23'
       )
     })
 
@@ -137,7 +348,7 @@ describe('Recognizers', () => {
         fail(parser, 'Ono', {
           expected: ['"Onoma"'],
           actual: '"Ono"',
-          index: 0,
+          index: 3,
         })
       })
       it('succeeds with an empty string', () => {
@@ -155,7 +366,7 @@ describe('Recognizers', () => {
         pass(parser, 'звукоподражание', { result: 'звуко', index: 10 })
       })
       it('fails if the string is longer than the remaining text', () => {
-        fail(parser, 'Зву', { actual: '"Зву"', index: 0 })
+        fail(parser, 'Зву', { actual: '"Зву"', index: 6 })
       })
       it('succeeds with an empty string', () => {
         pass(string(''), 'Звукоподражание', { result: '', index: 0 })
@@ -169,7 +380,7 @@ describe('Recognizers', () => {
         pass(parser, 'คำเลียนเสียง', { result: 'คำเลี', index: 15 })
       })
       it('fails if the string is longer than the remaining text', () => {
-        fail(parser, 'คำเ', { actual: '"คำเ"', index: 0 })
+        fail(parser, 'คำเ', { actual: '"คำเ"', index: 9 })
       })
       it('succeeds with an empty string', () => {
         pass(string(''), 'คำเลียนเสียง', { result: '', index: 0 })
@@ -183,7 +394,7 @@ describe('Recognizers', () => {
         pass(parser, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂𝑛𝑜𝑚𝑎', index: 20 })
       })
       it('fails if the string is longer than the remaining text', () => {
-        fail(parser, '𝑂𝑛𝑜', { actual: '"𝑂𝑛𝑜"', index: 0 })
+        fail(parser, '𝑂𝑛𝑜', { actual: '"𝑂𝑛𝑜"', index: 12 })
       })
       it('succeeds with an empty string', () => {
         pass(string(''), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '', index: 0 })
@@ -291,56 +502,6 @@ describe('Recognizers', () => {
     })
     it('succeeds only at EOF', () => {
       pass(eof, '', { result: null, index: 0 })
-    })
-  })
-
-  describe('satisfies', () => {
-    it('fails if the supplied value is not a function', () => {
-      error(
-        satisfies(23),
-        'some text',
-        'satisfies parser requires a function; got [object Number]'
-      )
-    })
-
-    const fn = char => char === char.toUpperCase()
-
-    it('tests the next 1-byte character', () => {
-      pass(satisfies(fn), 'Onomatopoeia', { result: 'O', index: 1 })
-      fail(satisfies(fn), 'onomatopoeia', {
-        expected: ['a character satisfying function fn'],
-        actual: '"o"',
-      })
-    })
-
-    it('tests the next 2-byte character', () => {
-      pass(satisfies(fn), 'Звукоподражание', { result: 'З', index: 2 })
-      fail(satisfies(fn), 'звукоподражание', {
-        expected: ['a character satisfying function fn'],
-        actual: '"з"',
-      })
-    })
-
-    it('tests the next 3-byte character', () => {
-      pass(satisfies(fn), 'คำเลียนเสียง', { result: 'ค', index: 3 })
-    })
-
-    it('tests the next 4-byte character', () => {
-      pass(satisfies(fn), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂', index: 4 })
-    })
-
-    it('names an unnamed function <anonymous>', () => {
-      fail(satisfies(char => char === char.toUpperCase()), 'onomatopoeia', {
-        expected: ['a character satisfying function <anonymous>'],
-        actual: '"o"',
-      })
-    })
-
-    it('fails automatically at EOF', () => {
-      fail(satisfies(fn), '', {
-        expected: ['a character satisfying function fn'],
-        actual: 'EOF',
-      })
     })
   })
 
@@ -1002,7 +1163,7 @@ describe('Recognizers', () => {
       pass(crlf, '\r\nabc', '\r\n')
     })
     it('fails on any other character combination', () => {
-      fail(crlf, '\nOnoma', { expected: ['CRLF'], actual: '"\nO"' })
+      fail(crlf, '\nOnoma', { expected: ['CRLF'], actual: '"\n"' })
     })
     it('fails at EOF', () => {
       fail(crlf, '', { expected: ['CRLF'], actual: 'EOF' })

@@ -21,9 +21,12 @@
 // recognize any text, so it's these two parsers that can be composed
 // for new parsing functions.
 
-import { alt, desc } from './combinators'
+import { alt, back, desc } from './combinators'
 import { failure, Parser, success } from './core'
 import {
+  assertCharacter,
+  assertFunction,
+  assertString,
   charLength,
   nextChar,
   push,
@@ -48,6 +51,83 @@ const reLower = /^\p{Lowercase}/u
 const reSpace = /^\p{White_Space}+/u
 const reSpaces = /^\p{White_Space}*/u
 
+// A parser for a single character. This parser takes a function of one
+// argument; the next read character is passed to that function and, if
+// it returns true, the parser succeeds with that character.
+//
+// If the function returns false, the parser fails, though it returns
+// its `actual` state property without the normal quotes around literal
+// strings. This is to enable the `StringParser` below to build up its
+// own actual from individual invocations of this parser.
+//
+// This parser directly powers `char`, `chari`, and `satisfies`, and it
+// is used repeatedly by `StringParser`.
+const CharParser = fn => Parser(state => {
+  const { index, view } = state
+  const name = fn.name.length ? fn.name : '<anonymous>'
+  const expected = `a character that satisfies function "${name}"`
+
+  if (index >= view.byteLength) {
+    return failure(state, {
+      expected: push(state.expected, expected),
+      actual: 'EOF',
+    })
+  }
+
+  const { width, next } = nextChar(index, view)
+
+  if (fn(next)) {
+    return success(state, { result: next, index: index + width })
+  }
+  return failure(state, {
+    expected: push(state.expected, expected),
+    actual: next,
+  })
+})
+
+// Reads the next character and succeeds if that character exactly
+// matches the passed one. The result is the read character. This parser
+// is more efficient than the `string` parser in cases where only one
+// character needs to be read.
+export const char = c => Parser(state => {
+  assertCharacter(c, 'char')
+  const nextState = CharParser(next => next === c)(state)
+
+  if (nextState.success) return nextState
+
+  const actual = nextState.actual === 'EOF' ? 'EOF' : `"${nextState.actual}"`
+  return failure(nextState, { expected: [`"${c}"`], actual })
+})
+
+// Reads the next character and succeeds if that character case-
+// insensitively matches the passed one. The result is the read
+// character (which may be different than the passed character if they
+// differ in case). This parser is more efficient than the `stringi`
+// parser in cases where only one character needs to be read.
+export const chari = c => Parser(state => {
+  assertCharacter(c, 'chari')
+  const nextState
+    = CharParser(next => next.toLowerCase() === c.toLowerCase())(state)
+
+  if (nextState.success) return nextState
+
+  const actual = nextState.actual === 'EOF' ? 'EOF' : `"${nextState.actual}"`
+  return failure(nextState, { expected: [`"${c}"`], actual })
+})
+
+// Reads the next character and passes it into the supplied predicate
+// function. If that function returns `true`, the parser succeeds with
+// that character as the result.
+export const satisfies = fn => Parser(state => {
+  assertFunction(fn, 'satisfies')
+  const nextState = CharParser(fn)(state)
+
+  if (nextState.success) return nextState
+
+  const actual = nextState.actual === 'EOF' ? 'EOF' : `"${nextState.actual}"`
+  return failure(nextState, { actual })
+})
+
 // Parses a particular string from the current position in the text. The
 // `fn` parameter is a comparision function; it returns true if its two
 // arguments are equal strings and `false` if they are not. This allows
@@ -55,42 +135,35 @@ const reSpaces = /^\p{White_Space}*/u
 // something that I wanted to do without resorting to regular
 // expressions.
 const StringParser = (str, fn) => Parser(state => {
-  const type = Object.prototype.toString.call(str)
-  if (type !== '[object String]') {
-    throw new TypeError(`String parser requires string input; got ${type}`)
-  }
-
   if (str.length === 0) return success(state, { result: '' })
 
-  const { index, view } = state
-  const bytes = stringToView(str)
-  const width = bytes.byteLength
+  let nextState = state
+  let actual = ''
 
-  if (index + width > view.byteLength) {
-    const actual = index === view.byteLength
-      ? 'EOF'
-      : `"${viewToString(index, view.byteLength - index, view)}"`
-    return failure(state, {
-      expected: push(state.expected, `"${str}"`),
-      actual,
-    })
+  for (const c of [...str]) {
+    nextState = CharParser(fn(c))(nextState)
+    if (!nextState.success) {
+      if (actual === '' || nextState.actual !== 'EOF') {
+        actual += nextState.actual
+      }
+      if (actual !== 'EOF') {
+        actual = `"${actual}"`
+      }
+      return failure(nextState, { expected: [`"${str}"`], actual })
+    }
+    actual += nextState.result
   }
 
-  const actual = viewToString(index, width, view)
-
-  if (fn(str, actual)) {
-    return success(state, { index: index + width, result: actual })
-  }
-  return failure(state, {
-    expected: push(state.expected, `"${str}"`),
-    actual: `"${actual}"`,
-  })
+  return success(nextState, { result: actual })
 })
 
 // Parses a string from the current location in the input. The string
 // match must be exact (it is case-sensitive), and all UTF8 characters
 // are recognized properly.
-export const string = str => StringParser(str, (a, b) => a === b)
+export const string = str => Parser(state => {
+  assertString(str, 'string')
+  return StringParser(str, c => next => next === c)(state)
+})
 
 // Parses a string from the current location in the input. This match is
 // *not* case-sensitive, but case-insensitivity is not recognized in
@@ -99,8 +172,12 @@ export const string = str => StringParser(str, (a, b) => a === b)
 // parser). This is a limitation for which a solution has not yet been
 // found; even using a regular expression with the flags `ui` does not
 // recognize these two characters as being equal.
-export const stringi = str =>
-  StringParser(str, (a, b) => a.toLowerCase() === b.toLowerCase())
+export const stringi = str => Parser(state => {
+  assertString(str, 'stringi')
+  return StringParser(
+    str, c => next => next.toLowerCase() === c.toLowerCase()
+  )(state)
+})
 
 // The base regular expression parser. This takes a regular expression
 // object and matches it as far as it can against the input at its
@@ -224,37 +301,6 @@ export const eof = Parser(state => {
   })
 })
 
-// Reads the next character and passes it into the supplied predicate
-// function. If that function returns `true`, the parser succeeds with
-// that character as the result.
-export const satisfies = predicate => Parser(state => {
-  const type = Object.prototype.toString.call(predicate)
-  if (type !== '[object Function]') {
-    throw new TypeError(`satisfies parser requires a function; got ${type}`)
-  }
-
-  const name = predicate.name.length ? predicate.name : '<anonymous>'
-  const { index, view } = state
-  const expected = `a character satisfying function ${name}`
-
-  if (index >= view.byteLength) {
-    return failure(state, {
-      expected: push(state.expected, expected),
-      actual: 'EOF',
-    })
-  }
-
-  const { width, next } = nextChar(index, view)
-
-  if (predicate(next)) {
-    return success(state, { result: next, index: index + width })
-  }
-  return failure(state, {
-    expected: push(state.expected, expected),
-    actual: `"${next}"`,
-  })
-})
-
 // Reads a character and compares it against each of the characters in
 // the provided string. Succeeds if the read character is one of the
 // characters in the string.
@@ -361,15 +407,15 @@ export const optWhitespace = RegexParser(reSpaces)
 
 // Reads a single character and succeeds with that character if it is a
 // tab.
-export const tab = desc(string('\t'), 'tab')
+export const tab = desc(char('\t'), 'tab')
 
 // Reads a single character and succeeds with that character if it is a
 // carriage return.
-export const cr = desc(string('\r'), 'carriage return')
+export const cr = desc(char('\r'), 'carriage return')
 
 // Reads a single character and succeeds with that character if it is a
 // line feed.
-export const lf = desc(string('\n'), 'line feed')
+export const lf = desc(char('\n'), 'line feed')
 
 // Reads two characters and succeeds with those two characters if they
 // are a carriage return and a line feed, in that order.
@@ -378,7 +424,7 @@ export const crlf = desc(string('\r\n'), 'CRLF')
 // Reads a character; succeeds if that character is a line feed or a
 // carriage return. If it is a carriage return, it will read one more
 // character if that character is a line feed.
-export const newline = desc(alt(crlf, lf, cr), 'newline')
+export const newline = desc(alt(back(crlf), lf, cr), 'newline')
 
 // Succeeds on any newline (LF, CR, or CRLF) or EOF.
 export const end = alt(newline, eof)

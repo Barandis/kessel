@@ -84,3 +84,30 @@ export function nextChar(index, view) {
 export function push(array, value) {
   return [...array, value]
 }
+
+export function assertCharacter(c, name) {
+  if (typeof c !== 'string' || charLength(c) !== 1) {
+    throw new TypeError(`[${name}]: expected single character; received ${c}`)
+  }
+}
+
+export function assertString(str, name) {
+  if (typeof str !== 'string') {
+    throw new TypeError(`[${name}]: expected string; received ${str}`)
+  }
+}
+
+export function assertStringOrRegex(re, name) {
+  const type = Object.prototype.toString.call(re)
+  if (typeof str !== 'string' && type !== '[object RegExp]') {
+    throw new TypeError(
+      `[${name}]: expected string or regular expression; received ${re}`
+    )
+  }
+}
+
+export function assertFunction(fn, name) {
+  if (typeof fn !== 'function') {
+    throw new TypeError(`[${name}]: expected function; received ${fn}`)
+  }
+}
