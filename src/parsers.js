@@ -27,6 +27,7 @@ import {
   assertCharacter,
   assertFunction,
   assertString,
+  assertStringOrRegex,
   charLength,
   nextChar,
   push,
@@ -231,22 +232,10 @@ const RegexParser = (re, length = null) => Parser(state => {
 // matching, the `actual` state property simply shows text of the same
 // length as the input pattern upon failure.
 export const regex = re => {
-  let regex = re
+  assertStringOrRegex(re, 'regex')
 
-  // Make sure we actually have a regular expression or a string
-  const type = Object.prototype.toString.call(re)
-  if (type !== '[object RegExp]' && type !== '[object String]') {
-    throw new TypeError(
-      `Regex parser requires regular expression or string input; got ${
-        type
-      }`
-    )
-  }
-  // If it's a string, make a regular expression out of it (without
-  // flags)
-  if (type === '[object String]') {
-    regex = new RegExp(re)
-  }
+  // First, convert to a regular expression if it's a string
+  let regex = typeof re === 'string' ? new RegExp(re) : re
 
   // Next, make sure the regular expression starts with a ^ anchor
   const { source, flags } = regex

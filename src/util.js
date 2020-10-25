@@ -3,6 +3,8 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+import { Parser } from './core'
+
 // This encoder/decoder pair is used to translate back and forth
 // between a JavaScript UCS2 string and a UTF8 encoding of that string
 // in a Uint8Array.
@@ -99,7 +101,7 @@ export function assertString(str, name) {
 
 export function assertStringOrRegex(re, name) {
   const type = Object.prototype.toString.call(re)
-  if (typeof str !== 'string' && type !== '[object RegExp]') {
+  if (typeof re !== 'string' && type !== '[object RegExp]') {
     throw new TypeError(
       `[${name}]: expected string or regular expression; received ${re}`
     )
@@ -109,5 +111,14 @@ export function assertStringOrRegex(re, name) {
 export function assertFunction(fn, name) {
   if (typeof fn !== 'function') {
     throw new TypeError(`[${name}]: expected function; received ${fn}`)
+  }
+}
+
+export function assertParser(fn, name) {
+  assertFunction(fn, name)
+  if (!Parser.created(fn)) {
+    throw new TypeError(
+      `[${name}]: expected parser; received non-parser function`
+    )
   }
 }

@@ -407,8 +407,7 @@ describe('Parsers', () => {
       error(
         () => regex(23),
         'some text',
-        'Regex parser requires regular expression or string input; got '
-          + '[object Number]'
+        '[regex]: expected string or regular expression; received 23'
       )
     })
     it('accepts a string as input', () => {
