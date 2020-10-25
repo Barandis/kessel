@@ -21,13 +21,32 @@
 // recognize any text, so it's these two parsers that can be composed
 // for new parsing functions.
 
+import { alt, desc } from './combinators'
 import { failure, Parser, success } from './core'
 import {
   charLength,
   nextChar,
+  push,
   stringToView,
   viewToString,
 } from './util'
+
+// All of the regular expressions used in the derived recognizers. These
+// are here to create and compile them once, upon initial lode, to
+// speed parsing later.
+
+const reDigit = /^[0-9]/
+const reDigits = /^[0-9]*/
+const reHexDigit = /^[0-9a-fA-F]/
+const reHexDigits = /^[0-9a-fA-F]*/
+const reLetter = /^\p{Alphabetic}/u
+const reLetters = /^\p{Alphabetic}*/u
+const reAlpha = /^(?:\p{Alphabetic}|\p{N})/u
+const reAlphas = /^(?:\p{Alphabetic}|\p{N})*/u
+const reUpper = /^(?:\p{Uppercase}|\p{Lt})/u
+const reLower = /^\p{Lowercase}/u
+const reSpace = /^\p{White_Space}+/u
+const reSpaces = /^\p{White_Space}*/u
 
 // Parses a particular string from the current position in the text. The
 // `fn` parameter is a comparision function; it returns true if its two
@@ -41,8 +60,6 @@ const StringParser = (str, fn) => Parser(state => {
     throw new TypeError(`String parser requires string input; got ${type}`)
   }
 
-  if (!state.success) return state
-
   if (str.length === 0) return success(state, { result: '' })
 
   const { index, view } = state
@@ -50,9 +67,12 @@ const StringParser = (str, fn) => Parser(state => {
   const width = bytes.byteLength
 
   if (index + width > view.byteLength) {
+    const actual = index === view.byteLength
+      ? 'EOF'
+      : `"${viewToString(index, view.byteLength - index, view)}"`
     return failure(state, {
-      expected: [`"${str}"`],
-      actual: `"${viewToString(index, view.byteLength - index, view)}"`,
+      expected: push(state.expected, `"${str}"`),
+      actual,
     })
   }
 
@@ -61,7 +81,10 @@ const StringParser = (str, fn) => Parser(state => {
   if (fn(str, actual)) {
     return success(state, { index: index + width, result: actual })
   }
-  return failure(state, { expected: [`"${str}"`], actual: `"${actual}"` })
+  return failure(state, {
+    expected: push(state.expected, `"${str}"`),
+    actual: `"${actual}"`,
+  })
 })
 
 // Parses a string from the current location in the input. The string
@@ -83,28 +106,18 @@ export const stringi = str =>
 // object and matches it as far as it can against the input at its
 // current position.
 //
-// It is assumed that the regex begins with a `^` and does not have the
-// `g` flag. For parsing, matches must be continuous from the beginning
-// of the text. `expected` is a string that becomes the value of
-// `expected` in the state if the parser fails. This lets more friendly
-// messages be generated; failure on a `whitespace` parser can then say
-// 'whitespace' for its expected rather than 'a string matching
-// /^\p{White_Space}/'.
+// It is assumed that the regex begins with a `^` . The `g` flag is
+// ignored in that only the first match is processed and returned. This
+// ensures that the match is only against the text directly at the
+// current pointer location.
 //
 // `length` is the length of the returned `actual` state property upon
 // failure. If it's not provided, the length will be the same as the
 // length of the regular expression's source.
 const RegexParser = (re, length = null) => Parser(state => {
-  if (!state.success) return state
-
   const { index, view } = state
   const rest = viewToString(index, view.byteLength - index, view)
-  const expected = [`a string matching ${re}`]
-
-  // Check to see if there's anything to match against
-  if (rest.length === 0) {
-    return failure(state, { expected, actual: 'EOF' })
-  }
+  const expected = `a string matching ${re}`
 
   const match = rest.match(re)
   if (match) {
@@ -113,10 +126,16 @@ const RegexParser = (re, length = null) => Parser(state => {
       index: index + stringToView(match[0]).byteLength,
     })
   }
-  const len = length ?? charLength(re.source) - 1 // to ignore anchor
+
+  let len = length ?? charLength(re.source) - 1 // to ignore anchor
+  if (len > view.byteLength - index) {
+    len = view.byteLength - index
+  }
+  const actual = len === 0 ? 'EOF' : `"${[...rest].slice(0, len).join('')}"`
+
   return failure(state, {
-    expected,
-    actual: `"${[...rest].slice(0, len).join('')}"`,
+    expected: push(state.expected, expected),
+    actual,
   })
 })
 
@@ -165,11 +184,12 @@ export const regex = re => {
 
 // Reads one character and results in that character. Fails only at EOF.
 export const any = Parser(state => {
-  if (!state.success) return state
-
   const { index, view } = state
   if (index === view.byteLength) {
-    return failure(state, { expected: ['any character'], actual: 'EOF' })
+    return failure(state, {
+      expected: push(state.expected, 'any character'),
+      actual: 'EOF',
+    })
   }
   const { width, next } = nextChar(index, view)
   return success(state, {
@@ -181,8 +201,6 @@ export const any = Parser(state => {
 // Reads the remainder of the input text and results in that text.
 // Succeeds if already at EOF, resulting in an empty string.
 export const all = Parser(state => {
-  if (!state.success) return state
-
   const { index, view } = state
   const width = view.byteLength - index
   return success(state, {
@@ -195,15 +213,13 @@ export const all = Parser(state => {
 // (i.e., if the index is already at the end of the text). Consumes
 // nothing on either success or failure.
 export const eof = Parser(state => {
-  if (!state.success) return state
-
   const { index, view } = state
   if (index === view.byteLength) {
     return success(state, { result: null })
   }
   const { _, next } = nextChar(index, view)
   return failure(state, {
-    expected: ['EOF'],
+    expected: push(state.expected, 'EOF'),
     actual: `"${next}"`,
   })
 })
@@ -212,8 +228,6 @@ export const eof = Parser(state => {
 // function. If that function returns `true`, the parser succeeds with
 // that character as the result.
 export const satisfies = predicate => Parser(state => {
-  if (!state.success) return state
-
   const type = Object.prototype.toString.call(predicate)
   if (type !== '[object Function]') {
     throw new TypeError(`satisfies parser requires a function; got ${type}`)
@@ -221,10 +235,13 @@ export const satisfies = predicate => Parser(state => {
 
   const name = predicate.name.length ? predicate.name : '<anonymous>'
   const { index, view } = state
-  const expected = [`a character satisfying function ${name}`]
+  const expected = `a character satisfying function ${name}`
 
   if (index >= view.byteLength) {
-    return failure(state, { expected, actual: 'EOF' })
+    return failure(state, {
+      expected: push(state.expected, expected),
+      actual: 'EOF',
+    })
   }
 
   const { width, next } = nextChar(index, view)
@@ -232,7 +249,10 @@ export const satisfies = predicate => Parser(state => {
   if (predicate(next)) {
     return success(state, { result: next, index: index + width })
   }
-  return failure(state, { expected, actual: `"${next}"` })
+  return failure(state, {
+    expected: push(state.expected, expected),
+    actual: `"${next}"`,
+  })
 })
 
 // Reads a character and compares it against each of the characters in
@@ -247,7 +267,10 @@ export const oneOf = str => Parser(state => {
   if (str.includes(next)) {
     return success(state, { result: next, index: index + width })
   }
-  return failure(state, { expected: [`one of "${str}"`], actual: `"${next}"` })
+  return failure(state, {
+    expected: push(state.expected, `one of "${str}"`),
+    actual: `"${next}"`,
+  })
 })
 
 // Reads a character and compares it against each of the characters in
@@ -261,9 +284,101 @@ export const noneOf = str => Parser(state => {
 
   if (str.includes(next)) {
     return failure(state, {
-      expected: [`none of "${str}"`],
+      expected: push(state.expected, `none of "${str}"`),
       actual: `"${next}"`,
     })
   }
   return success(state, { result: next, index: index + width })
 })
+
+// Reads a character and succeeds with that character if it is a digit.
+// Note that this is not a unicode decimal digit; for that, use
+// `regex(/\p{Nd}/)`. This parser succeeds only for the literal
+// characters 0-9.
+export const digit = desc(RegexParser(reDigit, 1), 'a digit')
+
+// Attempts to read a character; if it is a digit, it will read another
+// character, and so on until a character is read which is not a digit.
+// Always succeeds with the entire string of read digits (which will be
+// empty if no digit was read at all).
+export const optDigits = RegexParser(reDigits)
+
+// Reads a character and succeeds with that character if it is a
+// hexadecimal digit. This parser is not case sensitive.
+export const hexDigit = desc(RegexParser(reHexDigit, 1), 'a hex digit')
+
+// Attempts to read a character; if it is a hexadecimal digit, it will
+// read another character, and so on until a character is read which is
+// not a hexadecimal digit. Always succeeds with the entire string of
+// read digits (which will be empty if no hexadecimal digit was read at
+// all).
+export const optHexDigits = RegexParser(reHexDigits)
+
+// Reads a character and succeeds with that character if it is a letter.
+// A letter for this purpose is any character with the Unicode
+// `Alphabetic` property.
+export const letter = desc(RegexParser(reLetter, 1), 'a letter')
+
+// Attempts to read a character; if it is a letter, it will read another
+// character, and so on until a character is read which is not a letter.
+// Always succeeds with the entire string of read letters (which will be
+// empty if no letter was read at all).
+export const optLetters = RegexParser(reLetters)
+
+// Reads a character and succeeds with that character if it is
+// alphanumeric. A character is alphanumeric if it has either the
+// Unicode `Alphabetic` property or the Unicode `Number` property.
+export const alphanum = desc(RegexParser(reAlpha, 1), 'an alphanumeric')
+
+// Attempts to read a character; if it is an alphanumeric character, it
+// will read another character, and so on until a character is read
+// which is not alphanumeric. Always succeeds with the entire string of
+// read alphanumeric characters (which will be empty if no alphanumeric
+// character was read at all).
+export const optAlphanums = RegexParser(reAlphas)
+
+// Reads a character and succeeds with that character if it is either an
+// uppercase or titlecase letter. A character is uppercase if it has
+// the Unicode `Uppercase` property and is titlecase if it has the
+// Unicode `Letter, Titlecase` property.
+export const upper = desc(RegexParser(reUpper, 1), 'an uppercase letter')
+
+// Reads a character and succeeds with that character if it is a
+// lowercase letter. A character is lowercase if it has the Unicode
+// `Lowercase` property .
+export const lower = desc(RegexParser(reLower, 1), 'a lowercase letter')
+
+// Reads one or more characters, so long as they are whitespace
+// characters. Succeeds with the entire string of whitespace characters
+// so long as there is at least one.
+export const whitespace = desc(RegexParser(reSpace, 1), 'whitespace')
+
+// Reads zero or more characters, so long as they are whitespace
+// characters. Always succeeds with the entire string of whitespace
+// characters; if there were none, this will succeed with an empty
+// string.
+export const optWhitespace = RegexParser(reSpaces)
+
+// Reads a single character and succeeds with that character if it is a
+// tab.
+export const tab = desc(string('\t'), 'tab')
+
+// Reads a single character and succeeds with that character if it is a
+// carriage return.
+export const cr = desc(string('\r'), 'carriage return')
+
+// Reads a single character and succeeds with that character if it is a
+// line feed.
+export const lf = desc(string('\n'), 'line feed')
+
+// Reads two characters and succeeds with those two characters if they
+// are a carriage return and a line feed, in that order.
+export const crlf = desc(string('\r\n'), 'CRLF')
+
+// Reads a character; succeeds if that character is a line feed or a
+// carriage return. If it is a carriage return, it will read one more
+// character if that character is a line feed.
+export const newline = desc(alt(crlf, lf, cr), 'newline')
+
+// Succeeds on any newline (LF, CR, or CRLF) or EOF.
+export const end = alt(newline, eof)

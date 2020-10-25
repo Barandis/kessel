@@ -5,14 +5,32 @@
 
 import {
   all,
+  alphanum,
   any,
+  digit,
   eof,
+  hexDigit,
+  letter,
+  optAlphanums,
+  optDigits,
+  optHexDigits,
+  optLetters,
+  lower,
   noneOf,
   oneOf,
   regex,
   satisfies,
   string,
   stringi,
+  upper,
+  whitespace,
+  optWhitespace,
+  tab,
+  cr,
+  lf,
+  crlf,
+  newline,
+  end,
 } from 'kessel/parsers'
 import { error, fail, pass } from 'test/helper'
 
@@ -196,6 +214,9 @@ describe('Recognizers', () => {
     })
     it('fails if the input is at its end', () => {
       fail(regex(/^./), '', 'EOF')
+    })
+    it('succeeds at EOF if the match can be zero-length', () => {
+      pass(regex(/^.*/), '', '')
     })
     it('matches 1-byte characters', () => {
       pass(regex(/^Onoma/), 'Onomatopoeia', 'Onoma')
@@ -404,6 +425,615 @@ describe('Recognizers', () => {
         actual: '"𝑚"',
       })
       pass(parser, 'matriculate', { result: 'm', index: 1 })
+    })
+  })
+
+  describe('digit', () => {
+    it('succeeds on any single decimal digit', () => {
+      pass(digit, '123', '1')
+    })
+    it('fails on any other character', () => {
+      fail(digit, 'abc', { expected: ['a digit'], actual: '"a"' })
+    })
+    it('fails at EOF', () => {
+      fail(digit, '', { expected: ['a digit'], actual: 'EOF' })
+    })
+  })
+
+  describe('optDigits', () => {
+    it('succeeds with a string of digits', () => {
+      pass(optDigits, '123', '123')
+      pass(optDigits, '123abc', { result: '123', index: 3 })
+    })
+    it('succeeds with an empty string on any other character', () => {
+      pass(optDigits, 'abc', '')
+      pass(optDigits, 'abc123', '')
+    })
+    it('succeeds with an empty string at EOF', () => {
+      pass(optDigits, '', '')
+    })
+  })
+
+  describe('hexDigit', () => {
+    it('succeeds on any single decimal digit', () => {
+      pass(hexDigit, '123', '1')
+      pass(hexDigit, 'abc', 'a')
+    })
+    it('fails on any other character', () => {
+      fail(hexDigit, 'ghi', { expected: ['a hex digit'], actual: '"g"' })
+    })
+    it('fails at EOF', () => {
+      fail(hexDigit, '', { expected: ['a hex digit'], actual: 'EOF' })
+    })
+  })
+
+  describe('optHexDigits', () => {
+    it('succeeds with a string of digits', () => {
+      pass(optHexDigits, '123', '123')
+      pass(optHexDigits, '123abc', { result: '123abc', index: 6 })
+      pass(optHexDigits, 'ABCDEFG', 'ABCDEF')
+    })
+    it('succeeds with an empty string on any other character', () => {
+      pass(optHexDigits, 'ghi', '')
+      pass(optHexDigits, 'gfedcba', '')
+    })
+    it('succeeds with an empty string at EOF', () => {
+      pass(optHexDigits, '', '')
+    })
+  })
+
+  describe('letter', () => {
+    it('succeeds on a single uppercase letter', () => {
+      pass(letter, 'A', 'A') // LATIN CAPITAL LETTER A
+      pass(letter, 'Ž', 'Ž') // LATIN CAPITAL LETTER Z WITH CARON
+      pass(letter, 'Γ', 'Γ') // GREEK CAPITAL LETTER GAMMA
+      pass(letter, 'Л', 'Л') // CYRILLIC CAPITAL LETTER EL
+      pass(letter, 'Յ', 'Յ') // ARMENIAN CAPITAL LETTER YI
+      pass(letter, 'Ⴄ', 'Ⴄ') // GEORGIAN CAPITAL LETTER EN
+      pass(letter, 'Ꮅ', 'Ꮅ') // CHEROKEE LETTER LI
+      pass(letter, 'Ⰽ', 'Ⰽ') // GLAGOLITHIC CAPTIAL LETTER KAKO
+    })
+    it('succeeds on a single titlecase letter', () => {
+      // LATIN CAPITAL LETTER D WITH SMALL LETTER Z WITH CARON
+      pass(letter, 'ǅ', 'ǅ')
+      // LATIN CAPITAL LETTER N WITH SMALL LETTER J
+      pass(letter, 'ǋ', 'ǋ')
+      // GREEK CAPITAL LETTER OMEGA WITH PROSGEGRAMMENI
+      pass(letter, 'ῼ', 'ῼ')
+    })
+    it('succeeds on a single lowercase letter', () => {
+      pass(letter, 'a', 'a') // LATIN SMALL LETTER A
+      pass(letter, 'ž', 'ž') // LATIN SMALL LETTER Z WITH CARON
+      pass(letter, 'γ', 'γ') // GREEK SMALL LETTER GAMMA
+      pass(letter, 'л', 'л') // CYRILLIC SMALL LETTER EL
+      pass(letter, 'յ', 'յ') // ARMENIAN SMALL LETTER YI
+      pass(letter, 'ე', 'ე') // GEORGIAN LETTER EN
+      pass(letter, 'ⰽ', 'ⰽ') // GLAGOLITIC SMALL LETTER KAKO
+    })
+    it('fails on decimal digits', () => {
+      fail(letter, '4', { expected: ['a letter'], actual: '"4"' })
+      fail(letter, '۴', { expected: ['a letter'], actual: '"۴"' })
+      fail(letter, '४', { expected: ['a letter'], actual: '"४"' })
+      fail(letter, '৪', { expected: ['a letter'], actual: '"৪"' })
+      fail(letter, '๔', { expected: ['a letter'], actual: '"๔"' })
+      fail(letter, '᠔', { expected: ['a letter'], actual: '"᠔"' })
+      fail(letter, '𝟜', { expected: ['a letter'], actual: '"𝟜"' })
+    })
+    it('succeeds on a single uppercase letter number', () => {
+      pass(letter, 'Ⅳ', 'Ⅳ') // ROMAN NUMERAL FOUR
+    })
+    it('succeeds on a single lowercase letter number', () => {
+      pass(letter, 'ⅳ', 'ⅳ') // SMALL ROMAN NUMERAL FOUR
+    })
+    it('fails on other numbers', () => {
+      fail(letter, '¼', { expected: ['a letter'], actual: '"¼"' })
+      fail(letter, '፬', { expected: ['a letter'], actual: '"፬"' })
+      fail(letter, '⁴', { expected: ['a letter'], actual: '"⁴"' })
+      fail(letter, '₄', { expected: ['a letter'], actual: '"₄"' })
+      fail(letter, '④', { expected: ['a letter'], actual: '"④"' })
+      fail(letter, '❹', { expected: ['a letter'], actual: '"❹"' })
+    })
+    it('fails on whitespace', () => {
+      fail(letter, ' ', { expected: ['a letter'], actual: '" "' })
+      fail(letter, '\t', { expected: ['a letter'], actual: '"\t"' })
+      fail(letter, '\n', { expected: ['a letter'], actual: '"\n"' })
+      fail(letter, ' ', { expected: ['a letter'], actual: '" "' })
+      fail(letter, '\u2003', { expected: ['a letter'], actual: '"\u2003"' })
+      fail(letter, '\u202f', { expected: ['a letter'], actual: '"\u202f"' })
+    })
+    it('fails on punctuation', () => {
+      fail(letter, '(', { expected: ['a letter'], actual: '"("' })
+      fail(letter, '｢', { expected: ['a letter'], actual: '"｢"' })
+      fail(letter, ')', { expected: ['a letter'], actual: '")"' })
+      fail(letter, '｣', { expected: ['a letter'], actual: '"｣"' })
+      fail(letter, '!', { expected: ['a letter'], actual: '"!"' })
+      fail(letter, '፣', { expected: ['a letter'], actual: '"፣"' })
+    })
+    it('fails on symbols', () => {
+      fail(letter, '$', { expected: ['a letter'], actual: '"$"' })
+      fail(letter, '₯', { expected: ['a letter'], actual: '"₯"' })
+      fail(letter, '+', { expected: ['a letter'], actual: '"+"' })
+      fail(letter, '⫇', { expected: ['a letter'], actual: '"⫇"' })
+      fail(letter, '©', { expected: ['a letter'], actual: '"©"' })
+      fail(letter, '🀄', { expected: ['a letter'], actual: '"🀄"' })
+    })
+  })
+
+  describe('optLetters', () => {
+    it('succeeds with an entire uninterrupted string of letters', () => {
+      pass(optLetters, 'Onomatopoeia', { result: 'Onomatopoeia', index: 12 })
+      pass(optLetters, 'Звукоподражание', {
+        result: 'Звукоподражание',
+        index: 30,
+      })
+      pass(optLetters, 'คำเลียนเสียง', { result: 'คำเลียนเสียง', index: 36 })
+      pass(optLetters, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', index: 48 })
+    })
+    it('succeeds until the first non-letter character', () => {
+      pass(optLetters, 'Onoma1', { result: 'Onoma', index: 5 })
+      pass(optLetters, 'Звуко1', { result: 'Звуко', index: 10 })
+      pass(optLetters, 'คำเลี1', { result: 'คำเลี', index: 15 })
+      pass(optLetters, '𝑂𝑛𝑜𝑚𝑎1', { result: '𝑂𝑛𝑜𝑚𝑎', index: 20 })
+    })
+    it('succeeds with an empty string if the first is not a letter', () => {
+      pass(optLetters, '1Onoma', { result: '', index: 0 })
+      pass(optLetters, '1Звуко', { result: '', index: 0 })
+      pass(optLetters, '1คำเลี', { result: '', index: 0 })
+      pass(optLetters, '1𝑂𝑛𝑜𝑚𝑎', { result: '', index: 0 })
+    })
+    it('succeeds with an empty string at EOF', () => {
+      pass(optLetters, '', '')
+    })
+  })
+
+  describe('alphanum', () => {
+    it('succeeds on a single uppercase letter', () => {
+      pass(alphanum, 'A', 'A') // LATIN CAPITAL LETTER A
+      pass(alphanum, 'Ž', 'Ž') // LATIN CAPITAL LETTER Z WITH CARON
+      pass(alphanum, 'Γ', 'Γ') // GREEK CAPITAL LETTER GAMMA
+      pass(alphanum, 'Л', 'Л') // CYRILLIC CAPITAL LETTER EL
+      pass(alphanum, 'Յ', 'Յ') // ARMENIAN CAPITAL LETTER YI
+      pass(alphanum, 'Ⴄ', 'Ⴄ') // GEORGIAN CAPITAL LETTER EN
+      pass(alphanum, 'Ꮅ', 'Ꮅ') // CHEROKEE LETTER LI
+      pass(alphanum, 'Ⰽ', 'Ⰽ') // GLAGOLITHIC CAPTIAL LETTER KAKO
+    })
+    it('succeeds on a single titlecase letter', () => {
+      // LATIN CAPITAL LETTER D WITH SMALL LETTER Z WITH CARON
+      pass(alphanum, 'ǅ', 'ǅ')
+      // LATIN CAPITAL LETTER N WITH SMALL LETTER J
+      pass(alphanum, 'ǋ', 'ǋ')
+      // GREEK CAPITAL LETTER OMEGA WITH PROSGEGRAMMENI
+      pass(alphanum, 'ῼ', 'ῼ')
+    })
+    it('succeeds on a single lowercase letter', () => {
+      pass(alphanum, 'a', 'a') // LATIN SMALL LETTER A
+      pass(alphanum, 'ž', 'ž') // LATIN SMALL LETTER Z WITH CARON
+      pass(alphanum, 'γ', 'γ') // GREEK SMALL LETTER GAMMA
+      pass(alphanum, 'л', 'л') // CYRILLIC SMALL LETTER EL
+      pass(alphanum, 'յ', 'յ') // ARMENIAN SMALL LETTER YI
+      pass(alphanum, 'ე', 'ე') // GEORGIAN LETTER EN
+      pass(alphanum, 'ⰽ', 'ⰽ') // GLAGOLITIC SMALL LETTER KAKO
+    })
+    it('succeeds on a single decimal digit', () => {
+      pass(alphanum, '4', '4') // DIGIT FOUR
+      pass(alphanum, '۴', '۴') // ARABIC-INDIC DIGIT FOUR
+      pass(alphanum, '४', '४') // DEVANAGARI DIGIT FOUR
+      pass(alphanum, '৪', '৪') // BENGALI DIGIT FOUR
+      pass(alphanum, '๔', '๔') // THAI DIGIT FOUR
+      pass(alphanum, '᠔', '᠔') // MONGOLIAN DIGIT FOUR
+      pass(alphanum, '𝟜', '𝟜') // MATHEMATICAL DOUBLE-STRUCK DIGIT FOUR
+    })
+    it('succeeds on a single uppercase letter number', () => {
+      pass(alphanum, 'Ⅳ', 'Ⅳ') // ROMAN NUMERAL FOUR
+    })
+    it('succeeds on a single lowercase letter number', () => {
+      pass(alphanum, 'ⅳ', 'ⅳ') // SMALL ROMAN NUMERAL FOUR
+    })
+    it('succeeds on a single other number', () => {
+      pass(alphanum, '¼', '¼') // VULGAR FRACTION ONE QUARTER
+      pass(alphanum, '፬', '፬') // ETHIOPIC DIGIT FOUR
+      pass(alphanum, '⁴', '⁴') // SUPERSCRIPT FOUR
+      pass(alphanum, '₄', '₄') // SUBSCRIPT FOUR
+      pass(alphanum, '④', '④') // CIRCLED DIGIT FOUR
+      pass(alphanum, '❹', '❹') // DINGBAT NEGATIVE CIRCLED DIGIT FOUR
+    })
+    it('fails on whitespace', () => {
+      fail(alphanum, ' ', { expected: ['an alphanumeric'], actual: '" "' })
+      fail(alphanum, '\t', { expected: ['an alphanumeric'], actual: '"\t"' })
+      fail(alphanum, '\n', { expected: ['an alphanumeric'], actual: '"\n"' })
+      fail(alphanum, ' ', { expected: ['an alphanumeric'], actual: '" "' })
+      fail(alphanum, '\u2003', {
+        expected: ['an alphanumeric'],
+        actual: '"\u2003"',
+      })
+      fail(alphanum, '\u202f', {
+        expected: ['an alphanumeric'],
+        actual: '"\u202f"',
+      })
+    })
+    it('fails on punctuation', () => {
+      fail(alphanum, '(', { expected: ['an alphanumeric'], actual: '"("' })
+      fail(alphanum, '｢', { expected: ['an alphanumeric'], actual: '"｢"' })
+      fail(alphanum, ')', { expected: ['an alphanumeric'], actual: '")"' })
+      fail(alphanum, '｣', { expected: ['an alphanumeric'], actual: '"｣"' })
+      fail(alphanum, '!', { expected: ['an alphanumeric'], actual: '"!"' })
+      fail(alphanum, '፣', { expected: ['an alphanumeric'], actual: '"፣"' })
+    })
+    it('fails on symbols', () => {
+      fail(alphanum, '$', { expected: ['an alphanumeric'], actual: '"$"' })
+      fail(alphanum, '₯', { expected: ['an alphanumeric'], actual: '"₯"' })
+      fail(alphanum, '+', { expected: ['an alphanumeric'], actual: '"+"' })
+      fail(alphanum, '⫇', { expected: ['an alphanumeric'], actual: '"⫇"' })
+      fail(alphanum, '©', { expected: ['an alphanumeric'], actual: '"©"' })
+      fail(alphanum, '🀄', { expected: ['an alphanumeric'], actual: '"🀄"' })
+    })
+  })
+
+  describe('optAlphanums', () => {
+    it('succeeds with an entire uninterrupted string of alphas', () => {
+      pass(optAlphanums, 'Onomatopo123', { result: 'Onomatopo123', index: 12 })
+      pass(optAlphanums, 'Звукоподр123', { result: 'Звукоподр123', index: 21 })
+      pass(optAlphanums, 'คำเลียนเสีย123', {
+        result: 'คำเลียนเสีย123',
+        index: 36,
+      })
+      pass(optAlphanums, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜123', { result: '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜123', index: 39 })
+    })
+    it('succeeds until the first non-alphanum character', () => {
+      pass(optAlphanums, 'Onoma 123', { result: 'Onoma', index: 5 })
+      pass(optAlphanums, 'Звуко 123', { result: 'Звуко', index: 10 })
+      pass(optAlphanums, 'คำเลี 123', { result: 'คำเลี', index: 15 })
+      pass(optAlphanums, '𝑂𝑛𝑜𝑚𝑎 123', { result: '𝑂𝑛𝑜𝑚𝑎', index: 20 })
+    })
+    it('succeeds with an empty string if the first is not aa alphanum', () => {
+      pass(optAlphanums, ' 1Onoma', { result: '', index: 0 })
+      pass(optAlphanums, ' 1Звуко', { result: '', index: 0 })
+      pass(optAlphanums, ' 1คำเลี', { result: '', index: 0 })
+      pass(optAlphanums, ' 1𝑂𝑛𝑜𝑚𝑎', { result: '', index: 0 })
+    })
+    it('succeeds with an empty string at EOF', () => {
+      pass(optAlphanums, '', '')
+    })
+  })
+
+  describe('upper', () => {
+    it('succeeds on a single uppercase letter', () => {
+      pass(upper, 'A', 'A') // LATIN CAPITAL LETTER A
+      pass(upper, 'Ž', 'Ž') // LATIN CAPITAL LETTER Z WITH CARON
+      pass(upper, 'Γ', 'Γ') // GREEK CAPITAL LETTER GAMMA
+      pass(upper, 'Л', 'Л') // CYRILLIC CAPITAL LETTER EL
+      pass(upper, 'Յ', 'Յ') // ARMENIAN CAPITAL LETTER YI
+      pass(upper, 'Ⴄ', 'Ⴄ') // GEORGIAN CAPITAL LETTER EN
+      pass(upper, 'Ꮅ', 'Ꮅ') // CHEROKEE LETTER LI
+      pass(upper, 'Ⰽ', 'Ⰽ') // GLAGOLITHIC CAPTIAL LETTER KAKO
+    })
+    it('succeeds on a single titlecase letter', () => {
+      // LATIN CAPITAL LETTER D WITH SMALL LETTER Z WITH CARON
+      pass(upper, 'ǅ', 'ǅ')
+      // LATIN CAPITAL LETTER N WITH SMALL LETTER J
+      pass(upper, 'ǋ', 'ǋ')
+      // GREEK CAPITAL LETTER OMEGA WITH PROSGEGRAMMENI
+      pass(upper, 'ῼ', 'ῼ')
+    })
+    it('fails on lowercase letters', () => {
+      fail(upper, 'a', { expected: ['an uppercase letter'], actual: '"a"' })
+      fail(upper, 'ž', { expected: ['an uppercase letter'], actual: '"ž"' })
+      fail(upper, 'γ', { expected: ['an uppercase letter'], actual: '"γ"' })
+      fail(upper, 'л', { expected: ['an uppercase letter'], actual: '"л"' })
+      fail(upper, 'յ', { expected: ['an uppercase letter'], actual: '"յ"' })
+      fail(upper, 'ე', { expected: ['an uppercase letter'], actual: '"ე"' })
+      fail(upper, 'ⰽ', { expected: ['an uppercase letter'], actual: '"ⰽ"' })
+    })
+    it('fails on decimal digits', () => {
+      fail(upper, '4', { expected: ['an uppercase letter'], actual: '"4"' })
+      fail(upper, '۴', { expected: ['an uppercase letter'], actual: '"۴"' })
+      fail(upper, '४', { expected: ['an uppercase letter'], actual: '"४"' })
+      fail(upper, '৪', { expected: ['an uppercase letter'], actual: '"৪"' })
+      fail(upper, '๔', { expected: ['an uppercase letter'], actual: '"๔"' })
+      fail(upper, '᠔', { expected: ['an uppercase letter'], actual: '"᠔"' })
+      fail(upper, '𝟜', { expected: ['an uppercase letter'], actual: '"𝟜"' })
+    })
+    it('succeeds on a single uppercase letter number', () => {
+      pass(upper, 'Ⅳ', 'Ⅳ') // ROMAN NUMERAL FOUR
+    })
+    it('fails on lowercase letter numbers', () => {
+      fail(upper, 'ⅳ', { expected: ['an uppercase letter'], actual: '"ⅳ"' })
+    })
+    it('fails on other numbers', () => {
+      fail(upper, '¼', { expected: ['an uppercase letter'], actual: '"¼"' })
+      fail(upper, '፬', { expected: ['an uppercase letter'], actual: '"፬"' })
+      fail(upper, '⁴', { expected: ['an uppercase letter'], actual: '"⁴"' })
+      fail(upper, '₄', { expected: ['an uppercase letter'], actual: '"₄"' })
+      fail(upper, '④', { expected: ['an uppercase letter'], actual: '"④"' })
+      fail(upper, '❹', { expected: ['an uppercase letter'], actual: '"❹"' })
+    })
+    it('fails on whitespace', () => {
+      fail(upper, ' ', { expected: ['an uppercase letter'], actual: '" "' })
+      fail(upper, '\t', { expected: ['an uppercase letter'], actual: '"\t"' })
+      fail(upper, '\n', { expected: ['an uppercase letter'], actual: '"\n"' })
+      fail(upper, ' ', { expected: ['an uppercase letter'], actual: '" "' })
+      fail(upper, '\u2003',
+        { expected: ['an uppercase letter'], actual: '"\u2003"' })
+      fail(upper, '\u202f',
+        { expected: ['an uppercase letter'], actual: '"\u202f"' })
+    })
+    it('fails on punctuation', () => {
+      fail(upper, '(', { expected: ['an uppercase letter'], actual: '"("' })
+      fail(upper, '｢', { expected: ['an uppercase letter'], actual: '"｢"' })
+      fail(upper, ')', { expected: ['an uppercase letter'], actual: '")"' })
+      fail(upper, '｣', { expected: ['an uppercase letter'], actual: '"｣"' })
+      fail(upper, '!', { expected: ['an uppercase letter'], actual: '"!"' })
+      fail(upper, '፣', { expected: ['an uppercase letter'], actual: '"፣"' })
+    })
+    it('fails on symbols', () => {
+      fail(upper, '$', { expected: ['an uppercase letter'], actual: '"$"' })
+      fail(upper, '₯', { expected: ['an uppercase letter'], actual: '"₯"' })
+      fail(upper, '+', { expected: ['an uppercase letter'], actual: '"+"' })
+      fail(upper, '⫇', { expected: ['an uppercase letter'], actual: '"⫇"' })
+      fail(upper, '©', { expected: ['an uppercase letter'], actual: '"©"' })
+      fail(upper, '🀄', { expected: ['an uppercase letter'], actual: '"🀄"' })
+    })
+  })
+
+  describe('lower', () => {
+    it('fails on uppercase letters', () => {
+      fail(lower, 'A', { expected: ['a lowercase letter'], actual: '"A"' })
+      fail(lower, 'Ž', { expected: ['a lowercase letter'], actual: '"Ž"' })
+      fail(lower, 'Γ', { expected: ['a lowercase letter'], actual: '"Γ"' })
+      fail(lower, 'Л', { expected: ['a lowercase letter'], actual: '"Л"' })
+      fail(lower, 'Յ', { expected: ['a lowercase letter'], actual: '"Յ"' })
+      fail(lower, 'Ⴄ', { expected: ['a lowercase letter'], actual: '"Ⴄ"' })
+      fail(lower, 'Ꮅ', { expected: ['a lowercase letter'], actual: '"Ꮅ"' })
+      fail(lower, 'Ⰽ', { expected: ['a lowercase letter'], actual: '"Ⰽ"' })
+    })
+    it('fails on titlecase letters', () => {
+      fail(lower, 'ǅ', { expected: ['a lowercase letter'], actual: '"ǅ"' })
+      fail(lower, 'ǋ', { expected: ['a lowercase letter'], actual: '"ǋ"' })
+      fail(lower, 'ῼ', { expected: ['a lowercase letter'], actual: '"ῼ"' })
+    })
+    it('succeeds on a single lowercase letter', () => {
+      pass(lower, 'a', 'a') // LATIN SMALL LETTER A
+      pass(lower, 'ž', 'ž') // LATIN SMALL LETTER Z WITH CARON
+      pass(lower, 'γ', 'γ') // GREEK SMALL LETTER GAMMA
+      pass(lower, 'л', 'л') // CYRILLIC SMALL LETTER EL
+      pass(lower, 'յ', 'յ') // ARMENIAN SMALL LETTER YI
+      pass(lower, 'ე', 'ე') // GEORGIAN LETTER EN
+      pass(lower, 'ⰽ', 'ⰽ') // GLAGOLITIC SMALL LETTER KAKO
+    })
+    it('fails on decimal digits', () => {
+      fail(lower, '4', { expected: ['a lowercase letter'], actual: '"4"' })
+      fail(lower, '۴', { expected: ['a lowercase letter'], actual: '"۴"' })
+      fail(lower, '४', { expected: ['a lowercase letter'], actual: '"४"' })
+      fail(lower, '৪', { expected: ['a lowercase letter'], actual: '"৪"' })
+      fail(lower, '๔', { expected: ['a lowercase letter'], actual: '"๔"' })
+      fail(lower, '᠔', { expected: ['a lowercase letter'], actual: '"᠔"' })
+      fail(lower, '𝟜', { expected: ['a lowercase letter'], actual: '"𝟜"' })
+    })
+    it('fails on uppercase letter numbers', () => {
+      fail(lower, 'Ⅳ', { expected: ['a lowercase letter'], actual: '"Ⅳ"' })
+    })
+    it('succeeds on a single lowercase letter number', () => {
+      pass(lower, 'ⅳ', 'ⅳ') // SMALL ROMAN NUMERAL FOUR
+    })
+    it('fails on other numbers', () => {
+      fail(lower, '¼', { expected: ['a lowercase letter'], actual: '"¼"' })
+      fail(lower, '፬', { expected: ['a lowercase letter'], actual: '"፬"' })
+      fail(lower, '⁴', { expected: ['a lowercase letter'], actual: '"⁴"' })
+      fail(lower, '₄', { expected: ['a lowercase letter'], actual: '"₄"' })
+      fail(lower, '④', { expected: ['a lowercase letter'], actual: '"④"' })
+      fail(lower, '❹', { expected: ['a lowercase letter'], actual: '"❹"' })
+    })
+    it('fails on whitespace', () => {
+      fail(lower, ' ', { expected: ['a lowercase letter'], actual: '" "' })
+      fail(lower, '\t', { expected: ['a lowercase letter'], actual: '"\t"' })
+      fail(lower, '\n', { expected: ['a lowercase letter'], actual: '"\n"' })
+      fail(lower, ' ', { expected: ['a lowercase letter'], actual: '" "' })
+      fail(lower, '\u2003',
+        { expected: ['a lowercase letter'], actual: '"\u2003"' })
+      fail(lower, '\u202f',
+        { expected: ['a lowercase letter'], actual: '"\u202f"' })
+    })
+    it('fails on punctuation', () => {
+      fail(lower, '(', { expected: ['a lowercase letter'], actual: '"("' })
+      fail(lower, '｢', { expected: ['a lowercase letter'], actual: '"｢"' })
+      fail(lower, ')', { expected: ['a lowercase letter'], actual: '")"' })
+      fail(lower, '｣', { expected: ['a lowercase letter'], actual: '"｣"' })
+      fail(lower, '!', { expected: ['a lowercase letter'], actual: '"!"' })
+      fail(lower, '፣', { expected: ['a lowercase letter'], actual: '"፣"' })
+    })
+    it('fails on symbols', () => {
+      fail(lower, '$', { expected: ['a lowercase letter'], actual: '"$"' })
+      fail(lower, '₯', { expected: ['a lowercase letter'], actual: '"₯"' })
+      fail(lower, '+', { expected: ['a lowercase letter'], actual: '"+"' })
+      fail(lower, '⫇', { expected: ['a lowercase letter'], actual: '"⫇"' })
+      fail(lower, '©', { expected: ['a lowercase letter'], actual: '"©"' })
+      fail(lower, '🀄', { expected: ['a lowercase letter'], actual: '"🀄"' })
+    })
+  })
+
+  describe('whitespace', () => {
+    it('succeeds on a single character of UTF-8 whitespace', () => {
+      pass(whitespace, '\t', '\t')
+      pass(whitespace, '\n', '\n')
+      pass(whitespace, '\v', '\v')
+      pass(whitespace, '\f', '\f')
+      pass(whitespace, '\r', '\r')
+      pass(whitespace, ' ', ' ')
+      pass(whitespace, '\u0085', '\u0085')
+      pass(whitespace, '\u00a0', '\u00a0')
+      pass(whitespace, '\u1680', '\u1680')
+      pass(whitespace, '\u2000', '\u2000')
+      pass(whitespace, '\u2001', '\u2001')
+      pass(whitespace, '\u2002', '\u2002')
+      pass(whitespace, '\u2003', '\u2003')
+      pass(whitespace, '\u2004', '\u2004')
+      pass(whitespace, '\u2005', '\u2005')
+      pass(whitespace, '\u2006', '\u2006')
+      pass(whitespace, '\u2007', '\u2007')
+      pass(whitespace, '\u2008', '\u2008')
+      pass(whitespace, '\u2009', '\u2009')
+      pass(whitespace, '\u200a', '\u200a')
+      pass(whitespace, '\u2028', '\u2028')
+      pass(whitespace, '\u2029', '\u2029')
+      pass(whitespace, '\u202f', '\u202f')
+      pass(whitespace, '\u205f', '\u205f')
+      pass(whitespace, '\u3000', '\u3000')
+    })
+    it('succeeds on multiple UTF-8 whitespace characters', () => {
+      pass(whitespace, '     123', '     ')
+      pass(whitespace, '\r\nabc', '\r\n')
+      pass(whitespace, '\u3000\u1680\u202f', '\u3000\u1680\u202f')
+    })
+    it('fails on non-whitespace characters', () => {
+      fail(whitespace, 'O', { expected: ['whitespace'], actual: '"O"' })
+      fail(whitespace, 'З', { expected: ['whitespace'], actual: '"З"' })
+      fail(whitespace, 'ค', { expected: ['whitespace'], actual: '"ค"' })
+      fail(whitespace, '𝑂', { expected: ['whitespace'], actual: '"𝑂"' })
+      fail(whitespace, '\u180e', {
+        expected: ['whitespace'],
+        actual: '"\u180e"',
+      })
+      fail(whitespace, '\u200b', {
+        expected: ['whitespace'],
+        actual: '"\u200b"',
+      })
+      fail(whitespace, '\u200c', {
+        expected: ['whitespace'],
+        actual: '"\u200c"',
+      })
+      fail(whitespace, '\u200d', {
+        expected: ['whitespace'],
+        actual: '"\u200d"',
+      })
+      fail(whitespace, '\u2060', {
+        expected: ['whitespace'],
+        actual: '"\u2060"',
+      })
+    })
+  })
+
+  describe('optWhitespace', () => {
+    it('succeeds on a single character of UTF-8 whitespace', () => {
+      pass(optWhitespace, '\t', '\t')
+      pass(optWhitespace, '\n', '\n')
+      pass(optWhitespace, '\v', '\v')
+      pass(optWhitespace, '\f', '\f')
+      pass(optWhitespace, '\r', '\r')
+      pass(optWhitespace, ' ', ' ')
+      pass(optWhitespace, '\u0085', '\u0085')
+      pass(optWhitespace, '\u00a0', '\u00a0')
+      pass(optWhitespace, '\u1680', '\u1680')
+      pass(optWhitespace, '\u2000', '\u2000')
+      pass(optWhitespace, '\u2001', '\u2001')
+      pass(optWhitespace, '\u2002', '\u2002')
+      pass(optWhitespace, '\u2003', '\u2003')
+      pass(optWhitespace, '\u2004', '\u2004')
+      pass(optWhitespace, '\u2005', '\u2005')
+      pass(optWhitespace, '\u2006', '\u2006')
+      pass(optWhitespace, '\u2007', '\u2007')
+      pass(optWhitespace, '\u2008', '\u2008')
+      pass(optWhitespace, '\u2009', '\u2009')
+      pass(optWhitespace, '\u200a', '\u200a')
+      pass(optWhitespace, '\u2028', '\u2028')
+      pass(optWhitespace, '\u2029', '\u2029')
+      pass(optWhitespace, '\u202f', '\u202f')
+      pass(optWhitespace, '\u205f', '\u205f')
+      pass(optWhitespace, '\u3000', '\u3000')
+    })
+    it('succeeds on multiple UTF-8 whitespace characters', () => {
+      pass(optWhitespace, '     123', '     ')
+      pass(optWhitespace, '\r\nabc', '\r\n')
+      pass(optWhitespace, '\u3000\u1680\u202f', '\u3000\u1680\u202f')
+    })
+    it('succeeds with an empty string on non-whitespace characters', () => {
+      pass(optWhitespace, 'O', '')
+      pass(optWhitespace, 'З', '')
+      pass(optWhitespace, 'ค', '')
+      pass(optWhitespace, '𝑂', '')
+      pass(optWhitespace, '\u180e', '')
+      pass(optWhitespace, '\u200b', '')
+      pass(optWhitespace, '\u200c', '')
+      pass(optWhitespace, '\u200d', '')
+      pass(optWhitespace, '\u2060', '')
+    })
+    it('succeeds with an empty string at EOF', () => {
+      pass(optWhitespace, '', '')
+    })
+  })
+
+  describe('tab', () => {
+    it('succeeds on a single tab', () => {
+      pass(tab, '\tabc', '\t')
+    })
+    it('fails on any other character combination', () => {
+      fail(tab, 'Onomatopoeia', { expected: ['tab'], actual: '"O"' })
+    })
+    it('fails at EOF', () => {
+      fail(tab, '', { expected: ['tab'], actual: 'EOF' })
+    })
+  })
+
+  describe('cr', () => {
+    it('succeeds on a single cr', () => {
+      pass(cr, '\rabc', '\r')
+    })
+    it('fails on any other character combination', () => {
+      fail(cr, 'Onoma', { expected: ['carriage return'], actual: '"O"' })
+    })
+    it('fails at EOF', () => {
+      fail(cr, '', { expected: ['carriage return'], actual: 'EOF' })
+    })
+  })
+
+  describe('lf', () => {
+    it('succeeds on a single lf', () => {
+      pass(lf, '\nabc', '\n')
+    })
+    it('fails on any other character combination', () => {
+      fail(lf, 'Onoma', { expected: ['line feed'], actual: '"O"' })
+    })
+    it('fails at EOF', () => {
+      fail(lf, '', { expected: ['line feed'], actual: 'EOF' })
+    })
+  })
+
+  describe('crlf', () => {
+    it('succeeds on a single crlf', () => {
+      pass(crlf, '\r\nabc', '\r\n')
+    })
+    it('fails on any other character combination', () => {
+      fail(crlf, '\nOnoma', { expected: ['CRLF'], actual: '"\nO"' })
+    })
+    it('fails at EOF', () => {
+      fail(crlf, '', { expected: ['CRLF'], actual: 'EOF' })
+    })
+  })
+
+  describe('newline', () => {
+    it('succeeds on a single lf, cr, or crlf', () => {
+      pass(newline, '\nabc', '\n')
+      pass(newline, '\rabc', '\r')
+      pass(newline, '\r\nabc', '\r\n')
+    })
+    it('fails on any other character combination', () => {
+      fail(newline, 'Onoma', { expected: ['newline'], actual: '"O"' })
+    })
+    it('fails at EOF', () => {
+      fail(newline, '', { expected: ['newline'], actual: 'EOF' })
+    })
+  })
+
+  describe('end', () => {
+    it('succeeds on a single lf, cr, or crlf', () => {
+      pass(end, '\nabc', '\n')
+      pass(end, '\rabc', '\r')
+      pass(end, '\r\nabc', '\r\n')
+    })
+    it('fails on any other character combination', () => {
+      fail(end, 'Onoma', { expected: ['newline', 'EOF'], actual: '"O"' })
+    })
+    it('succeeds with a null at EOF', () => {
+      pass(end, '', { result: null })
     })
   })
 })
