@@ -34,6 +34,18 @@ export const back = p => Parser(state => {
   return failure(nextState, { index })
 })
 
+// Executes the supplied parser. If it succeeds, its result becomes the
+// result of `lookahead`. Either way, no input is consumed.
+export const lookahead = p => Parser(state => {
+  assertParser(p, 'lookahead')
+
+  const index = state.index
+  const nextState = p(state)
+  return nextState.success
+    ? success(nextState, { index })
+    : failure(nextState, { index })
+})
+
 // Implements alternatives. Each parser is executed one at a time, in
 // order. When the first parser succeeds, or the first parser fails
 // while consuming input, execution is stopped and the state from that

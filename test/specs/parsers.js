@@ -14,6 +14,7 @@ import {
   digit,
   end,
   eof,
+  fail as pfail,
   hexDigit,
   letter,
   lf,
@@ -31,6 +32,7 @@ import {
   string,
   stringi,
   tab,
+  unexpected,
   upper,
   whitespace,
 } from 'kessel/parsers'
@@ -1194,6 +1196,24 @@ describe('Parsers', () => {
     })
     it('succeeds with a null at EOF', () => {
       pass(end, '', { result: null })
+    })
+  })
+
+  describe('fail', () => {
+    it('throws if the passed value is not a string', () => {
+      error(pfail(23), 'abc', '[fail]: expected string; received 23')
+    })
+    it('fails with the supplied expected message', () => {
+      fail(pfail('test message'), '', { expected: ['test message'], index: 0 })
+    })
+  })
+
+  describe('unexpected', () => {
+    it('throws if the passed value is not a string', () => {
+      error(unexpected(23), 'abc', '[unexpected]: expected string; received 23')
+    })
+    it('fails with the supplied actual message', () => {
+      fail(unexpected('test message'), '', { actual: 'test message', index: 0 })
     })
   })
 })

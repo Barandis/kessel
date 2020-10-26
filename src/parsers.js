@@ -418,3 +418,17 @@ export const newline = desc(alt(back(crlf), lf, cr), 'newline')
 
 // Succeeds on any newline (LF, CR, or CRLF) or EOF.
 export const end = alt(newline, eof)
+
+// Fails without consuming input, setting the `expected` message to
+// whatever is passed in.
+export const fail = message => Parser(state => {
+  assertString(message, 'fail')
+  return failure(state, { expected: [message] })
+})
+
+// Fails without consuming input, setting the `actual` message to
+// whatever is passed in.
+export const unexpected = message => Parser(state => {
+  assertString(message, 'unexpected')
+  return failure(state, { actual: message })
+})

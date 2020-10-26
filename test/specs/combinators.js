@@ -5,7 +5,7 @@
 
 import { expect } from 'chai'
 
-import { alt, back, block, desc, seq } from 'kessel/combinators'
+import { alt, back, block, desc, lookahead, seq } from 'kessel/combinators'
 import { parse } from 'kessel/core'
 import { any, char, eof, string, whitespace } from 'kessel/parsers'
 import { error, fail, pass } from 'test/helper'
@@ -53,6 +53,17 @@ describe('Combinators', () => {
       const parser = string('test')
       fail(parser, 'tesl', { index: 3 })
       fail(back(parser), 'tesl', { index: 0 })
+    })
+  })
+
+  describe('lookahead', () => {
+    it('succeeds with no consumption if its parser succeeds', () => {
+      pass(lookahead(string('abc')), 'abc', { result: 'abc', index: 0 })
+    })
+    it('fails with no consumption if its parser fails', () => {
+      fail(lookahead(string('abc')), 'abd', {
+        expected: ['"abc"'], actual: '"abd"', index: 0,
+      })
     })
   })
 
