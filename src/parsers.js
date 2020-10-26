@@ -129,6 +129,35 @@ export const satisfies = fn => Parser(state => {
   return failure(nextState, { actual })
 })
 
+// Reads a character and succeeds if that character is in the range
+// between the start and end characters provided. This is here primarily
+// to lower the need for regular expressions on this common use case.
+//
+// "In range" is defined the same here as with the comparison operators
+// for strings in JavaScript, which work off Unicode code points. Mixing
+// cases is not recommended unless you know what you're doing, because
+// those comparisons are often not intuitive.
+//
+// Also take care in non-ascii characters. For example, there is a
+// series of "mathematical small italic" letters from 0xf09d918e to
+// 0xf09d91a7, but they do not include an 'h'. Instead, the character
+// "Planck constant" is used, which is at 0xe2848e. This 'h' will
+// therefore not be in the range from 'a' to 'z' in mathematical small
+// italics, and a solution to this problem is not feasible.
+export const range = (start, end) => Parser(state => {
+  assertCharacter(start, 'range')
+  assertCharacter(end, 'range')
+
+  const fn = c => c >= start && c <= end
+  const nextState = CharParser(fn)(state)
+
+  if (nextState.success) return nextState
+
+  const actual = nextState.actual === 'EOF' ? 'EOF' : `"${nextState.actual}"`
+  const expected = [`character between "${start}" and "${end}"`]
+  return failure(nextState, { actual, expected })
+})
+
 // Parses a particular string from the current position in the text. The
 // `fn` parameter is a comparision function; it returns true if its two
 // arguments are equal strings and `false` if they are not. This allows

@@ -5,9 +5,18 @@
 
 import { expect } from 'chai'
 
-import { alt, back, block, desc, lookahead, seq } from 'kessel/combinators'
+import {
+  alt,
+  back,
+  block,
+  desc,
+  lookahead,
+  many,
+  many1,
+  seq,
+} from 'kessel/combinators'
 import { parse } from 'kessel/core'
-import { any, char, eof, string, whitespace } from 'kessel/parsers'
+import { any, char, digit, eof, string, whitespace } from 'kessel/parsers'
 import { error, fail, pass } from 'test/helper'
 
 describe('Combinators', () => {
@@ -127,6 +136,34 @@ describe('Combinators', () => {
     })
     it('succeeds with its return value if all parsers succeed', () => {
       pass(parser, 'abc d ', { result: 'd', index: 6 })
+    })
+  })
+
+  describe('many', () => {
+    it('succeeds zero times with an empty array', () => {
+      pass(many(digit), 'abc123', [])
+      pass(many(digit), '', [])
+    })
+    it('succeeds with all results until a non-match', () => {
+      pass(many(digit), '123abc', ['1', '2', '3'])
+      pass(many(digit), '123abc456', ['1', '2', '3'])
+    })
+    it('succeeds until EOF if matches continue until then', () => {
+      pass(many(digit), '123', ['1', '2', '3'])
+    })
+  })
+
+  describe('many1', () => {
+    it('fails if its parser does not match at least once', () => {
+      fail(many1(digit), 'abc123', { expected: ['a digit'], actual: '"a"' })
+      fail(many1(digit), '', { expected: ['a digit'], actual: 'EOF' })
+    })
+    it('succeeds with all results until a non-match', () => {
+      pass(many1(digit), '123abc', ['1', '2', '3'])
+      pass(many1(digit), '123abc456', ['1', '2', '3'])
+    })
+    it('succeeds until EOF if matches continue until then', () => {
+      pass(many1(digit), '123', ['1', '2', '3'])
     })
   })
 })

@@ -118,3 +118,43 @@ export const block = genFn => Parser(state => {
     nextValue = nextState.result
   }
 })
+
+// Executes a parser until it fails, collecting all of the results into
+// an array and providing that as its own result. This parser always
+// succeeds, as even an initial failure counts as a zero-element match.
+export const many = p => Parser(state => {
+  assertParser(p, 'many')
+
+  const results = []
+  let nextState = state
+
+  while (true) {
+    nextState = p(nextState)
+    if (!nextState.success) break
+    results.push(nextState.result)
+    if (nextState.index >= nextState.view.byteLength) break
+  }
+
+  return success(nextState, { result: results })
+})
+
+// Executes a parser until it fails, collecting all of the results into
+// an array and providing that as its own result. This parser requires
+// that its parser succeed at least one time. The only way it can fail
+// is if that does not happen.
+export const many1 = p => Parser(state => {
+  assertParser(p, 'many1')
+
+  let nextState = p(state)
+  if (!nextState.success) return nextState
+
+  const results = [nextState.result]
+  while (true) {
+    nextState = p(nextState)
+    if (!nextState.success) break
+    results.push(nextState.result)
+    if (nextState.index >= nextState.view.byteLength) break
+  }
+
+  return success(nextState, { result: results })
+})

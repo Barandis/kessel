@@ -27,6 +27,7 @@ import {
   optHexDigits,
   optLetters,
   optWhitespace,
+  range,
   regex,
   satisfies,
   string,
@@ -238,6 +239,32 @@ describe('Parsers', () => {
         expected: ['a character that satisfies function "fn"'],
         actual: 'EOF',
       })
+    })
+  })
+
+  describe('range', () => {
+    it('throws if either argument is not a single character string', () => {
+      error(
+        range('0', 9), '123', '[range]: expected single character; received 9'
+      )
+      error(
+        range(0, '9'), '123', '[range]: expected single character; received 0'
+      )
+    })
+    it('succeeds if the next character is between the supplied two', () => {
+      pass(range('a', 'z'), 'abc', 'a')
+      pass(range('а', 'я'), 'цчш', 'ц')
+      pass(range('ก', 'ฮ'), 'รลว', 'ร')
+      pass(range('𝑎', '𝑧'), '𝑖𝑗𝑘', '𝑖')
+    })
+    it('fails if the next character is not between the supplied two', () => {
+      fail(range('a', 'z'), '123', '"1"')
+      fail(range('а', 'я'), 'աբգ', '"ա"')
+      fail(range('ก', 'ฮ'), 'ａｂｃ', '"ａ"')
+      fail(range('𝑎', '𝑧'), '𝒊𝒋𝒌', '"𝒊"')
+    })
+    it('fails at EOF', () => {
+      fail(range('a', 'z'), '', 'EOF')
     })
   })
 
