@@ -299,8 +299,6 @@ export const eof = Parser(state => {
 // the provided string. Succeeds if the read character is one of the
 // characters in the string.
 export const oneOf = str => Parser(state => {
-  if (!state.success) return state
-
   const { index, view } = state
   const { width, next } = nextChar(index, view)
 
@@ -317,8 +315,6 @@ export const oneOf = str => Parser(state => {
 // the provided string. Succeeds if the read character is *not* one of
 // the characters in the string.
 export const noneOf = str => Parser(state => {
-  if (!state.success) return state
-
   const { index, view } = state
   const { width, next } = nextChar(index, view)
 

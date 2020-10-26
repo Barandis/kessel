@@ -108,9 +108,9 @@ describe('Combinators', () => {
         actual: 'EOF',
         index: 4,
       })
-      fail(parser, 'abc d', {
+      fail(parser, 'abc de', {
         expected: ['whitespace'],
-        actual: 'EOF',
+        actual: '"e"',
         index: 5,
       })
     })
