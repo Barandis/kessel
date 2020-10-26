@@ -21,7 +21,6 @@
 // recognize any text, so it's these two parsers that can be composed
 // for new parsing functions.
 
-import { alt, back, desc } from './combinators'
 import { failure, Parser, success } from './core'
 import {
   assertCharacter,
@@ -35,18 +34,19 @@ import {
   viewToString,
 } from './util'
 
-// All of the regular expressions used in the derived recognizers. These
+// All of the regular expressions used in the derived parsers. These
 // are here to create and compile them once, upon initial lode, to
 // speed parsing later.
-
-const reDigit = /^[0-9]/
-const reHexDigit = /^[0-9a-fA-F]/
 const reLetter = /^\p{Alphabetic}/u
 const reAlpha = /^(?:\p{Alphabetic}|\p{N})/u
 const reUpper = /^(?:\p{Uppercase}|\p{Lt})/u
 const reLower = /^\p{Lowercase}/u
 const reSpace = /^\p{White_Space}/u
 
+// Small utility function to deal with actual values from the
+// CharParser. This handles returning the unquoted 'EOF' while still
+// putting quotes around anything else, on account of the CharParser not
+// quoting anything.
 const actual = state => state.actual === 'EOF' ? 'EOF' : quote(state.actual)
 
 // A parser for a single character. This parser takes a function of one
@@ -336,61 +336,136 @@ export const noneOf = str => Parser(state => {
 // Note that this is not a unicode decimal digit; for that, use
 // `regex(/\p{Nd}/)`. This parser succeeds only for the literal
 // characters 0-9.
-export const digit = desc(RegexParser(reDigit, 1), 'a digit')
+export const digit = Parser(state => {
+  const fn = c => c >= '0' && c <= '9'
+  const nextState = CharParser(fn)(state)
+  if (nextState.success) return nextState
+  return failure(nextState, {
+    actual: actual(nextState),
+    expected: ['a digit'],
+  })
+})
 
 // Reads a character and succeeds with that character if it is a
 // hexadecimal digit. This parser is not case sensitive.
-export const hexDigit = desc(RegexParser(reHexDigit, 1), 'a hex digit')
+export const hexDigit = Parser(state => {
+  const fn = c => c >= '0' && c <= '9'
+    || c >= 'a' && c <= 'f'
+    || c >= 'A' && c <= 'F'
+  const nextState = CharParser(fn)(state)
+  if (nextState.success) return nextState
+  return failure(nextState, {
+    actual: actual(nextState),
+    expected: ['a hex digit'],
+  })
+})
 
 // Reads a character and succeeds with that character if it is a letter.
 // A letter for this purpose is any character with the Unicode
 // `Alphabetic` property.
-export const letter = desc(RegexParser(reLetter, 1), 'a letter')
+export const letter = Parser(state => {
+  const nextState = RegexParser(reLetter, 1)(state)
+  if (nextState.success) return nextState
+  return failure(nextState, { expected: ['a letter'] })
+})
 
 // Reads a character and succeeds with that character if it is
 // alphanumeric. A character is alphanumeric if it has either the
 // Unicode `Alphabetic` property or the Unicode `Number` property.
-export const alphanum = desc(RegexParser(reAlpha, 1), 'an alphanumeric')
+export const alphanum = Parser(state => {
+  const nextState = RegexParser(reAlpha, 1)(state)
+  if (nextState.success) return nextState
+  return failure(nextState, { expected: ['an alphanumeric'] })
+})
 
 // Reads a character and succeeds with that character if it is either an
 // uppercase or titlecase letter. A character is uppercase if it has
 // the Unicode `Uppercase` property and is titlecase if it has the
 // Unicode `Letter, Titlecase` property.
-export const upper = desc(RegexParser(reUpper, 1), 'an uppercase letter')
+export const upper = Parser(state => {
+  const nextState = RegexParser(reUpper, 1)(state)
+  if (nextState.success) return nextState
+  return failure(nextState, { expected: ['an uppercase letter'] })
+})
 
 // Reads a character and succeeds with that character if it is a
 // lowercase letter. A character is lowercase if it has the Unicode
 // `Lowercase` property.
-export const lower = desc(RegexParser(reLower, 1), 'a lowercase letter')
+export const lower = Parser(state => {
+  const nextState = RegexParser(reLower, 1)(state)
+  if (nextState.success) return nextState
+  return failure(nextState, { expected: ['a lowercase letter'] })
+})
 
 // Reads a character and succeeds with that character if it is a
 // whitespace character. A character is whitespace if it has the Unicode
-// `White_Space` property.
-export const space = desc(RegexParser(reSpace, 1), 'whitespace')
+// `White_Space` property.\
+export const space = Parser(state => {
+  const nextState = RegexParser(reSpace, 1)(state)
+  if (nextState.success) return nextState
+  return failure(nextState, { expected: ['whitespace'] })
+})
 
 // Reads a single character and succeeds with that character if it is a
 // tab.
-export const tab = desc(char('\t'), 'tab')
+export const tab = Parser(state => {
+  const fn = c => c === '\t'
+  const nextState = CharParser(fn)(state)
+  if (nextState.success) return nextState
+  return failure(nextState, { actual: actual(nextState), expected: ['tab'] })
+})
 
 // Reads a single character and succeeds with that character if it is a
 // carriage return.
-export const cr = desc(char('\r'), 'carriage return')
+export const cr = Parser(state => {
+  const fn = c => c === '\r'
+  const nextState = CharParser(fn)(state)
+  if (nextState.success) return nextState
+  return failure(nextState, {
+    actual: actual(nextState),
+    expected: ['carriage return'],
+  })
+})
 
 // Reads a single character and succeeds with that character if it is a
 // line feed.
-export const lf = desc(char('\n'), 'line feed')
+export const lf = Parser(state => {
+  const fn = c => c === '\n'
+  const nextState = CharParser(fn)(state)
+  if (nextState.success) return nextState
+  return failure(nextState, {
+    actual: actual(nextState),
+    expected: ['line feed'],
+  })
+})
 
 // Reads two characters and succeeds with those two characters if they
 // are a carriage return and a line feed, in that order.
-export const crlf = desc(string('\r\n'), 'CRLF')
+export const crlf = Parser(state => {
+  const nextState = StringParser('\r\n', c => next => c === next)(state)
+  if (nextState.success) return nextState
+  return failure(nextState, { expected: ['CRLF'] })
+})
 
 // Reads a character; succeeds if that character is a line feed or a
 // carriage return. If it is a carriage return, it will read one more
 // character if that character is a line feed.
-export const newline = desc(alt(back(crlf), lf, cr), 'newline')
-
-// Succeeds on any newline (LF, CR, or CRLF) or EOF.
-export const end = alt(newline, eof)
+export const newline = Parser(state => {
+  const nextState = CharParser(c => c === '\r' || c === '\n')(state)
+  if (nextState.success) {
+    if (nextState.result === '\r') {
+      const crlfState = CharParser(c => c === '\n')(nextState)
+      if (crlfState.success) {
+        return success(crlfState, { result: '\r\n' })
+      }
+    }
+    return nextState
+  }
+  return failure(nextState, {
+    actual: actual(nextState),
+    expected: ['newline'],
+  })
+})
 
 // Fails without consuming input, setting the `expected` message to
 // whatever is passed in.

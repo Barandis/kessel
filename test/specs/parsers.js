@@ -12,7 +12,6 @@ import {
   cr,
   crlf,
   digit,
-  end,
   eof,
   fail as pfail,
   hexDigit,
@@ -1057,20 +1056,6 @@ describe('Parsers', () => {
     })
     it('fails at EOF', () => {
       fail(newline, '', { expected: ['newline'], actual: 'EOF' })
-    })
-  })
-
-  describe('end', () => {
-    it('succeeds on a single lf, cr, or crlf', () => {
-      pass(end, '\nabc', '\n')
-      pass(end, '\rabc', '\r')
-      pass(end, '\r\nabc', '\r\n')
-    })
-    it('fails on any other character combination', () => {
-      fail(end, 'Onoma', { expected: ['newline', 'EOF'], actual: '"O"' })
-    })
-    it('succeeds with a null at EOF', () => {
-      pass(end, '', { result: null })
     })
   })
 
