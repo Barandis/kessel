@@ -30,7 +30,7 @@ import {
   assertStringOrRegex,
   charLength,
   nextChar,
-  push,
+  quote,
   stringToView,
   viewToString,
 } from './util'
@@ -47,6 +47,8 @@ const reUpper = /^(?:\p{Uppercase}|\p{Lt})/u
 const reLower = /^\p{Lowercase}/u
 const reSpace = /^\p{White_Space}/u
 
+const actual = state => state.actual === 'EOF' ? 'EOF' : quote(state.actual)
+
 // A parser for a single character. This parser takes a function of one
 // argument; the next read character is passed to that function and, if
 // it returns true, the parser succeeds with that character.
@@ -61,13 +63,10 @@ const reSpace = /^\p{White_Space}/u
 const CharParser = fn => Parser(state => {
   const { index, view } = state
   const name = fn.name.length ? fn.name : '<anonymous>'
-  const expected = `a character that satisfies function "${name}"`
+  const expected = [`a character that satisfies function "${name}"`]
 
   if (index >= view.byteLength) {
-    return failure(state, {
-      expected: push(state.expected, expected),
-      actual: 'EOF',
-    })
+    return failure(state, { expected, actual: 'EOF' })
   }
 
   const { width, next } = nextChar(index, view)
@@ -75,10 +74,7 @@ const CharParser = fn => Parser(state => {
   if (fn(next)) {
     return success(state, { result: next, index: index + width })
   }
-  return failure(state, {
-    expected: push(state.expected, expected),
-    actual: next,
-  })
+  return failure(state, { expected, actual: next })
 })
 
 // Reads the next character and succeeds if that character exactly
@@ -90,9 +86,7 @@ export const char = c => Parser(state => {
   const nextState = CharParser(next => next === c)(state)
 
   if (nextState.success) return nextState
-
-  const actual = nextState.actual === 'EOF' ? 'EOF' : `"${nextState.actual}"`
-  return failure(nextState, { expected: [`"${c}"`], actual })
+  return failure(nextState, { expected: [quote(c)], actual: actual(nextState) })
 })
 
 // Reads the next character and succeeds if that character case-
@@ -106,9 +100,7 @@ export const chari = c => Parser(state => {
     = CharParser(next => next.toLowerCase() === c.toLowerCase())(state)
 
   if (nextState.success) return nextState
-
-  const actual = nextState.actual === 'EOF' ? 'EOF' : `"${nextState.actual}"`
-  return failure(nextState, { expected: [`"${c}"`], actual })
+  return failure(nextState, { expected: [quote(c)], actual: actual(nextState) })
 })
 
 // Reads the next character and passes it into the supplied predicate
@@ -119,9 +111,7 @@ export const satisfies = fn => Parser(state => {
   const nextState = CharParser(fn)(state)
 
   if (nextState.success) return nextState
-
-  const actual = nextState.actual === 'EOF' ? 'EOF' : `"${nextState.actual}"`
-  return failure(nextState, { actual })
+  return failure(nextState, { actual: actual(nextState) })
 })
 
 // Reads a character and succeeds if that character is in the range
@@ -148,9 +138,8 @@ export const range = (start, end) => Parser(state => {
 
   if (nextState.success) return nextState
 
-  const actual = nextState.actual === 'EOF' ? 'EOF' : `"${nextState.actual}"`
   const expected = [`character between "${start}" and "${end}"`]
-  return failure(nextState, { actual, expected })
+  return failure(nextState, { actual: actual(nextState), expected })
 })
 
 // Parses a particular string from the current position in the text. The
@@ -172,9 +161,9 @@ const StringParser = (str, fn) => Parser(state => {
         actual += nextState.actual
       }
       if (actual !== 'EOF') {
-        actual = `"${actual}"`
+        actual = quote(actual)
       }
-      return failure(nextState, { expected: [`"${str}"`], actual })
+      return failure(nextState, { expected: [quote(str)], actual })
     }
     actual += nextState.result
   }
@@ -219,7 +208,7 @@ export const stringi = str => Parser(state => {
 const RegexParser = (re, length = null) => Parser(state => {
   const { index, view } = state
   const rest = viewToString(index, view.byteLength - index, view)
-  const expected = `a string matching ${re}`
+  const expected = [`a string matching ${re}`]
 
   const match = rest.match(re)
   if (match) {
@@ -233,12 +222,9 @@ const RegexParser = (re, length = null) => Parser(state => {
   if (len > view.byteLength - index) {
     len = view.byteLength - index
   }
-  const actual = len === 0 ? 'EOF' : `"${[...rest].slice(0, len).join('')}"`
+  const actual = len === 0 ? 'EOF' : quote([...rest].slice(0, len).join(''))
 
-  return failure(state, {
-    expected: push(state.expected, expected),
-    actual,
-  })
+  return failure(state, { expected, actual })
 })
 
 // The regular expression parser.
@@ -281,10 +267,7 @@ export const regex = re => {
 export const any = Parser(state => {
   const { index, view } = state
   if (index === view.byteLength) {
-    return failure(state, {
-      expected: push(state.expected, 'any character'),
-      actual: 'EOF',
-    })
+    return failure(state, { expected: ['any character'], actual: 'EOF' })
   }
   const { width, next } = nextChar(index, view)
   return success(state, {
@@ -313,39 +296,37 @@ export const eof = Parser(state => {
     return success(state, { result: null })
   }
   const { _, next } = nextChar(index, view)
-  return failure(state, {
-    expected: push(state.expected, 'EOF'),
-    actual: `"${next}"`,
-  })
+  return failure(state, { expected: ['EOF'], actual: quote(next) })
 })
 
 // Reads a character and compares it against each of the characters in
 // the provided string. Succeeds if the read character is one of the
 // characters in the string.
 export const oneOf = str => Parser(state => {
+  assertString(str, 'oneOf')
+
   const { index, view } = state
   const { width, next } = nextChar(index, view)
 
   if (str.includes(next)) {
     return success(state, { result: next, index: index + width })
   }
-  return failure(state, {
-    expected: push(state.expected, `one of "${str}"`),
-    actual: `"${next}"`,
-  })
+  return failure(state, { expected: [`one of "${str}"`], actual: quote(next) })
 })
 
 // Reads a character and compares it against each of the characters in
 // the provided string. Succeeds if the read character is *not* one of
 // the characters in the string.
 export const noneOf = str => Parser(state => {
+  assertString(str, 'noneOf')
+
   const { index, view } = state
   const { width, next } = nextChar(index, view)
 
   if (str.includes(next)) {
     return failure(state, {
-      expected: push(state.expected, `none of "${str}"`),
-      actual: `"${next}"`,
+      expected: [`none of "${str}"`],
+      actual: quote(next),
     })
   }
   return success(state, { result: next, index: index + width })

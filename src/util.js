@@ -84,10 +84,6 @@ export function nextChar(index, view) {
   return { width, next: viewToString(index, width, view) }
 }
 
-export function push(array, value) {
-  return [...array, value]
-}
-
 export function assertCharacter(c, name) {
   if (typeof c !== 'string' || charLength(c) !== 1) {
     throw new TypeError(`[${name}]: expected single character; received ${c}`)
@@ -122,4 +118,8 @@ export function assertParser(fn, name) {
       `[${name}]: expected parser; received non-parser function`
     )
   }
+}
+
+export function quote(str) {
+  return `"${str}"`
 }
