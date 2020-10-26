@@ -4,7 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import { failure, Parser, success } from './core'
-import { assertParser } from './util'
+import { assertParser, assertString } from './util'
 
 // Executes the supplied parser. If the parser succeeds, `desc` simply
 // passes the result through; but if it fails, `desc` replaces its
@@ -12,6 +12,7 @@ import { assertParser } from './util'
 // error messages from composed parsers.
 export const desc = (p, str) => Parser(state => {
   assertParser(p, 'desc')
+  assertString(str, 'desc')
 
   const nextState = p(state)
   if (!nextState.success) {

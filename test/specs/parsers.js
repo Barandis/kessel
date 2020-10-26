@@ -22,20 +22,15 @@ import {
   newline,
   noneOf,
   oneOf,
-  optAlphanums,
-  optDigits,
-  optHexDigits,
-  optLetters,
-  optWhitespace,
   range,
   regex,
   satisfies,
+  space,
   string,
   stringi,
   tab,
   unexpected,
   upper,
-  whitespace,
 } from 'kessel/parsers'
 import { error, fail, pass } from 'test/helper'
 
@@ -629,20 +624,6 @@ describe('Parsers', () => {
     })
   })
 
-  describe('optDigits', () => {
-    it('succeeds with a string of digits', () => {
-      pass(optDigits, '123', '123')
-      pass(optDigits, '123abc', { result: '123', index: 3 })
-    })
-    it('succeeds with an empty string on any other character', () => {
-      pass(optDigits, 'abc', '')
-      pass(optDigits, 'abc123', '')
-    })
-    it('succeeds with an empty string at EOF', () => {
-      pass(optDigits, '', '')
-    })
-  })
-
   describe('hexDigit', () => {
     it('succeeds on any single decimal digit', () => {
       pass(hexDigit, '123', '1')
@@ -653,21 +634,6 @@ describe('Parsers', () => {
     })
     it('fails at EOF', () => {
       fail(hexDigit, '', { expected: ['a hex digit'], actual: 'EOF' })
-    })
-  })
-
-  describe('optHexDigits', () => {
-    it('succeeds with a string of digits', () => {
-      pass(optHexDigits, '123', '123')
-      pass(optHexDigits, '123abc', { result: '123abc', index: 6 })
-      pass(optHexDigits, 'ABCDEFG', 'ABCDEF')
-    })
-    it('succeeds with an empty string on any other character', () => {
-      pass(optHexDigits, 'ghi', '')
-      pass(optHexDigits, 'gfedcba', '')
-    })
-    it('succeeds with an empty string at EOF', () => {
-      pass(optHexDigits, '', '')
     })
   })
 
@@ -745,33 +711,6 @@ describe('Parsers', () => {
       fail(letter, '⫇', { expected: ['a letter'], actual: '"⫇"' })
       fail(letter, '©', { expected: ['a letter'], actual: '"©"' })
       fail(letter, '🀄', { expected: ['a letter'], actual: '"🀄"' })
-    })
-  })
-
-  describe('optLetters', () => {
-    it('succeeds with an entire uninterrupted string of letters', () => {
-      pass(optLetters, 'Onomatopoeia', { result: 'Onomatopoeia', index: 12 })
-      pass(optLetters, 'Звукоподражание', {
-        result: 'Звукоподражание',
-        index: 30,
-      })
-      pass(optLetters, 'คำเลียนเสียง', { result: 'คำเลียนเสียง', index: 36 })
-      pass(optLetters, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', index: 48 })
-    })
-    it('succeeds until the first non-letter character', () => {
-      pass(optLetters, 'Onoma1', { result: 'Onoma', index: 5 })
-      pass(optLetters, 'Звуко1', { result: 'Звуко', index: 10 })
-      pass(optLetters, 'คำเลี1', { result: 'คำเลี', index: 15 })
-      pass(optLetters, '𝑂𝑛𝑜𝑚𝑎1', { result: '𝑂𝑛𝑜𝑚𝑎', index: 20 })
-    })
-    it('succeeds with an empty string if the first is not a letter', () => {
-      pass(optLetters, '1Onoma', { result: '', index: 0 })
-      pass(optLetters, '1Звуко', { result: '', index: 0 })
-      pass(optLetters, '1คำเลี', { result: '', index: 0 })
-      pass(optLetters, '1𝑂𝑛𝑜𝑚𝑎', { result: '', index: 0 })
-    })
-    it('succeeds with an empty string at EOF', () => {
-      pass(optLetters, '', '')
     })
   })
 
@@ -855,33 +794,6 @@ describe('Parsers', () => {
       fail(alphanum, '⫇', { expected: ['an alphanumeric'], actual: '"⫇"' })
       fail(alphanum, '©', { expected: ['an alphanumeric'], actual: '"©"' })
       fail(alphanum, '🀄', { expected: ['an alphanumeric'], actual: '"🀄"' })
-    })
-  })
-
-  describe('optAlphanums', () => {
-    it('succeeds with an entire uninterrupted string of alphas', () => {
-      pass(optAlphanums, 'Onomatopo123', { result: 'Onomatopo123', index: 12 })
-      pass(optAlphanums, 'Звукоподр123', { result: 'Звукоподр123', index: 21 })
-      pass(optAlphanums, 'คำเลียนเสีย123', {
-        result: 'คำเลียนเสีย123',
-        index: 36,
-      })
-      pass(optAlphanums, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜123', { result: '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜123', index: 39 })
-    })
-    it('succeeds until the first non-alphanum character', () => {
-      pass(optAlphanums, 'Onoma 123', { result: 'Onoma', index: 5 })
-      pass(optAlphanums, 'Звуко 123', { result: 'Звуко', index: 10 })
-      pass(optAlphanums, 'คำเลี 123', { result: 'คำเลี', index: 15 })
-      pass(optAlphanums, '𝑂𝑛𝑜𝑚𝑎 123', { result: '𝑂𝑛𝑜𝑚𝑎', index: 20 })
-    })
-    it('succeeds with an empty string if the first is not aa alphanum', () => {
-      pass(optAlphanums, ' 1Onoma', { result: '', index: 0 })
-      pass(optAlphanums, ' 1Звуко', { result: '', index: 0 })
-      pass(optAlphanums, ' 1คำเลี', { result: '', index: 0 })
-      pass(optAlphanums, ' 1𝑂𝑛𝑜𝑚𝑎', { result: '', index: 0 })
-    })
-    it('succeeds with an empty string at EOF', () => {
-      pass(optAlphanums, '', '')
     })
   })
 
@@ -1040,113 +952,49 @@ describe('Parsers', () => {
     })
   })
 
-  describe('whitespace', () => {
+  describe('space', () => {
     it('succeeds on a single character of UTF-8 whitespace', () => {
-      pass(whitespace, '\t', '\t')
-      pass(whitespace, '\n', '\n')
-      pass(whitespace, '\v', '\v')
-      pass(whitespace, '\f', '\f')
-      pass(whitespace, '\r', '\r')
-      pass(whitespace, ' ', ' ')
-      pass(whitespace, '\u0085', '\u0085')
-      pass(whitespace, '\u00a0', '\u00a0')
-      pass(whitespace, '\u1680', '\u1680')
-      pass(whitespace, '\u2000', '\u2000')
-      pass(whitespace, '\u2001', '\u2001')
-      pass(whitespace, '\u2002', '\u2002')
-      pass(whitespace, '\u2003', '\u2003')
-      pass(whitespace, '\u2004', '\u2004')
-      pass(whitespace, '\u2005', '\u2005')
-      pass(whitespace, '\u2006', '\u2006')
-      pass(whitespace, '\u2007', '\u2007')
-      pass(whitespace, '\u2008', '\u2008')
-      pass(whitespace, '\u2009', '\u2009')
-      pass(whitespace, '\u200a', '\u200a')
-      pass(whitespace, '\u2028', '\u2028')
-      pass(whitespace, '\u2029', '\u2029')
-      pass(whitespace, '\u202f', '\u202f')
-      pass(whitespace, '\u205f', '\u205f')
-      pass(whitespace, '\u3000', '\u3000')
+      pass(space, '\t', '\t')
+      pass(space, '\n', '\n')
+      pass(space, '\v', '\v')
+      pass(space, '\f', '\f')
+      pass(space, '\r', '\r')
+      pass(space, ' ', ' ')
+      pass(space, '\u0085', '\u0085')
+      pass(space, '\u00a0', '\u00a0')
+      pass(space, '\u1680', '\u1680')
+      pass(space, '\u2000', '\u2000')
+      pass(space, '\u2001', '\u2001')
+      pass(space, '\u2002', '\u2002')
+      pass(space, '\u2003', '\u2003')
+      pass(space, '\u2004', '\u2004')
+      pass(space, '\u2005', '\u2005')
+      pass(space, '\u2006', '\u2006')
+      pass(space, '\u2007', '\u2007')
+      pass(space, '\u2008', '\u2008')
+      pass(space, '\u2009', '\u2009')
+      pass(space, '\u200a', '\u200a')
+      pass(space, '\u2028', '\u2028')
+      pass(space, '\u2029', '\u2029')
+      pass(space, '\u202f', '\u202f')
+      pass(space, '\u205f', '\u205f')
+      pass(space, '\u3000', '\u3000')
     })
-    it('succeeds on multiple UTF-8 whitespace characters', () => {
-      pass(whitespace, '     123', '     ')
-      pass(whitespace, '\r\nabc', '\r\n')
-      pass(whitespace, '\u3000\u1680\u202f', '\u3000\u1680\u202f')
+    it('succeeds only once', () => {
+      pass(space, '     123', ' ')
+      pass(space, '\r\nabc', '\r')
+      pass(space, '\u3000\u1680\u202f', '\u3000')
     })
     it('fails on non-whitespace characters', () => {
-      fail(whitespace, 'O', { expected: ['whitespace'], actual: '"O"' })
-      fail(whitespace, 'З', { expected: ['whitespace'], actual: '"З"' })
-      fail(whitespace, 'ค', { expected: ['whitespace'], actual: '"ค"' })
-      fail(whitespace, '𝑂', { expected: ['whitespace'], actual: '"𝑂"' })
-      fail(whitespace, '\u180e', {
-        expected: ['whitespace'],
-        actual: '"\u180e"',
-      })
-      fail(whitespace, '\u200b', {
-        expected: ['whitespace'],
-        actual: '"\u200b"',
-      })
-      fail(whitespace, '\u200c', {
-        expected: ['whitespace'],
-        actual: '"\u200c"',
-      })
-      fail(whitespace, '\u200d', {
-        expected: ['whitespace'],
-        actual: '"\u200d"',
-      })
-      fail(whitespace, '\u2060', {
-        expected: ['whitespace'],
-        actual: '"\u2060"',
-      })
-    })
-  })
-
-  describe('optWhitespace', () => {
-    it('succeeds on a single character of UTF-8 whitespace', () => {
-      pass(optWhitespace, '\t', '\t')
-      pass(optWhitespace, '\n', '\n')
-      pass(optWhitespace, '\v', '\v')
-      pass(optWhitespace, '\f', '\f')
-      pass(optWhitespace, '\r', '\r')
-      pass(optWhitespace, ' ', ' ')
-      pass(optWhitespace, '\u0085', '\u0085')
-      pass(optWhitespace, '\u00a0', '\u00a0')
-      pass(optWhitespace, '\u1680', '\u1680')
-      pass(optWhitespace, '\u2000', '\u2000')
-      pass(optWhitespace, '\u2001', '\u2001')
-      pass(optWhitespace, '\u2002', '\u2002')
-      pass(optWhitespace, '\u2003', '\u2003')
-      pass(optWhitespace, '\u2004', '\u2004')
-      pass(optWhitespace, '\u2005', '\u2005')
-      pass(optWhitespace, '\u2006', '\u2006')
-      pass(optWhitespace, '\u2007', '\u2007')
-      pass(optWhitespace, '\u2008', '\u2008')
-      pass(optWhitespace, '\u2009', '\u2009')
-      pass(optWhitespace, '\u200a', '\u200a')
-      pass(optWhitespace, '\u2028', '\u2028')
-      pass(optWhitespace, '\u2029', '\u2029')
-      pass(optWhitespace, '\u202f', '\u202f')
-      pass(optWhitespace, '\u205f', '\u205f')
-      pass(optWhitespace, '\u3000', '\u3000')
-    })
-    it('succeeds on multiple UTF-8 whitespace characters', () => {
-      pass(optWhitespace, '     123', '     ')
-      pass(optWhitespace, '\r\nabc', '\r\n')
-      pass(optWhitespace, '\u3000\u1680\u202f', '\u3000\u1680\u202f')
-    })
-    it('succeeds with an empty string on non-whitespace characters', () => {
-      pass(optWhitespace, 'O', '')
-      pass(optWhitespace, 'З', '')
-      pass(optWhitespace, 'ค', '')
-      pass(optWhitespace, '𝑂', '')
-      pass(optWhitespace, '\u180e', '')
-      pass(optWhitespace, '\u200b', '')
-      pass(optWhitespace, '\u200c', '')
-      pass(optWhitespace, '\u200d', '')
-      pass(optWhitespace, '\u2060', '')
-    })
-    it('succeeds with an empty string at EOF', () => {
-      pass(optWhitespace, '', '')
+      fail(space, 'O', { expected: ['whitespace'], actual: '"O"' })
+      fail(space, 'З', { expected: ['whitespace'], actual: '"З"' })
+      fail(space, 'ค', { expected: ['whitespace'], actual: '"ค"' })
+      fail(space, '𝑂', { expected: ['whitespace'], actual: '"𝑂"' })
+      fail(space, '\u180e', { expected: ['whitespace'], actual: '"\u180e"' })
+      fail(space, '\u200b', { expected: ['whitespace'], actual: '"\u200b"' })
+      fail(space, '\u200c', { expected: ['whitespace'], actual: '"\u200c"' })
+      fail(space, '\u200d', { expected: ['whitespace'], actual: '"\u200d"' })
+      fail(space, '\u2060', { expected: ['whitespace'], actual: '"\u2060"' })
     })
   })
 

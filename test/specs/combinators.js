@@ -16,7 +16,7 @@ import {
   seq,
 } from 'kessel/combinators'
 import { parse } from 'kessel/core'
-import { any, char, digit, eof, string, whitespace } from 'kessel/parsers'
+import { any, char, digit, eof, space, string } from 'kessel/parsers'
 import { error, fail, pass } from 'test/helper'
 
 describe('Combinators', () => {
@@ -109,9 +109,9 @@ describe('Combinators', () => {
   describe('block', () => {
     const parser = block(function *() {
       yield string('abc')
-      yield whitespace
+      yield space
       const c = yield any
-      yield whitespace
+      yield space
 
       return c
     })

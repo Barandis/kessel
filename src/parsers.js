@@ -40,17 +40,12 @@ import {
 // speed parsing later.
 
 const reDigit = /^[0-9]/
-const reDigits = /^[0-9]*/
 const reHexDigit = /^[0-9a-fA-F]/
-const reHexDigits = /^[0-9a-fA-F]*/
 const reLetter = /^\p{Alphabetic}/u
-const reLetters = /^\p{Alphabetic}*/u
 const reAlpha = /^(?:\p{Alphabetic}|\p{N})/u
-const reAlphas = /^(?:\p{Alphabetic}|\p{N})*/u
 const reUpper = /^(?:\p{Uppercase}|\p{Lt})/u
 const reLower = /^\p{Lowercase}/u
-const reSpace = /^\p{White_Space}+/u
-const reSpaces = /^\p{White_Space}*/u
+const reSpace = /^\p{White_Space}/u
 
 // A parser for a single character. This parser takes a function of one
 // argument; the next read character is passed to that function and, if
@@ -362,45 +357,19 @@ export const noneOf = str => Parser(state => {
 // characters 0-9.
 export const digit = desc(RegexParser(reDigit, 1), 'a digit')
 
-// Attempts to read a character; if it is a digit, it will read another
-// character, and so on until a character is read which is not a digit.
-// Always succeeds with the entire string of read digits (which will be
-// empty if no digit was read at all).
-export const optDigits = RegexParser(reDigits)
-
 // Reads a character and succeeds with that character if it is a
 // hexadecimal digit. This parser is not case sensitive.
 export const hexDigit = desc(RegexParser(reHexDigit, 1), 'a hex digit')
-
-// Attempts to read a character; if it is a hexadecimal digit, it will
-// read another character, and so on until a character is read which is
-// not a hexadecimal digit. Always succeeds with the entire string of
-// read digits (which will be empty if no hexadecimal digit was read at
-// all).
-export const optHexDigits = RegexParser(reHexDigits)
 
 // Reads a character and succeeds with that character if it is a letter.
 // A letter for this purpose is any character with the Unicode
 // `Alphabetic` property.
 export const letter = desc(RegexParser(reLetter, 1), 'a letter')
 
-// Attempts to read a character; if it is a letter, it will read another
-// character, and so on until a character is read which is not a letter.
-// Always succeeds with the entire string of read letters (which will be
-// empty if no letter was read at all).
-export const optLetters = RegexParser(reLetters)
-
 // Reads a character and succeeds with that character if it is
 // alphanumeric. A character is alphanumeric if it has either the
 // Unicode `Alphabetic` property or the Unicode `Number` property.
 export const alphanum = desc(RegexParser(reAlpha, 1), 'an alphanumeric')
-
-// Attempts to read a character; if it is an alphanumeric character, it
-// will read another character, and so on until a character is read
-// which is not alphanumeric. Always succeeds with the entire string of
-// read alphanumeric characters (which will be empty if no alphanumeric
-// character was read at all).
-export const optAlphanums = RegexParser(reAlphas)
 
 // Reads a character and succeeds with that character if it is either an
 // uppercase or titlecase letter. A character is uppercase if it has
@@ -410,19 +379,13 @@ export const upper = desc(RegexParser(reUpper, 1), 'an uppercase letter')
 
 // Reads a character and succeeds with that character if it is a
 // lowercase letter. A character is lowercase if it has the Unicode
-// `Lowercase` property .
+// `Lowercase` property.
 export const lower = desc(RegexParser(reLower, 1), 'a lowercase letter')
 
-// Reads one or more characters, so long as they are whitespace
-// characters. Succeeds with the entire string of whitespace characters
-// so long as there is at least one.
-export const whitespace = desc(RegexParser(reSpace, 1), 'whitespace')
-
-// Reads zero or more characters, so long as they are whitespace
-// characters. Always succeeds with the entire string of whitespace
-// characters; if there were none, this will succeed with an empty
-// string.
-export const optWhitespace = RegexParser(reSpaces)
+// Reads a character and succeeds with that character if it is a
+// whitespace character. A character is whitespace if it has the Unicode
+// `White_Space` property.
+export const space = desc(RegexParser(reSpace, 1), 'whitespace')
 
 // Reads a single character and succeeds with that character if it is a
 // tab.
