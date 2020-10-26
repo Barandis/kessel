@@ -231,6 +231,11 @@ const RegexParser = (re, length = null) => Parser(state => {
 // Since we can't know the length of a match before successfully
 // matching, the `actual` state property simply shows text of the same
 // length as the input pattern upon failure.
+//
+// NOTE: the `regex` parser automatically backtracks; it does not
+// consume input on failure. This is because there isn't a set number
+// of characters to check against a regular expression, so we can't know
+// how many "matched" before a parser failure.
 export const regex = re => {
   assertStringOrRegex(re, 'regex')
 
