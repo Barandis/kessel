@@ -43,12 +43,6 @@ const reUpper = /^(?:\p{Uppercase}|\p{Lt})/u
 const reLower = /^\p{Lowercase}/u
 const reSpace = /^\p{White_Space}/u
 
-// Small utility function to deal with actual values from the
-// CharParser. This handles returning the unquoted 'EOF' while still
-// putting quotes around anything else, on account of the CharParser not
-// quoting anything.
-const actual = state => state.actual === 'EOF' ? 'EOF' : quote(state.actual)
-
 // A parser for a single character. This parser takes a function of one
 // argument; the next read character is passed to that function and, if
 // it returns true, the parser succeeds with that character.
@@ -74,7 +68,7 @@ const CharParser = fn => Parser(state => {
   if (fn(next)) {
     return success(state, { result: next, index: index + width })
   }
-  return failure(state, { expected, actual: next })
+  return failure(state, { expected, actual: quote(next) })
 })
 
 // Reads the next character and succeeds if that character exactly
@@ -86,7 +80,7 @@ export const char = c => Parser(state => {
   const nextState = CharParser(next => next === c)(state)
 
   if (nextState.success) return nextState
-  return failure(nextState, { expected: [quote(c)], actual: actual(nextState) })
+  return failure(nextState, { expected: [quote(c)] })
 })
 
 // Reads the next character and succeeds if that character case-
@@ -100,7 +94,7 @@ export const chari = c => Parser(state => {
     = CharParser(next => next.toLowerCase() === c.toLowerCase())(state)
 
   if (nextState.success) return nextState
-  return failure(nextState, { expected: [quote(c)], actual: actual(nextState) })
+  return failure(nextState, { expected: [quote(c)] })
 })
 
 // Reads the next character and passes it into the supplied predicate
@@ -108,10 +102,7 @@ export const chari = c => Parser(state => {
 // that character as the result.
 export const satisfies = fn => Parser(state => {
   assertFunction(fn, 'satisfies')
-  const nextState = CharParser(fn)(state)
-
-  if (nextState.success) return nextState
-  return failure(nextState, { actual: actual(nextState) })
+  return CharParser(fn)(state)
 })
 
 // Reads a character and succeeds if that character is in the range
@@ -139,7 +130,7 @@ export const range = (start, end) => Parser(state => {
   if (nextState.success) return nextState
 
   const expected = [`character between "${start}" and "${end}"`]
-  return failure(nextState, { actual: actual(nextState), expected })
+  return failure(nextState, { expected })
 })
 
 // Parses a particular string from the current position in the text. The
@@ -151,24 +142,20 @@ export const range = (start, end) => Parser(state => {
 const StringParser = (str, fn) => Parser(state => {
   if (str.length === 0) return success(state, { result: '' })
 
-  let nextState = state
-  let actual = ''
-
-  for (const c of [...str]) {
-    nextState = CharParser(fn(c))(nextState)
-    if (!nextState.success) {
-      if (actual === '' || nextState.actual !== 'EOF') {
-        actual += nextState.actual
-      }
-      if (actual !== 'EOF') {
-        actual = quote(actual)
-      }
-      return failure(nextState, { expected: [quote(str)], actual })
-    }
-    actual += nextState.result
+  const { index, view } = state
+  if (index >= view.byteLength) {
+    return failure(state, { expected: [quote(str)], actual: 'EOF' })
   }
 
-  return success(nextState, { result: actual })
+  const bytes = stringToView(str).byteLength
+  const width = bytes > view.byteLength - index
+    ? view.byteLength - index
+    : bytes
+  const actual = viewToString(index, width, view)
+
+  return fn(actual)
+    ? success(state, { index: index + width, result: actual })
+    : failure(state, { expected: [quote(str)], actual: quote(actual) })
 })
 
 // Parses a string from the current location in the input. The string
@@ -176,7 +163,7 @@ const StringParser = (str, fn) => Parser(state => {
 // are recognized properly.
 export const string = str => Parser(state => {
   assertString(str, 'string')
-  return StringParser(str, c => next => next === c)(state)
+  return StringParser(str, c => c === str)(state)
 })
 
 // Parses a string from the current location in the input. This match is
@@ -189,7 +176,7 @@ export const string = str => Parser(state => {
 export const stringi = str => Parser(state => {
   assertString(str, 'stringi')
   return StringParser(
-    str, c => next => next.toLowerCase() === c.toLowerCase()
+    str, c => c.toLowerCase() === str.toLowerCase()
   )(state)
 })
 
@@ -340,10 +327,7 @@ export const digit = Parser(state => {
   const fn = c => c >= '0' && c <= '9'
   const nextState = CharParser(fn)(state)
   if (nextState.success) return nextState
-  return failure(nextState, {
-    actual: actual(nextState),
-    expected: ['a digit'],
-  })
+  return failure(nextState, { expected: ['a digit'] })
 })
 
 // Reads a character and succeeds with that character if it is a
@@ -354,10 +338,7 @@ export const hexDigit = Parser(state => {
     || c >= 'A' && c <= 'F'
   const nextState = CharParser(fn)(state)
   if (nextState.success) return nextState
-  return failure(nextState, {
-    actual: actual(nextState),
-    expected: ['a hex digit'],
-  })
+  return failure(nextState, { expected: ['a hex digit'] })
 })
 
 // Reads a character and succeeds with that character if it is a letter.
@@ -412,7 +393,7 @@ export const tab = Parser(state => {
   const fn = c => c === '\t'
   const nextState = CharParser(fn)(state)
   if (nextState.success) return nextState
-  return failure(nextState, { actual: actual(nextState), expected: ['tab'] })
+  return failure(nextState, { expected: ['tab'] })
 })
 
 // Reads a single character and succeeds with that character if it is a
@@ -421,10 +402,7 @@ export const cr = Parser(state => {
   const fn = c => c === '\r'
   const nextState = CharParser(fn)(state)
   if (nextState.success) return nextState
-  return failure(nextState, {
-    actual: actual(nextState),
-    expected: ['carriage return'],
-  })
+  return failure(nextState, { expected: ['carriage return'] })
 })
 
 // Reads a single character and succeeds with that character if it is a
@@ -433,16 +411,13 @@ export const lf = Parser(state => {
   const fn = c => c === '\n'
   const nextState = CharParser(fn)(state)
   if (nextState.success) return nextState
-  return failure(nextState, {
-    actual: actual(nextState),
-    expected: ['line feed'],
-  })
+  return failure(nextState, { expected: ['line feed'] })
 })
 
 // Reads two characters and succeeds with those two characters if they
 // are a carriage return and a line feed, in that order.
 export const crlf = Parser(state => {
-  const nextState = StringParser('\r\n', c => next => c === next)(state)
+  const nextState = StringParser('\r\n', c => c === '\r\n')(state)
   if (nextState.success) return nextState
   return failure(nextState, { expected: ['CRLF'] })
 })
@@ -461,10 +436,7 @@ export const newline = Parser(state => {
     }
     return nextState
   }
-  return failure(nextState, {
-    actual: actual(nextState),
-    expected: ['newline'],
-  })
+  return failure(nextState, { expected: ['newline'] })
 })
 
 // Fails without consuming input, setting the `expected` message to

@@ -135,7 +135,6 @@ export const many = p => Parser(state => {
     results.push(nextState.result)
     if (nextState.index >= nextState.view.byteLength) break
   }
-
   return success(nextState, { result: results })
 })
 
@@ -156,6 +155,5 @@ export const many1 = p => Parser(state => {
     results.push(nextState.result)
     if (nextState.index >= nextState.view.byteLength) break
   }
-
   return success(nextState, { result: results })
 })

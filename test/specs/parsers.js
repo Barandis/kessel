@@ -280,22 +280,22 @@ describe('Parsers', () => {
       it('fails if case does not match', () => {
         fail(parser, 'onomatopoeia', {
           expected: ['"Onoma"'],
-          actual: '"o"',
+          actual: '"onoma"',
           index: 0,
         })
       })
-      it('consumes input up until a failure', () => {
+      it('does not consume input on failure', () => {
         fail(parser, 'Onosho', {
           expected: ['"Onoma"'],
-          actual: '"Onos"',
-          index: 3,
+          actual: '"Onosh"',
+          index: 0,
         })
       })
       it('fails if the string is longer than the remaining text', () => {
         fail(parser, 'Ono', {
           expected: ['"Onoma"'],
           actual: '"Ono"',
-          index: 3,
+          index: 0,
         })
       })
       it('succeeds with an empty string', () => {
@@ -310,10 +310,10 @@ describe('Parsers', () => {
         pass(parser, 'Звукоподражание', { result: 'Звуко', index: 10 })
       })
       it('fails if case does not match', () => {
-        fail(parser, 'звукоподражание', { actual: '"з"', index: 0 })
+        fail(parser, 'звукоподражание', { actual: '"звуко"', index: 0 })
       })
       it('fails if the string is longer than the remaining text', () => {
-        fail(parser, 'Зву', { actual: '"Зву"', index: 6 })
+        fail(parser, 'Зву', { actual: '"Зву"', index: 0 })
       })
       it('succeeds with an empty string', () => {
         pass(string(''), 'Звукоподражание', { result: '', index: 0 })
@@ -327,7 +327,7 @@ describe('Parsers', () => {
         pass(parser, 'คำเลียนเสียง', { result: 'คำเลี', index: 15 })
       })
       it('fails if the string is longer than the remaining text', () => {
-        fail(parser, 'คำเ', { actual: '"คำเ"', index: 9 })
+        fail(parser, 'คำเ', { actual: '"คำเ"', index: 0 })
       })
       it('succeeds with an empty string', () => {
         pass(string(''), 'คำเลียนเสียง', { result: '', index: 0 })
@@ -341,7 +341,7 @@ describe('Parsers', () => {
         pass(parser, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂𝑛𝑜𝑚𝑎', index: 20 })
       })
       it('fails if the string is longer than the remaining text', () => {
-        fail(parser, '𝑂𝑛𝑜', { actual: '"𝑂𝑛𝑜"', index: 12 })
+        fail(parser, '𝑂𝑛𝑜', { actual: '"𝑂𝑛𝑜"', index: 0 })
       })
       it('succeeds with an empty string', () => {
         pass(string(''), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '', index: 0 })
@@ -371,7 +371,7 @@ describe('Parsers', () => {
         fail(parser, 'Ono', {
           expected: ['"Onoma"'],
           actual: '"Ono"',
-          index: 3,
+          index: 0,
         })
       })
       it('succeeds with an empty string', () => {
@@ -389,7 +389,7 @@ describe('Parsers', () => {
         pass(parser, 'звукоподражание', { result: 'звуко', index: 10 })
       })
       it('fails if the string is longer than the remaining text', () => {
-        fail(parser, 'Зву', { actual: '"Зву"', index: 6 })
+        fail(parser, 'Зву', { actual: '"Зву"', index: 0 })
       })
       it('succeeds with an empty string', () => {
         pass(string(''), 'Звукоподражание', { result: '', index: 0 })
@@ -403,7 +403,7 @@ describe('Parsers', () => {
         pass(parser, 'คำเลียนเสียง', { result: 'คำเลี', index: 15 })
       })
       it('fails if the string is longer than the remaining text', () => {
-        fail(parser, 'คำเ', { actual: '"คำเ"', index: 9 })
+        fail(parser, 'คำเ', { actual: '"คำเ"', index: 0 })
       })
       it('succeeds with an empty string', () => {
         pass(string(''), 'คำเลียนเสียง', { result: '', index: 0 })
@@ -417,7 +417,7 @@ describe('Parsers', () => {
         pass(parser, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂𝑛𝑜𝑚𝑎', index: 20 })
       })
       it('fails if the string is longer than the remaining text', () => {
-        fail(parser, '𝑂𝑛𝑜', { actual: '"𝑂𝑛𝑜"', index: 12 })
+        fail(parser, '𝑂𝑛𝑜', { actual: '"𝑂𝑛𝑜"', index: 0 })
       })
       it('succeeds with an empty string', () => {
         pass(string(''), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '', index: 0 })
@@ -1038,7 +1038,7 @@ describe('Parsers', () => {
       pass(crlf, '\r\nabc', '\r\n')
     })
     it('fails on any other character combination', () => {
-      fail(crlf, '\nOnoma', { expected: ['CRLF'], actual: '"\n"' })
+      fail(crlf, '\nOnoma', { expected: ['CRLF'], actual: '"\nO"' })
     })
     it('fails at EOF', () => {
       fail(crlf, '', { expected: ['CRLF'], actual: 'EOF' })

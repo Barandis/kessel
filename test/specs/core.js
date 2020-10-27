@@ -69,7 +69,7 @@ describe('Core functionality', () => {
         })
         expect(result.expected).to.deep.equal(['"123"'])
         expect(updated.expected).to.deep.equal(['"x"', '"y"'])
-        expect(result.actual).to.equal('"a"')
+        expect(result.actual).to.equal('"abc"')
         expect(updated.actual).to.equal('"z"')
         expect(result.index).to.equal(0)
         expect(updated.index).to.equal(17)

@@ -59,34 +59,38 @@ describe('Combinators', () => {
       expect(r1).to.deep.equal(r2)
     })
     it('resets the index if its parser fails with consuming input', () => {
-      const parser = string('test')
-      fail(parser, 'tesl', { index: 3 })
+      const parser = seq(string('te'), string('st'))
+      fail(parser, 'tesl', { index: 2 })
       fail(back(parser), 'tesl', { index: 0 })
     })
   })
 
   describe('lookahead', () => {
+    const parser = lookahead(seq(string('ab'), string('cd')))
+
     it('succeeds with no consumption if its parser succeeds', () => {
-      pass(lookahead(string('abc')), 'abc', { result: 'abc', index: 0 })
+      pass(parser, 'abcd', { result: ['ab', 'cd'], index: 0 })
     })
     it('fails with no consumption if its parser fails', () => {
-      fail(lookahead(string('abc')), 'abd', {
-        expected: ['"abc"'], actual: '"abd"', index: 0,
-      })
+      fail(parser, 'abd', { expected: ['"cd"'], actual: '"d"', index: 0 })
     })
   })
 
   describe('alt', () => {
-    const parser = alt(string('abc'), string('def'), string('ghi'))
+    const parser = alt(
+      seq(char('a'), char('b')),
+      seq(char('c'), char('d')),
+      seq(char('e'), char('f')),
+    )
 
     it('fails with all expecteds if all parsers fail without consuming', () => {
-      fail(parser, 'xyz', { expected: ['"abc"', '"def"', '"ghi"'] })
+      fail(parser, 'yz', { expected: ['"a"', '"c"', '"e"'] })
     })
     it('fails immediately if a failed parser consumes input', () => {
-      fail(parser, 'deg', { expected: ['"abc"', '"def"'] })
+      fail(parser, 'ce', { expected: ['"a"', '"d"'] })
     })
     it('succeeds if one parser succeeds first', () => {
-      pass(parser, 'def', 'def')
+      pass(parser, 'cd', { result: ['c', 'd'] })
     })
   })
 
@@ -94,8 +98,8 @@ describe('Combinators', () => {
     const parser = seq(string('abc'), string('def'), string('ghi'))
 
     it('fails if any of its parsers fail', () => {
-      fail(parser, 'abd', { expected: ['"abc"'], actual: '"abd"', index: 2 })
-      fail(parser, 'abcdf', { expected: ['"def"'], actual: '"df"', index: 4 })
+      fail(parser, 'abd', { expected: ['"abc"'], actual: '"abd"', index: 0 })
+      fail(parser, 'abcdf', { expected: ['"def"'], actual: '"df"', index: 3 })
       fail(parser, 'abcdefh', { expected: ['"ghi"'], actual: '"h"', index: 6 })
     })
     it('succeeds if all of its parsers succeed', () => {
@@ -117,7 +121,7 @@ describe('Combinators', () => {
     })
 
     it('fails if any of its parsers fail', () => {
-      fail(parser, 'abd', { expected: ['"abc"'], actual: '"abd"', index: 2 })
+      fail(parser, 'abd', { expected: ['"abc"'], actual: '"abd"', index: 0 })
       fail(parser, 'abcd', {
         expected: ['whitespace'],
         actual: '"d"',
