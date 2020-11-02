@@ -14,6 +14,7 @@ import {
   digit,
   eof,
   fail as pfail,
+  failFatally,
   hexDigit,
   letter,
   lf,
@@ -28,7 +29,6 @@ import {
   string,
   stringi,
   tab,
-  unexpected,
   upper,
 } from 'kessel/parsers'
 import { error, fail, pass } from 'test/helper'
@@ -37,12 +37,12 @@ describe('Parsers', () => {
   describe('char', () => {
     it('fails if the supplied value is not a one-character string', () => {
       error(
-        char(23), 'some text', '[char]: expected single character; received 23'
+        char(23), 'some text', '[char]: expected single character; received 23',
       )
       error(
         char('str'),
         'some text',
-        '[char]: expected single character; received str'
+        '[char]: expected single character; received str',
       )
     })
 
@@ -114,12 +114,12 @@ describe('Parsers', () => {
       error(
         chari(23),
         'some text',
-        '[chari]: expected single character; received 23'
+        '[chari]: expected single character; received 23',
       )
       error(
         chari('str'),
         'some text',
-        '[chari]: expected single character; received str'
+        '[chari]: expected single character; received str',
       )
     })
 
@@ -191,7 +191,7 @@ describe('Parsers', () => {
       error(
         satisfies(23),
         'some text',
-        '[satisfies]: expected function; received 23'
+        '[satisfies]: expected function; received 23',
       )
     })
 
@@ -200,7 +200,7 @@ describe('Parsers', () => {
     it('tests the next 1-byte character', () => {
       pass(satisfies(fn), 'Onomatopoeia', { result: 'O', index: 1 })
       fail(satisfies(fn), 'onomatopoeia', {
-        expected: ['a character that satisfies function "fn"'],
+        expected: 'a character that satisfies function "fn"',
         actual: '"o"',
       })
     })
@@ -208,7 +208,7 @@ describe('Parsers', () => {
     it('tests the next 2-byte character', () => {
       pass(satisfies(fn), 'Звукоподражание', { result: 'З', index: 2 })
       fail(satisfies(fn), 'звукоподражание', {
-        expected: ['a character that satisfies function "fn"'],
+        expected: 'a character that satisfies function "fn"',
         actual: '"з"',
       })
     })
@@ -223,14 +223,14 @@ describe('Parsers', () => {
 
     it('names an unnamed function <anonymous>', () => {
       fail(satisfies(char => char === char.toUpperCase()), 'onomatopoeia', {
-        expected: ['a character that satisfies function "<anonymous>"'],
+        expected: 'a character that satisfies function "<anonymous>"',
         actual: '"o"',
       })
     })
 
     it('fails automatically at EOF', () => {
       fail(satisfies(fn), '', {
-        expected: ['a character that satisfies function "fn"'],
+        expected: 'a character that satisfies function "fn"',
         actual: 'EOF',
       })
     })
@@ -239,10 +239,10 @@ describe('Parsers', () => {
   describe('range', () => {
     it('throws if either argument is not a single character string', () => {
       error(
-        range('0', 9), '123', '[range]: expected single character; received 9'
+        range('0', 9), '123', '[range]: expected single character; received 9',
       )
       error(
-        range(0, '9'), '123', '[range]: expected single character; received 0'
+        range(0, '9'), '123', '[range]: expected single character; received 0',
       )
     })
     it('succeeds if the next character is between the supplied two', () => {
@@ -267,7 +267,7 @@ describe('Parsers', () => {
       error(
         string(23),
         'some text',
-        '[string]: expected string; received 23'
+        '[string]: expected string; received 23',
       )
     })
 
@@ -279,21 +279,21 @@ describe('Parsers', () => {
       })
       it('fails if case does not match', () => {
         fail(parser, 'onomatopoeia', {
-          expected: ['"Onoma"'],
+          expected: '"Onoma"',
           actual: '"onoma"',
           index: 0,
         })
       })
       it('does not consume input on failure', () => {
         fail(parser, 'Onosho', {
-          expected: ['"Onoma"'],
+          expected: '"Onoma"',
           actual: '"Onosh"',
           index: 0,
         })
       })
       it('fails if the string is longer than the remaining text', () => {
         fail(parser, 'Ono', {
-          expected: ['"Onoma"'],
+          expected: '"Onoma"',
           actual: '"Ono"',
           index: 0,
         })
@@ -354,7 +354,7 @@ describe('Parsers', () => {
       error(
         stringi(23),
         'some text',
-        '[stringi]: expected string; received 23'
+        '[stringi]: expected string; received 23',
       )
     })
 
@@ -369,7 +369,7 @@ describe('Parsers', () => {
       })
       it('fails if the string is longer than the remaining text', () => {
         fail(parser, 'Ono', {
-          expected: ['"Onoma"'],
+          expected: '"Onoma"',
           actual: '"Ono"',
           index: 0,
         })
@@ -430,7 +430,7 @@ describe('Parsers', () => {
       error(
         () => regex(23),
         'some text',
-        '[regex]: expected string or regular expression; received 23'
+        '[regex]: expected string or regular expression; received 23',
       )
     })
     it('accepts a string as input', () => {
@@ -442,7 +442,7 @@ describe('Parsers', () => {
     it('is anchored even if an anchor is not in the regex', () => {
       fail(regex(/poe/), 'Onomatopoeia', {
         actual: '"Ono"',
-        expected: ['a string matching /^poe/'],
+        expected: 'a string matching /^poe/',
       })
     })
     it('fails if the input is at its end', () => {
@@ -487,7 +487,7 @@ describe('Parsers', () => {
       pass(any, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂', index: 4 })
     })
     it('fails at EOF', () => {
-      fail(any, '', { expected: ['any character'], actual: 'EOF' })
+      fail(any, '', { expected: 'any character', actual: 'EOF' })
     })
   })
 
@@ -511,16 +511,16 @@ describe('Parsers', () => {
 
   describe('eof', () => {
     it('fails if there are any remaining 1-byte characters', () => {
-      fail(eof, 'Onomatopoeia', { expected: ['EOF'], actual: '"O"' })
+      fail(eof, 'Onomatopoeia', { expected: 'EOF', actual: '"O"' })
     })
     it('fails if there are any remaining 2-byte characters', () => {
-      fail(eof, 'Звукоподражание', { expected: ['EOF'], actual: '"З"' })
+      fail(eof, 'Звукоподражание', { expected: 'EOF', actual: '"З"' })
     })
     it('fails if there are any remaining 3-byte characters', () => {
-      fail(eof, 'คำเลียนเสียง', { expected: ['EOF'], actual: '"ค"' })
+      fail(eof, 'คำเลียนเสียง', { expected: 'EOF', actual: '"ค"' })
     })
     it('fails if there are any remaining 4-byte characters', () => {
-      fail(eof, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { expected: ['EOF'], actual: '"𝑂"' })
+      fail(eof, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { expected: 'EOF', actual: '"𝑂"' })
     })
     it('succeeds only at EOF', () => {
       pass(eof, '', { result: null, index: 0 })
@@ -533,7 +533,7 @@ describe('Parsers', () => {
       pass(parser, 'Onomatopoeia', { result: 'O', index: 1 })
       pass(parser, 'matriculate', { result: 'm', index: 1 })
       fail(parser, 'Matriculate', {
-        expected: ['one of "Onoma"'],
+        expected: 'one of "Onoma"',
         actual: '"M"',
       })
     })
@@ -542,14 +542,14 @@ describe('Parsers', () => {
       const parser = oneOf('Звуко')
       pass(parser, 'Звукоподражание', { result: 'З', index: 2 })
       pass(parser, 'учитель', { result: 'у', index: 2 })
-      fail(parser, 'Учитель', { expected: ['one of "Звуко"'], actual: '"У"' })
+      fail(parser, 'Учитель', { expected: 'one of "Звуко"', actual: '"У"' })
     })
 
     it('checks the next character against 3-byte characters', () => {
       const parser = oneOf('คำเลี')
       pass(parser, 'คำเลียนเสียง', { result: 'ค', index: 3 })
       pass(parser, 'ลียน', { result: 'ล', index: 3 })
-      fail(parser, 'ยง', { expected: ['one of "คำเลี"'], actual: '"ย"' })
+      fail(parser, 'ยง', { expected: 'one of "คำเลี"', actual: '"ย"' })
     })
 
     it('checks the next character against 4-byte characters', () => {
@@ -557,7 +557,7 @@ describe('Parsers', () => {
       pass(parser, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂', index: 4 })
       pass(parser, '𝑚𝑎𝑡𝑟𝑖𝑐𝑢𝑙𝑎𝑡𝑒', { result: '𝑚', index: 4 })
       fail(parser, 'matriculate', {
-        expected: ['one of "𝑂𝑛𝑜𝑚𝑎"'],
+        expected: 'one of "𝑂𝑛𝑜𝑚𝑎"',
         actual: '"m"',
       })
     })
@@ -567,11 +567,11 @@ describe('Parsers', () => {
     it('checks the next charater against 1-byte characters', () => {
       const parser = noneOf('Onoma')
       fail(parser, 'Onomatopoeia', {
-        expected: ['none of "Onoma"'],
+        expected: 'none of "Onoma"',
         actual: '"O"',
       })
       fail(parser, 'matriculate', {
-        expected: ['none of "Onoma"'],
+        expected: 'none of "Onoma"',
         actual: '"m"',
       })
       pass(parser, 'Matriculate', { result: 'M', index: 1 })
@@ -580,31 +580,31 @@ describe('Parsers', () => {
     it('checks the next character against 2-byte characters', () => {
       const parser = noneOf('Звуко')
       fail(parser, 'Звукоподражание', {
-        expected: ['none of "Звуко"'],
+        expected: 'none of "Звуко"',
         actual: '"З"',
       })
-      fail(parser, 'учитель', { expected: ['none of "Звуко"'], actual: '"у"' })
+      fail(parser, 'учитель', { expected: 'none of "Звуко"', actual: '"у"' })
       pass(parser, 'Учитель', { result: 'У', index: 2 })
     })
 
     it('checks the next character against 3-byte characters', () => {
       const parser = noneOf('คำเลี')
       fail(parser, 'คำเลียนเสียง', {
-        expected: ['none of "คำเลี"'],
+        expected: 'none of "คำเลี"',
         actual: '"ค"',
       })
-      fail(parser, 'ลียน', { expected: ['none of "คำเลี"'], actual: '"ล"' })
+      fail(parser, 'ลียน', { expected: 'none of "คำเลี"', actual: '"ล"' })
       pass(parser, 'ยง', { result: 'ย', index: 3 })
     })
 
     it('checks the next character against 4-byte characters', () => {
       const parser = noneOf('𝑂𝑛𝑜𝑚𝑎')
       fail(parser, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', {
-        expected: ['none of "𝑂𝑛𝑜𝑚𝑎"'],
+        expected: 'none of "𝑂𝑛𝑜𝑚𝑎"',
         actual: '"𝑂"',
       })
       fail(parser, '𝑚𝑎𝑡𝑟𝑖𝑐𝑢𝑙𝑎𝑡𝑒', {
-        expected: ['none of "𝑂𝑛𝑜𝑚𝑎"'],
+        expected: 'none of "𝑂𝑛𝑜𝑚𝑎"',
         actual: '"𝑚"',
       })
       pass(parser, 'matriculate', { result: 'm', index: 1 })
@@ -616,10 +616,10 @@ describe('Parsers', () => {
       pass(digit, '123', '1')
     })
     it('fails on any other character', () => {
-      fail(digit, 'abc', { expected: ['a digit'], actual: '"a"' })
+      fail(digit, 'abc', { expected: 'a digit', actual: '"a"' })
     })
     it('fails at EOF', () => {
-      fail(digit, '', { expected: ['a digit'], actual: 'EOF' })
+      fail(digit, '', { expected: 'a digit', actual: 'EOF' })
     })
   })
 
@@ -629,10 +629,10 @@ describe('Parsers', () => {
       pass(hexDigit, 'abc', 'a')
     })
     it('fails on any other character', () => {
-      fail(hexDigit, 'ghi', { expected: ['a hex digit'], actual: '"g"' })
+      fail(hexDigit, 'ghi', { expected: 'a hex digit', actual: '"g"' })
     })
     it('fails at EOF', () => {
-      fail(hexDigit, '', { expected: ['a hex digit'], actual: 'EOF' })
+      fail(hexDigit, '', { expected: 'a hex digit', actual: 'EOF' })
     })
   })
 
@@ -665,13 +665,13 @@ describe('Parsers', () => {
       pass(letter, 'ⰽ', 'ⰽ') // GLAGOLITIC SMALL LETTER KAKO
     })
     it('fails on decimal digits', () => {
-      fail(letter, '4', { expected: ['a letter'], actual: '"4"' })
-      fail(letter, '۴', { expected: ['a letter'], actual: '"۴"' })
-      fail(letter, '४', { expected: ['a letter'], actual: '"४"' })
-      fail(letter, '৪', { expected: ['a letter'], actual: '"৪"' })
-      fail(letter, '๔', { expected: ['a letter'], actual: '"๔"' })
-      fail(letter, '᠔', { expected: ['a letter'], actual: '"᠔"' })
-      fail(letter, '𝟜', { expected: ['a letter'], actual: '"𝟜"' })
+      fail(letter, '4', { expected: 'a letter', actual: '"4"' })
+      fail(letter, '۴', { expected: 'a letter', actual: '"۴"' })
+      fail(letter, '४', { expected: 'a letter', actual: '"४"' })
+      fail(letter, '৪', { expected: 'a letter', actual: '"৪"' })
+      fail(letter, '๔', { expected: 'a letter', actual: '"๔"' })
+      fail(letter, '᠔', { expected: 'a letter', actual: '"᠔"' })
+      fail(letter, '𝟜', { expected: 'a letter', actual: '"𝟜"' })
     })
     it('succeeds on a single uppercase letter number', () => {
       pass(letter, 'Ⅳ', 'Ⅳ') // ROMAN NUMERAL FOUR
@@ -680,36 +680,36 @@ describe('Parsers', () => {
       pass(letter, 'ⅳ', 'ⅳ') // SMALL ROMAN NUMERAL FOUR
     })
     it('fails on other numbers', () => {
-      fail(letter, '¼', { expected: ['a letter'], actual: '"¼"' })
-      fail(letter, '፬', { expected: ['a letter'], actual: '"፬"' })
-      fail(letter, '⁴', { expected: ['a letter'], actual: '"⁴"' })
-      fail(letter, '₄', { expected: ['a letter'], actual: '"₄"' })
-      fail(letter, '④', { expected: ['a letter'], actual: '"④"' })
-      fail(letter, '❹', { expected: ['a letter'], actual: '"❹"' })
+      fail(letter, '¼', { expected: 'a letter', actual: '"¼"' })
+      fail(letter, '፬', { expected: 'a letter', actual: '"፬"' })
+      fail(letter, '⁴', { expected: 'a letter', actual: '"⁴"' })
+      fail(letter, '₄', { expected: 'a letter', actual: '"₄"' })
+      fail(letter, '④', { expected: 'a letter', actual: '"④"' })
+      fail(letter, '❹', { expected: 'a letter', actual: '"❹"' })
     })
     it('fails on whitespace', () => {
-      fail(letter, ' ', { expected: ['a letter'], actual: '" "' })
-      fail(letter, '\t', { expected: ['a letter'], actual: '"\t"' })
-      fail(letter, '\n', { expected: ['a letter'], actual: '"\n"' })
-      fail(letter, ' ', { expected: ['a letter'], actual: '" "' })
-      fail(letter, '\u2003', { expected: ['a letter'], actual: '"\u2003"' })
-      fail(letter, '\u202f', { expected: ['a letter'], actual: '"\u202f"' })
+      fail(letter, ' ', { expected: 'a letter', actual: '" "' })
+      fail(letter, '\t', { expected: 'a letter', actual: '"\t"' })
+      fail(letter, '\n', { expected: 'a letter', actual: '"\n"' })
+      fail(letter, ' ', { expected: 'a letter', actual: '" "' })
+      fail(letter, '\u2003', { expected: 'a letter', actual: '"\u2003"' })
+      fail(letter, '\u202f', { expected: 'a letter', actual: '"\u202f"' })
     })
     it('fails on punctuation', () => {
-      fail(letter, '(', { expected: ['a letter'], actual: '"("' })
-      fail(letter, '｢', { expected: ['a letter'], actual: '"｢"' })
-      fail(letter, ')', { expected: ['a letter'], actual: '")"' })
-      fail(letter, '｣', { expected: ['a letter'], actual: '"｣"' })
-      fail(letter, '!', { expected: ['a letter'], actual: '"!"' })
-      fail(letter, '፣', { expected: ['a letter'], actual: '"፣"' })
+      fail(letter, '(', { expected: 'a letter', actual: '"("' })
+      fail(letter, '｢', { expected: 'a letter', actual: '"｢"' })
+      fail(letter, ')', { expected: 'a letter', actual: '")"' })
+      fail(letter, '｣', { expected: 'a letter', actual: '"｣"' })
+      fail(letter, '!', { expected: 'a letter', actual: '"!"' })
+      fail(letter, '፣', { expected: 'a letter', actual: '"፣"' })
     })
     it('fails on symbols', () => {
-      fail(letter, '$', { expected: ['a letter'], actual: '"$"' })
-      fail(letter, '₯', { expected: ['a letter'], actual: '"₯"' })
-      fail(letter, '+', { expected: ['a letter'], actual: '"+"' })
-      fail(letter, '⫇', { expected: ['a letter'], actual: '"⫇"' })
-      fail(letter, '©', { expected: ['a letter'], actual: '"©"' })
-      fail(letter, '🀄', { expected: ['a letter'], actual: '"🀄"' })
+      fail(letter, '$', { expected: 'a letter', actual: '"$"' })
+      fail(letter, '₯', { expected: 'a letter', actual: '"₯"' })
+      fail(letter, '+', { expected: 'a letter', actual: '"+"' })
+      fail(letter, '⫇', { expected: 'a letter', actual: '"⫇"' })
+      fail(letter, '©', { expected: 'a letter', actual: '"©"' })
+      fail(letter, '🀄', { expected: 'a letter', actual: '"🀄"' })
     })
   })
 
@@ -765,34 +765,34 @@ describe('Parsers', () => {
       pass(alphanum, '❹', '❹') // DINGBAT NEGATIVE CIRCLED DIGIT FOUR
     })
     it('fails on whitespace', () => {
-      fail(alphanum, ' ', { expected: ['an alphanumeric'], actual: '" "' })
-      fail(alphanum, '\t', { expected: ['an alphanumeric'], actual: '"\t"' })
-      fail(alphanum, '\n', { expected: ['an alphanumeric'], actual: '"\n"' })
-      fail(alphanum, ' ', { expected: ['an alphanumeric'], actual: '" "' })
+      fail(alphanum, ' ', { expected: 'an alphanumeric', actual: '" "' })
+      fail(alphanum, '\t', { expected: 'an alphanumeric', actual: '"\t"' })
+      fail(alphanum, '\n', { expected: 'an alphanumeric', actual: '"\n"' })
+      fail(alphanum, ' ', { expected: 'an alphanumeric', actual: '" "' })
       fail(alphanum, '\u2003', {
-        expected: ['an alphanumeric'],
+        expected: 'an alphanumeric',
         actual: '"\u2003"',
       })
       fail(alphanum, '\u202f', {
-        expected: ['an alphanumeric'],
+        expected: 'an alphanumeric',
         actual: '"\u202f"',
       })
     })
     it('fails on punctuation', () => {
-      fail(alphanum, '(', { expected: ['an alphanumeric'], actual: '"("' })
-      fail(alphanum, '｢', { expected: ['an alphanumeric'], actual: '"｢"' })
-      fail(alphanum, ')', { expected: ['an alphanumeric'], actual: '")"' })
-      fail(alphanum, '｣', { expected: ['an alphanumeric'], actual: '"｣"' })
-      fail(alphanum, '!', { expected: ['an alphanumeric'], actual: '"!"' })
-      fail(alphanum, '፣', { expected: ['an alphanumeric'], actual: '"፣"' })
+      fail(alphanum, '(', { expected: 'an alphanumeric', actual: '"("' })
+      fail(alphanum, '｢', { expected: 'an alphanumeric', actual: '"｢"' })
+      fail(alphanum, ')', { expected: 'an alphanumeric', actual: '")"' })
+      fail(alphanum, '｣', { expected: 'an alphanumeric', actual: '"｣"' })
+      fail(alphanum, '!', { expected: 'an alphanumeric', actual: '"!"' })
+      fail(alphanum, '፣', { expected: 'an alphanumeric', actual: '"፣"' })
     })
     it('fails on symbols', () => {
-      fail(alphanum, '$', { expected: ['an alphanumeric'], actual: '"$"' })
-      fail(alphanum, '₯', { expected: ['an alphanumeric'], actual: '"₯"' })
-      fail(alphanum, '+', { expected: ['an alphanumeric'], actual: '"+"' })
-      fail(alphanum, '⫇', { expected: ['an alphanumeric'], actual: '"⫇"' })
-      fail(alphanum, '©', { expected: ['an alphanumeric'], actual: '"©"' })
-      fail(alphanum, '🀄', { expected: ['an alphanumeric'], actual: '"🀄"' })
+      fail(alphanum, '$', { expected: 'an alphanumeric', actual: '"$"' })
+      fail(alphanum, '₯', { expected: 'an alphanumeric', actual: '"₯"' })
+      fail(alphanum, '+', { expected: 'an alphanumeric', actual: '"+"' })
+      fail(alphanum, '⫇', { expected: 'an alphanumeric', actual: '"⫇"' })
+      fail(alphanum, '©', { expected: 'an alphanumeric', actual: '"©"' })
+      fail(alphanum, '🀄', { expected: 'an alphanumeric', actual: '"🀄"' })
     })
   })
 
@@ -816,80 +816,80 @@ describe('Parsers', () => {
       pass(upper, 'ῼ', 'ῼ')
     })
     it('fails on lowercase letters', () => {
-      fail(upper, 'a', { expected: ['an uppercase letter'], actual: '"a"' })
-      fail(upper, 'ž', { expected: ['an uppercase letter'], actual: '"ž"' })
-      fail(upper, 'γ', { expected: ['an uppercase letter'], actual: '"γ"' })
-      fail(upper, 'л', { expected: ['an uppercase letter'], actual: '"л"' })
-      fail(upper, 'յ', { expected: ['an uppercase letter'], actual: '"յ"' })
-      fail(upper, 'ე', { expected: ['an uppercase letter'], actual: '"ე"' })
-      fail(upper, 'ⰽ', { expected: ['an uppercase letter'], actual: '"ⰽ"' })
+      fail(upper, 'a', { expected: 'an uppercase letter', actual: '"a"' })
+      fail(upper, 'ž', { expected: 'an uppercase letter', actual: '"ž"' })
+      fail(upper, 'γ', { expected: 'an uppercase letter', actual: '"γ"' })
+      fail(upper, 'л', { expected: 'an uppercase letter', actual: '"л"' })
+      fail(upper, 'յ', { expected: 'an uppercase letter', actual: '"յ"' })
+      fail(upper, 'ე', { expected: 'an uppercase letter', actual: '"ე"' })
+      fail(upper, 'ⰽ', { expected: 'an uppercase letter', actual: '"ⰽ"' })
     })
     it('fails on decimal digits', () => {
-      fail(upper, '4', { expected: ['an uppercase letter'], actual: '"4"' })
-      fail(upper, '۴', { expected: ['an uppercase letter'], actual: '"۴"' })
-      fail(upper, '४', { expected: ['an uppercase letter'], actual: '"४"' })
-      fail(upper, '৪', { expected: ['an uppercase letter'], actual: '"৪"' })
-      fail(upper, '๔', { expected: ['an uppercase letter'], actual: '"๔"' })
-      fail(upper, '᠔', { expected: ['an uppercase letter'], actual: '"᠔"' })
-      fail(upper, '𝟜', { expected: ['an uppercase letter'], actual: '"𝟜"' })
+      fail(upper, '4', { expected: 'an uppercase letter', actual: '"4"' })
+      fail(upper, '۴', { expected: 'an uppercase letter', actual: '"۴"' })
+      fail(upper, '४', { expected: 'an uppercase letter', actual: '"४"' })
+      fail(upper, '৪', { expected: 'an uppercase letter', actual: '"৪"' })
+      fail(upper, '๔', { expected: 'an uppercase letter', actual: '"๔"' })
+      fail(upper, '᠔', { expected: 'an uppercase letter', actual: '"᠔"' })
+      fail(upper, '𝟜', { expected: 'an uppercase letter', actual: '"𝟜"' })
     })
     it('succeeds on a single uppercase letter number', () => {
       pass(upper, 'Ⅳ', 'Ⅳ') // ROMAN NUMERAL FOUR
     })
     it('fails on lowercase letter numbers', () => {
-      fail(upper, 'ⅳ', { expected: ['an uppercase letter'], actual: '"ⅳ"' })
+      fail(upper, 'ⅳ', { expected: 'an uppercase letter', actual: '"ⅳ"' })
     })
     it('fails on other numbers', () => {
-      fail(upper, '¼', { expected: ['an uppercase letter'], actual: '"¼"' })
-      fail(upper, '፬', { expected: ['an uppercase letter'], actual: '"፬"' })
-      fail(upper, '⁴', { expected: ['an uppercase letter'], actual: '"⁴"' })
-      fail(upper, '₄', { expected: ['an uppercase letter'], actual: '"₄"' })
-      fail(upper, '④', { expected: ['an uppercase letter'], actual: '"④"' })
-      fail(upper, '❹', { expected: ['an uppercase letter'], actual: '"❹"' })
+      fail(upper, '¼', { expected: 'an uppercase letter', actual: '"¼"' })
+      fail(upper, '፬', { expected: 'an uppercase letter', actual: '"፬"' })
+      fail(upper, '⁴', { expected: 'an uppercase letter', actual: '"⁴"' })
+      fail(upper, '₄', { expected: 'an uppercase letter', actual: '"₄"' })
+      fail(upper, '④', { expected: 'an uppercase letter', actual: '"④"' })
+      fail(upper, '❹', { expected: 'an uppercase letter', actual: '"❹"' })
     })
     it('fails on whitespace', () => {
-      fail(upper, ' ', { expected: ['an uppercase letter'], actual: '" "' })
-      fail(upper, '\t', { expected: ['an uppercase letter'], actual: '"\t"' })
-      fail(upper, '\n', { expected: ['an uppercase letter'], actual: '"\n"' })
-      fail(upper, ' ', { expected: ['an uppercase letter'], actual: '" "' })
+      fail(upper, ' ', { expected: 'an uppercase letter', actual: '" "' })
+      fail(upper, '\t', { expected: 'an uppercase letter', actual: '"\t"' })
+      fail(upper, '\n', { expected: 'an uppercase letter', actual: '"\n"' })
+      fail(upper, ' ', { expected: 'an uppercase letter', actual: '" "' })
       fail(upper, '\u2003',
-        { expected: ['an uppercase letter'], actual: '"\u2003"' })
+        { expected: 'an uppercase letter', actual: '"\u2003"' })
       fail(upper, '\u202f',
-        { expected: ['an uppercase letter'], actual: '"\u202f"' })
+        { expected: 'an uppercase letter', actual: '"\u202f"' })
     })
     it('fails on punctuation', () => {
-      fail(upper, '(', { expected: ['an uppercase letter'], actual: '"("' })
-      fail(upper, '｢', { expected: ['an uppercase letter'], actual: '"｢"' })
-      fail(upper, ')', { expected: ['an uppercase letter'], actual: '")"' })
-      fail(upper, '｣', { expected: ['an uppercase letter'], actual: '"｣"' })
-      fail(upper, '!', { expected: ['an uppercase letter'], actual: '"!"' })
-      fail(upper, '፣', { expected: ['an uppercase letter'], actual: '"፣"' })
+      fail(upper, '(', { expected: 'an uppercase letter', actual: '"("' })
+      fail(upper, '｢', { expected: 'an uppercase letter', actual: '"｢"' })
+      fail(upper, ')', { expected: 'an uppercase letter', actual: '")"' })
+      fail(upper, '｣', { expected: 'an uppercase letter', actual: '"｣"' })
+      fail(upper, '!', { expected: 'an uppercase letter', actual: '"!"' })
+      fail(upper, '፣', { expected: 'an uppercase letter', actual: '"፣"' })
     })
     it('fails on symbols', () => {
-      fail(upper, '$', { expected: ['an uppercase letter'], actual: '"$"' })
-      fail(upper, '₯', { expected: ['an uppercase letter'], actual: '"₯"' })
-      fail(upper, '+', { expected: ['an uppercase letter'], actual: '"+"' })
-      fail(upper, '⫇', { expected: ['an uppercase letter'], actual: '"⫇"' })
-      fail(upper, '©', { expected: ['an uppercase letter'], actual: '"©"' })
-      fail(upper, '🀄', { expected: ['an uppercase letter'], actual: '"🀄"' })
+      fail(upper, '$', { expected: 'an uppercase letter', actual: '"$"' })
+      fail(upper, '₯', { expected: 'an uppercase letter', actual: '"₯"' })
+      fail(upper, '+', { expected: 'an uppercase letter', actual: '"+"' })
+      fail(upper, '⫇', { expected: 'an uppercase letter', actual: '"⫇"' })
+      fail(upper, '©', { expected: 'an uppercase letter', actual: '"©"' })
+      fail(upper, '🀄', { expected: 'an uppercase letter', actual: '"🀄"' })
     })
   })
 
   describe('lower', () => {
     it('fails on uppercase letters', () => {
-      fail(lower, 'A', { expected: ['a lowercase letter'], actual: '"A"' })
-      fail(lower, 'Ž', { expected: ['a lowercase letter'], actual: '"Ž"' })
-      fail(lower, 'Γ', { expected: ['a lowercase letter'], actual: '"Γ"' })
-      fail(lower, 'Л', { expected: ['a lowercase letter'], actual: '"Л"' })
-      fail(lower, 'Յ', { expected: ['a lowercase letter'], actual: '"Յ"' })
-      fail(lower, 'Ⴄ', { expected: ['a lowercase letter'], actual: '"Ⴄ"' })
-      fail(lower, 'Ꮅ', { expected: ['a lowercase letter'], actual: '"Ꮅ"' })
-      fail(lower, 'Ⰽ', { expected: ['a lowercase letter'], actual: '"Ⰽ"' })
+      fail(lower, 'A', { expected: 'a lowercase letter', actual: '"A"' })
+      fail(lower, 'Ž', { expected: 'a lowercase letter', actual: '"Ž"' })
+      fail(lower, 'Γ', { expected: 'a lowercase letter', actual: '"Γ"' })
+      fail(lower, 'Л', { expected: 'a lowercase letter', actual: '"Л"' })
+      fail(lower, 'Յ', { expected: 'a lowercase letter', actual: '"Յ"' })
+      fail(lower, 'Ⴄ', { expected: 'a lowercase letter', actual: '"Ⴄ"' })
+      fail(lower, 'Ꮅ', { expected: 'a lowercase letter', actual: '"Ꮅ"' })
+      fail(lower, 'Ⰽ', { expected: 'a lowercase letter', actual: '"Ⰽ"' })
     })
     it('fails on titlecase letters', () => {
-      fail(lower, 'ǅ', { expected: ['a lowercase letter'], actual: '"ǅ"' })
-      fail(lower, 'ǋ', { expected: ['a lowercase letter'], actual: '"ǋ"' })
-      fail(lower, 'ῼ', { expected: ['a lowercase letter'], actual: '"ῼ"' })
+      fail(lower, 'ǅ', { expected: 'a lowercase letter', actual: '"ǅ"' })
+      fail(lower, 'ǋ', { expected: 'a lowercase letter', actual: '"ǋ"' })
+      fail(lower, 'ῼ', { expected: 'a lowercase letter', actual: '"ῼ"' })
     })
     it('succeeds on a single lowercase letter', () => {
       pass(lower, 'a', 'a') // LATIN SMALL LETTER A
@@ -901,53 +901,53 @@ describe('Parsers', () => {
       pass(lower, 'ⰽ', 'ⰽ') // GLAGOLITIC SMALL LETTER KAKO
     })
     it('fails on decimal digits', () => {
-      fail(lower, '4', { expected: ['a lowercase letter'], actual: '"4"' })
-      fail(lower, '۴', { expected: ['a lowercase letter'], actual: '"۴"' })
-      fail(lower, '४', { expected: ['a lowercase letter'], actual: '"४"' })
-      fail(lower, '৪', { expected: ['a lowercase letter'], actual: '"৪"' })
-      fail(lower, '๔', { expected: ['a lowercase letter'], actual: '"๔"' })
-      fail(lower, '᠔', { expected: ['a lowercase letter'], actual: '"᠔"' })
-      fail(lower, '𝟜', { expected: ['a lowercase letter'], actual: '"𝟜"' })
+      fail(lower, '4', { expected: 'a lowercase letter', actual: '"4"' })
+      fail(lower, '۴', { expected: 'a lowercase letter', actual: '"۴"' })
+      fail(lower, '४', { expected: 'a lowercase letter', actual: '"४"' })
+      fail(lower, '৪', { expected: 'a lowercase letter', actual: '"৪"' })
+      fail(lower, '๔', { expected: 'a lowercase letter', actual: '"๔"' })
+      fail(lower, '᠔', { expected: 'a lowercase letter', actual: '"᠔"' })
+      fail(lower, '𝟜', { expected: 'a lowercase letter', actual: '"𝟜"' })
     })
     it('fails on uppercase letter numbers', () => {
-      fail(lower, 'Ⅳ', { expected: ['a lowercase letter'], actual: '"Ⅳ"' })
+      fail(lower, 'Ⅳ', { expected: 'a lowercase letter', actual: '"Ⅳ"' })
     })
     it('succeeds on a single lowercase letter number', () => {
       pass(lower, 'ⅳ', 'ⅳ') // SMALL ROMAN NUMERAL FOUR
     })
     it('fails on other numbers', () => {
-      fail(lower, '¼', { expected: ['a lowercase letter'], actual: '"¼"' })
-      fail(lower, '፬', { expected: ['a lowercase letter'], actual: '"፬"' })
-      fail(lower, '⁴', { expected: ['a lowercase letter'], actual: '"⁴"' })
-      fail(lower, '₄', { expected: ['a lowercase letter'], actual: '"₄"' })
-      fail(lower, '④', { expected: ['a lowercase letter'], actual: '"④"' })
-      fail(lower, '❹', { expected: ['a lowercase letter'], actual: '"❹"' })
+      fail(lower, '¼', { expected: 'a lowercase letter', actual: '"¼"' })
+      fail(lower, '፬', { expected: 'a lowercase letter', actual: '"፬"' })
+      fail(lower, '⁴', { expected: 'a lowercase letter', actual: '"⁴"' })
+      fail(lower, '₄', { expected: 'a lowercase letter', actual: '"₄"' })
+      fail(lower, '④', { expected: 'a lowercase letter', actual: '"④"' })
+      fail(lower, '❹', { expected: 'a lowercase letter', actual: '"❹"' })
     })
     it('fails on whitespace', () => {
-      fail(lower, ' ', { expected: ['a lowercase letter'], actual: '" "' })
-      fail(lower, '\t', { expected: ['a lowercase letter'], actual: '"\t"' })
-      fail(lower, '\n', { expected: ['a lowercase letter'], actual: '"\n"' })
-      fail(lower, ' ', { expected: ['a lowercase letter'], actual: '" "' })
+      fail(lower, ' ', { expected: 'a lowercase letter', actual: '" "' })
+      fail(lower, '\t', { expected: 'a lowercase letter', actual: '"\t"' })
+      fail(lower, '\n', { expected: 'a lowercase letter', actual: '"\n"' })
+      fail(lower, ' ', { expected: 'a lowercase letter', actual: '" "' })
       fail(lower, '\u2003',
-        { expected: ['a lowercase letter'], actual: '"\u2003"' })
+        { expected: 'a lowercase letter', actual: '"\u2003"' })
       fail(lower, '\u202f',
-        { expected: ['a lowercase letter'], actual: '"\u202f"' })
+        { expected: 'a lowercase letter', actual: '"\u202f"' })
     })
     it('fails on punctuation', () => {
-      fail(lower, '(', { expected: ['a lowercase letter'], actual: '"("' })
-      fail(lower, '｢', { expected: ['a lowercase letter'], actual: '"｢"' })
-      fail(lower, ')', { expected: ['a lowercase letter'], actual: '")"' })
-      fail(lower, '｣', { expected: ['a lowercase letter'], actual: '"｣"' })
-      fail(lower, '!', { expected: ['a lowercase letter'], actual: '"!"' })
-      fail(lower, '፣', { expected: ['a lowercase letter'], actual: '"፣"' })
+      fail(lower, '(', { expected: 'a lowercase letter', actual: '"("' })
+      fail(lower, '｢', { expected: 'a lowercase letter', actual: '"｢"' })
+      fail(lower, ')', { expected: 'a lowercase letter', actual: '")"' })
+      fail(lower, '｣', { expected: 'a lowercase letter', actual: '"｣"' })
+      fail(lower, '!', { expected: 'a lowercase letter', actual: '"!"' })
+      fail(lower, '፣', { expected: 'a lowercase letter', actual: '"፣"' })
     })
     it('fails on symbols', () => {
-      fail(lower, '$', { expected: ['a lowercase letter'], actual: '"$"' })
-      fail(lower, '₯', { expected: ['a lowercase letter'], actual: '"₯"' })
-      fail(lower, '+', { expected: ['a lowercase letter'], actual: '"+"' })
-      fail(lower, '⫇', { expected: ['a lowercase letter'], actual: '"⫇"' })
-      fail(lower, '©', { expected: ['a lowercase letter'], actual: '"©"' })
-      fail(lower, '🀄', { expected: ['a lowercase letter'], actual: '"🀄"' })
+      fail(lower, '$', { expected: 'a lowercase letter', actual: '"$"' })
+      fail(lower, '₯', { expected: 'a lowercase letter', actual: '"₯"' })
+      fail(lower, '+', { expected: 'a lowercase letter', actual: '"+"' })
+      fail(lower, '⫇', { expected: 'a lowercase letter', actual: '"⫇"' })
+      fail(lower, '©', { expected: 'a lowercase letter', actual: '"©"' })
+      fail(lower, '🀄', { expected: 'a lowercase letter', actual: '"🀄"' })
     })
   })
 
@@ -985,15 +985,15 @@ describe('Parsers', () => {
       pass(space, '\u3000\u1680\u202f', '\u3000')
     })
     it('fails on non-whitespace characters', () => {
-      fail(space, 'O', { expected: ['whitespace'], actual: '"O"' })
-      fail(space, 'З', { expected: ['whitespace'], actual: '"З"' })
-      fail(space, 'ค', { expected: ['whitespace'], actual: '"ค"' })
-      fail(space, '𝑂', { expected: ['whitespace'], actual: '"𝑂"' })
-      fail(space, '\u180e', { expected: ['whitespace'], actual: '"\u180e"' })
-      fail(space, '\u200b', { expected: ['whitespace'], actual: '"\u200b"' })
-      fail(space, '\u200c', { expected: ['whitespace'], actual: '"\u200c"' })
-      fail(space, '\u200d', { expected: ['whitespace'], actual: '"\u200d"' })
-      fail(space, '\u2060', { expected: ['whitespace'], actual: '"\u2060"' })
+      fail(space, 'O', { expected: 'whitespace', actual: '"O"' })
+      fail(space, 'З', { expected: 'whitespace', actual: '"З"' })
+      fail(space, 'ค', { expected: 'whitespace', actual: '"ค"' })
+      fail(space, '𝑂', { expected: 'whitespace', actual: '"𝑂"' })
+      fail(space, '\u180e', { expected: 'whitespace', actual: '"\u180e"' })
+      fail(space, '\u200b', { expected: 'whitespace', actual: '"\u200b"' })
+      fail(space, '\u200c', { expected: 'whitespace', actual: '"\u200c"' })
+      fail(space, '\u200d', { expected: 'whitespace', actual: '"\u200d"' })
+      fail(space, '\u2060', { expected: 'whitespace', actual: '"\u2060"' })
     })
   })
 
@@ -1002,10 +1002,10 @@ describe('Parsers', () => {
       pass(tab, '\tabc', '\t')
     })
     it('fails on any other character combination', () => {
-      fail(tab, 'Onomatopoeia', { expected: ['tab'], actual: '"O"' })
+      fail(tab, 'Onomatopoeia', { expected: 'a tab', actual: '"O"' })
     })
     it('fails at EOF', () => {
-      fail(tab, '', { expected: ['tab'], actual: 'EOF' })
+      fail(tab, '', { expected: 'a tab', actual: 'EOF' })
     })
   })
 
@@ -1014,10 +1014,10 @@ describe('Parsers', () => {
       pass(cr, '\rabc', '\r')
     })
     it('fails on any other character combination', () => {
-      fail(cr, 'Onoma', { expected: ['carriage return'], actual: '"O"' })
+      fail(cr, 'Onoma', { expected: 'a carriage return', actual: '"O"' })
     })
     it('fails at EOF', () => {
-      fail(cr, '', { expected: ['carriage return'], actual: 'EOF' })
+      fail(cr, '', { expected: 'a carriage return', actual: 'EOF' })
     })
   })
 
@@ -1026,10 +1026,10 @@ describe('Parsers', () => {
       pass(lf, '\nabc', '\n')
     })
     it('fails on any other character combination', () => {
-      fail(lf, 'Onoma', { expected: ['line feed'], actual: '"O"' })
+      fail(lf, 'Onoma', { expected: 'a line feed', actual: '"O"' })
     })
     it('fails at EOF', () => {
-      fail(lf, '', { expected: ['line feed'], actual: 'EOF' })
+      fail(lf, '', { expected: 'a line feed', actual: 'EOF' })
     })
   })
 
@@ -1038,10 +1038,10 @@ describe('Parsers', () => {
       pass(crlf, '\r\nabc', '\r\n')
     })
     it('fails on any other character combination', () => {
-      fail(crlf, '\nOnoma', { expected: ['CRLF'], actual: '"\nO"' })
+      fail(crlf, '\nOnoma', { expected: 'a CR+LF', actual: '"\nO"' })
     })
     it('fails at EOF', () => {
-      fail(crlf, '', { expected: ['CRLF'], actual: 'EOF' })
+      fail(crlf, '', { expected: 'a CR+LF', actual: 'EOF' })
     })
   })
 
@@ -1052,10 +1052,10 @@ describe('Parsers', () => {
       pass(newline, '\r\nabc', '\r\n')
     })
     it('fails on any other character combination', () => {
-      fail(newline, 'Onoma', { expected: ['newline'], actual: '"O"' })
+      fail(newline, 'Onoma', { expected: 'a newline', actual: '"O"' })
     })
     it('fails at EOF', () => {
-      fail(newline, '', { expected: ['newline'], actual: 'EOF' })
+      fail(newline, '', { expected: 'a newline', actual: 'EOF' })
     })
   })
 
@@ -1063,17 +1063,24 @@ describe('Parsers', () => {
     it('throws if the passed value is not a string', () => {
       error(pfail(23), 'abc', '[fail]: expected string; received 23')
     })
-    it('fails with the supplied expected message', () => {
-      fail(pfail('test message'), '', { expected: ['test message'], index: 0 })
+    it('fails with the supplied generic message', () => {
+      fail(pfail('test message'), '', { generic: 'test message', index: 0 })
     })
   })
 
-  describe('unexpected', () => {
+  describe('failFatally', () => {
     it('throws if the passed value is not a string', () => {
-      error(unexpected(23), 'abc', '[unexpected]: expected string; received 23')
+      error(
+        failFatally(23),
+        'abc',
+        '[failFatally]: expected string; received 23',
+      )
     })
-    it('fails with the supplied actual message', () => {
-      fail(unexpected('test message'), '', { actual: 'test message', index: 0 })
+    it('fails with the supplied generic message', () => {
+      fail(failFatally('test message'), '', {
+        generic: 'test message',
+        index: 0,
+      })
     })
   })
 })

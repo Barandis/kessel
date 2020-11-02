@@ -5,6 +5,7 @@
 // https://opensource.org/licenses/MIT
 
 import { Parser } from './core'
+import { ParseError } from './error'
 
 // This encoder/decoder pair is used to translate back and forth
 // between a JavaScript UCS2 string and a UTF8 encoding of that string
@@ -22,8 +23,19 @@ export function trackedFactory(fn, prop = 'created') {
       return created
     },
     prop,
-    { value: creations.has.bind(creations) }
+    { value: creations.has.bind(creations) },
   )
+}
+
+export function *enumerate(iterable, start = 0) {
+  const iterator = iterable[Symbol.iterator]()
+  let result = iterator.next()
+  let index = start >= 0 ? Math.floor(start) : 0
+
+  while (!result.done) {
+    yield { index: index++, value: result.value }
+    result = iterator.next()
+  }
 }
 
 export function *range(start, end, step, inclusive) {
@@ -55,7 +67,7 @@ export function *range(start, end, step, inclusive) {
 export function viewToString(index, length, view) {
   const bytes = Uint8Array.from(
     { length },
-    (_, i) => view.getUint8(index + i)
+    (_, i) => view.getUint8(index + i),
   )
   return decoder.decode(bytes)
 }
@@ -100,7 +112,7 @@ export function assertStringOrRegex(re, name) {
   const type = Object.prototype.toString.call(re)
   if (typeof re !== 'string' && type !== '[object RegExp]') {
     throw new TypeError(
-      `[${name}]: expected string or regular expression; received ${re}`
+      `[${name}]: expected string or regular expression; received ${re}`,
     )
   }
 }
@@ -115,8 +127,14 @@ export function assertParser(fn, name) {
   assertFunction(fn, name)
   if (!Parser.created(fn)) {
     throw new TypeError(
-      `[${name}]: expected parser; received non-parser function`
+      `[${name}]: expected parser; received non-parser function`,
     )
+  }
+}
+
+export function assertParseError(error, name) {
+  if (!ParseError.created(error)) {
+    throw new TypeError(`[${name}]: expected parse error; received ${error}`)
   }
 }
 

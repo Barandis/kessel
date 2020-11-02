@@ -21,7 +21,8 @@
 // recognize any text, so it's these two parsers that can be composed
 // for new parsing functions.
 
-import { failure, Parser, success } from './core'
+import { error, fatal, ok, Parser, ParserStatus } from './core'
+import { expected, generic, overwrite, unexpected } from './error'
 import {
   assertCharacter,
   assertFunction,
@@ -42,6 +43,7 @@ const reAlpha = /^(?:\p{Alphabetic}|\p{N})/u
 const reUpper = /^(?:\p{Uppercase}|\p{Lt})/u
 const reLower = /^\p{Lowercase}/u
 const reSpace = /^\p{White_Space}/u
+const reNewline = /^(?:\r\n|[\r\n\t\v\u0085\u2028\u2029])/u
 
 // A parser for a single character. This parser takes a function of one
 // argument; the next read character is passed to that function and, if
@@ -57,18 +59,26 @@ const reSpace = /^\p{White_Space}/u
 const CharParser = fn => Parser(state => {
   const { index, view } = state
   const name = fn.name.length ? fn.name : '<anonymous>'
-  const expected = [`a character that satisfies function "${name}"`]
+  const message = `a character that satisfies function "${name}"`
 
   if (index >= view.byteLength) {
-    return failure(state, { expected, actual: 'EOF' })
+    return error(state, overwrite(
+      state.errors,
+      expected(message),
+      unexpected('EOF'),
+    ))
   }
 
   const { width, next } = nextChar(index, view)
 
   if (fn(next)) {
-    return success(state, { result: next, index: index + width })
+    return ok(state, next, index + width)
   }
-  return failure(state, { expected, actual: quote(next) })
+  return error(state, overwrite(
+    state.errors,
+    expected(message),
+    unexpected(quote(next)),
+  ))
 })
 
 // Reads the next character and succeeds if that character exactly
@@ -79,8 +89,8 @@ export const char = c => Parser(state => {
   assertCharacter(c, 'char')
   const nextState = CharParser(next => next === c)(state)
 
-  if (nextState.success) return nextState
-  return failure(nextState, { expected: [quote(c)] })
+  if (nextState.status === ParserStatus.Ok) return nextState
+  return error(nextState, overwrite(nextState.errors, expected(quote(c))))
 })
 
 // Reads the next character and succeeds if that character case-
@@ -93,8 +103,8 @@ export const chari = c => Parser(state => {
   const nextState
     = CharParser(next => next.toLowerCase() === c.toLowerCase())(state)
 
-  if (nextState.success) return nextState
-  return failure(nextState, { expected: [quote(c)] })
+  if (nextState.status === ParserStatus.Ok) return nextState
+  return error(nextState, overwrite(nextState.errors, expected(quote(c))))
 })
 
 // Reads the next character and passes it into the supplied predicate
@@ -127,10 +137,10 @@ export const range = (start, end) => Parser(state => {
   const fn = c => c >= start && c <= end
   const nextState = CharParser(fn)(state)
 
-  if (nextState.success) return nextState
+  if (nextState.status === ParserStatus.Ok) return nextState
 
-  const expected = [`character between "${start}" and "${end}"`]
-  return failure(nextState, { expected })
+  const message = `character between "${start}" and "${end}"`
+  return error(nextState, overwrite(nextState.errors, expected(message)))
 })
 
 // Parses a particular string from the current position in the text. The
@@ -140,11 +150,14 @@ export const range = (start, end) => Parser(state => {
 // something that I wanted to do without resorting to regular
 // expressions.
 const StringParser = (str, fn) => Parser(state => {
-  if (str.length === 0) return success(state, { result: '' })
+  if (str.length === 0) return ok(state, '')
 
   const { index, view } = state
   if (index >= view.byteLength) {
-    return failure(state, { expected: [quote(str)], actual: 'EOF' })
+    return error(
+      state,
+      overwrite(state.errors, expected(quote(str)), unexpected('EOF')),
+    )
   }
 
   const bytes = stringToView(str).byteLength
@@ -154,8 +167,12 @@ const StringParser = (str, fn) => Parser(state => {
   const actual = viewToString(index, width, view)
 
   return fn(actual)
-    ? success(state, { index: index + width, result: actual })
-    : failure(state, { expected: [quote(str)], actual: quote(actual) })
+    ? ok(state, actual, index + width)
+    : error(state, overwrite(
+      state.errors,
+      expected(quote(str)),
+      unexpected(quote(actual)),
+    ))
 })
 
 // Parses a string from the current location in the input. The string
@@ -176,7 +193,7 @@ export const string = str => Parser(state => {
 export const stringi = str => Parser(state => {
   assertString(str, 'stringi')
   return StringParser(
-    str, c => c.toLowerCase() === str.toLowerCase()
+    str, c => c.toLowerCase() === str.toLowerCase(),
   )(state)
 })
 
@@ -195,14 +212,10 @@ export const stringi = str => Parser(state => {
 const RegexParser = (re, length = null) => Parser(state => {
   const { index, view } = state
   const rest = viewToString(index, view.byteLength - index, view)
-  const expected = [`a string matching ${re}`]
 
   const match = rest.match(re)
   if (match) {
-    return success(state, {
-      result: match[0],
-      index: index + stringToView(match[0]).byteLength,
-    })
+    return ok(state, match[0], index + stringToView(match[0]).byteLength)
   }
 
   let len = length ?? charLength(re.source) - 1 // to ignore anchor
@@ -211,7 +224,11 @@ const RegexParser = (re, length = null) => Parser(state => {
   }
   const actual = len === 0 ? 'EOF' : quote([...rest].slice(0, len).join(''))
 
-  return failure(state, { expected, actual })
+  return error(state, overwrite(
+    state.errors,
+    expected(`a string matching ${re}`),
+    unexpected(actual),
+  ))
 })
 
 // The regular expression parser.
@@ -254,13 +271,14 @@ export const regex = re => {
 export const any = Parser(state => {
   const { index, view } = state
   if (index === view.byteLength) {
-    return failure(state, { expected: ['any character'], actual: 'EOF' })
+    return error(state, overwrite(
+      state.errors,
+      expected('any character'),
+      unexpected('EOF'),
+    ))
   }
   const { width, next } = nextChar(index, view)
-  return success(state, {
-    index: index + width,
-    result: next,
-  })
+  return ok(state, next, index + width)
 })
 
 // Reads the remainder of the input text and results in that text.
@@ -268,10 +286,7 @@ export const any = Parser(state => {
 export const all = Parser(state => {
   const { index, view } = state
   const width = view.byteLength - index
-  return success(state, {
-    index: index + width,
-    result: viewToString(index, width, view),
-  })
+  return ok(state, viewToString(index, width, view), index + width)
 })
 
 // Reads one character and succeeds if that character does not exist
@@ -280,10 +295,14 @@ export const all = Parser(state => {
 export const eof = Parser(state => {
   const { index, view } = state
   if (index === view.byteLength) {
-    return success(state, { result: null })
+    return ok(state, null)
   }
   const { _, next } = nextChar(index, view)
-  return failure(state, { expected: ['EOF'], actual: quote(next) })
+  return error(state, overwrite(
+    state.errors,
+    expected('EOF'),
+    unexpected(quote(next)),
+  ))
 })
 
 // Reads a character and compares it against each of the characters in
@@ -296,9 +315,13 @@ export const oneOf = str => Parser(state => {
   const { width, next } = nextChar(index, view)
 
   if (str.includes(next)) {
-    return success(state, { result: next, index: index + width })
+    return ok(state, next, index + width)
   }
-  return failure(state, { expected: [`one of "${str}"`], actual: quote(next) })
+  return error(state, overwrite(
+    state.errors,
+    expected(`one of "${str}"`),
+    unexpected(quote(next)),
+  ))
 })
 
 // Reads a character and compares it against each of the characters in
@@ -311,12 +334,13 @@ export const noneOf = str => Parser(state => {
   const { width, next } = nextChar(index, view)
 
   if (str.includes(next)) {
-    return failure(state, {
-      expected: [`none of "${str}"`],
-      actual: quote(next),
-    })
+    return error(state, overwrite(
+      state.errors,
+      expected(`none of "${str}"`),
+      unexpected(quote(next)),
+    ))
   }
-  return success(state, { result: next, index: index + width })
+  return ok(state, next, index + width)
 })
 
 // Reads a character and succeeds with that character if it is a digit.
@@ -326,8 +350,8 @@ export const noneOf = str => Parser(state => {
 export const digit = Parser(state => {
   const fn = c => c >= '0' && c <= '9'
   const nextState = CharParser(fn)(state)
-  if (nextState.success) return nextState
-  return failure(nextState, { expected: ['a digit'] })
+  if (nextState.status === ParserStatus.Ok) return nextState
+  return error(nextState, overwrite(nextState.errors, expected('a digit')))
 })
 
 // Reads a character and succeeds with that character if it is a
@@ -337,8 +361,8 @@ export const hexDigit = Parser(state => {
     || c >= 'a' && c <= 'f'
     || c >= 'A' && c <= 'F'
   const nextState = CharParser(fn)(state)
-  if (nextState.success) return nextState
-  return failure(nextState, { expected: ['a hex digit'] })
+  if (nextState.status === ParserStatus.Ok) return nextState
+  return error(nextState, overwrite(nextState.errors, expected('a hex digit')))
 })
 
 // Reads a character and succeeds with that character if it is a letter.
@@ -346,8 +370,8 @@ export const hexDigit = Parser(state => {
 // `Alphabetic` property.
 export const letter = Parser(state => {
   const nextState = RegexParser(reLetter, 1)(state)
-  if (nextState.success) return nextState
-  return failure(nextState, { expected: ['a letter'] })
+  if (nextState.status === ParserStatus.Ok) return nextState
+  return error(nextState, overwrite(nextState.errors, expected('a letter')))
 })
 
 // Reads a character and succeeds with that character if it is
@@ -355,8 +379,11 @@ export const letter = Parser(state => {
 // Unicode `Alphabetic` property or the Unicode `Number` property.
 export const alphanum = Parser(state => {
   const nextState = RegexParser(reAlpha, 1)(state)
-  if (nextState.success) return nextState
-  return failure(nextState, { expected: ['an alphanumeric'] })
+  if (nextState.status === ParserStatus.Ok) return nextState
+  return error(nextState, overwrite(
+    nextState.errors,
+    expected('an alphanumeric'),
+  ))
 })
 
 // Reads a character and succeeds with that character if it is either an
@@ -365,8 +392,11 @@ export const alphanum = Parser(state => {
 // Unicode `Letter, Titlecase` property.
 export const upper = Parser(state => {
   const nextState = RegexParser(reUpper, 1)(state)
-  if (nextState.success) return nextState
-  return failure(nextState, { expected: ['an uppercase letter'] })
+  if (nextState.status === ParserStatus.Ok) return nextState
+  return error(nextState, overwrite(
+    nextState.errors,
+    expected('an uppercase letter'),
+  ))
 })
 
 // Reads a character and succeeds with that character if it is a
@@ -374,8 +404,11 @@ export const upper = Parser(state => {
 // `Lowercase` property.
 export const lower = Parser(state => {
   const nextState = RegexParser(reLower, 1)(state)
-  if (nextState.success) return nextState
-  return failure(nextState, { expected: ['a lowercase letter'] })
+  if (nextState.status === ParserStatus.Ok) return nextState
+  return error(nextState, overwrite(
+    nextState.errors,
+    expected('a lowercase letter'),
+  ))
 })
 
 // Reads a character and succeeds with that character if it is a
@@ -383,8 +416,8 @@ export const lower = Parser(state => {
 // `White_Space` property.\
 export const space = Parser(state => {
   const nextState = RegexParser(reSpace, 1)(state)
-  if (nextState.success) return nextState
-  return failure(nextState, { expected: ['whitespace'] })
+  if (nextState.status === ParserStatus.Ok) return nextState
+  return error(nextState, overwrite(nextState.errors, expected('whitespace')))
 })
 
 // Reads a single character and succeeds with that character if it is a
@@ -392,8 +425,8 @@ export const space = Parser(state => {
 export const tab = Parser(state => {
   const fn = c => c === '\t'
   const nextState = CharParser(fn)(state)
-  if (nextState.success) return nextState
-  return failure(nextState, { expected: ['tab'] })
+  if (nextState.status === ParserStatus.Ok) return nextState
+  return error(nextState, overwrite(nextState.errors, expected('a tab')))
 })
 
 // Reads a single character and succeeds with that character if it is a
@@ -401,8 +434,11 @@ export const tab = Parser(state => {
 export const cr = Parser(state => {
   const fn = c => c === '\r'
   const nextState = CharParser(fn)(state)
-  if (nextState.success) return nextState
-  return failure(nextState, { expected: ['carriage return'] })
+  if (nextState.status === ParserStatus.Ok) return nextState
+  return error(nextState, overwrite(
+    nextState.errors,
+    expected('a carriage return'),
+  ))
 })
 
 // Reads a single character and succeeds with that character if it is a
@@ -410,45 +446,38 @@ export const cr = Parser(state => {
 export const lf = Parser(state => {
   const fn = c => c === '\n'
   const nextState = CharParser(fn)(state)
-  if (nextState.success) return nextState
-  return failure(nextState, { expected: ['line feed'] })
+  if (nextState.status === ParserStatus.Ok) return nextState
+  return error(nextState, overwrite(nextState.errors, expected('a line feed')))
 })
 
 // Reads two characters and succeeds with those two characters if they
 // are a carriage return and a line feed, in that order.
 export const crlf = Parser(state => {
   const nextState = StringParser('\r\n', c => c === '\r\n')(state)
-  if (nextState.success) return nextState
-  return failure(nextState, { expected: ['CRLF'] })
+  if (nextState.status === ParserStatus.Ok) return nextState
+  return error(nextState, overwrite(nextState.errors, expected('a CR+LF')))
 })
 
 // Reads a character; succeeds if that character is a line feed or a
 // carriage return. If it is a carriage return, it will read one more
 // character if that character is a line feed.
 export const newline = Parser(state => {
-  const nextState = CharParser(c => c === '\r' || c === '\n')(state)
-  if (nextState.success) {
-    if (nextState.result === '\r') {
-      const crlfState = CharParser(c => c === '\n')(nextState)
-      if (crlfState.success) {
-        return success(crlfState, { result: '\r\n' })
-      }
-    }
-    return nextState
-  }
-  return failure(nextState, { expected: ['newline'] })
+  const nextState = RegexParser(reNewline, 1)(state)
+  if (nextState.status === ParserStatus.Ok) return nextState
+  return error(nextState, overwrite(nextState.errors, expected('a newline')))
 })
 
-// Fails without consuming input, setting the `expected` message to
+// Fails without consuming input, setting the generic error message to
 // whatever is passed in.
 export const fail = message => Parser(state => {
   assertString(message, 'fail')
-  return failure(state, { expected: [message] })
+  return error(state, overwrite(state.errors, generic(message)))
 })
 
-// Fails without consuming input, setting the `actual` message to
-// whatever is passed in.
-export const unexpected = message => Parser(state => {
-  assertString(message, 'unexpected')
-  return failure(state, { actual: message })
+// Fails without consuming input, setting the generic error message to
+// whatever is passed in. This signifies a fatal error, one that cannot
+// be recovered from without backtracking.
+export const failFatally = message => Parser(state => {
+  assertString(message, 'failFatally')
+  return fatal(state, overwrite(state.errors, generic(message)))
 })

@@ -5,9 +5,11 @@
 
 import { expect } from 'chai'
 
-import { failure, parse, success } from 'kessel/core'
-import { string } from 'kessel/parsers'
-import { error, pass } from 'test/helper'
+import { sequence } from 'kessel/combinators'
+import { error, fatal, ok, parse } from 'kessel/core'
+import { ErrorType, expected, overwrite, unexpected } from 'kessel/error'
+import { char, string } from 'kessel/parsers'
+import { error as terror, pass } from 'test/helper'
 
 const encoder = new TextEncoder()
 
@@ -27,11 +29,11 @@ describe('Core functionality', () => {
         pass(string('abc'), new DataView(encoder.encode('abc').buffer), 'abc')
       })
       it('throws an error if anything else is passed', () => {
-        error(
+        terror(
           string('123'),
           123,
           'Parser input must be a string, a typed array, an array buffer, or '
-            + 'a data view; parser input was number'
+            + 'a data view; parser input was number',
         )
       })
     })
@@ -39,13 +41,13 @@ describe('Core functionality', () => {
     describe('updating successful parser state', () => {
       it('creates a new object', () => {
         const result = parse(string('123'), '123')
-        const updated = success(result)
+        const updated = ok(result)
         expect(result).to.not.equal(updated)
         expect(result).to.deep.equal(updated)
       })
       it('can update result and/or index properties', () => {
         const result = parse(string('123'), '123')
-        const updated = success(result, { result: '456', index: 0 })
+        const updated = ok(result, '456', 0)
         expect(result.result).to.equal('123')
         expect(updated.result).to.equal('456')
         expect(result.index).to.equal(3)
@@ -56,22 +58,51 @@ describe('Core functionality', () => {
     describe('updated failure parser state', () => {
       it('creates a new object', () => {
         const result = parse(string('123'), 'abc')
-        const updated = failure(result)
+        const updated = error(result)
         expect(result).to.not.equal(updated)
         expect(result).to.deep.equal(updated)
       })
-      it('can update expected, unexpected, and/or index properties', () => {
+      it('can update errors and/or index properties', () => {
         const result = parse(string('123'), 'abc')
-        const updated = failure(result, {
-          expected: ['"x"', '"y"'],
-          actual: '"z"',
-          index: 17,
-        })
-        expect(result.expected).to.deep.equal(['"123"'])
-        expect(updated.expected).to.deep.equal(['"x"', '"y"'])
-        expect(result.actual).to.equal('"abc"')
-        expect(updated.actual).to.equal('"z"')
+        const updated = error(result, overwrite(
+          result.errors, expected('"x"'), expected('"y"'), unexpected('"z"'),
+        ), 17)
+        expect(result.errors).to.deep.equal([
+          { type: ErrorType.Expected, message: '"123"' },
+          { type: ErrorType.Unexpected, message: '"abc"' },
+        ])
+        expect(updated.errors).to.deep.equal([
+          { type: ErrorType.Expected, message: '"x"' },
+          { type: ErrorType.Expected, message: '"y"' },
+          { type: ErrorType.Unexpected, message: '"z"' },
+        ])
         expect(result.index).to.equal(0)
+        expect(updated.index).to.equal(17)
+      })
+    })
+
+    describe('updated fatal failure parser state', () => {
+      it('creates a new object', () => {
+        const result = parse(sequence(char('a'), char('1')), 'abc')
+        const updated = fatal(result)
+        expect(result).to.not.equal(updated)
+        expect(result).to.deep.equal(updated)
+      })
+      it('can update errors and/or index properties', () => {
+        const result = parse(sequence(char('a'), char('1')), 'abc')
+        const updated = fatal(result, overwrite(
+          result.errors, expected('"x"'), expected('"y"'), unexpected('"z"'),
+        ), 17)
+        expect(result.errors).to.deep.equal([
+          { type: ErrorType.Unexpected, message: '"b"' },
+          { type: ErrorType.Expected, message: '"1"' },
+        ])
+        expect(updated.errors).to.deep.equal([
+          { type: ErrorType.Expected, message: '"x"' },
+          { type: ErrorType.Expected, message: '"y"' },
+          { type: ErrorType.Unexpected, message: '"z"' },
+        ])
+        expect(result.index).to.equal(1)
         expect(updated.index).to.equal(17)
       })
     })
