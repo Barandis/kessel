@@ -78,8 +78,7 @@ export function overwrite(list, ...errors) {
   return [...result, ...errors]
 }
 
-///////////////////////////////////////////////////////////////////////
-// Error formatting helper functions
+// #region Formatting utility functions
 
 // Determines whether the character at the given index in the supplied
 // view is a newline. An object with two properties is returned;
@@ -393,6 +392,8 @@ export function format(errors, index, view, tabSize, maxWidth) {
 
   return `${position}\n\n${display}\n${unexpMsg}${expMsg}${msgMsg}\n`
 }
+
+// #endregion
 
 // Accepts a parser state and produces an error message from it.
 //
