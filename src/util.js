@@ -5,7 +5,6 @@
 // https://opensource.org/licenses/MIT
 
 import { Parser } from './core'
-import { ParseError } from './error'
 
 const reType = /^\[(?:object|class) (.*)\]/
 
@@ -98,70 +97,102 @@ export function nextChar(index, view) {
   return { width, next: viewToString(index, width, view) }
 }
 
-function getType(obj) {
+export function articlize(str) {
+  return 'aeiouyAEIOUY'.includes(str[0]) ? `an ${str}` : `a ${str}`
+}
+
+export function getType(obj) {
   const type = Object.prototype.toString.call(obj)
   return type.match(reType)[1]
 }
 
-export function assertCharacter(c, name) {
-  assertString(c, name)
+export function assertType(obj, type, name, msgFn) {
+  const actualType = getType(obj)
+  if (type !== actualType) {
+    throw new TypeError(`[${name}]: ${msgFn(actualType)}`)
+  }
+}
+
+export function assertTypes(obj, types, name, msgFn) {
+  const actualType = getType(obj)
+  if (!types.includes(actualType)) {
+    throw new TypeError(`[${name}]: ${msgFn(actualType)}`)
+  }
+}
+
+export function assertCreated(obj, factory, name, msgFn) {
+  if (!factory.created(obj)) {
+    throw new TypeError(`[${name}]: ${msgFn()}`)
+  }
+}
+
+const assertStringFn = type =>
+  `expected argument to be a String; found ${articlize(type)}`
+
+export function assertString(str, name, msgFn = assertStringFn) {
+  assertType(str, 'String', name, msgFn)
+}
+
+const assertCharacterFn = c =>
+  `expected argument to be one character; found "${c}"`
+
+export function assertCharacter(
+  c,
+  name,
+  strFn = assertStringFn,
+  charFn = assertCharacterFn,
+) {
+  assertString(c, name, strFn)
   if (charLength(c) !== 1) {
-    throw new TypeError(`[${name}]: expected single character; received "${c}"`)
+    throw new TypeError(`[${name}]: ${charFn(c)}`)
   }
 }
 
-export function assertString(str, name) {
-  const type = getType(str)
-  if (type !== 'String') {
-    throw new TypeError(`[${name}]: expected String; received ${type}`)
-  }
+const assertStringOrRegexFn = type =>
+  `expected argument to be a String or a RegExp; found ${articlize(type)}`
+
+export function assertStringOrRegex(re, name, msgFn = assertStringOrRegexFn) {
+  assertTypes(re, ['String', 'RegExp'], name, msgFn)
 }
 
-export function assertStringOrRegex(re, name) {
-  const type = getType(re)
-  if (type !== 'String' && type !== 'RegExp') {
-    throw new TypeError(
-      `[${name}]: expected String or RegExp; received ${type}`,
-    )
-  }
+const assertFunctionFn = type =>
+  `expected argument to be a Function; found ${articlize(type)}`
+
+export function assertFunction(fn, name, msgFn = assertFunctionFn) {
+  assertType(fn, 'Function', name, msgFn)
 }
 
-export function assertFunction(fn, name) {
-  const type = getType(fn)
-  if (type !== 'Function') {
-    throw new TypeError(`[${name}]: expected Function; received ${type}`)
-  }
+const assertGeneratorFunctionFn = type =>
+  `expected argument to be a GeneratorFunction; found ${articlize(type)}`
+
+export function assertGeneratorFunction(
+  fn,
+  name,
+  msgFn = assertGeneratorFunctionFn,
+) {
+  assertType(fn, 'GeneratorFunction', name, msgFn)
 }
 
-export function assertGeneratorFunction(fn, name) {
-  const type = getType(fn)
-  if (type !== 'GeneratorFunction') {
-    throw new TypeError(
-      `[${name}]: expected GeneratorFunction; received ${type}`,
-    )
-  }
-}
+const assertParserFunctionFn = type =>
+  `expected argument to be a parser Function; found ${articlize(type)}`
 
-export function assertParser(fn, name) {
-  assertFunction(fn, name)
-  if (!Parser.created(fn)) {
-    throw new TypeError(
-      `[${name}]: expected Parser; received non-Parser Function`,
-    )
-  }
-}
+const assertParserFn = () =>
+  'expected argument to be a Parser; found a non-Parser Function'
 
-export function assertParseError(error, name) {
-  const type = getType(error)
-  if (!ParseError.created(error)) {
-    throw new TypeError(`[${name}]: expected ParseError; received ${type}`)
-  }
+export function assertParser(
+  fn,
+  name,
+  fnFn = assertParserFunctionFn,
+  parserFn = assertParserFn,
+) {
+  assertType(fn, 'Function', name, fnFn)
+  assertCreated(fn, Parser, name, parserFn)
 }
 
 export function assertArgs(args, length, name) {
   if (args.length < length) {
     throw new TypeError(
-      `[${name}]: expected at least ${length} args; found ${args.length}`,
+      `[${name}]: expected at least ${length} arguments; found ${args.length}`,
     )
   }
 }

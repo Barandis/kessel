@@ -5,7 +5,7 @@
 
 import { error, fatal, Parser, ParserStatus } from 'kessel/core'
 import { ErrorType, expected, overwrite } from 'kessel/error'
-import { assertArgs, assertParser, assertString } from 'kessel/util'
+import { articlize, assertArgs, assertParser, assertString } from 'kessel/util'
 
 // Implements alternatives. Each parser is executed one at a time, in
 // order. When the first parser succeeds, or the first parser fails
@@ -53,7 +53,11 @@ export const choiceL = (...args) => Parser(state => {
   assertArgs(args, 2, 'choiceL')
   const ps = args.slice()
   const message = ps.pop()
-  assertString(message, 'choiceL')
+  assertString(
+    message,
+    'choiceL',
+    type => `expected final argument to be a String; found ${articlize(type)}`,
+  )
 
   let nextState = state
 

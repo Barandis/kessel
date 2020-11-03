@@ -42,14 +42,14 @@ describe('Alternative combinators', () => {
       error(
         choiceL(char('a'), char('b')),
         'ab',
-        '[choiceL]: expected String; received Function',
+        '[choiceL]: expected final argument to be a String; found a Function',
       )
     })
     it('throws if there are not at least two arguments', () => {
       error(
         choiceL('message'),
         'ab',
-        '[choiceL]: expected at least 2 args; found 1',
+        '[choiceL]: expected at least 2 arguments; found 1',
       )
     })
     it('fails with its message if all parsers fail without consuming', () => {

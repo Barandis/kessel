@@ -30,14 +30,6 @@ import { stringToView } from 'kessel/util'
 describe('Parse errors', () => {
   describe('constructing error lists', () => {
     describe('push', () => {
-      it('throws if an error is not passed in', () => {
-        expect(() => push([], {
-          type: ErrorType.Expected,
-          message: 'test message',
-        })).to.throw(
-          '[push]: expected ParseError; received Object',
-        )
-      })
       it('adds an error to the end of an array', () => {
         let list = push([], expected('expected'))
         expect(list).to.deep.equal([
@@ -103,15 +95,6 @@ describe('Parse errors', () => {
         expected('expected 2'),
         generic('message'),
       ]
-
-      it('throws if an error is not passed in', () => {
-        expect(() => overwrite([], {
-          type: ErrorType.Expected,
-          message: 'test message',
-        })).to.throw(
-          '[overwrite]: expected ParseError; received Object',
-        )
-      })
 
       it('replaces all errors of one type with another error', () => {
         expect(overwrite(list, expected('new expected'))).to.deep.equal([

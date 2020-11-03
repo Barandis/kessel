@@ -4,7 +4,6 @@
 // https://opensource.org/licenses/MIT
 
 import {
-  assertParseError,
   charLength,
   nextCharWidth,
   trackedFactory,
@@ -53,9 +52,6 @@ export function other(msg) {
 
 // Adds one or more errors to a list of errors.
 export function push(list, ...errors) {
-  for (const error of errors) {
-    assertParseError(error, 'push')
-  }
   return [...list, ...errors]
 }
 
@@ -70,9 +66,6 @@ export function clear(errors, ...types) {
 // Clears all errors from a list of errors that are of the same type as
 // any of the provided errors, and then adds those errors to the list.
 export function overwrite(list, ...errors) {
-  for (const error of errors) {
-    assertParseError(error, 'overwrite')
-  }
   const types = errors.map(error => error.type)
   const result = list.filter(error => !types.includes(error.type))
   return [...result, ...errors]

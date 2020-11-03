@@ -39,7 +39,8 @@ describe('Sequence combinators', () => {
       error(
         block(() => {}),
         'abc',
-        '[block]: expected GeneratorFunction; received Function',
+        '[block]: '
+          + 'expected argument to be a GeneratorFunction; found a Function',
       )
     })
     it('fails if any of its parsers fail', () => {

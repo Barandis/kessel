@@ -37,12 +37,14 @@ describe('Parsers', () => {
   describe('char', () => {
     it('fails if the supplied value is not a one-character string', () => {
       error(
-        char(23), 'some text', '[char]: expected String; received Number',
+        char(23),
+        'some text',
+        '[char]: expected argument to be a String; found a Number',
       )
       error(
         char('str'),
         'some text',
-        '[char]: expected single character; received "str"',
+        '[char]: expected argument to be one character; found "str"',
       )
     })
 
@@ -110,16 +112,16 @@ describe('Parsers', () => {
   })
 
   describe('chari', () => {
-    it('fails if the supplied value is not a one-character string', () => {
+    it('throws if the supplied value is not a one-character string', () => {
       error(
         chari(23),
         'some text',
-        '[chari]: expected String; received Number',
+        '[chari]: expected argument to be a String; found a Number',
       )
       error(
         chari('str'),
         'some text',
-        '[chari]: expected single character; received "str"',
+        '[chari]: expected argument to be one character; found "str"',
       )
     })
 
@@ -191,7 +193,7 @@ describe('Parsers', () => {
       error(
         satisfies(23),
         'some text',
-        '[satisfies]: expected Function; received Number',
+        '[satisfies]: expected argument to be a Function; found a Number',
       )
     })
 
@@ -239,10 +241,24 @@ describe('Parsers', () => {
   describe('range', () => {
     it('throws if either argument is not a single character string', () => {
       error(
-        range('0', 9), '123', '[range]: expected String; received Number',
+        range('0', 9),
+        '123',
+        '[range]: expected second argument to be a String; found a Number',
       )
       error(
-        range(0, '9'), '123', '[range]: expected String; received Number',
+        range(0, '9'),
+        '123',
+        '[range]: expected first argument to be a String; found a Number',
+      )
+      error(
+        range('12', '9'),
+        '123',
+        '[range]: expected first argument to be one character; found "12"',
+      )
+      error(
+        range('1', '89'),
+        '123',
+        '[range]: expected second argument to be one character; found "89"',
       )
     })
     it('succeeds if the next character is between the supplied two', () => {
@@ -267,7 +283,7 @@ describe('Parsers', () => {
       error(
         string(23),
         'some text',
-        '[string]: expected String; received Number',
+        '[string]: expected argument to be a String; found a Number',
       )
     })
 
@@ -354,7 +370,7 @@ describe('Parsers', () => {
       error(
         stringi(23),
         'some text',
-        '[stringi]: expected String; received Number',
+        '[stringi]: expected argument to be a String; found a Number',
       )
     })
 
@@ -430,7 +446,7 @@ describe('Parsers', () => {
       error(
         () => regex(23),
         'some text',
-        '[regex]: expected String or RegExp; received Number',
+        '[regex]: expected argument to be a String or a RegExp; found a Number',
       )
     })
     it('accepts a string as input', () => {
@@ -1061,7 +1077,11 @@ describe('Parsers', () => {
 
   describe('fail', () => {
     it('throws if the passed value is not a string', () => {
-      error(pfail(23), 'abc', '[fail]: expected String; received Number')
+      error(
+        pfail(23),
+        'abc',
+        '[fail]: expected argument to be a String; found a Number',
+      )
     })
     it('fails with the supplied generic message', () => {
       fail(pfail('test message'), '', { generic: 'test message', index: 0 })
@@ -1073,7 +1093,7 @@ describe('Parsers', () => {
       error(
         failFatally(23),
         'abc',
-        '[failFatally]: expected String; received Number',
+        '[failFatally]: expected argument to be a String; found a Number',
       )
     })
     it('fails with the supplied generic message', () => {
