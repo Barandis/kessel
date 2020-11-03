@@ -5,7 +5,7 @@
 
 import { expect } from 'chai'
 
-import { sequence } from 'kessel/combinators'
+import { sequence } from 'kessel/combinators/sequence'
 import { error, fatal, ok, parse } from 'kessel/core'
 import { ErrorType, expected, overwrite, unexpected } from 'kessel/error'
 import { char, string } from 'kessel/parsers'

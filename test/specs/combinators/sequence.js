@@ -3,109 +3,12 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { expect } from 'chai'
-
-import {
-  attempt,
-  block,
-  choice,
-  label,
-  lookAhead,
-  many,
-  many1,
-  sequence,
-} from 'kessel/combinators'
-import { parse, ParserStatus } from 'kessel/core'
+import { block, many, many1, sequence } from 'kessel/combinators/sequence'
+import { ParserStatus } from 'kessel/core'
 import { any, char, digit, eof, space, string } from 'kessel/parsers'
-import { error, fail, pass } from 'test/helper'
+import { fail, pass } from 'test/helper'
 
-describe('Combinators', () => {
-  describe('label', () => {
-    it('throws if passed a non-function', () => {
-      error(
-        label(23, 'test'),
-        'test',
-        '[label]: expected function; received 23',
-      )
-    })
-    it('throws if passed a function that is not a parser', () => {
-      error(
-        label(x => x, 'test'),
-        'test',
-        '[label]: expected parser; received non-parser function',
-      )
-    })
-    it('does nothing if its parser succeeds', () => {
-      const r1 = parse(char('a'), 'abc')
-      const r2 = parse(label(char('a'), 'test'), 'abc')
-      expect(r1).to.deep.equal(r2)
-    })
-    it('changes the expected message if its parser fails', () => {
-      fail(char('a'), 'bcd', { expected: '"a"' })
-      fail(label(char('a'), 'letter a'), 'bcd', { expected: 'letter a' })
-    })
-    it('changes the expected message on a fatal error', () => {
-      fail(sequence(char('a'), char('b')), 'a1', { expected: '"b"' })
-      fail(
-        label(sequence(char('a'), char('b')), 'letter b'),
-        'a1',
-        { expected: 'letter b' },
-      )
-    })
-    it('overwrites all of multiple expected messages', () => {
-      const parser = choice(char('a'), char('b'), char('c'))
-      fail(parser, 'def', { expected: '"a", "b", or "c"' })
-      fail(label(parser, 'a, b, or c'), 'def', { expected: 'a, b, or c' })
-    })
-  })
-
-  describe('attempt', () => {
-    it('does nothing if its parser succeeds', () => {
-      const r1 = parse(char('a'), 'abc')
-      const r2 = parse(attempt(char('a')), 'abc')
-      expect(r1).to.deep.equal(r2)
-    })
-    it('does nothing if its parser fails without consuming input', () => {
-      const r1 = parse(char('a'), 'bcd')
-      const r2 = parse(attempt(char('a')), 'bcd')
-      expect(r1).to.deep.equal(r2)
-    })
-    it('resets the index if its parser fails with consuming input', () => {
-      const parser = sequence(string('te'), string('st'))
-      fail(parser, 'tesl', { index: 2, status: ParserStatus.Fatal })
-      fail(attempt(parser), 'tesl', { index: 0, status: ParserStatus.Error })
-    })
-  })
-
-  describe('lookAhead', () => {
-    const parser = lookAhead(sequence(string('ab'), string('cd')))
-
-    it('succeeds with no consumption if its parser succeeds', () => {
-      pass(parser, 'abcd', { result: ['ab', 'cd'], index: 0 })
-    })
-    it('fails with no consumption if its parser fails', () => {
-      fail(parser, 'abd', { expected: '"cd"', actual: '"d"', index: 0 })
-    })
-  })
-
-  describe('choice', () => {
-    const parser = choice(
-      sequence(char('a'), char('b')),
-      sequence(char('c'), char('d')),
-      sequence(char('e'), char('f')),
-    )
-
-    it('fails with all expecteds if all parsers fail without consuming', () => {
-      fail(parser, 'yz', { expected: '"a", "c", or "e"' })
-    })
-    it('fails immediately if a failed parser consumes input', () => {
-      fail(parser, 'ce', { expected: '"a" or "d"' })
-    })
-    it('succeeds if one parser succeeds first', () => {
-      pass(parser, 'cd', { result: ['c', 'd'] })
-    })
-  })
-
+describe('Sequence combinators', () => {
   describe('sequence', () => {
     const parser = sequence(string('abc'), string('def'), string('ghi'))
 
