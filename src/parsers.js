@@ -3,24 +3,6 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// Here are the string and regular expression parsers which form the
-// basis of the entire system.
-//
-// Every recognizer is a specialization of the StringParser or the
-// RegexParser. In other words, these are the only two parsers that
-// actually *parse text*. Every other parser either parameterizes one
-// of these two to parse something more specific, or they are
-// combinators that build more complex parsers. At the end though,
-// every combinator calls one of these two, either directly or
-// indirectly.
-//
-// These two are not exposed outside of this file. Their interfaces
-// (with the comparison function for the StringParser and the expected
-// outcome for the RegexParser) contain things that don't need to be
-// exposed. The `string` and `regex` parsers are low-level enough to
-// recognize any text, so it's these two parsers that can be composed
-// for new parsing functions.
-
 import { error, fatal, ok, Parser, ParserStatus } from './core'
 import { expected, generic, overwrite, unexpected } from './error'
 import {
@@ -35,8 +17,8 @@ import {
   viewToString,
 } from './util'
 
-// All of the regular expressions used in the derived parsers. These
-// are here to create and compile them once, upon initial lode, to
+// All of the regular expressions used in the derived regex parsers.
+// These are here to create and compile them once, upon initial load, to
 // speed parsing later.
 const reLetter = /^\p{Alphabetic}/u
 const reAlpha = /^(?:\p{Alphabetic}|\p{N})/u
@@ -45,26 +27,21 @@ const reLower = /^\p{Lowercase}/u
 const reSpace = /^\p{White_Space}/u
 const reNewline = /^(?:\r\n|[\r\n\t\v\u0085\u2028\u2029])/u
 
-// A parser for a single character. This parser takes a function of one
-// argument; the next read character is passed to that function and, if
-// it returns true, the parser succeeds with that character.
+// A parser that reads a single character, feeds it to function `fn`,
+// and succeeds or fails based on the return value.
 //
-// If the function returns false, the parser fails, though it returns
-// its `actual` state property without the normal quotes around literal
-// strings. This is to enable the `StringParser` below to build up its
-// own actual from individual invocations of this parser.
-//
-// This parser directly powers `char`, `chari`, and `satisfies`, and it
-// is used repeatedly by `StringParser`.
+// There isn't anything here that couldn't be written with
+// `StringParser` instead, but when working with single characters there
+// are certain assumptions that can be made (such as the number of
+// characters that have to be read from the input view) that allow it to
+// be a little more efficient. For that reason, this parser and the
+// associated `char` and `chari` parsers will remain.
 const CharParser = fn => Parser(state => {
   const { index, view } = state
-  const name = fn.name.length ? fn.name : '<anonymous>'
-  const message = `a character that satisfies function "${name}"`
 
   if (index >= view.byteLength) {
     return error(state, overwrite(
       state.errors,
-      expected(message),
       unexpected('EOF'),
     ))
   }
@@ -76,79 +53,39 @@ const CharParser = fn => Parser(state => {
   }
   return error(state, overwrite(
     state.errors,
-    expected(message),
     unexpected(quote(next)),
   ))
 })
 
-// Reads the next character and succeeds if that character exactly
-// matches the passed one. The result is the read character. This parser
-// is more efficient than the `string` parser in cases where only one
-// character needs to be read.
+// Reads a single character from input and succeeds if that character is
+// `c`. Upon failure, this parser does not consume input.
 export const char = c => Parser(state => {
   assertCharacter(c, 'char')
-  const nextState = CharParser(next => next === c)(state)
 
+  const nextState = CharParser(next => c === next)(state)
   if (nextState.status === ParserStatus.Ok) return nextState
   return error(nextState, overwrite(nextState.errors, expected(quote(c))))
 })
 
-// Reads the next character and succeeds if that character case-
-// insensitively matches the passed one. The result is the read
-// character (which may be different than the passed character if they
-// differ in case). This parser is more efficient than the `stringi`
-// parser in cases where only one character needs to be read.
+// Reads a single character from input and succeeds if that character is
+// `c`. This differs from `char` in that the comparison done by this
+// parser is case-insensitive. Upon failure, this parser does not
+// consume input.
 export const chari = c => Parser(state => {
   assertCharacter(c, 'chari')
-  const nextState
-    = CharParser(next => next.toLowerCase() === c.toLowerCase())(state)
 
+  const nextState = CharParser(
+    next => c.toLowerCase() === next.toLowerCase(),
+  )(state)
   if (nextState.status === ParserStatus.Ok) return nextState
   return error(nextState, overwrite(nextState.errors, expected(quote(c))))
-})
-
-// Reads the next character and passes it into the supplied predicate
-// function. If that function returns `true`, the parser succeeds with
-// that character as the result.
-export const satisfies = fn => Parser(state => {
-  assertFunction(fn, 'satisfies')
-  return CharParser(fn)(state)
-})
-
-// Reads a character and succeeds if that character is in the range
-// between the start and end characters provided. This is here primarily
-// to lower the need for regular expressions on this common use case.
-//
-// "In range" is defined the same here as with the comparison operators
-// for strings in JavaScript, which work off Unicode code points. Mixing
-// cases is not recommended unless you know what you're doing, because
-// those comparisons are often not intuitive.
-//
-// Also take care in non-ascii characters. For example, there is a
-// series of "mathematical small italic" letters from 0xf09d918e to
-// 0xf09d91a7, but they do not include an 'h'. Instead, the character
-// "Planck constant" is used, which is at 0xe2848e. This 'h' will
-// therefore not be in the range from 'a' to 'z' in mathematical small
-// italics, and a solution to this problem is not feasible.
-export const range = (start, end) => Parser(state => {
-  assertCharacter(start, 'range')
-  assertCharacter(end, 'range')
-
-  const fn = c => c >= start && c <= end
-  const nextState = CharParser(fn)(state)
-
-  if (nextState.status === ParserStatus.Ok) return nextState
-
-  const message = `character between "${start}" and "${end}"`
-  return error(nextState, overwrite(nextState.errors, expected(message)))
 })
 
 // Parses a particular string from the current position in the text. The
 // `fn` parameter is a comparision function; it returns true if its two
-// arguments are equal strings and `false` if they are not. This allows
-// this parser to be used to make case-insenstive parsers, which is
-// something that I wanted to do without resorting to regular
-// expressions.
+// arguments are equal strings and `false` if they are not. `str` is the
+// input string; this parameter is necessary for knowing how many bytes
+// of the input view to pull for comparison.
 const StringParser = (str, fn) => Parser(state => {
   if (str.length === 0) return ok(state, '')
 
@@ -176,7 +113,7 @@ const StringParser = (str, fn) => Parser(state => {
 })
 
 // Parses a string from the current location in the input. The string
-// match must be exact (it is case-sensitive), and all UTF8 characters
+// match must be exact (it is case-sensitive), and all UTF-8 characters
 // are recognized properly.
 export const string = str => Parser(state => {
   assertString(str, 'string')
@@ -184,12 +121,10 @@ export const string = str => Parser(state => {
 })
 
 // Parses a string from the current location in the input. This match is
-// *not* case-sensitive, but case-insensitivity is not recognized in
-// 3-byte or 4-byte characters (for example, `𝑂` and `𝑜`, which are
-// both 4-byte characters, are not recognized as matching by this
-// parser). This is a limitation for which a solution has not yet been
-// found; even using a regular expression with the flags `ui` does not
-// recognize these two characters as being equal.
+// *not* case-sensitive. However, there is a limitation based on the
+// JavaScript understanding of pairs of upper- and lowercase letters. It
+// cannot be assumed that 3- and 4-byte characters will recognize case-
+// insensitive counterparts.
 export const stringi = str => Parser(state => {
   assertString(str, 'stringi')
   return StringParser(
@@ -231,25 +166,17 @@ const RegexParser = (re, length = null) => Parser(state => {
   ))
 })
 
-// The regular expression parser.
+// Attempts to match the supplied regular expression to the input text
+// at the current location. If there is a match, any matching text is
+// returned as a successful result. No text is consumed upon failure.
 //
-// This parser begins by manipulating its argument into the kind of
-// regular expression expected. If it's a string, it's turned into a
-// regular expression using that string as the pattern and using no
-// flags. If it does *not* begin with `^`, a new regular expression that
-// is anchored (but is otherwise identical) is created.
+// A string can be passed to this parser. If one is, it is converted
+// into a regular expression without flags.
 //
-// Only the first match is returned, so the global flag essentially does
-// nothing.
-//
-// Since we can't know the length of a match before successfully
-// matching, the `actual` state property simply shows text of the same
-// length as the input pattern upon failure.
-//
-// NOTE: the `regex` parser automatically backtracks; it does not
-// consume input on failure. This is because there isn't a set number
-// of characters to check against a regular expression, so we can't know
-// how many "matched" before a parser failure.
+// If a start anchor (^) is not included, one will be added. If the `g`
+// flag is included, it'll functionally be ignored as only the first
+// match will be considered anyway. These two rules ensure that the
+// match is only attempted at the beginning of the current text.
 export const regex = re => {
   assertStringOrRegex(re, 'regex')
 
@@ -266,6 +193,44 @@ export const regex = re => {
 
   return RegexParser(regex)
 }
+
+// Reads a single character and passes it to the provided function. If
+// the function returns true, this parser succeeds with that character
+// as the result. If the function returns false, this parser fails and
+// consumes no input.
+export const satisfies = fn => Parser(state => {
+  assertFunction(fn, 'satisfies')
+
+  const name = fn.name.length ? fn.name : '<anonymous>'
+  const message = `a character that satisfies function "${name}"`
+
+  const nextState = CharParser(fn)(state)
+  if (nextState.status === ParserStatus.Ok) return nextState
+  return error(nextState, overwrite(nextState.errors, expected(message)))
+})
+
+// Reads a single character and determines whether it is between the
+// provided start and end characters (inclusive). If it is, the read
+// character is the successful result, and if it is not, the parser
+// fails without consuming input.
+//
+// "Between" is defined according to code points. This is fine in most
+// cases, but it can get weird with higher code points. For example,
+// there is no `h` in the set of mathematical lowercase italic symbols.
+// The `h` would instead be the Planck's Constant character, which is in
+// a completely different part of the Unicode spectrum and therefore is
+// not "between" `a` and `z`. Take care with non-ascii characters.
+export const range = (start, end) => Parser(state => {
+  assertCharacter(start, 'range')
+  assertCharacter(end, 'range')
+
+  const fn = c => c >= start && c <= end
+  const message = `a character between "${start}" and "${end}"`
+
+  const nextState = CharParser(fn)(state)
+  if (nextState.status === ParserStatus.Ok) return nextState
+  return error(nextState, overwrite(nextState.errors, expected(message)))
+})
 
 // Reads one character and results in that character. Fails only at EOF.
 export const any = Parser(state => {

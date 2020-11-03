@@ -123,6 +123,15 @@ export function assertFunction(fn, name) {
   }
 }
 
+export function assertGeneratorFunction(fn, name) {
+  const type = Object.prototype.toString.call(fn)
+  if (type !== '[object GeneratorFunction]') {
+    throw new TypeError(
+      `[${name}]: expected generator function; received ${fn}`,
+    )
+  }
+}
+
 export function assertParser(fn, name) {
   assertFunction(fn, name)
   if (!Parser.created(fn)) {

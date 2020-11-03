@@ -5,7 +5,7 @@
 
 import { error, fatal, ok, Parser, ParserStatus } from './core'
 import { ErrorType, expected, overwrite } from './error'
-import { assertParser, assertString } from './util'
+import { assertGeneratorFunction, assertParser, assertString } from './util'
 
 // Executes the supplied parser. If the parser succeeds, `label` simply
 // passes the result through; but if it fails, `label` replaces its
@@ -121,6 +121,8 @@ export const sequence = (...ps) => Parser(state => {
 // Only parsers may be yielded in a block. Yielding anything else will
 // throw an exception.
 export const block = genFn => Parser(state => {
+  assertGeneratorFunction(genFn, 'block')
+
   const gen = genFn()
   const index = state.index
   let nextValue
