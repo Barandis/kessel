@@ -18,14 +18,14 @@ describe('Message combinators', () => {
       error(
         label(23, 'test'),
         'test',
-        '[label]: expected function; received 23',
+        '[label]: expected Function; received Number',
       )
     })
     it('throws if passed a function that is not a parser', () => {
       error(
         label(x => x, 'test'),
         'test',
-        '[label]: expected parser; received non-parser function',
+        '[label]: expected Parser; received non-Parser Function',
       )
     })
     it('does nothing if its parser succeeds', () => {

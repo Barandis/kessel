@@ -6,7 +6,7 @@
 import { block, many, many1, sequence } from 'kessel/combinators/sequence'
 import { ParserStatus } from 'kessel/core'
 import { any, char, digit, eof, space, string } from 'kessel/parsers'
-import { fail, pass } from 'test/helper'
+import { error, fail, pass } from 'test/helper'
 
 describe('Sequence combinators', () => {
   describe('sequence', () => {
@@ -35,6 +35,13 @@ describe('Sequence combinators', () => {
       return c
     })
 
+    it('fails if a non- generator function is passed in', () => {
+      error(
+        block(() => {}),
+        'abc',
+        '[block]: expected GeneratorFunction; received Function',
+      )
+    })
     it('fails if any of its parsers fail', () => {
       fail(parser, 'abd', {
         expected: '"abc"',

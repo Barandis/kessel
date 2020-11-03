@@ -35,7 +35,7 @@ describe('Parse errors', () => {
           type: ErrorType.Expected,
           message: 'test message',
         })).to.throw(
-          '[push]: expected parse error; received [object Object]',
+          '[push]: expected ParseError; received Object',
         )
       })
       it('adds an error to the end of an array', () => {
@@ -109,7 +109,7 @@ describe('Parse errors', () => {
           type: ErrorType.Expected,
           message: 'test message',
         })).to.throw(
-          '[overwrite]: expected parse error; received [object Object]',
+          '[overwrite]: expected ParseError; received Object',
         )
       })
 

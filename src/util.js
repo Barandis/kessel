@@ -7,6 +7,8 @@
 import { Parser } from './core'
 import { ParseError } from './error'
 
+const reType = /^\[(?:object|class) (.*)\]/
+
 // This encoder/decoder pair is used to translate back and forth
 // between a JavaScript UCS2 string and a UTF8 encoding of that string
 // in a Uint8Array.
@@ -96,38 +98,46 @@ export function nextChar(index, view) {
   return { width, next: viewToString(index, width, view) }
 }
 
+function getType(obj) {
+  const type = Object.prototype.toString.call(obj)
+  return type.match(reType)[1]
+}
+
 export function assertCharacter(c, name) {
-  if (typeof c !== 'string' || charLength(c) !== 1) {
-    throw new TypeError(`[${name}]: expected single character; received ${c}`)
+  assertString(c, name)
+  if (charLength(c) !== 1) {
+    throw new TypeError(`[${name}]: expected single character; received "${c}"`)
   }
 }
 
 export function assertString(str, name) {
-  if (typeof str !== 'string') {
-    throw new TypeError(`[${name}]: expected string; received ${str}`)
+  const type = getType(str)
+  if (type !== 'String') {
+    throw new TypeError(`[${name}]: expected String; received ${type}`)
   }
 }
 
 export function assertStringOrRegex(re, name) {
-  const type = Object.prototype.toString.call(re)
-  if (typeof re !== 'string' && type !== '[object RegExp]') {
+  const type = getType(re)
+  if (type !== 'String' && type !== 'RegExp') {
     throw new TypeError(
-      `[${name}]: expected string or regular expression; received ${re}`,
+      `[${name}]: expected String or RegExp; received ${type}`,
     )
   }
 }
 
 export function assertFunction(fn, name) {
-  if (typeof fn !== 'function') {
-    throw new TypeError(`[${name}]: expected function; received ${fn}`)
+  const type = getType(fn)
+  if (type !== 'Function') {
+    throw new TypeError(`[${name}]: expected Function; received ${type}`)
   }
 }
 
 export function assertGeneratorFunction(fn, name) {
-  const type = Object.prototype.toString.call(fn)
-  if (type !== '[object GeneratorFunction]') {
+  const type = getType(fn)
+  if (type !== 'GeneratorFunction') {
     throw new TypeError(
-      `[${name}]: expected generator function; received ${fn}`,
+      `[${name}]: expected GeneratorFunction; received ${type}`,
     )
   }
 }
@@ -136,14 +146,23 @@ export function assertParser(fn, name) {
   assertFunction(fn, name)
   if (!Parser.created(fn)) {
     throw new TypeError(
-      `[${name}]: expected parser; received non-parser function`,
+      `[${name}]: expected Parser; received non-Parser Function`,
     )
   }
 }
 
 export function assertParseError(error, name) {
+  const type = getType(error)
   if (!ParseError.created(error)) {
-    throw new TypeError(`[${name}]: expected parse error; received ${error}`)
+    throw new TypeError(`[${name}]: expected ParseError; received ${type}`)
+  }
+}
+
+export function assertArgs(args, length, name) {
+  if (args.length < length) {
+    throw new TypeError(
+      `[${name}]: expected at least ${length} args; found ${args.length}`,
+    )
   }
 }
 

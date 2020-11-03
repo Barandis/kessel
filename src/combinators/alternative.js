@@ -4,8 +4,8 @@
 // https://opensource.org/licenses/MIT
 
 import { error, fatal, Parser, ParserStatus } from 'kessel/core'
-import { ErrorType, overwrite } from 'kessel/error'
-import { assertParser } from 'kessel/util'
+import { ErrorType, expected, overwrite } from 'kessel/error'
+import { assertArgs, assertParser, assertString } from 'kessel/util'
 
 // Implements alternatives. Each parser is executed one at a time, in
 // order. When the first parser succeeds, or the first parser fails
@@ -37,6 +37,38 @@ export const choice = (...ps) => Parser(state => {
   }
 
   return error(nextState, overwrite(nextState.errors, ...expecteds))
+})
+
+// Implements alternatives, but with a failure message included. All
+// arguments must be parsers except for the last, which must be a
+// string. The parsers are tried one at a time as with `choice`, but if
+// they all fail (or if any fail fatally), the last argument is used as
+// the expected message rather than constructing it out of the expected
+// messages of each failed parser.
+//
+// This is a bit more efficient than using `label` and `choice` together
+// since one less parser is created and there's no need to track each
+// parser's expected messages.
+export const choiceL = (...args) => Parser(state => {
+  assertArgs(args, 2, 'choiceL')
+  const ps = args.slice()
+  const message = ps.pop()
+  assertString(message, 'choiceL')
+
+  let nextState = state
+
+  for (const p of ps) {
+    assertParser(p, 'choiceL')
+
+    nextState = p(nextState)
+
+    if (nextState.status === ParserStatus.Ok) return nextState
+    if (nextState.status === ParserStatus.Fatal) {
+      return fatal(nextState, overwrite(nextState.errors, expected(message)))
+    }
+  }
+
+  return error(nextState, overwrite(nextState.errors, expected(message)))
 })
 
 // Executes the supplied parser. If the parser succeeds or fails
