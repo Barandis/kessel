@@ -6,7 +6,8 @@
 import { expect } from 'chai'
 
 import { parse, ParserStatus } from 'kessel/core'
-import { commaSeparate, ErrorType } from 'kessel/error'
+import { ErrorType } from 'kessel/error'
+import { commaSeparate } from 'kessel/util'
 
 const first = (errors, type) =>
   errors.find(error => error.type === type)?.message

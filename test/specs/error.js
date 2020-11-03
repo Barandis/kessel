@@ -8,7 +8,6 @@ import { expect } from 'chai'
 import { ParserState } from 'kessel/core'
 import {
   clear,
-  commaSeparate,
   ErrorType,
   expected,
   format,
@@ -25,7 +24,7 @@ import {
   tabify,
   unexpected,
 } from 'kessel/error'
-import { stringToView } from 'kessel/util'
+import { commaSeparate, stringToView } from 'kessel/util'
 
 describe('Parse errors', () => {
   describe('constructing error lists', () => {

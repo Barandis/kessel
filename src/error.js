@@ -5,6 +5,7 @@
 
 import {
   charLength,
+  commaSeparate,
   nextCharWidth,
   trackedFactory,
   viewToString,
@@ -271,26 +272,6 @@ export function show(line, length, colno, maxWidth) {
   }...\n${
     ' '.repeat(Math.ceil(maxWidth / 2))
   }^`
-}
-
-// Comma-separates (as needed) the messages in the provided array. If
-// the array is empty, the result will be an empty string; if the array
-// has only one element, that element will be returned. If the array has
-// two elements, they will be joined with ' or ' between them. If the
-// array is longer than that, all elements will be comma-separated with
-// an additional 'or' between the last two elements (Oxford comma
-// style).
-export function commaSeparate(messages) {
-  switch (messages.length) {
-    case 0: return ''
-    case 1: return messages[0]
-    case 2: return messages.join(' or ')
-    default: {
-      const msgs = messages.slice()
-      const last = msgs.pop()
-      return `${msgs.join(', ')}, or ${last}`
-    }
-  }
 }
 
 // The default formatter for error messages.
