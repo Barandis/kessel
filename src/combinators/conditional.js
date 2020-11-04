@@ -3,17 +3,30 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { error, ok, Parser, ParserStatus } from 'kessel/core'
+import { error, ok, makeParser, Status } from 'kessel/core'
 
-// Executes the supplied parser. If it succeeds, its result becomes the
-// result of `lookAhead`. Either way, no input is consumed.
-//
-// As a side effect, any fatal parse error will be transformed into a
-// non-fatal one, since no input is being consumed.
-export const lookAhead = p => Parser(state => {
+/**
+ * @typedef {import('kessel/core').Parser} Parser
+ */
+
+/**
+ * Creates a parser that applies the supplied parser. If that parser
+ * succeeds, its result becomes the result of the returned parser.
+ * Either way, no input is consumed. This is used to determine whether
+ * the next character(s) satisfy the parser without actually consuming
+ * the input to find out.
+ *
+ * As a side effect, any fatal parse error will be transformed into a
+ * non-fatal one, since no input is being consumed.
+ *
+ * @param {Parser} p The parser to be applied.
+ * @returns {Parser} A parser that applies `p` and succeeds or fails
+ *     with it, but which consumes no input either way.
+ */
+export const lookAhead = p => makeParser(state => {
   const index = state.index
   const nextState = p(state)
-  return nextState.status === ParserStatus.Ok
+  return nextState.status === Status.Ok
     ? ok(nextState, undefined, index)
     : error(nextState, undefined, index)
 })

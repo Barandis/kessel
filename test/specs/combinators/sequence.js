@@ -4,13 +4,13 @@
 // https://opensource.org/licenses/MIT
 
 import { block, many, many1, sequence } from 'kessel/combinators/sequence'
-import { ParserStatus } from 'kessel/core'
+import { Status } from 'kessel/core'
 import { any, char, digit, eof, space, string } from 'kessel/parsers'
 import { fail, pass } from 'test/helper'
 
 describe('Sequence combinators', () => {
   describe('sequence', () => {
-    const parser = sequence(string('abc'), string('def'), string('ghi'))
+    const parser = sequence([string('abc'), string('def'), string('ghi')])
 
     it('fails if any of its parsers fail', () => {
       fail(parser, 'abd', { expected: '"abc"', actual: '"abd"', index: 0 })
@@ -21,7 +21,7 @@ describe('Sequence combinators', () => {
       pass(parser, 'abcdefghi', { result: ['abc', 'def', 'ghi'], index: 9 })
     })
     it('does not add null to results', () => {
-      pass(sequence(string('abc'), eof), 'abc', { result: ['abc'], index: 3 })
+      pass(sequence([string('abc'), eof]), 'abc', { result: ['abc'], index: 3 })
     })
   })
 
@@ -40,25 +40,25 @@ describe('Sequence combinators', () => {
         expected: '"abc"',
         actual: '"abd"',
         index: 0,
-        status: ParserStatus.Error,
+        status: Status.Error,
       })
       fail(parser, 'abcd', {
         expected: 'whitespace',
         actual: '"d"',
         index: 3,
-        status: ParserStatus.Fatal,
+        status: Status.Fatal,
       })
       fail(parser, 'abc ', {
         expected: 'any character',
         actual: 'EOF',
         index: 4,
-        status: ParserStatus.Fatal,
+        status: Status.Fatal,
       })
       fail(parser, 'abc de', {
         expected: 'whitespace',
         actual: '"e"',
         index: 5,
-        status: ParserStatus.Fatal,
+        status: Status.Fatal,
       })
     })
     it('succeeds with its return value if all parsers succeed', () => {
@@ -79,11 +79,11 @@ describe('Sequence combinators', () => {
       pass(many(digit), '123', ['1', '2', '3'])
     })
     it('fails if its parser consumes while failing', () => {
-      fail(many(sequence(char('a'), char('b'))), 'ababac', {
+      fail(many(sequence([char('a'), char('b')])), 'ababac', {
         expected: '"b"',
         actual: '"c"',
         index: 5,
-        status: ParserStatus.Fatal,
+        status: Status.Fatal,
       })
     })
   })
@@ -101,11 +101,11 @@ describe('Sequence combinators', () => {
       pass(many1(digit), '123', ['1', '2', '3'])
     })
     it('fails if its parser consumes while failing', () => {
-      fail(many1(sequence(char('a'), char('b'))), 'ababac', {
+      fail(many1(sequence([char('a'), char('b')])), 'ababac', {
         expected: '"b"',
         actual: '"c"',
         index: 5,
-        status: ParserStatus.Fatal,
+        status: Status.Fatal,
       })
     })
   })

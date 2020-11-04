@@ -4,12 +4,30 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-// This encoder/decoder pair is used to translate back and forth
-// between a JavaScript UCS2 string and a UTF8 encoding of that string
-// in a Uint8Array.
+/**
+ * Translates a UCS-2 string into a Uint8Array of UTF-8 bytes.
+ */
 export const encoder = new TextEncoder()
+
+/**
+ * Translates a Uint8Array of UTF-8 bytes into a UCS-2 string.
+ */
 export const decoder = new TextDecoder()
 
+/**
+ * Creates an iterator that covers a range from a starting value to an
+ * ending value, stepping by a certain value between each.
+ *
+ * @param {number} [start=0] The first number of the range.
+ * @param {number} end The last number of the range. By default this
+ *     number forms the upper bound of the range without being included
+ *     in it.
+ * @param {number} [step=1] The number to increase the yielded value by
+ *     during each iteration.
+ * @param {boolean} [inclusive=false] Determines whether `end` should be
+ *     included as part of the range.
+ * @yields {number} The values that make up the range.
+ */
 export function *range(start, end, step, inclusive) {
   const s = typeof end === 'number' ? start : 0
   const e = typeof end === 'number' ? end : start
@@ -36,6 +54,18 @@ export function *range(start, end, step, inclusive) {
   /* eslint-enable require-atomic-updates */
 }
 
+/**
+ * Returns a portion of a UTF-8 data view as a UCS-2 string.
+ *
+ * @param {number} index The index of the byte to be the first in the
+ *     generated string.
+ * @param {number} length The number of bytes to include in the
+ *     generated string.
+ * @param {DataView} view The data view containing the text from which
+ *     the generated string is taken.
+ * @returns {string} A UCS-2 (regular JavaScript string) representation
+ *     of the UTF-8 characters in the data view.
+ */
 export function viewToString(index, length, view) {
   const bytes = Uint8Array.from(
     { length },
@@ -44,14 +74,39 @@ export function viewToString(index, length, view) {
   return decoder.decode(bytes)
 }
 
+/**
+ * Creates a UTF-8 data view of a UCS-2 string.
+ *
+ * @param {string} str The string to encode into a UTF-8 data view.
+ * @returns {DataView} A data view over the UTF-8 bytes of the input
+ *     string.
+ */
 export function stringToView(str) {
   return new DataView(encoder.encode(str).buffer)
 }
 
+/**
+ * Returns the number of UTF-8 characters in a string. This can differ
+ * from the number of UCS-2 characters in the same string, meaning this
+ * value can differ from the `length` property of the same string.
+ *
+ * @param {string} str The string of which to get the character length.
+ * @return {number} The number of UTF-8 characters in that string.
+ */
 export function charLength(str) {
   return [...str].length
 }
 
+/**
+ * Determines the width of the character currently indexed in the view,
+ * based on the value of its first byte.
+ *
+ * @param {number} index The index of the byte within the view that is
+ *     the first (and perhaps only) byte of the next character.
+ * @param {DataView} view The data view containing the text.
+ * @returns {(1|2|3|4)} The number of bytes contained in the character
+ *     starting at the indexed byte.
+ */
 export function nextCharWidth(index, view) {
   const byte = view.getUint8(index)
   if ((byte & 0x80) >> 7 === 0) return 1
@@ -63,22 +118,53 @@ export function nextCharWidth(index, view) {
   return 1
 }
 
+/**
+ * Contains information about the next character in the data view.
+ *
+ * @typedef NextCharInfo
+ * @property {(1|2|3|4)} width The width of the returned character.
+ * @property {string} next The next character.
+ */
+
+/**
+ * Returns the character at the indexed position within the data view.
+ * This character may be a 1-, 2-, 3-, or 4-byte character depending on
+ * the value of its first byte.
+ *
+ * @param {number} index The index within the view of the first byte of
+ *     the desired character.
+ * @param {DataView} view The data view containing the text.
+ * @returns {NextCharInfo} Information about the next character in the
+ *     data view.
+ */
 export function nextChar(index, view) {
   const width = nextCharWidth(index, view)
   return { width, next: viewToString(index, width, view) }
 }
 
+/**
+ * Surrounds the supplied string in double quotes.
+ *
+ * @param {string} str The string to surround in double quotes.
+ * @returns {string} The same string, led and trailed by double quotes.
+ */
 export function quote(str) {
   return `"${str}"`
 }
 
-// Comma-separates (as needed) the messages in the provided array. If
-// the array is empty, the result will be an empty string; if the array
-// has only one element, that element will be returned. If the array has
-// two elements, they will be joined with ' or ' between them. If the
-// array is longer than that, all elements will be comma-separated with
-// an additional 'or' between the last two elements (Oxford comma
-// style).
+/**
+ * Comma-separates (as needed) the strings in the provided array. If
+ * the array is empty, the result will be an empty string; if the array
+ * has only one element, that element will be returned. If the array has
+ * two elements, they will be joined with ' or ' between them. If the
+ * array is longer than that, all elements will be comma-separated with
+ * an additional 'or' between the last two elements (Oxford comma
+ * style).
+ *
+ * @param {string[]} messages The strings that need to be joined into
+ *     a comma-separated string.
+ * @returns {string} The messages joined into a single string.
+ */
 export function commaSeparate(messages) {
   switch (messages.length) {
     case 0: return ''

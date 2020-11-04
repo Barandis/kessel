@@ -5,24 +5,24 @@
 
 import { expect } from 'chai'
 
-import { ParserState } from 'kessel/core'
+import { makeState } from 'kessel/core'
 import {
   clear,
   ErrorType,
-  expected,
+  makeExpected,
   format,
   formatErrors,
   getCharIndex,
   getColNumber,
   getLineIndexes,
   isNewline,
-  generic,
-  other,
+  makeGeneric,
+  makeOther,
   overwrite,
   push,
   show,
   tabify,
-  unexpected,
+  makeUnexpected,
 } from 'kessel/error'
 import { commaSeparate, stringToView } from 'kessel/util'
 
@@ -30,18 +30,18 @@ describe('Parse errors', () => {
   describe('constructing error lists', () => {
     describe('push', () => {
       it('adds an error to the end of an array', () => {
-        let list = push([], expected('expected'))
+        let list = push([], makeExpected('expected'))
         expect(list).to.deep.equal([
           { type: ErrorType.Expected, message: 'expected' },
         ])
 
-        list = push(list, unexpected('unexpected'))
+        list = push(list, makeUnexpected('unexpected'))
         expect(list).to.deep.equal([
           { type: ErrorType.Expected, message: 'expected' },
           { type: ErrorType.Unexpected, message: 'unexpected' },
         ])
 
-        list = push(list, generic('message'), other('other'))
+        list = push(list, makeGeneric('message'), makeOther('other'))
         expect(list).to.deep.equal([
           { type: ErrorType.Expected, message: 'expected' },
           { type: ErrorType.Unexpected, message: 'unexpected' },
@@ -53,11 +53,11 @@ describe('Parse errors', () => {
 
     describe('clear', () => {
       const list = [
-        expected('expected 1'),
-        unexpected('unexpected'),
-        expected('expected 2'),
-        generic('message'),
-        other('other'),
+        makeExpected('expected 1'),
+        makeUnexpected('unexpected'),
+        makeExpected('expected 2'),
+        makeGeneric('message'),
+        makeOther('other'),
       ]
 
       it('removes all errors if no type is passed in', () => {
@@ -66,37 +66,37 @@ describe('Parse errors', () => {
 
       it('removes a single type of error if one is passed in', () => {
         expect(clear(list, ErrorType.Generic)).to.deep.equal([
-          expected('expected 1'),
-          unexpected('unexpected'),
-          expected('expected 2'),
-          other('other'),
+          makeExpected('expected 1'),
+          makeUnexpected('unexpected'),
+          makeExpected('expected 2'),
+          makeOther('other'),
         ])
         expect(clear(list, ErrorType.Expected)).to.deep.equal([
-          unexpected('unexpected'),
-          generic('message'),
-          other('other'),
+          makeUnexpected('unexpected'),
+          makeGeneric('message'),
+          makeOther('other'),
         ])
       })
 
       it('can remove multiple types of errors', () => {
         expect(clear(list, ErrorType.Expected, ErrorType.Unexpected))
           .to.deep.equal([
-            generic('message'),
-            other('other'),
+            makeGeneric('message'),
+            makeOther('other'),
           ])
       })
     })
 
     describe('overwrite', () => {
       const list = [
-        expected('expected 1'),
-        unexpected('unexpected'),
-        expected('expected 2'),
-        generic('message'),
+        makeExpected('expected 1'),
+        makeUnexpected('unexpected'),
+        makeExpected('expected 2'),
+        makeGeneric('message'),
       ]
 
       it('replaces all errors of one type with another error', () => {
-        expect(overwrite(list, expected('new expected'))).to.deep.equal([
+        expect(overwrite(list, makeExpected('new expected'))).to.deep.equal([
           { type: ErrorType.Unexpected, message: 'unexpected' },
           { type: ErrorType.Generic, message: 'message' },
           { type: ErrorType.Expected, message: 'new expected' },
@@ -104,7 +104,7 @@ describe('Parse errors', () => {
       })
 
       it('only adds if there are no errors of that type', () => {
-        expect(overwrite(list, other('new other'))).to.deep.equal([
+        expect(overwrite(list, makeOther('new other'))).to.deep.equal([
           { type: ErrorType.Expected, message: 'expected 1' },
           { type: ErrorType.Unexpected, message: 'unexpected' },
           { type: ErrorType.Expected, message: 'expected 2' },
@@ -616,11 +616,15 @@ describe('Parse errors', () => {
 
     describe('format', () => {
       const expecteds = [
-        expected('a letter'), expected('a digit'), expected('whitespace'),
+        makeExpected('a letter'),
+        makeExpected('a digit'),
+        makeExpected('whitespace'),
       ]
-      const unexpecteds = [unexpected('end of input'), unexpected('"a"')]
-      const generics = [generic('Test message')]
-      const others = [other('Other message')]
+      const unexpecteds = [
+        makeUnexpected('end of input'), makeUnexpected('"a"'),
+      ]
+      const generics = [makeGeneric('Test message')]
+      const others = [makeOther('Other message')]
       const view = stringToView(
         '\tOnomatopoeia\t\t\t\tคำเลียนเสียง\nЗвукоподражание',
       )
@@ -682,10 +686,10 @@ describe('Parse errors', () => {
 
     describe('formatErrors', () => {
       const input = '\t\tOnomatopoeia'
-      const state = ParserState(input)
+      const state = makeState(input)
       state.success = false
       state.index = 4
-      state.errors = push([], expected('a digit'))
+      state.errors = push([], makeExpected('a digit'))
 
       it('formats errors using default settings', () => {
         const exp = 'Parse error at (line 1, column 19):\n\n'

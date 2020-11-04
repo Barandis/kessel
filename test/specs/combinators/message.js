@@ -24,15 +24,15 @@ describe('Message combinators', () => {
       fail(label(char('a'), 'letter a'), 'bcd', { expected: 'letter a' })
     })
     it('changes the expected message on a fatal error', () => {
-      fail(sequence(char('a'), char('b')), 'a1', { expected: '"b"' })
+      fail(sequence([char('a'), char('b')]), 'a1', { expected: '"b"' })
       fail(
-        label(sequence(char('a'), char('b')), 'letter b'),
+        label(sequence([char('a'), char('b')]), 'letter b'),
         'a1',
         { expected: 'letter b' },
       )
     })
     it('overwrites all of multiple expected messages', () => {
-      const parser = choice(char('a'), char('b'), char('c'))
+      const parser = choice([char('a'), char('b'), char('c')])
       fail(parser, 'def', { expected: '"a", "b", or "c"' })
       fail(label(parser, 'a, b, or c'), 'def', { expected: 'a, b, or c' })
     })

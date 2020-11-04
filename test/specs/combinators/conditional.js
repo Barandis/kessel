@@ -10,7 +10,7 @@ import { fail, pass } from 'test/helper'
 
 describe('Conditional and look-ahead combinators', () => {
   describe('lookAhead', () => {
-    const parser = lookAhead(sequence(string('ab'), string('cd')))
+    const parser = lookAhead(sequence([string('ab'), string('cd')]))
 
     it('succeeds with no consumption if its parser succeeds', () => {
       pass(parser, 'abcd', { result: ['ab', 'cd'], index: 0 })

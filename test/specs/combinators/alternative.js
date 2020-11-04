@@ -12,17 +12,17 @@ import {
   optional,
 } from 'kessel/combinators/alternative'
 import { sequence } from 'kessel/combinators/sequence'
-import { parse, ParserStatus } from 'kessel/core'
+import { parse, Status } from 'kessel/core'
 import { char, string } from 'kessel/parsers'
 import { fail, pass } from 'test/helper'
 
 describe('Alternative combinators', () => {
   describe('choice', () => {
-    const parser = choice(
-      sequence(char('a'), char('b')),
-      sequence(char('c'), char('d')),
-      sequence(char('e'), char('f')),
-    )
+    const parser = choice([
+      sequence([char('a'), char('b')]),
+      sequence([char('c'), char('d')]),
+      sequence([char('e'), char('f')]),
+    ])
 
     it('fails with all expecteds if all parsers fail without consuming', () => {
       fail(parser, 'yz', { expected: '"a", "c", or "e"' })
@@ -36,12 +36,12 @@ describe('Alternative combinators', () => {
   })
 
   describe('choiceL', () => {
-    const parser = choiceL(
-      sequence(char('a'), char('b')),
-      sequence(char('c'), char('d')),
-      sequence(char('e'), char('f')),
-      '"ab", "cd", or "ef"',
-    )
+    const parser = choiceL([
+      sequence([char('a'), char('b')]),
+      sequence([char('c'), char('d')]),
+      sequence([char('e'), char('f')]),
+    ],
+    '"ab", "cd", or "ef"')
 
     it('fails with its message if all parsers fail without consuming', () => {
       fail(parser, 'yz', { expected: '"ab", "cd", or "ef"' })
@@ -62,13 +62,13 @@ describe('Alternative combinators', () => {
       pass(optional(char('a')), 'bcd', { result: null, index: 0 })
     })
     it('fails fatally if its parser fails fatally', () => {
-      fail(optional(sequence(char('a'), char('b'))), 'acd', {
+      fail(optional(sequence([char('a'), char('b')])), 'acd', {
         expected: '"b"',
         actual: '"c"',
         index: 1,
-        status: ParserStatus.Fatal,
+        status: Status.Fatal,
       })
-      pass(optional(attempt(sequence(char('a'), char('b')))), 'acd', {
+      pass(optional(attempt(sequence([char('a'), char('b')]))), 'acd', {
         result: null,
         index: 0,
       })
@@ -87,9 +87,9 @@ describe('Alternative combinators', () => {
       expect(r1).to.deep.equal(r2)
     })
     it('resets the index if its parser fails with consuming input', () => {
-      const parser = sequence(string('te'), string('st'))
-      fail(parser, 'tesl', { index: 2, status: ParserStatus.Fatal })
-      fail(attempt(parser), 'tesl', { index: 0, status: ParserStatus.Error })
+      const parser = sequence([string('te'), string('st')])
+      fail(parser, 'tesl', { index: 2, status: Status.Fatal })
+      fail(attempt(parser), 'tesl', { index: 0, status: Status.Error })
     })
   })
 })

@@ -7,7 +7,12 @@ import { expect } from 'chai'
 
 import { sequence } from 'kessel/combinators/sequence'
 import { error, fatal, ok, parse } from 'kessel/core'
-import { ErrorType, expected, overwrite, unexpected } from 'kessel/error'
+import {
+  ErrorType,
+  makeExpected,
+  overwrite,
+  makeUnexpected,
+} from 'kessel/error'
 import { char, string } from 'kessel/parsers'
 import { error as terror, pass } from 'test/helper'
 
@@ -65,7 +70,10 @@ describe('Core functionality', () => {
       it('can update errors and/or index properties', () => {
         const result = parse(string('123'), 'abc')
         const updated = error(result, overwrite(
-          result.errors, expected('"x"'), expected('"y"'), unexpected('"z"'),
+          result.errors,
+          makeExpected('"x"'),
+          makeExpected('"y"'),
+          makeUnexpected('"z"'),
         ), 17)
         expect(result.errors).to.deep.equal([
           { type: ErrorType.Expected, message: '"123"' },
@@ -83,15 +91,18 @@ describe('Core functionality', () => {
 
     describe('updated fatal failure parser state', () => {
       it('creates a new object', () => {
-        const result = parse(sequence(char('a'), char('1')), 'abc')
+        const result = parse(sequence([char('a'), char('1')]), 'abc')
         const updated = fatal(result)
         expect(result).to.not.equal(updated)
         expect(result).to.deep.equal(updated)
       })
       it('can update errors and/or index properties', () => {
-        const result = parse(sequence(char('a'), char('1')), 'abc')
+        const result = parse(sequence([char('a'), char('1')]), 'abc')
         const updated = fatal(result, overwrite(
-          result.errors, expected('"x"'), expected('"y"'), unexpected('"z"'),
+          result.errors,
+          makeExpected('"x"'),
+          makeExpected('"y"'),
+          makeUnexpected('"z"'),
         ), 17)
         expect(result.errors).to.deep.equal([
           { type: ErrorType.Unexpected, message: '"b"' },
