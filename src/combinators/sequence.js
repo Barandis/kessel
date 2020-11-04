@@ -4,7 +4,22 @@
 // https://opensource.org/licenses/MIT
 
 import { error, fatal, ok, Parser, ParserStatus } from 'kessel/core'
-import { assertGeneratorFunction, assertParser } from 'kessel/util'
+import {
+  articlize,
+  assertGeneratorFunction,
+  assertParser,
+  enumerate,
+  ordinalize,
+} from 'kessel/util'
+
+const seqFunctionMsg = i => type =>
+  `expected ${ordinalize(i)} argument to be a parser Function; found ${
+    articlize(type)
+  }`
+const seqParserMsg = i => () =>
+  `expected ${
+    ordinalize(i)
+  } argument to be a Parser; found a non-Parser Function`
 
 // Implements a sequence. Each parser is executed in order until either
 // they all succeed or the first one fails. In the former case, all
@@ -15,8 +30,8 @@ export const sequence = (...ps) => Parser(state => {
   const index = state.index
   let nextState = state
 
-  for (const p of ps) {
-    assertParser(p, 'seq')
+  for (const { index: i, value: p } of enumerate(ps)) {
+    assertParser(p, 'sequence', seqFunctionMsg(i + 1), seqParserMsg(i + 1))
 
     nextState = p(nextState)
 
@@ -28,6 +43,14 @@ export const sequence = (...ps) => Parser(state => {
 
   return ok(nextState, results)
 })
+
+// These don't include indexes because the exception will give a
+// position anyway, and since these parsers are not arguments, the
+// position will be enough to differentiate them
+const blockFunctionMsg = type =>
+  `expected yielded value to be a parser Function; found ${articlize(type)}`
+const blockParserMsg = () =>
+  'expected yielded value to be a Parser; found a non-Parser Function'
 
 // Executes a block of code in the form of a generator function. Inside
 // that function, parsers that are `yield`ed will be executed and will
@@ -52,7 +75,7 @@ export const block = genFn => Parser(state => {
     const { value, done } = gen.next(nextValue)
     if (done) return ok(nextState, value)
 
-    assertParser(value, 'block')
+    assertParser(value, 'block', blockFunctionMsg, blockParserMsg)
     nextState = value(nextState)
     if (nextState.status !== ParserStatus.Ok) {
       return nextState.index === index ? error(nextState) : fatal(nextState)

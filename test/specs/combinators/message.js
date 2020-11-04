@@ -14,19 +14,25 @@ import { error, fail } from 'test/helper'
 
 describe('Message combinators', () => {
   describe('label', () => {
-    it('throws if passed a non-function', () => {
+    it('throws if first argument is not a parser', () => {
       error(
         label(23, 'test'),
         'test',
-        '[label]: expected argument to be a parser Function; found a Number',
+        '[label]: '
+          + 'expected first argument to be a parser Function; found a Number',
       )
-    })
-    it('throws if passed a function that is not a parser', () => {
       error(
         label(x => x, 'test'),
         'test',
-        '[label]: '
-          + 'expected argument to be a Parser; found a non-Parser Function',
+        '[label]: expected '
+          + 'first argument to be a Parser; found a non-Parser Function',
+      )
+    })
+    it('throws if second argument is not a string', () => {
+      error(
+        label(char('a'), 23),
+        'test',
+        '[label]: expected second argument to be a String; found a Number',
       )
     })
     it('does nothing if its parser succeeds', () => {
