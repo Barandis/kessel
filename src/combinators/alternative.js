@@ -6,22 +6,17 @@
 import { error, fatal, ok, Parser, ParserStatus } from 'kessel/core'
 import { ErrorType, expected, overwrite } from 'kessel/error'
 import {
-  articlize,
   assertArgs,
   assertParser,
   assertString,
   enumerate,
   ordinalize,
+  parserAssertMsg,
+  typeAssertMsg,
 } from 'kessel/util'
 
-const choiceFunctionMsg = i => type =>
-  `expected ${ordinalize(i)} argument to be a parser Function; found ${
-    articlize(type)
-  }`
-const choiceParserMsg = i => () =>
-  `expected ${
-    ordinalize(i)
-  } argument to be a Parser; found a non-Parser Function`
+const choiceFunctionMsg = i => typeAssertMsg(ordinalize(i), 'parser Function')
+const choiceParserMsg = i => parserAssertMsg(ordinalize(i))
 
 // Implements alternatives. Each parser is executed one at a time, in
 // order. When the first parser succeeds, or the first parser fails
@@ -69,11 +64,7 @@ export const choiceL = (...args) => Parser(state => {
   assertArgs(args, 2, 'choiceL')
   const ps = args.slice()
   const message = ps.pop()
-  assertString(
-    message,
-    'choiceL',
-    type => `expected final argument to be a String; found ${articlize(type)}`,
-  )
+  assertString(message, 'choiceL', typeAssertMsg('final', 'String'))
 
   let nextState = state
 

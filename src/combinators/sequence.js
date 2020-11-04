@@ -10,16 +10,12 @@ import {
   assertParser,
   enumerate,
   ordinalize,
+  parserAssertMsg,
+  typeAssertMsg,
 } from 'kessel/util'
 
-const seqFunctionMsg = i => type =>
-  `expected ${ordinalize(i)} argument to be a parser Function; found ${
-    articlize(type)
-  }`
-const seqParserMsg = i => () =>
-  `expected ${
-    ordinalize(i)
-  } argument to be a Parser; found a non-Parser Function`
+const seqFunctionMsg = i => typeAssertMsg(ordinalize(i), 'parser Function')
+const seqParserMsg = i => parserAssertMsg(ordinalize(i))
 
 // Implements a sequence. Each parser is executed in order until either
 // they all succeed or the first one fails. In the former case, all

@@ -197,6 +197,23 @@ export function assertArgs(args, length, name) {
   }
 }
 
+export function typeAssertMsg(ordinal, type) {
+  return t =>
+    `expected ${ordinal} argument to be ${
+      articlize(type)
+    }; found ${articlize(t)}`
+}
+
+export function charAssertMsg(ordinal) {
+  return c =>
+    `expected ${ordinal} argument to be one character; found "${c}"`
+}
+
+export function parserAssertMsg(ordinal) {
+  return () =>
+    `expected ${ordinal} argument to be a Parser; found a non-Parser Function`
+}
+
 export function quote(str) {
   return `"${str}"`
 }

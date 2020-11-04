@@ -5,14 +5,16 @@
 
 import { error, fatal, Parser, ParserStatus } from 'kessel/core'
 import { expected, overwrite } from 'kessel/error'
-import { articlize, assertParser, assertString } from 'kessel/util'
+import {
+  assertParser,
+  assertString,
+  parserAssertMsg,
+  typeAssertMsg,
+} from 'kessel/util'
 
-const labelFunctionMsg = type =>
-  `expected first argument to be a parser Function; found ${articlize(type)}`
-const labelParserMsg = () =>
-  'expected first argument to be a Parser; found a non-Parser Function'
-const labelStringMsg = type =>
-  `expected second argument to be a String; found ${articlize(type)}`
+const labelFunctionMsg = typeAssertMsg('first', 'parser Function')
+const labelParserMsg = parserAssertMsg('first')
+const labelStringMsg = typeAssertMsg('second', 'String')
 
 // Executes the supplied parser. If the parser succeeds, `label` simply
 // passes the result through; but if it fails, `label` replaces its

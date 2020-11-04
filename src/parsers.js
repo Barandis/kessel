@@ -6,15 +6,16 @@
 import { error, fatal, ok, Parser, ParserStatus } from './core'
 import { expected, generic, overwrite, unexpected } from './error'
 import {
-  articlize,
   assertCharacter,
   assertFunction,
   assertString,
   assertStringOrRegex,
+  charAssertMsg,
   charLength,
   nextChar,
   quote,
   stringToView,
+  typeAssertMsg,
   viewToString,
 } from './util'
 
@@ -112,16 +113,10 @@ export const satisfies = fn => Parser(state => {
 // not "between" `a` and `z`. Take care with non-ascii characters.
 export const range = (start, end) => Parser(state => {
   assertCharacter(
-    start,
-    'range',
-    type => `expected first argument to be a String; found ${articlize(type)}`,
-    c => `expected first argument to be one character; found "${c}"`,
+    start, 'range', typeAssertMsg('first', 'String'), charAssertMsg('first'),
   )
   assertCharacter(
-    end,
-    'range',
-    type => `expected second argument to be a String; found ${articlize(type)}`,
-    c => `expected second argument to be one character; found "${c}"`,
+    end, 'range', typeAssertMsg('second', 'String'), charAssertMsg('second'),
   )
 
   const fn = c => c >= start && c <= end
