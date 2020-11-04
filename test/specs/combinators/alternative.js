@@ -5,7 +5,12 @@
 
 import { expect } from 'chai'
 
-import { attempt, choice, choiceL } from 'kessel/combinators/alternative'
+import {
+  attempt,
+  choice,
+  choiceL,
+  optional,
+} from 'kessel/combinators/alternative'
 import { sequence } from 'kessel/combinators/sequence'
 import { parse, ParserStatus } from 'kessel/core'
 import { char, string } from 'kessel/parsers'
@@ -88,6 +93,40 @@ describe('Alternative combinators', () => {
     })
     it('succeeds if one parser succeeds first', () => {
       pass(parser, 'cd', { result: ['c', 'd'] })
+    })
+  })
+
+  describe('optional', () => {
+    it('throws if a non-parser is passed in', () => {
+      error(
+        optional(23),
+        'abc',
+        '[optional]: expected argument to be a parser Function; found a Number',
+      )
+      error(
+        optional(() => {}),
+        'abc',
+        '[optional]: '
+          + 'expected argument to be a Parser; found a non-Parser Function',
+      )
+    })
+    it('consumes input without a result on success', () => {
+      pass(optional(char('a')), 'abc', { result: null, index: 1 })
+    })
+    it('succeeds without consuming if its parser fails', () => {
+      pass(optional(char('a')), 'bcd', { result: null, index: 0 })
+    })
+    it('fails fatally if its parser fails fatally', () => {
+      fail(optional(sequence(char('a'), char('b'))), 'acd', {
+        expected: '"b"',
+        actual: '"c"',
+        index: 1,
+        status: ParserStatus.Fatal,
+      })
+      pass(optional(attempt(sequence(char('a'), char('b')))), 'acd', {
+        result: null,
+        index: 0,
+      })
     })
   })
 

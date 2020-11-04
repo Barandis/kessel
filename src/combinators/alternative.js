@@ -3,7 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { error, fatal, Parser, ParserStatus } from 'kessel/core'
+import { error, fatal, ok, Parser, ParserStatus } from 'kessel/core'
 import { ErrorType, expected, overwrite } from 'kessel/error'
 import {
   articlize,
@@ -14,11 +14,11 @@ import {
   ordinalize,
 } from 'kessel/util'
 
-const functionMsgFn = i => type =>
+const choiceFunctionMsg = i => type =>
   `expected ${ordinalize(i)} argument to be a parser Function; found ${
     articlize(type)
   }`
-const parserMsgFn = i => () =>
+const choiceParserMsg = i => () =>
   `expected ${
     ordinalize(i)
   } argument to be a Parser; found a non-Parser Function`
@@ -36,7 +36,7 @@ export const choice = (...ps) => Parser(state => {
   let expecteds = []
 
   for (const { index: i, value: p } of enumerate(ps)) {
-    assertParser(p, 'choice', functionMsgFn(i + 1), parserMsgFn(i + 1))
+    assertParser(p, 'choice', choiceFunctionMsg(i + 1), choiceParserMsg(i + 1))
 
     nextState = p({ ...nextState, errors: [] })
 
@@ -78,7 +78,7 @@ export const choiceL = (...args) => Parser(state => {
   let nextState = state
 
   for (const { index: i, value: p } of enumerate(ps)) {
-    assertParser(p, 'choiceL', functionMsgFn(i + 1), parserMsgFn(i + 1))
+    assertParser(p, 'choiceL', choiceFunctionMsg(i + 1), choiceParserMsg(i + 1))
 
     nextState = p(nextState)
 
@@ -89,6 +89,18 @@ export const choiceL = (...args) => Parser(state => {
   }
 
   return error(nextState, overwrite(nextState.errors, expected(message)))
+})
+
+// Executes a parser, succeeding whether it fails or not but only
+// consuming input if it succeeds. This parser will only fail if its
+// supplied parser fails fatally. It's used to implement skipping over
+// some optional text.
+export const optional = p => Parser(state => {
+  assertParser(p, 'optional')
+
+  const nextState = p(state)
+  if (nextState.status === ParserStatus.Fatal) return nextState
+  return ok(nextState, null)
 })
 
 // Executes the supplied parser. If the parser succeeds or fails
