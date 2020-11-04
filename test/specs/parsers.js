@@ -549,7 +549,7 @@ describe('Parsers', () => {
       pass(parser, 'Onomatopoeia', { result: 'O', index: 1 })
       pass(parser, 'matriculate', { result: 'm', index: 1 })
       fail(parser, 'Matriculate', {
-        expected: 'one of "Onoma"',
+        expected: 'one of "O", "n", "o", "m", or "a"',
         actual: '"M"',
       })
     })
@@ -558,14 +558,20 @@ describe('Parsers', () => {
       const parser = oneOf('Звуко')
       pass(parser, 'Звукоподражание', { result: 'З', index: 2 })
       pass(parser, 'учитель', { result: 'у', index: 2 })
-      fail(parser, 'Учитель', { expected: 'one of "Звуко"', actual: '"У"' })
+      fail(parser, 'Учитель', {
+        expected: 'one of "З", "в", "у", "к", or "о"',
+        actual: '"У"',
+      })
     })
 
     it('checks the next character against 3-byte characters', () => {
       const parser = oneOf('คำเลี')
       pass(parser, 'คำเลียนเสียง', { result: 'ค', index: 3 })
       pass(parser, 'ลียน', { result: 'ล', index: 3 })
-      fail(parser, 'ยง', { expected: 'one of "คำเลี"', actual: '"ย"' })
+      fail(parser, 'ยง', {
+        expected: 'one of "ค", "ำ", "เ", "ล", or "ี"',
+        actual: '"ย"',
+      })
     })
 
     it('checks the next character against 4-byte characters', () => {
@@ -573,7 +579,7 @@ describe('Parsers', () => {
       pass(parser, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂', index: 4 })
       pass(parser, '𝑚𝑎𝑡𝑟𝑖𝑐𝑢𝑙𝑎𝑡𝑒', { result: '𝑚', index: 4 })
       fail(parser, 'matriculate', {
-        expected: 'one of "𝑂𝑛𝑜𝑚𝑎"',
+        expected: 'one of "𝑂", "𝑛", "𝑜", "𝑚", or "𝑎"',
         actual: '"m"',
       })
     })
@@ -583,11 +589,11 @@ describe('Parsers', () => {
     it('checks the next charater against 1-byte characters', () => {
       const parser = noneOf('Onoma')
       fail(parser, 'Onomatopoeia', {
-        expected: 'none of "Onoma"',
+        expected: 'none of "O", "n", "o", "m", or "a"',
         actual: '"O"',
       })
       fail(parser, 'matriculate', {
-        expected: 'none of "Onoma"',
+        expected: 'none of "O", "n", "o", "m", or "a"',
         actual: '"m"',
       })
       pass(parser, 'Matriculate', { result: 'M', index: 1 })
@@ -596,31 +602,37 @@ describe('Parsers', () => {
     it('checks the next character against 2-byte characters', () => {
       const parser = noneOf('Звуко')
       fail(parser, 'Звукоподражание', {
-        expected: 'none of "Звуко"',
+        expected: 'none of "З", "в", "у", "к", or "о"',
         actual: '"З"',
       })
-      fail(parser, 'учитель', { expected: 'none of "Звуко"', actual: '"у"' })
+      fail(parser, 'учитель', {
+        expected: 'none of "З", "в", "у", "к", or "о"',
+        actual: '"у"',
+      })
       pass(parser, 'Учитель', { result: 'У', index: 2 })
     })
 
     it('checks the next character against 3-byte characters', () => {
       const parser = noneOf('คำเลี')
       fail(parser, 'คำเลียนเสียง', {
-        expected: 'none of "คำเลี"',
+        expected: 'none of "ค", "ำ", "เ", "ล", or "ี"',
         actual: '"ค"',
       })
-      fail(parser, 'ลียน', { expected: 'none of "คำเลี"', actual: '"ล"' })
+      fail(parser, 'ลียน', {
+        expected: 'none of "ค", "ำ", "เ", "ล", or "ี"',
+        actual: '"ล"',
+      })
       pass(parser, 'ยง', { result: 'ย', index: 3 })
     })
 
     it('checks the next character against 4-byte characters', () => {
       const parser = noneOf('𝑂𝑛𝑜𝑚𝑎')
       fail(parser, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', {
-        expected: 'none of "𝑂𝑛𝑜𝑚𝑎"',
+        expected: 'none of "𝑂", "𝑛", "𝑜", "𝑚", or "𝑎"',
         actual: '"𝑂"',
       })
       fail(parser, '𝑚𝑎𝑡𝑟𝑖𝑐𝑢𝑙𝑎𝑡𝑒', {
-        expected: 'none of "𝑂𝑛𝑜𝑚𝑎"',
+        expected: 'none of "𝑂", "𝑛", "𝑜", "𝑚", or "𝑎"',
         actual: '"𝑚"',
       })
       pass(parser, 'matriculate', { result: 'm', index: 1 })

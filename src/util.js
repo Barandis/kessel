@@ -155,6 +155,13 @@ export function assertStringOrRegex(re, name, msgFn = assertStringOrRegexFn) {
   assertTypes(re, ['String', 'RegExp'], name, msgFn)
 }
 
+const assertStringOrArrayFn = type =>
+  `expected argument to be a String or an Array; found ${articlize(type)}`
+
+export function assertStringOrArray(arr, name, msgFn = assertStringOrArrayFn) {
+  assertTypes(arr, ['String', 'Array'], name, msgFn)
+}
+
 const assertFunctionFn = type =>
   `expected argument to be a Function; found ${articlize(type)}`
 

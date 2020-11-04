@@ -9,9 +9,11 @@ import {
   assertCharacter,
   assertFunction,
   assertString,
+  assertStringOrArray,
   assertStringOrRegex,
   charAssertMsg,
   charLength,
+  commaSeparate,
   nextChar,
   quote,
   stringToView,
@@ -158,37 +160,46 @@ export const eof = Parser(state => {
 })
 
 // Reads a character and compares it against each of the characters in
-// the provided string. Succeeds if the read character is one of the
-// characters in the string.
-export const oneOf = str => Parser(state => {
-  assertString(str, 'oneOf')
+// the provided string or array (if the array has multi-character
+// strings, they cannot match and will essentially be ignored). If the
+// read character is among those characters, it will succeed.
+export const oneOf = chars => Parser(state => {
+  assertStringOrArray(chars, 'oneOf')
 
   const { index, view } = state
   const { width, next } = nextChar(index, view)
+  const arr = [...chars]
 
-  if (str.includes(next)) {
+  if (arr.includes(next)) {
     return ok(state, next, index + width)
   }
+  const message = 'one of ' + commaSeparate(arr.map(c => `"${c}"`))
+
   return error(state, overwrite(
     state.errors,
-    expected(`one of "${str}"`),
+    expected(message),
     unexpected(quote(next)),
   ))
 })
 
 // Reads a character and compares it against each of the characters in
-// the provided string. Succeeds if the read character is *not* one of
-// the characters in the string.
-export const noneOf = str => Parser(state => {
-  assertString(str, 'noneOf')
+// the provided string or array (if the array has multi-character
+// strings, they cannot be matched and will essentially be ignored).
+// Succeeds if the read character is *not* one of the characters in the
+// string.
+export const noneOf = chars => Parser(state => {
+  assertStringOrArray(chars, 'noneOf')
 
   const { index, view } = state
   const { width, next } = nextChar(index, view)
+  const arr = [...chars]
 
-  if (str.includes(next)) {
+  if (arr.includes(next)) {
+    const message = 'none of ' + commaSeparate(arr.map(c => `"${c}"`))
+
     return error(state, overwrite(
       state.errors,
-      expected(`none of "${str}"`),
+      expected(message),
       unexpected(quote(next)),
     ))
   }
