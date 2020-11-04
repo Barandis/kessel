@@ -3,7 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { stringToView, trackedFactory } from './util'
+import { stringToView } from './util'
 
 // It's probably still better than having these arrays inherit from a
 // base array type
@@ -65,7 +65,7 @@ export function ParserState(input) {
 // argument, a parser state (as created by `ParserState` above);
 // performs some action based on that parser state; and returns an
 // updated parser state.
-export const Parser = trackedFactory(fn => fn)
+export const Parser = fn => fn
 
 export function ok(state, result = state.result, index = state.index) {
   return {

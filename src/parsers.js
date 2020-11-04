@@ -6,18 +6,11 @@
 import { error, fatal, ok, Parser, ParserStatus } from './core'
 import { expected, generic, overwrite, unexpected } from './error'
 import {
-  assertCharacter,
-  assertFunction,
-  assertString,
-  assertStringOrArray,
-  assertStringOrRegex,
-  charAssertMsg,
   charLength,
   commaSeparate,
   nextChar,
   quote,
   stringToView,
-  typeAssertMsg,
   viewToString,
 } from './util'
 
@@ -66,8 +59,6 @@ const CharParser = fn => Parser(state => {
 // Reads a single character from input and succeeds if that character is
 // `c`. Upon failure, this parser does not consume input.
 export const char = c => Parser(state => {
-  assertCharacter(c, 'char')
-
   const nextState = CharParser(next => c === next)(state)
   if (nextState.status === ParserStatus.Ok) return nextState
   return error(nextState, overwrite(nextState.errors, expected(quote(c))))
@@ -78,8 +69,6 @@ export const char = c => Parser(state => {
 // parser is case-insensitive. Upon failure, this parser does not
 // consume input.
 export const chari = c => Parser(state => {
-  assertCharacter(c, 'chari')
-
   const nextState = CharParser(
     next => c.toLowerCase() === next.toLowerCase(),
   )(state)
@@ -92,8 +81,6 @@ export const chari = c => Parser(state => {
 // as the result. If the function returns false, this parser fails and
 // consumes no input.
 export const satisfies = fn => Parser(state => {
-  assertFunction(fn, 'satisfies')
-
   const name = fn.name.length ? fn.name : '<anonymous>'
   const message = `a character that satisfies function "${name}"`
 
@@ -114,13 +101,6 @@ export const satisfies = fn => Parser(state => {
 // a completely different part of the Unicode spectrum and therefore is
 // not "between" `a` and `z`. Take care with non-ascii characters.
 export const range = (start, end) => Parser(state => {
-  assertCharacter(
-    start, 'range', typeAssertMsg('first', 'String'), charAssertMsg('first'),
-  )
-  assertCharacter(
-    end, 'range', typeAssertMsg('second', 'String'), charAssertMsg('second'),
-  )
-
   const fn = c => c >= start && c <= end
   const message = `a character between "${start}" and "${end}"`
 
@@ -164,8 +144,6 @@ export const eof = Parser(state => {
 // strings, they cannot match and will essentially be ignored). If the
 // read character is among those characters, it will succeed.
 export const oneOf = chars => Parser(state => {
-  assertStringOrArray(chars, 'oneOf')
-
   const { index, view } = state
   const { width, next } = nextChar(index, view)
   const arr = [...chars]
@@ -188,8 +166,6 @@ export const oneOf = chars => Parser(state => {
 // Succeeds if the read character is *not* one of the characters in the
 // string.
 export const noneOf = chars => Parser(state => {
-  assertStringOrArray(chars, 'noneOf')
-
   const { index, view } = state
   const { width, next } = nextChar(index, view)
   const arr = [...chars]
@@ -304,22 +280,18 @@ const StringParser = (str, fn) => Parser(state => {
 // Parses a string from the current location in the input. The string
 // match must be exact (it is case-sensitive), and all UTF-8 characters
 // are recognized properly.
-export const string = str => Parser(state => {
-  assertString(str, 'string')
-  return StringParser(str, c => c === str)(state)
-})
+export const string = str => Parser(state => StringParser(
+  str, c => c === str,
+)(state))
 
 // Parses a string from the current location in the input. This match is
 // *not* case-sensitive. However, there is a limitation based on the
 // JavaScript understanding of pairs of upper- and lowercase letters. It
 // cannot be assumed that 3- and 4-byte characters will recognize case-
 // insensitive counterparts.
-export const stringi = str => Parser(state => {
-  assertString(str, 'stringi')
-  return StringParser(
-    str, c => c.toLowerCase() === str.toLowerCase(),
-  )(state)
-})
+export const stringi = str => Parser(state => StringParser(
+  str, c => c.toLowerCase() === str.toLowerCase(),
+)(state))
 
 // Reads the remainder of the input text and results in that text.
 // Succeeds if already at EOF, resulting in an empty string.
@@ -379,8 +351,6 @@ const RegexParser = (re, length = null) => Parser(state => {
 // match will be considered anyway. These two rules ensure that the
 // match is only attempted at the beginning of the current text.
 export const regex = re => {
-  assertStringOrRegex(re, 'regex')
-
   // First, convert to a regular expression if it's a string
   let regex = typeof re === 'string' ? new RegExp(re) : re
 
@@ -463,15 +433,13 @@ export const newline = Parser(state => {
 
 // Fails without consuming input, setting the generic error message to
 // whatever is passed in.
-export const fail = message => Parser(state => {
-  assertString(message, 'fail')
-  return error(state, overwrite(state.errors, generic(message)))
-})
+export const fail = message => Parser(state => error(
+  state, overwrite(state.errors, generic(message)),
+))
 
 // Fails without consuming input, setting the generic error message to
 // whatever is passed in. This signifies a fatal error, one that cannot
 // be recovered from without backtracking.
-export const failFatally = message => Parser(state => {
-  assertString(message, 'failFatally')
-  return fatal(state, overwrite(state.errors, generic(message)))
-})
+export const failFatally = message => Parser(state => fatal(
+  state, overwrite(state.errors, generic(message)),
+))

@@ -4,7 +4,6 @@
 // https://opensource.org/licenses/MIT
 
 import { error, ok, Parser, ParserStatus } from 'kessel/core'
-import { assertParser } from 'kessel/util'
 
 // Executes the supplied parser. If it succeeds, its result becomes the
 // result of `lookAhead`. Either way, no input is consumed.
@@ -12,8 +11,6 @@ import { assertParser } from 'kessel/util'
 // As a side effect, any fatal parse error will be transformed into a
 // non-fatal one, since no input is being consumed.
 export const lookAhead = p => Parser(state => {
-  assertParser(p, 'lookAhead')
-
   const index = state.index
   const nextState = p(state)
   return nextState.status === ParserStatus.Ok

@@ -4,18 +4,6 @@
 // https://opensource.org/licenses/MIT
 
 import { error, fatal, ok, Parser, ParserStatus } from 'kessel/core'
-import {
-  articlize,
-  assertGeneratorFunction,
-  assertParser,
-  enumerate,
-  ordinalize,
-  parserAssertMsg,
-  typeAssertMsg,
-} from 'kessel/util'
-
-const seqFunctionMsg = i => typeAssertMsg(ordinalize(i), 'parser Function')
-const seqParserMsg = i => parserAssertMsg(ordinalize(i))
 
 // Implements a sequence. Each parser is executed in order until either
 // they all succeed or the first one fails. In the former case, all
@@ -26,9 +14,7 @@ export const sequence = (...ps) => Parser(state => {
   const index = state.index
   let nextState = state
 
-  for (const { index: i, value: p } of enumerate(ps)) {
-    assertParser(p, 'sequence', seqFunctionMsg(i + 1), seqParserMsg(i + 1))
-
+  for (const p of ps) {
     nextState = p(nextState)
 
     if (nextState.status !== ParserStatus.Ok) {
@@ -36,17 +22,8 @@ export const sequence = (...ps) => Parser(state => {
     }
     if (nextState.result !== null) results.push(nextState.result)
   }
-
   return ok(nextState, results)
 })
-
-// These don't include indexes because the exception will give a
-// position anyway, and since these parsers are not arguments, the
-// position will be enough to differentiate them
-const blockFunctionMsg = type =>
-  `expected yielded value to be a parser Function; found ${articlize(type)}`
-const blockParserMsg = () =>
-  'expected yielded value to be a Parser; found a non-Parser Function'
 
 // Executes a block of code in the form of a generator function. Inside
 // that function, parsers that are `yield`ed will be executed and will
@@ -60,8 +37,6 @@ const blockParserMsg = () =>
 // Only parsers may be yielded in a block. Yielding anything else will
 // throw an exception.
 export const block = genFn => Parser(state => {
-  assertGeneratorFunction(genFn, 'block')
-
   const gen = genFn()
   const index = state.index
   let nextValue
@@ -71,7 +46,6 @@ export const block = genFn => Parser(state => {
     const { value, done } = gen.next(nextValue)
     if (done) return ok(nextState, value)
 
-    assertParser(value, 'block', blockFunctionMsg, blockParserMsg)
     nextState = value(nextState)
     if (nextState.status !== ParserStatus.Ok) {
       return nextState.index === index ? error(nextState) : fatal(nextState)
@@ -85,8 +59,6 @@ export const block = genFn => Parser(state => {
 // if its contained parser consumes input when it fails. Otherwise, it
 // succeeds even if the contained parser doesn't succeed even once.
 export const many = p => Parser(state => {
-  assertParser(p, 'many')
-
   const results = []
   let nextState = state
 
@@ -106,8 +78,6 @@ export const many = p => Parser(state => {
 // (fatally) if its contained parser consumes input when and if it
 // fails.
 export const many1 = p => Parser(state => {
-  assertParser(p, 'many1')
-
   let nextState = p(state)
   if (nextState.status !== ParserStatus.Ok) return nextState
 

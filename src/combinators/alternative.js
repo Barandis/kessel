@@ -5,18 +5,6 @@
 
 import { error, fatal, ok, Parser, ParserStatus } from 'kessel/core'
 import { ErrorType, expected, overwrite } from 'kessel/error'
-import {
-  assertArgs,
-  assertParser,
-  assertString,
-  enumerate,
-  ordinalize,
-  parserAssertMsg,
-  typeAssertMsg,
-} from 'kessel/util'
-
-const choiceFunctionMsg = i => typeAssertMsg(ordinalize(i), 'parser Function')
-const choiceParserMsg = i => parserAssertMsg(ordinalize(i))
 
 // Implements alternatives. Each parser is executed one at a time, in
 // order. When the first parser succeeds, or the first parser fails
@@ -30,13 +18,10 @@ export const choice = (...ps) => Parser(state => {
   let nextState = state
   let expecteds = []
 
-  for (const { index: i, value: p } of enumerate(ps)) {
-    assertParser(p, 'choice', choiceFunctionMsg(i + 1), choiceParserMsg(i + 1))
-
+  for (const p of ps) {
     nextState = p({ ...nextState, errors: [] })
 
     if (nextState.status === ParserStatus.Ok) return nextState
-
     expecteds = [
       ...expecteds,
       ...nextState.errors.filter(error => error.type === ErrorType.Expected),
@@ -46,7 +31,6 @@ export const choice = (...ps) => Parser(state => {
       return fatal(nextState, overwrite(nextState.errors, ...expecteds))
     }
   }
-
   return error(nextState, overwrite(nextState.errors, ...expecteds))
 })
 
@@ -61,16 +45,12 @@ export const choice = (...ps) => Parser(state => {
 // since one less parser is created and there's no need to track each
 // parser's expected messages.
 export const choiceL = (...args) => Parser(state => {
-  assertArgs(args, 2, 'choiceL')
   const ps = args.slice()
   const message = ps.pop()
-  assertString(message, 'choiceL', typeAssertMsg('final', 'String'))
 
   let nextState = state
 
-  for (const { index: i, value: p } of enumerate(ps)) {
-    assertParser(p, 'choiceL', choiceFunctionMsg(i + 1), choiceParserMsg(i + 1))
-
+  for (const p of ps) {
     nextState = p(nextState)
 
     if (nextState.status === ParserStatus.Ok) return nextState
@@ -78,7 +58,6 @@ export const choiceL = (...args) => Parser(state => {
       return fatal(nextState, overwrite(nextState.errors, expected(message)))
     }
   }
-
   return error(nextState, overwrite(nextState.errors, expected(message)))
 })
 
@@ -87,8 +66,6 @@ export const choiceL = (...args) => Parser(state => {
 // supplied parser fails fatally. It's used to implement skipping over
 // some optional text.
 export const optional = p => Parser(state => {
-  assertParser(p, 'optional')
-
   const nextState = p(state)
   if (nextState.status === ParserStatus.Fatal) return nextState
   return ok(nextState, null)
@@ -100,8 +77,6 @@ export const optional = p => Parser(state => {
 // the failure is changed to non-fatal. This implements voluntary
 // backtracking.
 export const attempt = p => Parser(state => {
-  assertParser(p, 'attempt')
-
   const index = state.index
   const nextState = p(state)
   if (nextState.status !== ParserStatus.Fatal) return nextState

@@ -10,31 +10,10 @@ import { label } from 'kessel/combinators/message'
 import { sequence } from 'kessel/combinators/sequence'
 import { parse } from 'kessel/core'
 import { char } from 'kessel/parsers'
-import { error, fail } from 'test/helper'
+import { fail } from 'test/helper'
 
 describe('Message combinators', () => {
   describe('label', () => {
-    it('throws if first argument is not a parser', () => {
-      error(
-        label(23, 'test'),
-        'test',
-        '[label]: '
-          + 'expected first argument to be a parser Function; found a Number',
-      )
-      error(
-        label(x => x, 'test'),
-        'test',
-        '[label]: expected '
-          + 'first argument to be a Parser; found a non-Parser Function',
-      )
-    })
-    it('throws if second argument is not a string', () => {
-      error(
-        label(char('a'), 23),
-        'test',
-        '[label]: expected second argument to be a String; found a Number',
-      )
-    })
     it('does nothing if its parser succeeds', () => {
       const r1 = parse(char('a'), 'abc')
       const r2 = parse(label(char('a'), 'test'), 'abc')

@@ -14,7 +14,7 @@ import {
 import { sequence } from 'kessel/combinators/sequence'
 import { parse, ParserStatus } from 'kessel/core'
 import { char, string } from 'kessel/parsers'
-import { error, fail, pass } from 'test/helper'
+import { fail, pass } from 'test/helper'
 
 describe('Alternative combinators', () => {
   describe('choice', () => {
@@ -24,20 +24,6 @@ describe('Alternative combinators', () => {
       sequence(char('e'), char('f')),
     )
 
-    it('throws before running any parser that is not a parser', () => {
-      error(
-        choice(42, char('a'), char('b')),
-        'abc',
-        '[choice]: '
-          + 'expected 1st argument to be a parser Function; found a Number',
-      )
-      error(
-        choice(char('a'), () => {}, char('b')),
-        'def',
-        '[choice]: '
-          + 'expected 2nd argument to be a Parser; found a non-Parser Function',
-      )
-    })
     it('fails with all expecteds if all parsers fail without consuming', () => {
       fail(parser, 'yz', { expected: '"a", "c", or "e"' })
     })
@@ -57,34 +43,6 @@ describe('Alternative combinators', () => {
       '"ab", "cd", or "ef"',
     )
 
-    it('throws if the last argument is not a string', () => {
-      error(
-        choiceL(char('a'), char('b')),
-        'ab',
-        '[choiceL]: expected final argument to be a String; found a Function',
-      )
-    })
-    it('throws if there are not at least two arguments', () => {
-      error(
-        choiceL('message'),
-        'ab',
-        '[choiceL]: expected at least 2 arguments; found 1',
-      )
-    })
-    it('throws before running any parser that is not a parser', () => {
-      error(
-        choiceL(42, char('a'), char('b'), 'test'),
-        'abc',
-        '[choiceL]: '
-          + 'expected 1st argument to be a parser Function; found a Number',
-      )
-      error(
-        choiceL(char('a'), () => {}, char('b'), 'test'),
-        'def',
-        '[choiceL]: '
-          + 'expected 2nd argument to be a Parser; found a non-Parser Function',
-      )
-    })
     it('fails with its message if all parsers fail without consuming', () => {
       fail(parser, 'yz', { expected: '"ab", "cd", or "ef"' })
     })
@@ -97,19 +55,6 @@ describe('Alternative combinators', () => {
   })
 
   describe('optional', () => {
-    it('throws if a non-parser is passed in', () => {
-      error(
-        optional(23),
-        'abc',
-        '[optional]: expected argument to be a parser Function; found a Number',
-      )
-      error(
-        optional(() => {}),
-        'abc',
-        '[optional]: '
-          + 'expected argument to be a Parser; found a non-Parser Function',
-      )
-    })
     it('consumes input without a result on success', () => {
       pass(optional(char('a')), 'abc', { result: null, index: 1 })
     })
@@ -131,19 +76,6 @@ describe('Alternative combinators', () => {
   })
 
   describe('attempt', () => {
-    it('throws if a non-parser is passed in', () => {
-      error(
-        attempt(23),
-        'abc',
-        '[attempt]: expected argument to be a parser Function; found a Number',
-      )
-      error(
-        attempt(() => {}),
-        'abc',
-        '[attempt]: '
-          + 'expected argument to be a Parser; found a non-Parser Function',
-      )
-    })
     it('does nothing if its parser succeeds', () => {
       const r1 = parse(char('a'), 'abc')
       const r2 = parse(attempt(char('a')), 'abc')

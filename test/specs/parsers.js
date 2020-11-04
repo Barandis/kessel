@@ -31,23 +31,10 @@ import {
   tab,
   upper,
 } from 'kessel/parsers'
-import { error, fail, pass } from 'test/helper'
+import { fail, pass } from 'test/helper'
 
 describe('Parsers', () => {
   describe('char', () => {
-    it('fails if the supplied value is not a one-character string', () => {
-      error(
-        char(23),
-        'some text',
-        '[char]: expected argument to be a String; found a Number',
-      )
-      error(
-        char('str'),
-        'some text',
-        '[char]: expected argument to be one character; found "str"',
-      )
-    })
-
     context('1-byte characters', () => {
       const parser = char('O')
 
@@ -112,19 +99,6 @@ describe('Parsers', () => {
   })
 
   describe('chari', () => {
-    it('throws if the supplied value is not a one-character string', () => {
-      error(
-        chari(23),
-        'some text',
-        '[chari]: expected argument to be a String; found a Number',
-      )
-      error(
-        chari('str'),
-        'some text',
-        '[chari]: expected argument to be one character; found "str"',
-      )
-    })
-
     context('1-byte characters', () => {
       const parser = chari('O')
 
@@ -189,14 +163,6 @@ describe('Parsers', () => {
   })
 
   describe('satisfies', () => {
-    it('fails if the supplied value is not a function', () => {
-      error(
-        satisfies(23),
-        'some text',
-        '[satisfies]: expected argument to be a Function; found a Number',
-      )
-    })
-
     const fn = char => char === char.toUpperCase()
 
     it('tests the next 1-byte character', () => {
@@ -239,28 +205,6 @@ describe('Parsers', () => {
   })
 
   describe('range', () => {
-    it('throws if either argument is not a single character string', () => {
-      error(
-        range('0', 9),
-        '123',
-        '[range]: expected second argument to be a String; found a Number',
-      )
-      error(
-        range(0, '9'),
-        '123',
-        '[range]: expected first argument to be a String; found a Number',
-      )
-      error(
-        range('12', '9'),
-        '123',
-        '[range]: expected first argument to be one character; found "12"',
-      )
-      error(
-        range('1', '89'),
-        '123',
-        '[range]: expected second argument to be one character; found "89"',
-      )
-    })
     it('succeeds if the next character is between the supplied two', () => {
       pass(range('a', 'z'), 'abc', 'a')
       pass(range('а', 'я'), 'цчш', 'ц')
@@ -279,14 +223,6 @@ describe('Parsers', () => {
   })
 
   describe('string', () => {
-    it('throws an error if a non-string is passed in', () => {
-      error(
-        string(23),
-        'some text',
-        '[string]: expected argument to be a String; found a Number',
-      )
-    })
-
     context('1-byte characters', () => {
       const parser = string('Onoma')
 
@@ -366,14 +302,6 @@ describe('Parsers', () => {
   })
 
   describe('stringi', () => {
-    it('throws an error if a non-string is passed in', () => {
-      error(
-        stringi(23),
-        'some text',
-        '[stringi]: expected argument to be a String; found a Number',
-      )
-    })
-
     context('1-byte characters', () => {
       const parser = stringi('Onoma')
 
@@ -442,13 +370,6 @@ describe('Parsers', () => {
   })
 
   describe('regex', () => {
-    it('throws an error if the input is neither a string or a regex', () => {
-      error(
-        () => regex(23),
-        'some text',
-        '[regex]: expected argument to be a String or a RegExp; found a Number',
-      )
-    })
     it('accepts a string as input', () => {
       pass(regex('^\\w{3}'), 'Onomatopoeia', 'Ono')
     })
@@ -1088,26 +1009,12 @@ describe('Parsers', () => {
   })
 
   describe('fail', () => {
-    it('throws if the passed value is not a string', () => {
-      error(
-        pfail(23),
-        'abc',
-        '[fail]: expected argument to be a String; found a Number',
-      )
-    })
     it('fails with the supplied generic message', () => {
       fail(pfail('test message'), '', { generic: 'test message', index: 0 })
     })
   })
 
   describe('failFatally', () => {
-    it('throws if the passed value is not a string', () => {
-      error(
-        failFatally(23),
-        'abc',
-        '[failFatally]: expected argument to be a String; found a Number',
-      )
-    })
     it('fails with the supplied generic message', () => {
       fail(failFatally('test message'), '', {
         generic: 'test message',

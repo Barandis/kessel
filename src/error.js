@@ -7,7 +7,6 @@ import {
   charLength,
   commaSeparate,
   nextCharWidth,
-  trackedFactory,
   viewToString,
 } from './util'
 
@@ -21,9 +20,9 @@ export const ErrorType = {
   Other: Symbol('other'),
 }
 
-export const ParseError = trackedFactory((type, message) => ({
+export const ParseError = (type, message) => ({
   type, message,
-}))
+})
 
 // Creates an expected error. Multiple expected errors can be a part of
 // a single error message, and they will be comma-separated and prefaced
