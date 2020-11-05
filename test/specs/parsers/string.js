@@ -3,7 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { all, string, stringi } from 'kessel/parsers/string'
+import { all, anyString, string, stringi } from 'kessel/parsers/string'
 import { fail, pass } from 'test/helper'
 
 describe('String parsers', () => {
@@ -177,6 +177,27 @@ describe('String parsers', () => {
     })
     it('succeeds at EOF', () => {
       pass(all, '', { result: '', index: 0 })
+    })
+  })
+
+  describe('anyString', () => {
+    it('succeeds if there are more 1-byte characters than it reads', () => {
+      pass(anyString(5), 'Onomatopoeia', 'Onoma')
+    })
+    it('succeeds if there are more 2-byte characters than it reads', () => {
+      pass(anyString(5), 'Звукоподражание', 'Звуко')
+    })
+    it('succeeds if there are more 3-byte characters than it reads', () => {
+      pass(anyString(5), 'คำเลียนเสียง', 'คำเลี')
+    })
+    it('succeeds if there are more 4-byte characters than it reads', () => {
+      pass(anyString(5), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', '𝑂𝑛𝑜𝑚𝑎')
+    })
+    it('fails if there aren\'t enough characters remaining', () => {
+      fail(anyString(5), 'Ono', {
+        expected: 'a string of 5 characters',
+        actual: '"Ono"',
+      })
     })
   })
 })

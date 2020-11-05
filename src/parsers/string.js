@@ -38,12 +38,10 @@ const StringParser = (length, fn) => makeParser(state => {
   }
 
   const { width, next } = nextChars(index, view, length)
-
-  return fn(next)
-    ? ok(state, next, index + width)
-    : error(state, overwrite(
-      state.errors, makeUnexpected(quote(next)),
-    ))
+  if (charLength(next) !== length || !fn(next)) {
+    return error(state, overwrite(state.errors, makeUnexpected(quote(next))))
+  }
+  return ok(state, next, index + width)
 })
 
 /**
@@ -98,4 +96,22 @@ export const all = makeParser(state => {
   const { index, view } = state
   const width = view.byteLength - index
   return ok(state, viewToString(index, width, view), index + width)
+})
+
+/**
+ * Creates a parser that reads a certain number of characters, using
+ * them (as a string) as its result. The parser will fail if there are
+ * not that many characters left to read.
+ *
+ * @param {number} n The number of characters to read.
+ * @returns {Parser} A parser that reads that many characters and joins
+ *     them into a string for its result.
+ */
+export const anyString = n => makeParser(state => {
+  const nextState = StringParser(n, () => true)(state)
+  if (nextState.status === Status.Ok) return nextState
+  return error(
+    nextState,
+    overwrite(nextState.errors, makeExpected(`a string of ${n} characters`)),
+  )
 })
