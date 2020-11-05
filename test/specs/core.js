@@ -77,8 +77,8 @@ describe('Core functionality', () => {
           makeUnexpected('"z"'),
         ), 17)
         expect(result.errors).to.deep.equal([
-          { type: ErrorType.Expected, message: '"123"' },
           { type: ErrorType.Unexpected, message: '"abc"' },
+          { type: ErrorType.Expected, message: '"123"' },
         ])
         expect(updated.errors).to.deep.equal([
           { type: ErrorType.Expected, message: '"x"' },

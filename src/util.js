@@ -119,11 +119,11 @@ export function nextCharWidth(index, view) {
 }
 
 /**
- * Contains information about the next character in the data view.
+ * Contains information about the next character(s) in the data view.
  *
  * @typedef NextCharInfo
- * @property {(1|2|3|4)} width The width of the returned character.
- * @property {string} next The next character.
+ * @property {number} width The width of the returned character(s).
+ * @property {string} next The next character(s).
  */
 
 /**
@@ -139,6 +139,35 @@ export function nextCharWidth(index, view) {
  */
 export function nextChar(index, view) {
   const width = nextCharWidth(index, view)
+  return { width, next: viewToString(index, width, view) }
+}
+
+/**
+ * Returns the next `count` characters starting at the indexed position
+ * within the view. Each of these characters may be 1-, 2-, 3-, or
+ * 4-byte characters depending on the values of their first bytes. If
+ * there are not enough characters left, those remaining will be
+ * returned.
+ *
+ * @param {number} index The index within the view of the first byte of
+ *     the first desired character.
+ * @param {DataView} view The data view containing the text.
+ * @param {number} count The number of characters to return.
+ * @returns {NextCharInfo} Information about the next characters in the
+ *     data view.
+ */
+export function nextChars(index, view, count) {
+  const viewLength = view.byteLength
+  let width = 0
+
+  for (const _ of range(count)) {
+    const i = index + width
+    if (i >= viewLength) break
+    width += nextCharWidth(i, view)
+  }
+  if (index + width >= viewLength) {
+    width = viewLength - index
+  }
   return { width, next: viewToString(index, width, view) }
 }
 

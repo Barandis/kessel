@@ -4,6 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import {
+  newline,
   regex,
   space,
   spaces,
@@ -607,6 +608,23 @@ describe('Regular expression parsers', () => {
       pass(uspaces1, '\u202fabc', { result: null, index: 3 })
       pass(uspaces1, '\u205fabc', { result: null, index: 3 })
       pass(uspaces1, '\u3000abc', { result: null, index: 3 })
+    })
+  })
+
+  describe('newline', () => {
+    it('succeeds on a single newline', () => {
+      pass(newline, '\nabc', '\n')
+      pass(newline, '\rabc', '\r')
+      pass(newline, '\r\nabc', '\r\n')
+    })
+    it('fails on any other character combination', () => {
+      fail(newline, '\u0085abc', { expected: 'a newline', actual: '"\u0085"' })
+      fail(newline, '\u2028abc', { expected: 'a newline', actual: '"\u2028"' })
+      fail(newline, '\u2029abc', { expected: 'a newline', actual: '"\u2029"' })
+      fail(newline, 'Onoma', { expected: 'a newline', actual: '"O"' })
+    })
+    it('fails at EOF', () => {
+      fail(newline, '', { expected: 'a newline', actual: 'EOF' })
     })
   })
 

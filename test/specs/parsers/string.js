@@ -8,6 +8,10 @@ import { fail, pass } from 'test/helper'
 
 describe('String parsers', () => {
   describe('string', () => {
+    it('fails at the end of input', () => {
+      fail(string('abc'), '', { expected: '"abc"', actual: 'EOF' })
+    })
+
     context('1-byte characters', () => {
       const parser = string('Onoma')
 
@@ -87,6 +91,10 @@ describe('String parsers', () => {
   })
 
   describe('stringi', () => {
+    it('fails at the end of input', () => {
+      fail(stringi('abc'), '', { expected: '"abc"', actual: 'EOF' })
+    })
+
     context('1-byte characters', () => {
       const parser = stringi('Onoma')
 

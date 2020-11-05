@@ -3,57 +3,46 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { error, makeParser, ok } from 'kessel/core'
+import { error, makeParser, ok, Status } from 'kessel/core'
 import { makeExpected, makeUnexpected, overwrite } from 'kessel/error'
-import { quote, stringToView, viewToString } from 'kessel/util'
+import { charLength, nextChars, quote, viewToString } from 'kessel/util'
 
 /** @typedef {import('kessel/core').Parser} Parser */
 
 /**
  * Creates a parser that attempts to match a particular string from the
  * current position in the text. A string of characters equal in length
- * to `str` is read from input and passed to `fn`; if `fn` returns
+ * to `length` is read from input and passed to `fn`; if `fn` returns
  * `true`, then the parser succeeds.
  *
- * This parser always fails if there are not as many characters left in
- * the input as are in `str`. It will always pass if `str` is an empty
- * string.
+ * This parser always fails if there are less than `length` characters
+ * left in the input. It will always pass if `length` is 0.
  *
- * @param {string} str The string being compared to the next characters
- *     of input. Note that the only purposes of this string in this
- *     function is a) to determine if the parser succeeds automatically
- *     because this string is empty, or b) to determine how many
- *     characters are read from input. It is not used in the comparison
- *     function.
+ * @param {number} length The number of characters that the parser
+ *     should read.
  * @param {function(string): boolean} fn A function to which the read
  *     string is passed. If this function returns `true`, the parser
  *     succeeds.
  * @returns {Parser} A parser that succeeds if the read string passes
  *     the predicate function.
  */
-const StringParser = (str, fn) => makeParser(state => {
-  if (str.length === 0) return ok(state, '')
+const StringParser = (length, fn) => makeParser(state => {
+  if (length === 0) return ok(state, '')
 
   const { index, view } = state
   if (index >= view.byteLength) {
     return error(
       state,
-      overwrite(state.errors, makeExpected(quote(str)), makeUnexpected('EOF')),
+      overwrite(state.errors, makeUnexpected('EOF')),
     )
   }
 
-  const bytes = stringToView(str).byteLength
-  const width = bytes > view.byteLength - index
-    ? view.byteLength - index
-    : bytes
-  const actual = viewToString(index, width, view)
+  const { width, next } = nextChars(index, view, length)
 
-  return fn(actual)
-    ? ok(state, actual, index + width)
+  return fn(next)
+    ? ok(state, next, index + width)
     : error(state, overwrite(
-      state.errors,
-      makeExpected(quote(str)),
-      makeUnexpected(quote(actual)),
+      state.errors, makeUnexpected(quote(next)),
     ))
 })
 
@@ -71,9 +60,11 @@ const StringParser = (str, fn) => makeParser(state => {
  * @returns {Parser} A parser that will succeed if the supplied string
  *     matches the next characters in the input.
  */
-export const string = str => makeParser(state => StringParser(
-  str, c => c === str,
-)(state))
+export const string = str => makeParser(state => {
+  const nextState = StringParser(charLength(str), chars => str === chars)(state)
+  if (nextState.status === Status.Ok) return nextState
+  return error(nextState, overwrite(nextState.errors, makeExpected(quote(str))))
+})
 
 /**
  * Creates a parser that reads a string from the current location in the
@@ -91,9 +82,13 @@ export const string = str => makeParser(state => StringParser(
  * @returns {Parser} A parser that will succeed if the supplied string
  *     case-insensitively matches the next characters in the input.
  */
-export const stringi = str => makeParser(state => StringParser(
-  str, c => c.toLowerCase() === str.toLowerCase(),
-)(state))
+export const stringi = str => makeParser(state => {
+  const nextState = StringParser(
+    charLength(str), chars => str.toLowerCase() === chars.toLowerCase(),
+  )(state)
+  if (nextState.status === Status.Ok) return nextState
+  return error(nextState, overwrite(nextState.errors, makeExpected(quote(str))))
+})
 
 /**
  * A parser that reads the remainder of the input text and results in
