@@ -3,7 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { error, makeParser, ok, Status } from 'kessel/core'
+import { error, makeParser, ok } from 'kessel/core'
 import { makeExpected, makeUnexpected, overwrite } from 'kessel/error'
 import { quote, stringToView, viewToString } from 'kessel/util'
 
@@ -103,16 +103,4 @@ export const all = makeParser(state => {
   const { index, view } = state
   const width = view.byteLength - index
   return ok(state, viewToString(index, width, view), index + width)
-})
-
-/**
- * A parser that reads two characters and succeeds with those two
- * characters if they are a carriage return and a line feed, in that
- * order. Does not consume input on a failure, even if the first
- * character does match `\r`.
- */
-export const crlf = makeParser(state => {
-  const nextState = StringParser('\r\n', c => c === '\r\n')(state)
-  if (nextState.status === Status.Ok) return nextState
-  return error(nextState, overwrite(nextState.errors, makeExpected('a CR+LF')))
 })

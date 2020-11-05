@@ -3,7 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { all, crlf, string, stringi } from 'kessel/parsers/string'
+import { all, string, stringi } from 'kessel/parsers/string'
 import { fail, pass } from 'test/helper'
 
 describe('String parsers', () => {
@@ -169,18 +169,6 @@ describe('String parsers', () => {
     })
     it('succeeds at EOF', () => {
       pass(all, '', { result: '', index: 0 })
-    })
-  })
-
-  describe('crlf', () => {
-    it('succeeds on a single crlf', () => {
-      pass(crlf, '\r\nabc', '\r\n')
-    })
-    it('fails on any other character combination', () => {
-      fail(crlf, '\nOnoma', { expected: 'a CR+LF', actual: '"\nO"' })
-    })
-    it('fails at EOF', () => {
-      fail(crlf, '', { expected: 'a CR+LF', actual: 'EOF' })
     })
   })
 })
