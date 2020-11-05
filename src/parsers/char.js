@@ -272,3 +272,64 @@ export const octal = makeParser(state => {
     nextState, overwrite(nextState.errors, makeExpected('an octal digit')),
   )
 })
+
+/**
+ * A parser that reads a character and succeeds with that character if
+ * it is a letter. This parser is only for ASCII characters; `uletter`
+ * is a Unicode letter parser.
+ */
+export const letter = makeParser(state => {
+  const fn = c => c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z'
+  const nextState = CharParser(fn)(state)
+  if (nextState.status === Status.Ok) return nextState
+  return error(
+    nextState, overwrite(nextState.errors, makeExpected('a letter')),
+  )
+})
+
+/**
+ * A parser that reads a character and succeeds with that character if
+ * it is an alphanumeric character. This parser is only for ASCII
+ * characters; `ualpha` is a Unicode alphanumeric parser.
+ */
+export const alpha = makeParser(state => {
+  const fn = c => c >= 'a' && c <= 'z'
+    || c >= 'A' && c <= 'Z'
+    || c >= '0' && c <= '9'
+  const nextState = CharParser(fn)(state)
+  if (nextState.status === Status.Ok) return nextState
+  return error(
+    nextState, overwrite(
+      nextState.errors,
+      makeExpected('an alphanumeric character'),
+    ),
+  )
+})
+
+/**
+ * A parser that reads a character and succeeds with that character if
+ * it is an uppercase letter. This parser is only for ASCII characters;
+ * `uupper` is a Unicode uppercase letter parser.
+ */
+export const upper = makeParser(state => {
+  const fn = c => c >= 'A' && c <= 'Z'
+  const nextState = CharParser(fn)(state)
+  if (nextState.status === Status.Ok) return nextState
+  return error(
+    nextState, overwrite(nextState.errors, makeExpected('an uppercase letter')),
+  )
+})
+
+/**
+ * A parser that reads a character and succeeds with that character if
+ * it is a lowercase letter. This parser is only for ASCII characters;
+ * `ulower` is a Unicode letter parser.
+ */
+export const lower = makeParser(state => {
+  const fn = c => c >= 'a' && c <= 'z'
+  const nextState = CharParser(fn)(state)
+  if (nextState.status === Status.Ok) return nextState
+  return error(
+    nextState, overwrite(nextState.errors, makeExpected('a lowercase letter')),
+  )
+})

@@ -4,17 +4,21 @@
 // https://opensource.org/licenses/MIT
 
 import {
+  alpha,
   any,
+  anyOf,
   char,
   chari,
   digit,
   eof,
   hex,
+  letter,
+  lower,
   noneOf,
-  anyOf,
+  octal,
   range,
   satisfy,
-  octal,
+  upper,
 } from 'kessel/parsers/char'
 import { fail, pass } from 'test/helper'
 
@@ -374,6 +378,66 @@ describe('Character parsers', () => {
     })
     it('fails at EOF', () => {
       fail(octal, '', { expected: 'an octal digit', actual: 'EOF' })
+    })
+  })
+
+  describe('letter', () => {
+    it('succeeds on uppercase letters', () => {
+      pass(letter, 'A', 'A')
+    })
+    it('succeeds on lowercase letters', () => {
+      pass(letter, 'a', 'a')
+    })
+    it('fails on digits', () => {
+      fail(letter, '0', { expected: 'a letter', actual: '"0"' })
+    })
+    it('fails on whitespace', () => {
+      fail(letter, ' ', { expected: 'a letter', actual: '" "' })
+    })
+  })
+
+  describe('alpha', () => {
+    it('succeeds on uppercase letters', () => {
+      pass(alpha, 'A', 'A')
+    })
+    it('succeeds on lowercase letters', () => {
+      pass(alpha, 'a', 'a')
+    })
+    it('succeeds on digits', () => {
+      pass(alpha, '0', '0')
+    })
+    it('fails on whitespace', () => {
+      fail(alpha, ' ', { expected: 'an alphanumeric character', actual: '" "' })
+    })
+  })
+
+  describe('upper', () => {
+    it('succeeds on uppercase letters', () => {
+      pass(upper, 'A', 'A')
+    })
+    it('fails on lowercase letters', () => {
+      fail(upper, 'a', { expected: 'an uppercase letter', actual: '"a"' })
+    })
+    it('fails on digits', () => {
+      fail(upper, '0', { expected: 'an uppercase letter', actual: '"0"' })
+    })
+    it('fails on whitespace', () => {
+      fail(upper, ' ', { expected: 'an uppercase letter', actual: '" "' })
+    })
+  })
+
+  describe('lower', () => {
+    it('fails on uppercase letters', () => {
+      fail(lower, 'A', { expected: 'a lowercase letter', actual: '"A"' })
+    })
+    it('succeeds on lowercase letters', () => {
+      pass(lower, 'a', 'a')
+    })
+    it('fails on digits', () => {
+      fail(lower, '0', { expected: 'a lowercase letter', actual: '"0"' })
+    })
+    it('fails on whitespace', () => {
+      fail(lower, ' ', { expected: 'a lowercase letter', actual: '" "' })
     })
   })
 })
