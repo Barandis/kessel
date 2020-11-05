@@ -95,7 +95,7 @@ export const chari = c => makeParser(state => {
  * @returns {Parser} A parser that reads a character and executes `fn`
  *     on it when applied to input.
  */
-export const satisfies = fn => makeParser(state => {
+export const satisfy = fn => makeParser(state => {
   const name = fn.name.length ? fn.name : '<anonymous>'
   const message = `a character that satisfies function "${name}"`
 
@@ -185,7 +185,7 @@ export const eof = makeParser(state => {
  * @returns {Parser} A parser that succeeds if the next character is
  *     one of the characters in `chars`.
  */
-export const oneOf = chars => makeParser(state => {
+export const anyOf = chars => makeParser(state => {
   const { index, view } = state
   const { width, next } = nextChar(index, view)
   const arr = [...chars]
@@ -193,7 +193,7 @@ export const oneOf = chars => makeParser(state => {
   if (arr.includes(next)) {
     return ok(state, next, index + width)
   }
-  const message = 'one of ' + commaSeparate(arr.map(c => `"${c}"`))
+  const message = 'any of ' + commaSeparate(arr.map(c => `"${c}"`))
 
   return error(state, overwrite(
     state.errors,
@@ -246,10 +246,10 @@ export const digit = makeParser(state => {
 })
 
 /**
- * A parser taht reads a character and succeeds with that character if
+ * A parser that reads a character and succeeds with that character if
  * it is a hexadecimal digit. This parser is not case sensitive.
  */
-export const hexDigit = makeParser(state => {
+export const hex = makeParser(state => {
   const fn = c => c >= '0' && c <= '9'
     || c >= 'a' && c <= 'f'
     || c >= 'A' && c <= 'F'
@@ -261,39 +261,14 @@ export const hexDigit = makeParser(state => {
 })
 
 /**
- * A parser that reads a single character and succeeds with that
- * character if it is a tab.
+ * A parser that reads a character and succeeds with that character if
+ * it is an octal digit.
  */
-export const tab = makeParser(state => {
-  const fn = c => c === '\t'
-  const nextState = CharParser(fn)(state)
-  if (nextState.status === Status.Ok) return nextState
-  return error(nextState, overwrite(nextState.errors, makeExpected('a tab')))
-})
-
-/**
- * A parser that reads a single character and succeeds with that
- * character if it is a carriage return.
- */
-export const cr = makeParser(state => {
-  const fn = c => c === '\r'
-  const nextState = CharParser(fn)(state)
-  if (nextState.status === Status.Ok) return nextState
-  return error(nextState, overwrite(
-    nextState.errors,
-    makeExpected('a carriage return'),
-  ))
-})
-
-/**
- * A parser that reads a single character and succeeds with that
- * character if it is a line feed.
- */
-export const lf = makeParser(state => {
-  const fn = c => c === '\n'
+export const octal = makeParser(state => {
+  const fn = c => c >= '0' && c <= '7'
   const nextState = CharParser(fn)(state)
   if (nextState.status === Status.Ok) return nextState
   return error(
-    nextState, overwrite(nextState.errors, makeExpected('a line feed')),
+    nextState, overwrite(nextState.errors, makeExpected('an octal digit')),
   )
 })

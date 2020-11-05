@@ -7,16 +7,13 @@ import {
   any,
   char,
   chari,
-  cr,
   digit,
   eof,
-  hexDigit,
-  lf,
+  hex,
   noneOf,
-  oneOf,
+  anyOf,
   range,
-  satisfies,
-  tab,
+  satisfy,
 } from 'kessel/parsers/char'
 import { fail, pass } from 'test/helper'
 
@@ -149,42 +146,42 @@ describe('Character parsers', () => {
     })
   })
 
-  describe('satisfies', () => {
+  describe('satisfy', () => {
     const fn = char => char === char.toUpperCase()
 
     it('tests the next 1-byte character', () => {
-      pass(satisfies(fn), 'Onomatopoeia', { result: 'O', index: 1 })
-      fail(satisfies(fn), 'onomatopoeia', {
+      pass(satisfy(fn), 'Onomatopoeia', { result: 'O', index: 1 })
+      fail(satisfy(fn), 'onomatopoeia', {
         expected: 'a character that satisfies function "fn"',
         actual: '"o"',
       })
     })
 
     it('tests the next 2-byte character', () => {
-      pass(satisfies(fn), 'Звукоподражание', { result: 'З', index: 2 })
-      fail(satisfies(fn), 'звукоподражание', {
+      pass(satisfy(fn), 'Звукоподражание', { result: 'З', index: 2 })
+      fail(satisfy(fn), 'звукоподражание', {
         expected: 'a character that satisfies function "fn"',
         actual: '"з"',
       })
     })
 
     it('tests the next 3-byte character', () => {
-      pass(satisfies(fn), 'คำเลียนเสียง', { result: 'ค', index: 3 })
+      pass(satisfy(fn), 'คำเลียนเสียง', { result: 'ค', index: 3 })
     })
 
     it('tests the next 4-byte character', () => {
-      pass(satisfies(fn), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂', index: 4 })
+      pass(satisfy(fn), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂', index: 4 })
     })
 
     it('names an unnamed function <anonymous>', () => {
-      fail(satisfies(char => char === char.toUpperCase()), 'onomatopoeia', {
+      fail(satisfy(char => char === char.toUpperCase()), 'onomatopoeia', {
         expected: 'a character that satisfies function "<anonymous>"',
         actual: '"o"',
       })
     })
 
     it('fails automatically at EOF', () => {
-      fail(satisfies(fn), '', {
+      fail(satisfy(fn), '', {
         expected: 'a character that satisfies function "fn"',
         actual: 'EOF',
       })
@@ -245,43 +242,43 @@ describe('Character parsers', () => {
     })
   })
 
-  describe('oneOf', () => {
+  describe('anyOf', () => {
     it('checks the next charater against 1-byte characters', () => {
-      const parser = oneOf('Onoma')
+      const parser = anyOf('Onoma')
       pass(parser, 'Onomatopoeia', { result: 'O', index: 1 })
       pass(parser, 'matriculate', { result: 'm', index: 1 })
       fail(parser, 'Matriculate', {
-        expected: 'one of "O", "n", "o", "m", or "a"',
+        expected: 'any of "O", "n", "o", "m", or "a"',
         actual: '"M"',
       })
     })
 
     it('checks the next character against 2-byte characters', () => {
-      const parser = oneOf('Звуко')
+      const parser = anyOf('Звуко')
       pass(parser, 'Звукоподражание', { result: 'З', index: 2 })
       pass(parser, 'учитель', { result: 'у', index: 2 })
       fail(parser, 'Учитель', {
-        expected: 'one of "З", "в", "у", "к", or "о"',
+        expected: 'any of "З", "в", "у", "к", or "о"',
         actual: '"У"',
       })
     })
 
     it('checks the next character against 3-byte characters', () => {
-      const parser = oneOf('คำเลี')
+      const parser = anyOf('คำเลี')
       pass(parser, 'คำเลียนเสียง', { result: 'ค', index: 3 })
       pass(parser, 'ลียน', { result: 'ล', index: 3 })
       fail(parser, 'ยง', {
-        expected: 'one of "ค", "ำ", "เ", "ล", or "ี"',
+        expected: 'any of "ค", "ำ", "เ", "ล", or "ี"',
         actual: '"ย"',
       })
     })
 
     it('checks the next character against 4-byte characters', () => {
-      const parser = oneOf('𝑂𝑛𝑜𝑚𝑎')
+      const parser = anyOf('𝑂𝑛𝑜𝑚𝑎')
       pass(parser, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂', index: 4 })
       pass(parser, '𝑚𝑎𝑡𝑟𝑖𝑐𝑢𝑙𝑎𝑡𝑒', { result: '𝑚', index: 4 })
       fail(parser, 'matriculate', {
-        expected: 'one of "𝑂", "𝑛", "𝑜", "𝑚", or "𝑎"',
+        expected: 'any of "𝑂", "𝑛", "𝑜", "𝑚", or "𝑎"',
         actual: '"m"',
       })
     })
@@ -353,52 +350,16 @@ describe('Character parsers', () => {
     })
   })
 
-  describe('hexDigit', () => {
+  describe('hex', () => {
     it('succeeds on any single decimal digit', () => {
-      pass(hexDigit, '123', '1')
-      pass(hexDigit, 'abc', 'a')
+      pass(hex, '123', '1')
+      pass(hex, 'abc', 'a')
     })
     it('fails on any other character', () => {
-      fail(hexDigit, 'ghi', { expected: 'a hex digit', actual: '"g"' })
+      fail(hex, 'ghi', { expected: 'a hex digit', actual: '"g"' })
     })
     it('fails at EOF', () => {
-      fail(hexDigit, '', { expected: 'a hex digit', actual: 'EOF' })
-    })
-  })
-
-  describe('tab', () => {
-    it('succeeds on a single tab', () => {
-      pass(tab, '\tabc', '\t')
-    })
-    it('fails on any other character combination', () => {
-      fail(tab, 'Onomatopoeia', { expected: 'a tab', actual: '"O"' })
-    })
-    it('fails at EOF', () => {
-      fail(tab, '', { expected: 'a tab', actual: 'EOF' })
-    })
-  })
-
-  describe('cr', () => {
-    it('succeeds on a single cr', () => {
-      pass(cr, '\rabc', '\r')
-    })
-    it('fails on any other character combination', () => {
-      fail(cr, 'Onoma', { expected: 'a carriage return', actual: '"O"' })
-    })
-    it('fails at EOF', () => {
-      fail(cr, '', { expected: 'a carriage return', actual: 'EOF' })
-    })
-  })
-
-  describe('lf', () => {
-    it('succeeds on a single lf', () => {
-      pass(lf, '\nabc', '\n')
-    })
-    it('fails on any other character combination', () => {
-      fail(lf, 'Onoma', { expected: 'a line feed', actual: '"O"' })
-    })
-    it('fails at EOF', () => {
-      fail(lf, '', { expected: 'a line feed', actual: 'EOF' })
+      fail(hex, '', { expected: 'a hex digit', actual: 'EOF' })
     })
   })
 })
