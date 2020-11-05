@@ -9,7 +9,7 @@ import { choice } from 'kessel/combinators/alternative'
 import { label } from 'kessel/combinators/message'
 import { sequence } from 'kessel/combinators/sequence'
 import { parse } from 'kessel/core'
-import { char } from 'kessel/parsers'
+import { char } from 'kessel/parsers/char'
 import { fail } from 'test/helper'
 
 describe('Message combinators', () => {

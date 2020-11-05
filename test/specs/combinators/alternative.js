@@ -13,7 +13,8 @@ import {
 } from 'kessel/combinators/alternative'
 import { sequence } from 'kessel/combinators/sequence'
 import { parse, Status } from 'kessel/core'
-import { char, string } from 'kessel/parsers'
+import { char } from 'kessel/parsers/char'
+import { string } from 'kessel/parsers/string'
 import { fail, pass } from 'test/helper'
 
 describe('Alternative combinators', () => {

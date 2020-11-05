@@ -13,7 +13,8 @@ import {
   overwrite,
   makeUnexpected,
 } from 'kessel/error'
-import { char, string } from 'kessel/parsers'
+import { char } from 'kessel/parsers/char'
+import { string } from 'kessel/parsers/string'
 import { error as terror, pass } from 'test/helper'
 
 const encoder = new TextEncoder()

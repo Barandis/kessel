@@ -5,7 +5,7 @@
 
 import { lookAhead } from 'kessel/combinators/conditional'
 import { sequence } from 'kessel/combinators/sequence'
-import { string } from 'kessel/parsers'
+import { string } from 'kessel/parsers/string'
 import { fail, pass } from 'test/helper'
 
 describe('Conditional and look-ahead combinators', () => {
