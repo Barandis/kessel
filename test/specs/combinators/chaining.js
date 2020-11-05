@@ -3,8 +3,11 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { chain } from 'kessel/combinators/chaining'
-import { any, char } from 'kessel/parsers'
+import { chain, join, map } from 'kessel/combinators/chaining'
+import { many, many1, sequence } from 'kessel/combinators/sequence'
+import { Status } from 'kessel/core'
+import { any, char, digit } from 'kessel/parsers/char'
+import { letter } from 'kessel/parsers/regex'
 import { fail, pass } from 'test/helper'
 
 describe('Chaining and piping combinators', () => {
@@ -18,6 +21,45 @@ describe('Chaining and piping combinators', () => {
         expected: '"a"',
         actual: '"b"',
         index: 0,
+      })
+    })
+  })
+
+  describe('map', () => {
+    it('succeeds with the return value of its function', () => {
+      pass(map(any, c => c.toUpperCase()), 'abc', 'A')
+      pass(map(sequence([letter, digit]), cs => cs.join('')), 'a1', 'a1')
+    })
+    it('propagates failed state if its parser fails', () => {
+      fail(map(any, c => c.toUpperCase()), '', {
+        expected: 'any character',
+        actual: 'EOF',
+        status: Status.Error,
+      })
+      fail(map(sequence([letter, digit]), cs => cs.join('')), 'ab', {
+        expected: 'a digit',
+        actual: '"b"',
+        status: Status.Fatal,
+        index: 1,
+      })
+    })
+  })
+
+  describe('join', () => {
+    it('joins array elements together into a resulting string', () => {
+      pass(join(many(any)), '123', '123')
+      pass(join(map(many(any), x => x.map(c => parseInt(c)))), '123', '123')
+    })
+    it('fails if its contained parser fails', () => {
+      fail(join(many1(any)), '', {
+        expected: 'any character',
+        actual: 'EOF',
+        status: Status.Error,
+      })
+      fail(join(sequence([letter, digit])), 'ab', {
+        expected: 'a digit',
+        actual: '"b"',
+        status: Status.Fatal,
       })
     })
   })
