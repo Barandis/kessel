@@ -14,6 +14,7 @@ import {
   anyOf,
   range,
   satisfy,
+  octal,
 } from 'kessel/parsers/char'
 import { fail, pass } from 'test/helper'
 
@@ -360,6 +361,19 @@ describe('Character parsers', () => {
     })
     it('fails at EOF', () => {
       fail(hex, '', { expected: 'a hex digit', actual: 'EOF' })
+    })
+  })
+
+  describe('octal', () => {
+    it('succeeds on any single octal digit', () => {
+      pass(octal, '123', '1')
+    })
+    it('fails on any other character', () => {
+      fail(octal, '890', { expected: 'an octal digit', actual: '"8"' })
+      fail(octal, 'abc', { expected: 'an octal digit', actual: '"a"' })
+    })
+    it('fails at EOF', () => {
+      fail(octal, '', { expected: 'an octal digit', actual: 'EOF' })
     })
   })
 })
