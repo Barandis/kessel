@@ -5,9 +5,7 @@
 
 import { error, ok, makeParser, Status } from 'kessel/core'
 
-/**
- * @typedef {import('kessel/core').Parser} Parser
- */
+/** @typedef {import('kessel/core').Parser} Parser */
 
 /**
  * Creates a parser that applies the supplied parser. If that parser

@@ -5,9 +5,7 @@
 
 import { error, fatal, ok, makeParser, Status } from 'kessel/core'
 
-/**
- * @typedef {import('kessel/core').Parser} Parser
- */
+/** @typedef {import('kessel/core').Parser} Parser */
 
 /**
  * Creates a parser that implements a sequence. Each supplied parser is

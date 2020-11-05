@@ -10,9 +10,7 @@ import {
   viewToString,
 } from './util'
 
-/**
- * @typedef {import('./core.js').State} State
- */
+/** @typedef {import('./core.js').State} State */
 
 const tab = /\t/gu
 const zeroWidth = /(?:\p{Mn}|\p{Cf})/gu

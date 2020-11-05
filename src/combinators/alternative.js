@@ -6,9 +6,7 @@
 import { error, fatal, ok, makeParser, Status } from 'kessel/core'
 import { ErrorType, makeExpected, overwrite } from 'kessel/error'
 
-/**
- * @typedef {import('kessel/core').Parser} Parser
- */
+/** @typedef {import('kessel/core').Parser} Parser */
 
 /**
  * Creates a parser that implements alternatives. Each of the supplied

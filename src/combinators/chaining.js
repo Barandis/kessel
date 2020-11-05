@@ -5,9 +5,7 @@
 
 import { makeParser, ok, Status } from 'kessel/core'
 
-/**
- * @typedef {import('kessel/core').Parser} Parser
- */
+/** @typedef {import('kessel/core').Parser} Parser */
 
 /**
  * Creates a parser that chains the state after applying its contained

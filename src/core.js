@@ -5,9 +5,7 @@
 
 import { stringToView } from './util'
 
-/**
- * @typedef {import('./error.js').ParseError} ParseError
- */
+/** @typedef {import('./error.js').ParseError} ParseError */
 
 /**
  * Determines whether the input value is an instance of one of the types
