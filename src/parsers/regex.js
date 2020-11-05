@@ -13,29 +13,21 @@ import { charLength, quote, stringToView, viewToString } from 'kessel/util'
 // These are here to create and compile them once, upon initial load, to
 // speed parsing later.
 
-/**
- * Matches every Unicode letter character.
- */
+/** Matches every Unicode letter character. */
 const reLetter = /^\p{Alphabetic}/u
-/**
- * Matches every Unicode letter or number character.
- */
+/** Matches every Unicode letter or number character. */
 const reAlpha = /^(?:\p{Alphabetic}|\p{N})/u
-/**
- * Matches every Unicode uppercase or titlecase character.
- */
+/** Matches every Unicode uppercase or titlecase character. */
 const reUpper = /^(?:\p{Uppercase}|\p{Lt})/u
-/**
- * Matches every Unicode lowercase character.
- */
+/** Matches every Unicode lowercase character. */
 const reLower = /^\p{Lowercase}/u
-/**
- * Matches every Unicode whitespace character.
- */
+/** Matches every Unicode whitespace character. */
 const reSpace = /^\p{White_Space}/u
-/**
- * Matches every Unicode newline character, plus \r\n.
- */
+/** Matches zero or more Unicode whitespace characters. */
+const reSpaces = /^\p{White_Space}*/u
+/** Matches one or more Unicode whitespace characters. */
+const reSpaces1 = /^\p{White_Space}+/u
+/** Matches every Unicode newline character, plus \r\n. */
 const reNewline = /^(?:\r\n|[\r\n\u0085\u2028\u2029])/u
 
 /**
@@ -181,6 +173,32 @@ export const lower = makeParser(state => {
 export const uspace = makeParser(state => {
   const nextState = RegexParser(reSpace, 1)(state)
   if (nextState.status === Status.Ok) return nextState
+  return error(
+    nextState, overwrite(nextState.errors, makeExpected('whitespace')),
+  )
+})
+
+/**
+ * A parser that reads zero or more Unicode whitespace characters at the
+ * current position in the input. This parser always succeeds; even zero
+ * whitespaces is enough to make it succeed, though it will not move the
+ * index in that case. This parser skips the whitespace and does not
+ * produde a result.
+ */
+export const uspaces = makeParser(state => {
+  const nextState = RegexParser(reSpaces, 1)(state)
+  return ok(nextState, null)
+})
+
+/**
+ * A parser that reads one or more Unicode whitespace characters at the
+ * current position in the input. This parser will only fail if there is
+ * not at least one whitespace character read. On success, it skips the
+ * whitespace and does not produde a result.
+ */
+export const uspaces1 = makeParser(state => {
+  const nextState = RegexParser(reSpaces1, 1)(state)
+  if (nextState.status === Status.Ok) return ok(nextState, null)
   return error(
     nextState, overwrite(nextState.errors, makeExpected('whitespace')),
   )

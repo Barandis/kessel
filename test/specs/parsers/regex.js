@@ -11,6 +11,8 @@ import {
   regex,
   uspace,
   upper,
+  uspaces,
+  uspaces1,
 } from 'kessel/parsers/regex'
 import { fail, pass } from 'test/helper'
 
@@ -414,6 +416,74 @@ describe('Regular expression parsers', () => {
       fail(uspace, '\u200c', { expected: 'whitespace', actual: '"\u200c"' })
       fail(uspace, '\u200d', { expected: 'whitespace', actual: '"\u200d"' })
       fail(uspace, '\u2060', { expected: 'whitespace', actual: '"\u2060"' })
+    })
+  })
+
+  describe('uspaces', () => {
+    it('succeeds even if no whitespace is found', () => {
+      pass(uspaces, '', { result: null, index: 0 })
+      pass(uspaces, 'abc', { result: null, index: 0 })
+    })
+    it('skips all whitespace until the first non-whitespace', () => {
+      pass(uspaces, '\t\t\tabc', { result: null, index: 3 })
+      pass(uspaces, '\n\nabc', { result: null, index: 2 })
+      pass(uspaces, '\vabc', { result: null, index: 1 })
+      pass(uspaces, '\f\f\f\fabc', { result: null, index: 4 })
+      pass(uspaces, '\r\rabc', { result: null, index: 2 })
+      pass(uspaces, ' abc', { result: null, index: 1 })
+      pass(uspaces, '\u0085abc', { result: null, index: 2 })
+      pass(uspaces, '\u00a0abc', { result: null, index: 2 })
+      pass(uspaces, '\u1680abc', { result: null, index: 3 })
+      pass(uspaces, '\u2000abc', { result: null, index: 3 })
+      pass(uspaces, '\u2001abc', { result: null, index: 3 })
+      pass(uspaces, '\u2002abc', { result: null, index: 3 })
+      pass(uspaces, '\u2003abc', { result: null, index: 3 })
+      pass(uspaces, '\u2004abc', { result: null, index: 3 })
+      pass(uspaces, '\u2005abc', { result: null, index: 3 })
+      pass(uspaces, '\u2006abc', { result: null, index: 3 })
+      pass(uspaces, '\u2007abc', { result: null, index: 3 })
+      pass(uspaces, '\u2008abc', { result: null, index: 3 })
+      pass(uspaces, '\u2009abc', { result: null, index: 3 })
+      pass(uspaces, '\u200aabc', { result: null, index: 3 })
+      pass(uspaces, '\u2028abc', { result: null, index: 3 })
+      pass(uspaces, '\u2029abc', { result: null, index: 3 })
+      pass(uspaces, '\u202fabc', { result: null, index: 3 })
+      pass(uspaces, '\u205fabc', { result: null, index: 3 })
+      pass(uspaces, '\u3000abc', { result: null, index: 3 })
+    })
+  })
+
+  describe('uspaces1', () => {
+    it('fails if no whitespace is found', () => {
+      fail(uspaces1, '', { expected: 'whitespace', actual: 'EOF' })
+      fail(uspaces1, 'abc', { expected: 'whitespace', actual: '"a"' })
+    })
+    it('skips all whitespace until the first non-whitespace', () => {
+      pass(uspaces1, '\t\t\tabc', { result: null, index: 3 })
+      pass(uspaces1, '\n\nabc', { result: null, index: 2 })
+      pass(uspaces1, '\vabc', { result: null, index: 1 })
+      pass(uspaces1, '\f\f\f\fabc', { result: null, index: 4 })
+      pass(uspaces1, '\r\rabc', { result: null, index: 2 })
+      pass(uspaces1, ' abc', { result: null, index: 1 })
+      pass(uspaces1, '\u0085abc', { result: null, index: 2 })
+      pass(uspaces1, '\u00a0abc', { result: null, index: 2 })
+      pass(uspaces1, '\u1680abc', { result: null, index: 3 })
+      pass(uspaces1, '\u2000abc', { result: null, index: 3 })
+      pass(uspaces1, '\u2001abc', { result: null, index: 3 })
+      pass(uspaces1, '\u2002abc', { result: null, index: 3 })
+      pass(uspaces1, '\u2003abc', { result: null, index: 3 })
+      pass(uspaces1, '\u2004abc', { result: null, index: 3 })
+      pass(uspaces1, '\u2005abc', { result: null, index: 3 })
+      pass(uspaces1, '\u2006abc', { result: null, index: 3 })
+      pass(uspaces1, '\u2007abc', { result: null, index: 3 })
+      pass(uspaces1, '\u2008abc', { result: null, index: 3 })
+      pass(uspaces1, '\u2009abc', { result: null, index: 3 })
+      pass(uspaces1, '\u200aabc', { result: null, index: 3 })
+      pass(uspaces1, '\u2028abc', { result: null, index: 3 })
+      pass(uspaces1, '\u2029abc', { result: null, index: 3 })
+      pass(uspaces1, '\u202fabc', { result: null, index: 3 })
+      pass(uspaces1, '\u205fabc', { result: null, index: 3 })
+      pass(uspaces1, '\u3000abc', { result: null, index: 3 })
     })
   })
 
