@@ -21,14 +21,22 @@ const reAlpha = /^(?:\p{Alphabetic}|\p{N})/u
 const reUpper = /^(?:\p{Uppercase}|\p{Lt})/u
 /** Matches every Unicode lowercase character. */
 const reLower = /^\p{Lowercase}/u
-/** Matches every Unicode whitespace character. */
-const reSpace = /^\p{White_Space}/u
+/** Matches a single conventional whitespace character. */
+const reSpace = /^(?:\r\n|[\r\n\t ])/
+/** Matches a single Unicode whitespace character. */
+const reUspace = /^(?:\r\n|\p{White_Space})/u
+/** Matches zero or more conventional whitespace characters. */
+const reSpaces = /^[\r\n\t ]*/
 /** Matches zero or more Unicode whitespace characters. */
-const reSpaces = /^\p{White_Space}*/u
+const reUspaces = /^\p{White_Space}*/u
+/** Matches one or more conventional whitespace characters. */
+const reSpaces1 = /^[\r\n\t ]+/
 /** Matches one or more Unicode whitespace characters. */
-const reSpaces1 = /^\p{White_Space}+/u
+const reUspaces1 = /^\p{White_Space}+/u
+/** Matches any conventional newline (\r, \n, or \r\n). */
+const reNewline = /^(?:\r\n|\r|\n)/
 /** Matches every Unicode newline character, plus \r\n. */
-const reNewline = /^(?:\r\n|[\r\n\u0085\u2028\u2029])/u
+const reUnewline = /^(?:\r\n|[\r\n\u0085\u2028\u2029])/u
 
 /**
  * Creates a parser that takes a regular expression object and matches
@@ -167,15 +175,44 @@ export const lower = makeParser(state => {
 
 /**
  * A parser that reads a character and succeeds with that character if
- * it is a whitespace character. A character is whitespace for the
- * purpose of this parser if it has the Unicode `White_Space` property.
+ * it is a whitespace character. Whitespace characters this parser
+ * recognizes are space, tab, and any conventional newline (`\r`, `\n`,
+ * or `\r\n`).
  */
-export const uspace = makeParser(state => {
+export const space = makeParser(state => {
   const nextState = RegexParser(reSpace, 1)(state)
   if (nextState.status === Status.Ok) return nextState
   return error(
     nextState, overwrite(nextState.errors, makeExpected('whitespace')),
   )
+})
+
+/**
+ * A parser that reads a character and succeeds with that character if
+ * it is a whitespace character. A character is whitespace for the
+ * purpose of this parser if it has the Unicode `White_Space` property.
+ *
+ * This parser will also recognize the two-character combination `\r\n`
+ * as a single instance of whitespace.
+ */
+export const uspace = makeParser(state => {
+  const nextState = RegexParser(reUspace, 1)(state)
+  if (nextState.status === Status.Ok) return nextState
+  return error(
+    nextState, overwrite(nextState.errors, makeExpected('whitespace')),
+  )
+})
+
+/**
+ * A parser that reads zero or more whitespace characters (space, `\t`,
+ * `\r`, or `\n`) at the current position in the input. This parser
+ * always succeeds; even zero whitespaces is enough to make it succeed,
+ * though it will not move the index in that case. This parser skips the
+ * whitespace and does not produde a result.
+ */
+export const spaces = makeParser(state => {
+  const nextState = RegexParser(reSpaces, 1)(state)
+  return ok(nextState, null)
 })
 
 /**
@@ -186,8 +223,22 @@ export const uspace = makeParser(state => {
  * produde a result.
  */
 export const uspaces = makeParser(state => {
-  const nextState = RegexParser(reSpaces, 1)(state)
+  const nextState = RegexParser(reUspaces, 1)(state)
   return ok(nextState, null)
+})
+
+/**
+ * A parser that reads one or more whitespace characters (space, `\t`,
+ * `\r`, or `\n`) at the current position in the input. This parser will
+ * only fail if there is not at least one whitespace character read. On
+ * success, it skips the whitespace and does not produde a result.
+ */
+export const spaces1 = makeParser(state => {
+  const nextState = RegexParser(reSpaces1, 1)(state)
+  if (nextState.status === Status.Ok) return ok(nextState, null)
+  return error(
+    nextState, overwrite(nextState.errors, makeExpected('whitespace')),
+  )
 })
 
 /**
@@ -197,10 +248,32 @@ export const uspaces = makeParser(state => {
  * whitespace and does not produde a result.
  */
 export const uspaces1 = makeParser(state => {
-  const nextState = RegexParser(reSpaces1, 1)(state)
+  const nextState = RegexParser(reUspaces1, 1)(state)
   if (nextState.status === Status.Ok) return ok(nextState, null)
   return error(
     nextState, overwrite(nextState.errors, makeExpected('whitespace')),
+  )
+})
+
+/**
+ * A parser that reads a character and succeeds if the next character is
+ * a newline. If that newline is a carriage return, it will also read
+ * the next character and include it in the result if it is a line feed.
+ * Newlines this parser recognizes are any of the following
+ * characters/combinations:
+ *
+ * * `LF` (line feed, `U+000A` or `\n`)
+ * * `CR` (carriage return, `U+000D` or `\r`)
+ * * `CR+LF` (`CR` followed by `LF`, `\r\n`)
+ *
+ * No characters will be consumed on failure, even in the case of
+ * `\r\n`.
+ */
+export const newline = makeParser(state => {
+  const nextState = RegexParser(reNewline, 1)(state)
+  if (nextState.status === Status.Ok) return nextState
+  return error(
+    nextState, overwrite(nextState.errors, makeExpected('a newline')),
   )
 })
 
@@ -224,7 +297,7 @@ export const uspaces1 = makeParser(state => {
  * `\r\n`.
  */
 export const unewline = makeParser(state => {
-  const nextState = RegexParser(reNewline, 1)(state)
+  const nextState = RegexParser(reUnewline, 1)(state)
   if (nextState.status === Status.Ok) return nextState
   return error(
     nextState, overwrite(nextState.errors, makeExpected('a newline')),

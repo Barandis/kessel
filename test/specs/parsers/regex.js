@@ -7,10 +7,13 @@ import {
   alphanum,
   letter,
   lower,
-  unewline,
   regex,
-  uspace,
+  space,
+  spaces,
+  spaces1,
+  unewline,
   upper,
+  uspace,
   uspaces,
   uspaces1,
 } from 'kessel/parsers/regex'
@@ -373,13 +376,62 @@ describe('Regular expression parsers', () => {
     })
   })
 
+  describe('space', () => {
+    it('succeeds on a single instance of conventional whitespace', () => {
+      pass(space, '\t', '\t')
+      pass(space, '\n', '\n')
+      pass(space, '\r', '\r')
+      pass(space, '\r\n', '\r\n')
+      pass(space, ' ', ' ')
+    })
+    it('fails on Unicode whitespace of other kinds', () => {
+      fail(space, '\v', { expected: 'whitespace', actual: '"\v"' })
+      fail(space, '\f', { expected: 'whitespace', actual: '"\f"' })
+      fail(space, '\u0085', '"\u0085"')
+      fail(space, '\u00a0', '"\u00a0"')
+      fail(space, '\u1680', '"\u1680"')
+      fail(space, '\u2000', '"\u2000"')
+      fail(space, '\u2001', '"\u2001"')
+      fail(space, '\u2002', '"\u2002"')
+      fail(space, '\u2003', '"\u2003"')
+      fail(space, '\u2004', '"\u2004"')
+      fail(space, '\u2005', '"\u2005"')
+      fail(space, '\u2006', '"\u2006"')
+      fail(space, '\u2007', '"\u2007"')
+      fail(space, '\u2008', '"\u2008"')
+      fail(space, '\u2009', '"\u2009"')
+      fail(space, '\u200a', '"\u200a"')
+      fail(space, '\u2028', '"\u2028"')
+      fail(space, '\u2029', '"\u2029"')
+      fail(space, '\u202f', '"\u202f"')
+      fail(space, '\u205f', '"\u205f"')
+      fail(space, '\u3000', '"\u3000"')
+    })
+    it('succeeds only once', () => {
+      pass(space, '     123', ' ')
+      pass(space, '\t\n\r ', '\t')
+    })
+    it('fails on non-whitespace characters', () => {
+      fail(space, 'O', { expected: 'whitespace', actual: '"O"' })
+      fail(space, 'З', { expected: 'whitespace', actual: '"З"' })
+      fail(space, 'ค', { expected: 'whitespace', actual: '"ค"' })
+      fail(space, '𝑂', { expected: 'whitespace', actual: '"𝑂"' })
+      fail(space, '\u180e', { expected: 'whitespace', actual: '"\u180e"' })
+      fail(space, '\u200b', { expected: 'whitespace', actual: '"\u200b"' })
+      fail(space, '\u200c', { expected: 'whitespace', actual: '"\u200c"' })
+      fail(space, '\u200d', { expected: 'whitespace', actual: '"\u200d"' })
+      fail(space, '\u2060', { expected: 'whitespace', actual: '"\u2060"' })
+    })
+  })
+
   describe('uspace', () => {
-    it('succeeds on a single character of Unicode whitespace', () => {
+    it('succeeds on a single instance of Unicode whitespace', () => {
       pass(uspace, '\t', '\t')
       pass(uspace, '\n', '\n')
       pass(uspace, '\v', '\v')
       pass(uspace, '\f', '\f')
       pass(uspace, '\r', '\r')
+      pass(uspace, '\r\n', '\r\n')
       pass(uspace, ' ', ' ')
       pass(uspace, '\u0085', '\u0085')
       pass(uspace, '\u00a0', '\u00a0')
@@ -403,7 +455,6 @@ describe('Regular expression parsers', () => {
     })
     it('succeeds only once', () => {
       pass(uspace, '     123', ' ')
-      pass(uspace, '\r\nabc', '\r')
       pass(uspace, '\u3000\u1680\u202f', '\u3000')
     })
     it('fails on non-whitespace characters', () => {
@@ -416,6 +467,42 @@ describe('Regular expression parsers', () => {
       fail(uspace, '\u200c', { expected: 'whitespace', actual: '"\u200c"' })
       fail(uspace, '\u200d', { expected: 'whitespace', actual: '"\u200d"' })
       fail(uspace, '\u2060', { expected: 'whitespace', actual: '"\u2060"' })
+    })
+  })
+
+  describe('spaces', () => {
+    it('succeeds even if no whitespace is found', () => {
+      pass(spaces, '', { result: null, index: 0 })
+      pass(spaces, 'abc', { result: null, index: 0 })
+    })
+    it('skips all whitespace until the first non-whitespace', () => {
+      pass(spaces, '\t\t\tabc', { result: null, index: 3 })
+      pass(spaces, '\n\nabc', { result: null, index: 2 })
+      pass(spaces, '\r\rabc', { result: null, index: 2 })
+      pass(spaces, ' abc', { result: null, index: 1 })
+    })
+    it('does not skip non-conventional Unicode whitespace', () => {
+      pass(spaces, '\vabc', { result: null, index: 0 })
+      pass(spaces, '\f\f\f\fabc', { result: null, index: 0 })
+      pass(spaces, '\u0085abc', { result: null, index: 0 })
+      pass(spaces, '\u00a0abc', { result: null, index: 0 })
+      pass(spaces, '\u1680abc', { result: null, index: 0 })
+      pass(spaces, '\u2000abc', { result: null, index: 0 })
+      pass(spaces, '\u2001abc', { result: null, index: 0 })
+      pass(spaces, '\u2002abc', { result: null, index: 0 })
+      pass(spaces, '\u2003abc', { result: null, index: 0 })
+      pass(spaces, '\u2004abc', { result: null, index: 0 })
+      pass(spaces, '\u2005abc', { result: null, index: 0 })
+      pass(spaces, '\u2006abc', { result: null, index: 0 })
+      pass(spaces, '\u2007abc', { result: null, index: 0 })
+      pass(spaces, '\u2008abc', { result: null, index: 0 })
+      pass(spaces, '\u2009abc', { result: null, index: 0 })
+      pass(spaces, '\u200aabc', { result: null, index: 0 })
+      pass(spaces, '\u2028abc', { result: null, index: 0 })
+      pass(spaces, '\u2029abc', { result: null, index: 0 })
+      pass(spaces, '\u202fabc', { result: null, index: 0 })
+      pass(spaces, '\u205fabc', { result: null, index: 0 })
+      pass(spaces, '\u3000abc', { result: null, index: 0 })
     })
   })
 
@@ -450,6 +537,42 @@ describe('Regular expression parsers', () => {
       pass(uspaces, '\u202fabc', { result: null, index: 3 })
       pass(uspaces, '\u205fabc', { result: null, index: 3 })
       pass(uspaces, '\u3000abc', { result: null, index: 3 })
+    })
+  })
+
+  describe('spaces1', () => {
+    it('fails if no whitespace is found', () => {
+      fail(spaces1, '', { expected: 'whitespace', actual: 'EOF' })
+      fail(spaces1, 'abc', { expected: 'whitespace', actual: '"a"' })
+    })
+    it('skips all whitespace until the first non-whitespace', () => {
+      pass(spaces1, '\t\t\tabc', { result: null, index: 3 })
+      pass(spaces1, '\n\nabc', { result: null, index: 2 })
+      pass(spaces1, '\r\rabc', { result: null, index: 2 })
+      pass(spaces1, ' abc', { result: null, index: 1 })
+    })
+    it('fails on non-conventional Unicode whitespace', () => {
+      fail(spaces1, '\vabc', { expected: 'whitespace', actual: '"\v"' })
+      fail(spaces1, '\f\f\f\fabc', { expected: 'whitespace', actual: '"\f"' })
+      fail(spaces1, '\u0085abc', { expected: 'whitespace', actual: '"\u0085"' })
+      fail(spaces1, '\u00a0abc', { expected: 'whitespace', actual: '"\u00a0"' })
+      fail(spaces1, '\u1680abc', { expected: 'whitespace', actual: '"\u1680"' })
+      fail(spaces1, '\u2000abc', { expected: 'whitespace', actual: '"\u2000"' })
+      fail(spaces1, '\u2001abc', { expected: 'whitespace', actual: '"\u2001"' })
+      fail(spaces1, '\u2002abc', { expected: 'whitespace', actual: '"\u2002"' })
+      fail(spaces1, '\u2003abc', { expected: 'whitespace', actual: '"\u2003"' })
+      fail(spaces1, '\u2004abc', { expected: 'whitespace', actual: '"\u2004"' })
+      fail(spaces1, '\u2005abc', { expected: 'whitespace', actual: '"\u2005"' })
+      fail(spaces1, '\u2006abc', { expected: 'whitespace', actual: '"\u2006"' })
+      fail(spaces1, '\u2007abc', { expected: 'whitespace', actual: '"\u2007"' })
+      fail(spaces1, '\u2008abc', { expected: 'whitespace', actual: '"\u2008"' })
+      fail(spaces1, '\u2009abc', { expected: 'whitespace', actual: '"\u2009"' })
+      fail(spaces1, '\u200aabc', { expected: 'whitespace', actual: '"\u200a"' })
+      fail(spaces1, '\u2028abc', { expected: 'whitespace', actual: '"\u2028"' })
+      fail(spaces1, '\u2029abc', { expected: 'whitespace', actual: '"\u2029"' })
+      fail(spaces1, '\u202fabc', { expected: 'whitespace', actual: '"\u202f"' })
+      fail(spaces1, '\u205fabc', { expected: 'whitespace', actual: '"\u205f"' })
+      fail(spaces1, '\u3000abc', { expected: 'whitespace', actual: '"\u3000"' })
     })
   })
 
