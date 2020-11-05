@@ -5,7 +5,7 @@
 
 import { expect } from 'chai'
 
-import { sequence } from 'kessel/combinators/sequence'
+import { seq } from 'kessel/combinators/sequence'
 import { error, fatal, ok, parse } from 'kessel/core'
 import {
   ErrorType,
@@ -92,13 +92,13 @@ describe('Core functionality', () => {
 
     describe('updated fatal failure parser state', () => {
       it('creates a new object', () => {
-        const result = parse(sequence([char('a'), char('1')]), 'abc')
+        const result = parse(seq([char('a'), char('1')]), 'abc')
         const updated = fatal(result)
         expect(result).to.not.equal(updated)
         expect(result).to.deep.equal(updated)
       })
       it('can update errors and/or index properties', () => {
-        const result = parse(sequence([char('a'), char('1')]), 'abc')
+        const result = parse(seq([char('a'), char('1')]), 'abc')
         const updated = fatal(result, overwrite(
           result.errors,
           makeExpected('"x"'),

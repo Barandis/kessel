@@ -22,7 +22,7 @@ import { error, fatal, ok, makeParser, Status } from 'kessel/core'
  * @returns {Parser} A parser that applies the supplied parsers one at a
  *     time, in order, and fails if any of those parsers fail.
  */
-export const sequence = ps => makeParser(state => {
+export const seq = ps => makeParser(state => {
   const results = []
   const index = state.index
   let nextState = state

@@ -3,7 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { block, many, many1, sequence } from 'kessel/combinators/sequence'
+import { block, many, many1, seq } from 'kessel/combinators/sequence'
 import { Status } from 'kessel/core'
 import { any, char, digit, eof } from 'kessel/parsers/char'
 import { uspace } from 'kessel/parsers/regex'
@@ -12,7 +12,7 @@ import { fail, pass } from 'test/helper'
 
 describe('Sequence combinators', () => {
   describe('sequence', () => {
-    const parser = sequence([string('abc'), string('def'), string('ghi')])
+    const parser = seq([string('abc'), string('def'), string('ghi')])
 
     it('fails if any of its parsers fail', () => {
       fail(parser, 'abd', { expected: '"abc"', actual: '"abd"', index: 0 })
@@ -23,7 +23,7 @@ describe('Sequence combinators', () => {
       pass(parser, 'abcdefghi', { result: ['abc', 'def', 'ghi'], index: 9 })
     })
     it('does not add null to results', () => {
-      pass(sequence([string('abc'), eof]), 'abc', { result: ['abc'], index: 3 })
+      pass(seq([string('abc'), eof]), 'abc', { result: ['abc'], index: 3 })
     })
   })
 
@@ -81,7 +81,7 @@ describe('Sequence combinators', () => {
       pass(many(digit), '123', ['1', '2', '3'])
     })
     it('fails if its parser consumes while failing', () => {
-      fail(many(sequence([char('a'), char('b')])), 'ababac', {
+      fail(many(seq([char('a'), char('b')])), 'ababac', {
         expected: '"b"',
         actual: '"c"',
         index: 5,
@@ -103,7 +103,7 @@ describe('Sequence combinators', () => {
       pass(many1(digit), '123', ['1', '2', '3'])
     })
     it('fails if its parser consumes while failing', () => {
-      fail(many1(sequence([char('a'), char('b')])), 'ababac', {
+      fail(many1(seq([char('a'), char('b')])), 'ababac', {
         expected: '"b"',
         actual: '"c"',
         index: 5,

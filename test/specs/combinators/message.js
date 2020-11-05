@@ -7,7 +7,7 @@ import { expect } from 'chai'
 
 import { choice } from 'kessel/combinators/alternative'
 import { label } from 'kessel/combinators/message'
-import { sequence } from 'kessel/combinators/sequence'
+import { seq } from 'kessel/combinators/sequence'
 import { parse } from 'kessel/core'
 import { char } from 'kessel/parsers/char'
 import { fail } from 'test/helper'
@@ -24,9 +24,9 @@ describe('Message combinators', () => {
       fail(label(char('a'), 'letter a'), 'bcd', { expected: 'letter a' })
     })
     it('changes the expected message on a fatal error', () => {
-      fail(sequence([char('a'), char('b')]), 'a1', { expected: '"b"' })
+      fail(seq([char('a'), char('b')]), 'a1', { expected: '"b"' })
       fail(
-        label(sequence([char('a'), char('b')]), 'letter b'),
+        label(seq([char('a'), char('b')]), 'letter b'),
         'a1',
         { expected: 'letter b' },
       )
