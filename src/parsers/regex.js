@@ -124,7 +124,7 @@ export const regex = re => {
  * it is a letter. A letter for this purpose is any character with the
  * Unicode `Alphabetic` property.
  */
-export const letter = makeParser(state => {
+export const uletter = makeParser(state => {
   const nextState = RegexParser(reLetter, 1)(state)
   if (nextState.status === Status.Ok) return nextState
   return error(nextState, overwrite(nextState.errors, makeExpected('a letter')))
@@ -135,7 +135,7 @@ export const letter = makeParser(state => {
  * it is alphanumeric. A character is alphanumeric if it has either the
  * Unicode `Alphabetic` property or the Unicode `Number` property.
  */
-export const alphanum = makeParser(state => {
+export const ualpha = makeParser(state => {
   const nextState = RegexParser(reAlpha, 1)(state)
   if (nextState.status === Status.Ok) return nextState
   return error(nextState, overwrite(
@@ -150,7 +150,7 @@ export const alphanum = makeParser(state => {
  * uppercase if it has the Unicode `Uppercase` property and is titlecase
  * if it has the Unicode `Letter, Titlecase` property.
  */
-export const upper = makeParser(state => {
+export const uupper = makeParser(state => {
   const nextState = RegexParser(reUpper, 1)(state)
   if (nextState.status === Status.Ok) return nextState
   return error(nextState, overwrite(
@@ -164,7 +164,7 @@ export const upper = makeParser(state => {
  * it is a lowercase letter. A character is lowercase if it has the
  * Unicode `Lowercase` property.
  */
-export const lower = makeParser(state => {
+export const ulower = makeParser(state => {
   const nextState = RegexParser(reLower, 1)(state)
   if (nextState.status === Status.Ok) return nextState
   return error(nextState, overwrite(
