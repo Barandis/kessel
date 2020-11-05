@@ -182,21 +182,22 @@ describe('String parsers', () => {
 
   describe('anyString', () => {
     it('succeeds if there are more 1-byte characters than it reads', () => {
-      pass(anyString(5), 'Onomatopoeia', 'Onoma')
+      pass(anyString(5), 'Onomatopoeia', { result: 'Onoma', index: 5 })
     })
     it('succeeds if there are more 2-byte characters than it reads', () => {
-      pass(anyString(5), 'Звукоподражание', 'Звуко')
+      pass(anyString(5), 'Звукоподражание', { result: 'Звуко', index: 10 })
     })
     it('succeeds if there are more 3-byte characters than it reads', () => {
-      pass(anyString(5), 'คำเลียนเสียง', 'คำเลี')
+      pass(anyString(5), 'คำเลียนเสียง', { result: 'คำเลี', index: 15 })
     })
     it('succeeds if there are more 4-byte characters than it reads', () => {
-      pass(anyString(5), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', '𝑂𝑛𝑜𝑚𝑎')
+      pass(anyString(5), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂𝑛𝑜𝑚𝑎', index: 20 })
     })
     it('fails if there aren\'t enough characters remaining', () => {
       fail(anyString(5), 'Ono', {
         expected: 'a string of 5 characters',
         actual: '"Ono"',
+        index: 0,
       })
     })
   })
