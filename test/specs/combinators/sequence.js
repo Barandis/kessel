@@ -6,7 +6,7 @@
 import { block, many, many1, sequence } from 'kessel/combinators/sequence'
 import { Status } from 'kessel/core'
 import { any, char, digit, eof } from 'kessel/parsers/char'
-import { space } from 'kessel/parsers/regex'
+import { uspace } from 'kessel/parsers/regex'
 import { string } from 'kessel/parsers/string'
 import { fail, pass } from 'test/helper'
 
@@ -30,9 +30,9 @@ describe('Sequence combinators', () => {
   describe('block', () => {
     const parser = block(function *() {
       yield string('abc')
-      yield space
+      yield uspace
       const c = yield any
-      yield space
+      yield uspace
 
       return c
     })

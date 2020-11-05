@@ -36,7 +36,7 @@ const reSpace = /^\p{White_Space}/u
 /**
  * Matches every Unicode newline character, plus \r\n.
  */
-const reNewline = /^(?:\r\n|[\r\n\t\v\u0085\u2028\u2029])/u
+const reNewline = /^(?:\r\n|[\r\n\u0085\u2028\u2029])/u
 
 /**
  * Creates a parser that takes a regular expression object and matches
@@ -175,10 +175,10 @@ export const lower = makeParser(state => {
 
 /**
  * A parser that reads a character and succeeds with that character if
- * it is a whitespace character. A character is whitespace if it has the
- * Unicode `White_Space` property.
+ * it is a whitespace character. A character is whitespace for the
+ * purpose of this parser if it has the Unicode `White_Space` property.
  */
-export const space = makeParser(state => {
+export const uspace = makeParser(state => {
   const nextState = RegexParser(reSpace, 1)(state)
   if (nextState.status === Status.Ok) return nextState
   return error(
@@ -193,18 +193,19 @@ export const space = makeParser(state => {
  * Newlines in Unicode are any of the following characters/combinations:
  *
  * * `LF` (line feed, `U+000A` or `\n`)
- * * `VT` (vertical tab, `U+000B` or `\v`)
- * * `FF` (form feed, `U+000C` or `\f`)
  * * `CR` (carriage return, `U+000D` or `\r`)
  * * `CR+LF` (`CR` followed by `LF`, `\r\n`)
  * * `NEL` (next line, `U+0085`)
  * * `LS` (line separator, `U+2028`)
  * * `PS` (paragraph separator, `U+2029`)
  *
+ * This does not include the characters `\f` or `\v`, which while being
+ * vertical separators, aren't really newlines in the traditional sense.
+ *
  * No characters will be consumed on failure, even in the case of
  * `\r\n`.
  */
-export const newline = makeParser(state => {
+export const unewline = makeParser(state => {
   const nextState = RegexParser(reNewline, 1)(state)
   if (nextState.status === Status.Ok) return nextState
   return error(
