@@ -7,7 +7,7 @@ import { chain, join, map } from 'kessel/combinators/chaining'
 import { many, many1, seq } from 'kessel/combinators/sequence'
 import { Status } from 'kessel/core'
 import { any, char, digit } from 'kessel/parsers/char'
-import { uletter } from 'kessel/parsers/regex'
+import { letterU } from 'kessel/parsers/regex'
 import { fail, pass } from 'test/helper'
 
 describe('Chaining and piping combinators', () => {
@@ -28,7 +28,7 @@ describe('Chaining and piping combinators', () => {
   describe('map', () => {
     it('succeeds with the return value of its function', () => {
       pass(map(any, c => c.toUpperCase()), 'abc', 'A')
-      pass(map(seq([uletter, digit]), cs => cs.join('')), 'a1', 'a1')
+      pass(map(seq([letterU, digit]), cs => cs.join('')), 'a1', 'a1')
     })
     it('propagates failed state if its parser fails', () => {
       fail(map(any, c => c.toUpperCase()), '', {
@@ -36,7 +36,7 @@ describe('Chaining and piping combinators', () => {
         actual: 'EOF',
         status: Status.Error,
       })
-      fail(map(seq([uletter, digit]), cs => cs.join('')), 'ab', {
+      fail(map(seq([letterU, digit]), cs => cs.join('')), 'ab', {
         expected: 'a digit',
         actual: '"b"',
         status: Status.Fatal,
@@ -56,7 +56,7 @@ describe('Chaining and piping combinators', () => {
         actual: 'EOF',
         status: Status.Error,
       })
-      fail(join(seq([uletter, digit])), 'ab', {
+      fail(join(seq([letterU, digit])), 'ab', {
         expected: 'a digit',
         actual: '"b"',
         status: Status.Fatal,

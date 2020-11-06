@@ -124,7 +124,7 @@ export const regex = re => makeParser(state => {
  * it is a letter. A letter for this purpose is any character with the
  * Unicode `Alphabetic` property.
  */
-export const uletter = makeParser(state => {
+export const letterU = makeParser(state => {
   const [tuple, [next, result]] = dup(RegexParser(reLetter, 1)(state))
   if (result.status === Status.Ok) return tuple
   return error(next, [...result.errors, makeExpected('a letter')])
@@ -135,7 +135,7 @@ export const uletter = makeParser(state => {
  * it is alphanumeric. A character is alphanumeric if it has either the
  * Unicode `Alphabetic` property or the Unicode `Number` property.
  */
-export const ualpha = makeParser(state => {
+export const alphaU = makeParser(state => {
   const [tuple, [next, result]] = dup(RegexParser(reAlpha, 1)(state))
   if (result.status === Status.Ok) return tuple
   return error(
@@ -149,7 +149,7 @@ export const ualpha = makeParser(state => {
  * uppercase if it has the Unicode `Uppercase` property and is titlecase
  * if it has the Unicode `Letter, Titlecase` property.
  */
-export const uupper = makeParser(state => {
+export const upperU = makeParser(state => {
   const [tuple, [next, result]] = dup(RegexParser(reUpper, 1)(state))
   if (result.status === Status.Ok) return tuple
   return error(next, [...result.errors, makeExpected('an uppercase letter')])
@@ -160,7 +160,7 @@ export const uupper = makeParser(state => {
  * it is a lowercase letter. A character is lowercase if it has the
  * Unicode `Lowercase` property.
  */
-export const ulower = makeParser(state => {
+export const lowerU = makeParser(state => {
   const [tuple, [next, result]] = dup(RegexParser(reLower, 1)(state))
   if (result.status === Status.Ok) return tuple
   return error(next, [...result.errors, makeExpected('a lowercase letter')])
@@ -186,7 +186,7 @@ export const space = makeParser(state => {
  * This parser will also recognize the two-character combination `\r\n`
  * as a single instance of whitespace.
  */
-export const uspace = makeParser(state => {
+export const spaceU = makeParser(state => {
   const [tuple, [next, result]] = dup(RegexParser(reUspace, 1)(state))
   if (result.status === Status.Ok) return tuple
   return error(next, [...result.errors, makeExpected('whitespace')])
@@ -211,7 +211,7 @@ export const spaces = makeParser(state => {
  * index in that case. This parser skips the whitespace and does not
  * produde a result.
  */
-export const uspaces = makeParser(state => {
+export const spacesU = makeParser(state => {
   const [next, _] = RegexParser(reUspaces, 1)(state)
   return ok(next, null)
 })
@@ -234,7 +234,7 @@ export const spaces1 = makeParser(state => {
  * not at least one whitespace character read. On success, it skips the
  * whitespace and does not produde a result.
  */
-export const uspaces1 = makeParser(state => {
+export const spaces1U = makeParser(state => {
   const [next, result] = RegexParser(reUspaces1, 1)(state)
   if (result.status === Status.Ok) return ok(next, null)
   return error(next, [...result.errors, makeExpected('whitespace')])
@@ -279,7 +279,7 @@ export const newline = makeParser(state => {
  * No characters will be consumed on failure, even in the case of
  * `\r\n`.
  */
-export const unewline = makeParser(state => {
+export const newlineU = makeParser(state => {
   const [tuple, [next, result]] = dup(RegexParser(reUnewline, 1)(state))
   if (result.status === Status.Ok) return tuple
   return error(next, [...result.errors, makeExpected('a newline')])
