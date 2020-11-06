@@ -16,4 +16,3 @@ module.exports = merge(common, {
     filename: 'kessel.js',
   },
 })
-

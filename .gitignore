@@ -39,4 +39,3 @@ jspm_packages
 
 # Coveralls config - for local only, includes private repo token
 .coveralls.yml
-

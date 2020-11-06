@@ -22,4 +22,3 @@ module.exports = merge(common, {
   },
   plugins: [new webpack.BannerPlugin({ banner, entryOnly: true })],
 })
-
