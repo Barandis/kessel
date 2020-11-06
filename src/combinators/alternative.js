@@ -95,6 +95,26 @@ export const optional = p => makeParser(state => {
 })
 
 /**
+ * Creates a parser that succeeds either with the supplied parser's
+ * successful result or else (if that parser fails) the supplied value
+ * `x`. This parser only fails if its contained parser fails fatally.
+ *
+ * This is an optimized implementation of `choice([p, constant(x)])`.
+ *
+ * @param {Parser} p A parser whose result will be the created parser's
+ *     result if it succeeds.
+ * @param {*} x A value which will be the created parser's result if the
+ *     supplied parser fails.
+ * @returns {Parser} A parser which results in either its contained
+ *     parser's successful result or the provided value.
+ */
+export const orElse = (p, x) => makeParser(state => {
+  const nextState = p(state)
+  if (nextState.status !== Status.Error) return nextState
+  return ok(nextState, x)
+})
+
+/**
  * Creates a parser that transforms a fatal failure into a non-fatal
  * failure. It applies the supplied parser; if that parser fails
  * fatally, the state is set back to what it was *before* that parser is

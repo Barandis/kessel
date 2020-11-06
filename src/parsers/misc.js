@@ -12,10 +12,10 @@ import { makeGeneric, makeUnexpected, overwrite } from 'kessel/error'
  * Creates a parser that always succeeds and results in the provided
  * value.
  *
- * @param {*} value The value that be the new parser's result.
+ * @param {*} x The value that be the new parser's result.
  * @returns {Parser} A parser that always succeeds with `value`.
  */
-export const constant = value => makeParser(state => ok(state, value))
+export const constant = x => makeParser(state => ok(state, x))
 
 /**
  * Creates a parser that fails without consuming input, setting the

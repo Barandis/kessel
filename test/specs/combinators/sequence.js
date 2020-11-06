@@ -3,21 +3,38 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+import { skip } from 'kessel/combinators/chaining'
 import { block, many, many1, seq } from 'kessel/combinators/sequence'
 import { Status } from 'kessel/core'
-import { any, char, digit, eof } from 'kessel/parsers/char'
+import { any, char, digit, eof, letter } from 'kessel/parsers/char'
 import { uspace } from 'kessel/parsers/regex'
 import { string } from 'kessel/parsers/string'
 import { fail, pass } from 'test/helper'
 
 describe('Sequence combinators', () => {
-  describe('sequence', () => {
+  describe('seq', () => {
     const parser = seq([string('abc'), string('def'), string('ghi')])
 
     it('fails if any of its parsers fail', () => {
       fail(parser, 'abd', { expected: '"abc"', actual: '"abd"', index: 0 })
       fail(parser, 'abcdf', { expected: '"def"', actual: '"df"', index: 3 })
       fail(parser, 'abcdefh', { expected: '"ghi"', actual: '"h"', index: 6 })
+    })
+    it('succeeds if all of its parsers succeed', () => {
+      pass(parser, 'abcdefghi', { result: ['abc', 'def', 'ghi'], index: 9 })
+    })
+    it('does not add null to results', () => {
+      pass(seq([string('abc'), eof]), 'abc', { result: ['abc'], index: 3 })
+    })
+  })
+
+  describe('seqA', () => {
+    const parser = seq([string('abc'), string('def'), string('ghi')])
+
+    it('fails if any of its parsers fail', () => {
+      fail(parser, 'abd', { expected: '"abc"', actual: '"abd"', index: 0 })
+      fail(parser, 'abcdf', { expected: '"def"', actual: '"df"', index: 0 })
+      fail(parser, 'abcdefh', { expected: '"ghi"', actual: '"h"', index: 0 })
     })
     it('succeeds if all of its parsers succeed', () => {
       pass(parser, 'abcdefghi', { result: ['abc', 'def', 'ghi'], index: 9 })
@@ -107,6 +124,25 @@ describe('Sequence combinators', () => {
         expected: '"b"',
         actual: '"c"',
         index: 5,
+        status: Status.Fatal,
+      })
+    })
+  })
+
+  describe('skip', () => {
+    it('succeeds with no result if its parser succeeds', () => {
+      pass(skip(char('a')), 'abc', { result: null, index: 1 })
+      pass(skip(many(letter)), 'abcdef123', { result: null, index: 6 })
+    })
+    it('propagates failures without modification', () => {
+      fail(skip(char('a')), '123', {
+        expected: '"a"',
+        actual: '"1"',
+        status: Status.Error,
+      })
+      fail(skip(seq([string('ab'), string('cd')])), 'abce', {
+        expected: '"cd"',
+        actual: '"ce"',
         status: Status.Fatal,
       })
     })

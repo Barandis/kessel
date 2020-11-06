@@ -39,6 +39,38 @@ export const seq = ps => makeParser(state => {
 })
 
 /**
+ * Creates a parser that implements a sequence. Each supplied parser is
+ * executed in order until either they all succeed or the first one
+ * fails. In the former case, all results are merged into an array that
+ * becomes the returned parser's result.
+ *
+ * The returned parser will not fail fatally. If it consumes input
+ * before or during a failure, backtracking will be done and the state
+ * will be left as it was before the sequence begain. In this way, this
+ * is a slightly optimized version of `attempt(seq(ps))` (hence the
+ * postfixed 'A').
+ *
+ * @param {Parser[]} ps An array of parsers to be applied.
+ * @returns {Parser} A parser that applies the supplied parsers one at a
+ *     time, in order, and fails if any of those parsers fail.
+ */
+export const seqA = ps => makeParser(state => {
+  const results = []
+  const index = state.index
+  let nextState = state
+
+  for (const p of ps) {
+    nextState = p(nextState)
+
+    if (nextState.status !== Status.Ok) {
+      return error(nextState, undefined, index)
+    }
+    if (nextState.result !== null) results.push(nextState.result)
+  }
+  return ok(nextState, results)
+})
+
+/**
  * Creates a parser that executes a block of code in the form of a
  * generator function. Inside that function, parsers that are `yield`ed
  * will be executed and will evaluate to their results (which can then

@@ -10,6 +10,7 @@ import {
   choice,
   choiceL,
   optional,
+  orElse,
 } from 'kessel/combinators/alternative'
 import { seq } from 'kessel/combinators/sequence'
 import { parse, Status } from 'kessel/core'
@@ -91,6 +92,22 @@ describe('Alternative combinators', () => {
       const parser = seq([string('te'), string('st')])
       fail(parser, 'tesl', { index: 2, status: Status.Fatal })
       fail(attempt(parser), 'tesl', { index: 0, status: Status.Error })
+    })
+  })
+
+  describe('orElse', () => {
+    it('succeeds with its parser\'s successful result', () => {
+      pass(orElse(char('a'), 'z'), 'abc', 'a')
+    })
+    it('succeeds with its value if is parser fails', () => {
+      pass(orElse(char('b'), 'z'), 'abc', 'z')
+    })
+    it('fails fatally if its parser does', () => {
+      fail(orElse(seq([string('ab'), string('cd')]), 'z'), 'abce', {
+        expected: '"cd"',
+        actual: '"ce"',
+        status: Status.Fatal,
+      })
     })
   })
 })

@@ -82,3 +82,18 @@ export const join = p => makeParser(state => {
   if (nextState.status !== Status.Ok) return nextState
   return ok(nextState, nextState.result.join(''))
 })
+
+/**
+ * Creates a parser that applies the supplied parser and discards any
+ * successful result while still consuming input. A failure will be
+ * propagated without modification.
+ *
+ * @param {Parser} p The parser whose result is to be discarded.
+ * @returns {Parser} A parser that will consume input as its contained
+ *     parser does on success, but will produce no result.
+ */
+export const skip = p => makeParser(state => {
+  const nextState = p(state)
+  if (nextState.status !== Status.Ok) return nextState
+  return ok(nextState, null)
+})
