@@ -11,27 +11,21 @@ import {
 } from './util'
 
 /** @typedef {import('./core.js').State} State */
+/** @typedef {import('./core.js').Result} Result */
 
 const tab = /\t/gu
 const zeroWidth = /(?:\p{Mn}|\p{Cf})/gu
 
 /**
  * A symbol defining the type of an error.
- *
  * @enum {symbol}
  */
 export const ErrorType = {
-  /**
-   * Error type representing an expected result.
-   */
+  /** Error type representing an expected result. */
   Expected: Symbol('expected'),
-  /**
-   * Error type representing a result that was not expected.
-   */
+  /** Error type representing a result that was not expected. */
   Unexpected: Symbol('unexpected'),
-  /**
-   * Error type representing a generic error message.
-   */
+  /** Error type representing a generic error message. */
   Generic: Symbol('message'),
   /**
    * Error type representing some other kind of error message to be
@@ -118,7 +112,7 @@ export function makeOther(message) {
  *     with the elements of `errors` added to the end.
  */
 export function push(list, ...errors) {
-  return [...list, ...errors]
+  return [...list ?? [], ...errors]
 }
 
 // Clears all errors of a particular type from a list of errors. If
@@ -136,7 +130,7 @@ export function push(list, ...errors) {
  */
 export function clear(list, ...types) {
   if (types.length === 0) return []
-  return list.filter(error => !types.includes(error.type))
+  return (list ?? []).filter(error => !types.includes(error.type))
 }
 
 /**
@@ -153,7 +147,7 @@ export function clear(list, ...types) {
  */
 export function overwrite(list, ...errors) {
   const types = errors.map(error => error.type)
-  const result = list.filter(error => !types.includes(error.type))
+  const result = (list ?? []).filter(error => !types.includes(error.type))
   return [...result, ...errors]
 }
 
@@ -589,6 +583,7 @@ export function format(errors, index, view, tabSize, maxWidth) {
  * to 72).
  *
  * @param {State} state The parser's state when the error happened.
+ * @param {Result} result The result produced when the error happened.
  * @param {number} [tabSize=8] A number whose multiples define where
  *     tabs stop.
  * @param {number} [maxWidth=72] The maximum width of the line being
@@ -598,8 +593,8 @@ export function format(errors, index, view, tabSize, maxWidth) {
  *     actual formatting is delegated.
  */
 export function formatErrors(
-  state, tabSize = 8, maxWidth = 72, formatter = format,
+  state, result, tabSize = 8, maxWidth = 72, formatter = format,
 ) {
-  const { errors, index, view } = state
-  return formatter(errors, index, view, tabSize, maxWidth)
+  const { index, view } = state
+  return formatter(result.errors, index, view, tabSize, maxWidth)
 }

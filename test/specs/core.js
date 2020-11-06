@@ -45,61 +45,61 @@ describe('Core functionality', () => {
     })
 
     describe('updating successful parser state', () => {
-      it('creates a new object', () => {
-        const result = parse(string('123'), '123')
-        const updated = ok(result)
-        expect(result).to.not.equal(updated)
-        expect(result).to.deep.equal(updated)
+      it('creates new objects', () => {
+        const [state, result] = parse(string('123'), '123')
+        const [ustate, uresult] = ok(state, result.value)
+        expect(state).to.not.equal(ustate)
+        expect(result).to.deep.equal(uresult)
       })
       it('can update result and/or index properties', () => {
-        const result = parse(string('123'), '123')
-        const updated = ok(result, '456', 0)
-        expect(result.result).to.equal('123')
-        expect(updated.result).to.equal('456')
-        expect(result.index).to.equal(3)
-        expect(updated.index).to.equal(0)
+        const [state, result] = parse(string('123'), '123')
+        const [ustate, uresult] = ok(state, '456', 0)
+        expect(result.value).to.equal('123')
+        expect(uresult.value).to.equal('456')
+        expect(state.index).to.equal(3)
+        expect(ustate.index).to.equal(0)
       })
     })
 
     describe('updated failure parser state', () => {
       it('creates a new object', () => {
-        const result = parse(string('123'), 'abc')
-        const updated = error(result)
-        expect(result).to.not.equal(updated)
-        expect(result).to.deep.equal(updated)
+        const [state, result] = parse(string('123'), 'abc')
+        const [ustate, uresult] = error(state, result.errors)
+        expect(state).to.not.equal(ustate)
+        expect(result).to.deep.equal(uresult)
       })
       it('can update errors and/or index properties', () => {
-        const result = parse(string('123'), 'abc')
-        const updated = error(result, overwrite(
+        const [state, result] = parse(string('123'), 'abc')
+        const [ustate, uresult] = error(state, overwrite(
           result.errors,
           makeExpected('"x"'),
           makeExpected('"y"'),
           makeUnexpected('"z"'),
-        ), 17)
+        ))
         expect(result.errors).to.deep.equal([
           { type: ErrorType.Unexpected, message: '"abc"' },
           { type: ErrorType.Expected, message: '"123"' },
         ])
-        expect(updated.errors).to.deep.equal([
+        expect(uresult.errors).to.deep.equal([
           { type: ErrorType.Expected, message: '"x"' },
           { type: ErrorType.Expected, message: '"y"' },
           { type: ErrorType.Unexpected, message: '"z"' },
         ])
-        expect(result.index).to.equal(0)
-        expect(updated.index).to.equal(17)
+        expect(state.index).to.equal(0)
+        expect(ustate.index).to.equal(0)
       })
     })
 
     describe('updated fatal failure parser state', () => {
       it('creates a new object', () => {
-        const result = parse(seq([char('a'), char('1')]), 'abc')
-        const updated = fatal(result)
-        expect(result).to.not.equal(updated)
-        expect(result).to.deep.equal(updated)
+        const [state, result] = parse(seq([char('a'), char('1')]), 'abc')
+        const [ustate, uresult] = fatal(state, result.errors)
+        expect(state).to.not.equal(ustate)
+        expect(result).to.deep.equal(uresult)
       })
       it('can update errors and/or index properties', () => {
-        const result = parse(seq([char('a'), char('1')]), 'abc')
-        const updated = fatal(result, overwrite(
+        const [state, result] = parse(seq([char('a'), char('1')]), 'abc')
+        const [ustate, uresult] = fatal(state, overwrite(
           result.errors,
           makeExpected('"x"'),
           makeExpected('"y"'),
@@ -109,13 +109,13 @@ describe('Core functionality', () => {
           { type: ErrorType.Unexpected, message: '"b"' },
           { type: ErrorType.Expected, message: '"1"' },
         ])
-        expect(updated.errors).to.deep.equal([
+        expect(uresult.errors).to.deep.equal([
           { type: ErrorType.Expected, message: '"x"' },
           { type: ErrorType.Expected, message: '"y"' },
           { type: ErrorType.Unexpected, message: '"z"' },
         ])
-        expect(result.index).to.equal(1)
-        expect(updated.index).to.equal(17)
+        expect(state.index).to.equal(1)
+        expect(ustate.index).to.equal(17)
       })
     })
   })

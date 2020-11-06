@@ -4,7 +4,8 @@
 // https://opensource.org/licenses/MIT
 
 import { error, fatal, ok, makeParser, Status } from 'kessel/core'
-import { ErrorType, makeExpected, overwrite } from 'kessel/error'
+import { makeExpected } from 'kessel/error'
+import { dup } from 'kessel/util'
 
 /** @typedef {import('kessel/core').Parser} Parser */
 
@@ -25,23 +26,16 @@ import { ErrorType, makeExpected, overwrite } from 'kessel/error'
  *     one succeeds.
  */
 export const choice = ps => makeParser(state => {
-  let nextState = state
-  let expecteds = []
+  const errors = []
 
   for (const p of ps) {
-    nextState = p({ ...nextState, errors: [] })
+    const [tuple, [next, result]] = dup(p(state))
 
-    if (nextState.status === Status.Ok) return nextState
-    expecteds = [
-      ...expecteds,
-      ...nextState.errors.filter(error => error.type === ErrorType.Expected),
-    ]
-
-    if (nextState.status === Status.Fatal) {
-      return fatal(nextState, overwrite(nextState.errors, ...expecteds))
-    }
+    if (result.status === Status.Ok) return tuple
+    errors.push(...result.errors)
+    if (result.status === Status.Fatal) return fatal(next, errors)
   }
-  return error(nextState, overwrite(nextState.errors, ...expecteds))
+  return error(state, errors)
 })
 
 /**
@@ -61,19 +55,15 @@ export const choice = ps => makeParser(state => {
  *     one succeeds.
  */
 export const choiceL = (ps, message) => makeParser(state => {
-  let nextState = state
-
   for (const p of ps) {
-    nextState = p(nextState)
+    const [tuple, [next, result]] = dup(p(state))
 
-    if (nextState.status === Status.Ok) return nextState
-    if (nextState.status === Status.Fatal) {
-      return fatal(
-        nextState, overwrite(nextState.errors, makeExpected(message)),
-      )
+    if (result.status === Status.Ok) return tuple
+    if (result.status === Status.Fatal) {
+      return fatal(next, [makeExpected(message)])
     }
   }
-  return error(nextState, overwrite(nextState.errors, makeExpected(message)))
+  return error(state, [makeExpected(message)])
 })
 
 /**
@@ -89,9 +79,9 @@ export const choiceL = (ps, message) => makeParser(state => {
  *     if its contained parser succeeds.
  */
 export const optional = p => makeParser(state => {
-  const nextState = p(state)
-  if (nextState.status === Status.Fatal) return nextState
-  return ok(nextState, null)
+  const [tuple, [next, result]] = dup(p(state))
+  if (result.status === Status.Fatal) return tuple
+  return ok(next, null)
 })
 
 /**
@@ -109,9 +99,9 @@ export const optional = p => makeParser(state => {
  *     parser's successful result or the provided value.
  */
 export const orElse = (p, x) => makeParser(state => {
-  const nextState = p(state)
-  if (nextState.status !== Status.Error) return nextState
-  return ok(nextState, x)
+  const [tuple, [next, result]] = dup(p(state))
+  if (result.status !== Status.Error) return tuple
+  return ok(next, x)
 })
 
 /**
@@ -132,7 +122,7 @@ export const orElse = (p, x) => makeParser(state => {
  */
 export const attempt = p => makeParser(state => {
   const index = state.index
-  const nextState = p(state)
-  if (nextState.status !== Status.Fatal) return nextState
-  return error(nextState, undefined, index)
+  const [tuple, [next, result]] = dup(p(state))
+  if (result.status !== Status.Fatal) return tuple
+  return error(next, result.errors, index)
 })

@@ -41,31 +41,47 @@ const all = (errors, type) => commaSeparate(errors
   .map(error => error.message))
 
 /**
+ * An object describing the state of the parser when tested and found
+ * to succeed.
+ *
+ * @typedef {object} SuccessObject
+ * @property {*} [value] The resulting value from the successful parser
+ *     application.
+ * @property {number} [index] The expected index into the input after
+ *     the parser is applied.
+ */
+
+/**
  * Asserts that a parser succeeds with a given result when tested
  * against a test string.
  *
  * @param {Parser} parser The parser to test against the test string.
  * @param {string} test The test string to which the parser is applied.
- * @param {(string|string[]|State)} result The expected result. This can
- *     be a string or an array, in which case it is compared (deeply if
- *     necessary) with the `result` property of the state that the
- *     parser returns. Otherwise it is deeply compared to the state
- *     itself.
+ * @param {(string|string[]|SuccessObject)} value The expected result.
+ *     This can be a string or an array, in which case it is compared
+ *     (deeply if necessary) with the `result` property of the state
+ *     that the parser returns. Otherwise it is deeply compared to the
+ *     state itself.
  */
-export function pass(parser, test, result) {
-  const state = parse(parser, test)
+export function pass(parser, test, value) {
+  const [state, result] = parse(parser, test)
 
-  if (!state.status === Status.Ok) {
-    const expected = all(state.errors, ErrorType.Expected)
-    const actual = first(state.errors, ErrorType.Unexpected)
+  if (!result.status === Status.Ok) {
+    const expected = all(result.errors, ErrorType.Expected)
+    const actual = first(result.errors, ErrorType.Unexpected)
 
     expect.fail(`Unexpected failure: expected ${expected}, actual ${actual}`)
-  } else if (typeof result === 'string') {
-    expect(state.result).to.equal(result)
-  } else if (Array.isArray(result)) {
-    expect(state.result).to.deep.equal(result)
+  } else if (typeof value === 'string') {
+    expect(result.value).to.equal(value)
+  } else if (Array.isArray(value)) {
+    expect(result.value).to.deep.equal(value)
   } else {
-    expect(state).to.deep.include(result)
+    if ('index' in value) {
+      expect(state.index).to.equal(value.index)
+    }
+    if ('value' in value) {
+      expect(result.value).to.equal(value.value)
+    }
   }
 }
 
@@ -93,33 +109,33 @@ export function pass(parser, test, result) {
  *
  * @param {Parser} parser The parser to test against the test string.
  * @param {string} test The test string to which the parser is applied.
- * @param {(string|FailureObject)} message Either a string which matches
+ * @param {(string|FailureObject)} error Either a string which matches
  *     the message from the first `Unexpected` error, or an object
  *     containing one or more properties that can be tested against the
  *     parser state.
  */
-export function fail(parser, test, message) {
-  const state = parse(parser, test)
+export function fail(parser, test, error) {
+  const [state, result] = parse(parser, test)
 
-  if (state.status === Status.Ok) {
-    expect.fail(`Unexpected success: ${state.result}`)
-  } else if (typeof message === 'string') {
-    expect(first(state.errors, ErrorType.Unexpected)).to.equal(message)
+  if (result.status === Status.Ok) {
+    expect.fail(`Unexpected success: ${result.value}`)
+  } else if (typeof error === 'string') {
+    expect(first(result.errors, ErrorType.Unexpected)).to.equal(error)
   } else {
-    if ('expected' in message) {
-      expect(all(state.errors, ErrorType.Expected)).to.equal(message.expected)
+    if ('expected' in error) {
+      expect(all(result.errors, ErrorType.Expected)).to.equal(error.expected)
     }
-    if ('actual' in message) {
-      expect(first(state.errors, ErrorType.Unexpected)).to.equal(message.actual)
+    if ('actual' in error) {
+      expect(first(result.errors, ErrorType.Unexpected)).to.equal(error.actual)
     }
-    if ('generic' in message) {
-      expect(first(state.errors, ErrorType.Generic)).to.equal(message.generic)
+    if ('generic' in error) {
+      expect(first(result.errors, ErrorType.Generic)).to.equal(error.generic)
     }
-    if ('index' in message) {
-      expect(state.index).to.equal(message.index)
+    if ('index' in error) {
+      expect(state.index).to.equal(error.index)
     }
-    if ('status' in message) {
-      expect(state.status).to.equal(message.status)
+    if ('status' in error) {
+      expect(result.status).to.equal(error.status)
     }
   }
 }

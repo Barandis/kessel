@@ -4,6 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import { error, fatal, ok, makeParser, Status } from 'kessel/core'
+import { dup } from 'kessel/util'
 
 /** @typedef {import('kessel/core').Parser} Parser */
 
@@ -23,19 +24,22 @@ import { error, fatal, ok, makeParser, Status } from 'kessel/core'
  *     time, in order, and fails if any of those parsers fail.
  */
 export const seq = ps => makeParser(state => {
-  const results = []
+  const values = []
   const index = state.index
-  let nextState = state
+  let next = state
 
   for (const p of ps) {
-    nextState = p(nextState)
+    const [nextState, result] = p(next)
+    next = nextState
 
-    if (nextState.status !== Status.Ok) {
-      return nextState.index === index ? error(nextState) : fatal(nextState)
+    if (result.status !== Status.Ok) {
+      return next.index === index
+        ? error(next, result.errors)
+        : fatal(next, result.errors)
     }
-    if (nextState.result !== null) results.push(nextState.result)
+    if (result.value !== null) values.push(result.value)
   }
-  return ok(nextState, results)
+  return ok(next, values)
 })
 
 /**
@@ -55,19 +59,18 @@ export const seq = ps => makeParser(state => {
  *     time, in order, and fails if any of those parsers fail.
  */
 export const seqA = ps => makeParser(state => {
-  const results = []
+  const values = []
   const index = state.index
-  let nextState = state
+  let next = state
 
   for (const p of ps) {
-    nextState = p(nextState)
+    const [nextState, result] = p(next)
+    next = nextState
 
-    if (nextState.status !== Status.Ok) {
-      return error(nextState, undefined, index)
-    }
-    if (nextState.result !== null) results.push(nextState.result)
+    if (result.status !== Status.Ok) return error(next, result.errors, index)
+    if (result.value !== null) values.push(result.value)
   }
-  return ok(nextState, results)
+  return ok(next, values)
 })
 
 /**
@@ -97,17 +100,21 @@ export const block = genFn => makeParser(state => {
   const gen = genFn()
   const index = state.index
   let nextValue
-  let nextState = state
+  let next = state
 
   while (true) {
     const { value, done } = gen.next(nextValue)
-    if (done) return ok(nextState, value)
+    if (done) return ok(next, value)
 
-    nextState = value(nextState)
-    if (nextState.status !== Status.Ok) {
-      return nextState.index === index ? error(nextState) : fatal(nextState)
+    const [nextState, result] = value(next)
+    next = nextState
+
+    if (result.status !== Status.Ok) {
+      return next.index === index
+        ? error(next, result.errors)
+        : fatal(next, result.errors)
     }
-    nextValue = nextState.result
+    nextValue = result.value
   }
 })
 
@@ -124,17 +131,19 @@ export const block = genFn => makeParser(state => {
  *     successful results from the contained parser.
  */
 export const many = p => makeParser(state => {
-  const results = []
-  let nextState = state
+  const values = []
+  let next = state
 
   while (true) {
-    nextState = p(nextState)
-    if (nextState.status === Status.Fatal) return nextState
-    if (nextState.status === Status.Error) break
-    results.push(nextState.result)
-    if (nextState.index >= nextState.view.byteLength) break
+    const [tuple, [nextState, result]] = dup(p(next))
+    next = nextState
+
+    if (result.status === Status.Fatal) return tuple
+    if (result.status === Status.Error) break
+    values.push(result.value)
+    if (next.index >= next.view.byteLength) break
   }
-  return ok(nextState, results)
+  return ok(next, values)
 })
 
 /**
@@ -151,16 +160,20 @@ export const many = p => makeParser(state => {
  *     successful results from the contained parser.
  */
 export const many1 = p => makeParser(state => {
-  let nextState = p(state)
-  if (nextState.status !== Status.Ok) return nextState
+  const [tuple, [nextState, result]] = dup(p(state))
+  if (result.status !== Status.Ok) return tuple
 
-  const results = [nextState.result]
+  let next = nextState
+  const values = [result.value]
+
   while (true) {
-    nextState = p(nextState)
-    if (nextState.status === Status.Fatal) return nextState
-    if (nextState.status === Status.Error) break
-    results.push(nextState.result)
-    if (nextState.index >= nextState.view.byteLength) break
+    const [tuple, [nextState, result]] = dup(p(next))
+    next = nextState
+
+    if (result.status === Status.Fatal) return tuple
+    if (result.status === Status.Error) break
+    values.push(result.value)
+    if (next.index >= next.view.byteLength) break
   }
-  return ok(nextState, results)
+  return ok(next, values)
 })

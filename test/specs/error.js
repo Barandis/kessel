@@ -5,7 +5,7 @@
 
 import { expect } from 'chai'
 
-import { makeState } from 'kessel/core'
+import { makeState, Status } from 'kessel/core'
 import {
   clear,
   ErrorType,
@@ -689,28 +689,28 @@ describe('Parse errors', () => {
       const state = makeState(input)
       state.success = false
       state.index = 4
-      state.errors = push([], makeExpected('a digit'))
+      const result = { errors: [makeExpected('a digit')], status: Status.Error }
 
       it('formats errors using default settings', () => {
         const exp = 'Parse error at (line 1, column 19):\n\n'
                   + '                Onomatopoeia\n'
                   + '                  ^\n'
                   + 'Expected a digit\n\n'
-        expect(formatErrors(state)).to.equal(exp)
+        expect(formatErrors(state, result)).to.equal(exp)
       })
       it('formats errors using a custom tab size', () => {
         const exp = 'Parse error at (line 1, column 11):\n\n'
                   + '        Onomatopoeia\n'
                   + '          ^\n'
                   + 'Expected a digit\n\n'
-        expect(formatErrors(state, 4)).to.equal(exp)
+        expect(formatErrors(state, result, 4)).to.equal(exp)
       })
       it('formats errors using a custom line length', () => {
         const exp = 'Parse error at (line 1, column 11):\n\n'
                   + '        Onom...\n'
                   + '          ^\n'
                   + 'Expected a digit\n\n'
-        expect(formatErrors(state, 4, 15)).to.equal(exp)
+        expect(formatErrors(state, result, 4, 15)).to.equal(exp)
       })
       it('formats errors using a custom formatting function', () => {
         const fn = (errors, index, view, tabSize, maxWidth) =>
@@ -718,7 +718,9 @@ describe('Parse errors', () => {
             view.byteLength
           }\n${tabSize}\n${maxWidth}`
         const exp = 'a digit\n4\n14\n8\n72'
-        expect(formatErrors(state, undefined, undefined, fn)).to.equal(exp)
+        expect(
+          formatErrors(state, result, undefined, undefined, fn),
+        ).to.equal(exp)
       })
     })
   })

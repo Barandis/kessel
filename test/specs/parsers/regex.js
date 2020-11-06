@@ -191,34 +191,82 @@ describe('Regular expression parsers', () => {
       pass(ualpha, '❹', '❹') // DINGBAT NEGATIVE CIRCLED DIGIT FOUR
     })
     it('fails on whitespace', () => {
-      fail(ualpha, ' ', { expected: 'an alphanumeric', actual: '" "' })
-      fail(ualpha, '\t', { expected: 'an alphanumeric', actual: '"\t"' })
-      fail(ualpha, '\n', { expected: 'an alphanumeric', actual: '"\n"' })
-      fail(ualpha, ' ', { expected: 'an alphanumeric', actual: '" "' })
+      fail(ualpha, ' ', {
+        expected: 'an alphanumeric character',
+        actual: '" "',
+      })
+      fail(ualpha, '\t', {
+        expected: 'an alphanumeric character',
+        actual: '"\t"',
+      })
+      fail(ualpha, '\n', {
+        expected: 'an alphanumeric character',
+        actual: '"\n"',
+      })
+      fail(ualpha, ' ', {
+        expected: 'an alphanumeric character',
+        actual: '" "',
+      })
       fail(ualpha, '\u2003', {
-        expected: 'an alphanumeric',
+        expected: 'an alphanumeric character',
         actual: '"\u2003"',
       })
       fail(ualpha, '\u202f', {
-        expected: 'an alphanumeric',
+        expected: 'an alphanumeric character',
         actual: '"\u202f"',
       })
     })
     it('fails on punctuation', () => {
-      fail(ualpha, '(', { expected: 'an alphanumeric', actual: '"("' })
-      fail(ualpha, '｢', { expected: 'an alphanumeric', actual: '"｢"' })
-      fail(ualpha, ')', { expected: 'an alphanumeric', actual: '")"' })
-      fail(ualpha, '｣', { expected: 'an alphanumeric', actual: '"｣"' })
-      fail(ualpha, '!', { expected: 'an alphanumeric', actual: '"!"' })
-      fail(ualpha, '፣', { expected: 'an alphanumeric', actual: '"፣"' })
+      fail(ualpha, '(', {
+        expected: 'an alphanumeric character',
+        actual: '"("',
+      })
+      fail(ualpha, '｢', {
+        expected: 'an alphanumeric character',
+        actual: '"｢"',
+      })
+      fail(ualpha, ')', {
+        expected: 'an alphanumeric character',
+        actual: '")"',
+      })
+      fail(ualpha, '｣', {
+        expected: 'an alphanumeric character',
+        actual: '"｣"',
+      })
+      fail(ualpha, '!', {
+        expected: 'an alphanumeric character',
+        actual: '"!"',
+      })
+      fail(ualpha, '፣', {
+        expected: 'an alphanumeric character',
+        actual: '"፣"',
+      })
     })
     it('fails on symbols', () => {
-      fail(ualpha, '$', { expected: 'an alphanumeric', actual: '"$"' })
-      fail(ualpha, '₯', { expected: 'an alphanumeric', actual: '"₯"' })
-      fail(ualpha, '+', { expected: 'an alphanumeric', actual: '"+"' })
-      fail(ualpha, '⫇', { expected: 'an alphanumeric', actual: '"⫇"' })
-      fail(ualpha, '©', { expected: 'an alphanumeric', actual: '"©"' })
-      fail(ualpha, '🀄', { expected: 'an alphanumeric', actual: '"🀄"' })
+      fail(ualpha, '$', {
+        expected: 'an alphanumeric character',
+        actual: '"$"',
+      })
+      fail(ualpha, '₯', {
+        expected: 'an alphanumeric character',
+        actual: '"₯"',
+      })
+      fail(ualpha, '+', {
+        expected: 'an alphanumeric character',
+        actual: '"+"',
+      })
+      fail(ualpha, '⫇', {
+        expected: 'an alphanumeric character',
+        actual: '"⫇"',
+      })
+      fail(ualpha, '©', {
+        expected: 'an alphanumeric character',
+        actual: '"©"',
+      })
+      fail(ualpha, '🀄', {
+        expected: 'an alphanumeric character',
+        actual: '"🀄"',
+      })
     })
   })
 

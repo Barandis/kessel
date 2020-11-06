@@ -4,6 +4,9 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+/** @typedef {import('./core').State} State */
+/** @typedef {import('./core').Result} Result */
+
 /**
  * Translates a UCS-2 string into a Uint8Array of UTF-8 bytes.
  */
@@ -179,6 +182,33 @@ export function nextChars(index, view, count) {
  */
 export function quote(str) {
   return `"${str}"`
+}
+
+/**
+ * Creates an array of two copies of the provided value.
+ *
+ * While this will duplicate any value, it's primarily useful for
+ * covering a missing part of JavaScript destructuring, so `value`
+ * should generally be an array or object.
+ *
+ * That missing part is reference to the entire value. JavaScript will
+ * allow destructuring to reference any and all parts of a value, but it
+ * does not have a syntax (like the `@` operator in languages like Scala
+ * and Haskell) to reference the entire value at the same time. Using
+ * this function, one of the copies can be retained as a whole while
+ * providing another copy for destructuring.
+ *
+ * ### Example
+ * ```
+ * const [whole, [state, value]] = dup(parse(parser, input))
+ * ```
+ *
+ * @param {[State, Result]} value Any value.
+ * @returns {[[State, Result], [State, Result]]} An array containing two
+ *     copies of the value.
+ */
+export function dup(value) {
+  return [value, value]
 }
 
 /**

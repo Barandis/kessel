@@ -23,8 +23,8 @@ import { error, ok, makeParser, Status } from 'kessel/core'
  */
 export const lookAhead = p => makeParser(state => {
   const index = state.index
-  const nextState = p(state)
-  return nextState.status === Status.Ok
-    ? ok(nextState, undefined, index)
-    : error(nextState, undefined, index)
+  const [next, result] = p(state)
+  return result.status === Status.Ok
+    ? ok(next, undefined, index)
+    : error(next, result.errors, index)
 })

@@ -28,38 +28,37 @@ function isTypedArray(value) {
 
 /**
  * A symbol representing the status of the last parsing operation.
- *
  * @enum {symbol}
  */
 export const Status = {
-  /**
-   * Indicates that the last parse was successful.
-   */
+  /** Indicates that the last parse was successful. */
   Ok: Symbol('ok'),
-  /**
-   * Indicates that the last parse failed but did not consume any input.
-   */
+  /** Indicates that the last parse failed without consuming input. */
   Error: Symbol('error'),
-  /**
-   * Indicates that the last parse failed and consumed input.
-   */
+  /** Indicates that the last parse failed and consumed input. */
   Fatal: Symbol('fatal'),
 }
 
 /**
- * The current user state of a parser. This object contains not only the
- * input text but also a pointer to the current location within it, the
- * result of a successful parse, and the errors produced by a failed
- * parse.
+ * The current state of a parser. This object contains the input text
+ * and a pointer to the current location within it.
  *
- * @typedef State
+ * @typedef {object} State
  * @property {DataView} view The data view containing the input text.
  * @property {number} index The index within the data view where the
  *     next parsing operation will take place (or where the last one
  *     resulted in an error).
+ */
+
+/**
+ * A result from a parser application, successful or not. This is
+ * essentially a union of successful value and failure error, with the
+ * `status` property to determine which is valid.
+ *
+ * @typedef {object} Result
  * @property {Status} status The status of the last attempted parse of
  *     the input text.
- * @property {*} result The result of a successful parse.
+ * @property {*} value The value of a successful parse.
  * @property {ParseError[]} errors A list of errors that occurred during
  *     an unsuccessful parse.
  */
@@ -104,9 +103,6 @@ export function makeState(input) {
   return {
     view,
     index: 0,
-    status: Status.Ok,
-    result: null,
-    errors: [],
   }
 }
 
@@ -117,7 +113,8 @@ export function makeState(input) {
  *
  * @callback Parser
  * @param {State} state The state before the parser is run.
- * @returns {State} The updated state after the parser is applied.
+ * @returns {[State, Result]} The updated state after the parser is
+ *     applied and the result of that parser application.
  */
 
 /**
@@ -140,67 +137,50 @@ export function makeParser(fn) {
 }
 
 /**
- * Produces a new `State` indicating that a parse succeeded.
+ * Produces a new `Result` indicating that a parse succeeded, as well as
+ * a `State` potentially with an updated `index`.
  *
  * @param {State} state The state prior to the parser being applied.
- * @param {*} [result=state.result] The new result of the parse.
+ * @param {*} [value=null] The new result of the parser application.
  * @param {number} [index=state.index] The updated index after the
  *     parser was applied.
- * @returns {State} A new object representing the state after the latest
- *     parser succeeded.
+ * @returns {[State, Result]} A new object representing the state and
+ *     result after the latest parser succeeded.
  */
-export function ok(state, result = state.result, index = state.index) {
-  return {
-    ...state,
-    index,
-    status: Status.Ok,
-    result,
-    errors: [],
-  }
+export function ok(state, value = null, index = state.index) {
+  return [{ ...state, index }, { status: Status.Ok, value }]
 }
 
 /**
- * Produces a new `State` indicating that a parse failed without
- * consuming input.
+ * Produces a new `Result` indicating that a parse failed without
+ * consuming input, as well as a copy of `State`.
  *
  * @param {State} state The state prior to the parser being applied.
- * @param {ParseError[]} [errors=state.errors] The errors associated
+ * @param {ParseError[]} [errors=[]] The errors associated
  *     with the state after the latest parser was applied.
  * @param {number} [index=state.index] The updated index after the
  *     latest parser was applied.
- * @returns {State} A new object representing the state after the latest
- *     parser failed.
+ * @returns {[State, Result]} A new object representing the state and
+ *     result after the latest parser failed.
  */
-export function error(state, errors = state.errors, index = state.index) {
-  return {
-    ...state,
-    index,
-    status: Status.Error,
-    result: null,
-    errors,
-  }
+export function error(state, errors = [], index = state.index) {
+  return [{ ...state, index }, { status: Status.Error, errors }]
 }
 
 /**
- * Produces a new `State` indicating that a parse failed while consuming
- * input.
+ * Produces a new `Result` indicating that a parse failed while
+ * consuming input, as well as a new `State` with an updated `index`.
  *
  * @param {State} state The state prior to the parser being applied.
- * @param {ParseError[]} [errors=state.errors] The errors associated
+ * @param {ParseError[]} [errors=[] The errors associated
  *     with the state after the latest parser was applied.
  * @param {number} [index=state.index] The updated index after the
  *     latest parser was applied.
- * @returns {State} A new object representing the state after the latest
- *     parser failed.
+ * @returns {[State, Result]} A new object representing the state and
+ *     result after the latest parser failed.
  */
-export function fatal(state, errors = state.errors, index = state.index) {
-  return {
-    ...state,
-    index,
-    status: Status.Fatal,
-    result: null,
-    errors,
-  }
+export function fatal(state, errors = [], index = state.index) {
+  return [{ ...state, index }, { status: Status.Fatal, errors }]
 }
 
 /**
@@ -213,7 +193,8 @@ export function fatal(state, errors = state.errors, index = state.index) {
  *     parsers and combinators.
  * @param {(string|ArrayBuffer|TypedArray|DataView)} input The input
  *     text.
- * @returns {State} The final state after all parsers have been applied.
+ * @returns {[State, Result]} The final state after all parsers have
+ *     been applied and the result of the final parser application.
  */
 export function parse(parser, input) {
   return parser(makeState(input))

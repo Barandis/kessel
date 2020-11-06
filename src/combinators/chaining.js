@@ -4,6 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import { makeParser, ok, Status } from 'kessel/core'
+import { dup } from 'kessel/util'
 
 /** @typedef {import('kessel/core').Parser} Parser */
 
@@ -24,9 +25,9 @@ import { makeParser, ok, Status } from 'kessel/core'
  *     return value as a second parser to apply the input to.
  */
 export const chain = (p, fn) => makeParser(state => {
-  const nextState = p(state)
-  if (nextState.status !== Status.Ok) return nextState
-  return fn(nextState.result)(nextState)
+  const [tuple, [next, result]] = dup(p(state))
+  if (result.status !== Status.Ok) return tuple
+  return fn(result.value)(next)
 })
 
 /**
@@ -46,9 +47,9 @@ export const chain = (p, fn) => makeParser(state => {
  *     return value as its result.
  */
 export const map = (p, fn) => makeParser(state => {
-  const nextState = p(state)
-  if (nextState.status !== Status.Ok) return nextState
-  return ok(nextState, fn(nextState.result))
+  const [tuple, [next, result]] = dup(p(state))
+  if (result.status !== Status.Ok) return tuple
+  return ok(next, fn(result.value))
 })
 
 /**
@@ -78,9 +79,9 @@ export const map = (p, fn) => makeParser(state => {
  *     array of strings.
  */
 export const join = p => makeParser(state => {
-  const nextState = p(state)
-  if (nextState.status !== Status.Ok) return nextState
-  return ok(nextState, nextState.result.join(''))
+  const [tuple, [next, result]] = dup(p(state))
+  if (result.status !== Status.Ok) return tuple
+  return ok(next, result.value.join(''))
 })
 
 /**
@@ -93,7 +94,7 @@ export const join = p => makeParser(state => {
  *     parser does on success, but will produce no result.
  */
 export const skip = p => makeParser(state => {
-  const nextState = p(state)
-  if (nextState.status !== Status.Ok) return nextState
-  return ok(nextState, null)
+  const [tuple, [next, result]] = dup(p(state))
+  if (result.status !== Status.Ok) return tuple
+  return ok(next, null)
 })

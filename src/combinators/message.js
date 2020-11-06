@@ -5,6 +5,7 @@
 
 import { error, fatal, makeParser, Status } from 'kessel/core'
 import { makeExpected, overwrite } from 'kessel/error'
+import { dup } from 'kessel/util'
 
 /** @typedef {import('kessel/core').Parser} Parser */
 
@@ -26,12 +27,12 @@ import { makeExpected, overwrite } from 'kessel/error'
  *     failure.
  */
 export const label = (p, message) => makeParser(state => {
-  const nextState = p(state)
-  if (nextState.status === Status.Error) {
-    return error(nextState, overwrite(nextState.errors, makeExpected(message)))
+  const [tuple, [next, result]] = dup(p(state))
+  if (result.status === Status.Error) {
+    return error(next, overwrite(result.errors, makeExpected(message)))
   }
-  if (nextState.status === Status.Fatal) {
-    return fatal(nextState, overwrite(nextState.errors, makeExpected(message)))
+  if (result.status === Status.Fatal) {
+    return fatal(next, overwrite(result.errors, makeExpected(message)))
   }
-  return nextState
+  return tuple
 })
