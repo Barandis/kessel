@@ -112,7 +112,7 @@ export function makeOther(message) {
  *     with the elements of `errors` added to the end.
  */
 export function push(list, ...errors) {
-  return [...list ?? [], ...errors]
+  return [...list, ...errors]
 }
 
 // Clears all errors of a particular type from a list of errors. If
@@ -130,7 +130,7 @@ export function push(list, ...errors) {
  */
 export function clear(list, ...types) {
   if (types.length === 0) return []
-  return (list ?? []).filter(error => !types.includes(error.type))
+  return list.filter(error => !types.includes(error.type))
 }
 
 /**
@@ -147,7 +147,7 @@ export function clear(list, ...types) {
  */
 export function overwrite(list, ...errors) {
   const types = errors.map(error => error.type)
-  const result = (list ?? []).filter(error => !types.includes(error.type))
+  const result = list.filter(error => !types.includes(error.type))
   return [...result, ...errors]
 }
 

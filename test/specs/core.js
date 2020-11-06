@@ -70,23 +70,27 @@ describe('Core functionality', () => {
       })
       it('can update errors and/or index properties', () => {
         const [state, result] = parse(string('123'), 'abc')
-        const [ustate, uresult] = error(state, overwrite(
+        const [ustate1, uresult1] = error(state, overwrite(
           result.errors,
           makeExpected('"x"'),
           makeExpected('"y"'),
           makeUnexpected('"z"'),
         ))
+        const [ustate2, uresult2] = error(state)
+
         expect(result.errors).to.deep.equal([
           { type: ErrorType.Unexpected, message: '"abc"' },
           { type: ErrorType.Expected, message: '"123"' },
         ])
-        expect(uresult.errors).to.deep.equal([
+        expect(uresult1.errors).to.deep.equal([
           { type: ErrorType.Expected, message: '"x"' },
           { type: ErrorType.Expected, message: '"y"' },
           { type: ErrorType.Unexpected, message: '"z"' },
         ])
+        expect(uresult2.errors).to.deep.equal([])
         expect(state.index).to.equal(0)
-        expect(ustate.index).to.equal(0)
+        expect(ustate1.index).to.equal(0)
+        expect(ustate2.index).to.equal(0)
       })
     })
 
@@ -99,23 +103,27 @@ describe('Core functionality', () => {
       })
       it('can update errors and/or index properties', () => {
         const [state, result] = parse(seq([char('a'), char('1')]), 'abc')
-        const [ustate, uresult] = fatal(state, overwrite(
+        const [ustate1, uresult1] = fatal(state, overwrite(
           result.errors,
           makeExpected('"x"'),
           makeExpected('"y"'),
           makeUnexpected('"z"'),
         ), 17)
+        const [ustate2, uresult2] = fatal(state)
+
         expect(result.errors).to.deep.equal([
           { type: ErrorType.Unexpected, message: '"b"' },
           { type: ErrorType.Expected, message: '"1"' },
         ])
-        expect(uresult.errors).to.deep.equal([
+        expect(uresult1.errors).to.deep.equal([
           { type: ErrorType.Expected, message: '"x"' },
           { type: ErrorType.Expected, message: '"y"' },
           { type: ErrorType.Unexpected, message: '"z"' },
         ])
+        expect(uresult2.errors).to.deep.equal([])
         expect(state.index).to.equal(1)
-        expect(ustate.index).to.equal(17)
+        expect(ustate1.index).to.equal(17)
+        expect(ustate2.index).to.equal(1)
       })
     })
   })
