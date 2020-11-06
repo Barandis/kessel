@@ -40,7 +40,7 @@ describe('Sequence combinators', () => {
       pass(parser, 'abcdefghi', { result: ['abc', 'def', 'ghi'], index: 9 })
     })
     it('does not add null to results', () => {
-      pass(seq([string('abc'), eof]), 'abc', { result: ['abc'], index: 3 })
+      pass(seqA([string('abc'), eof]), 'abc', { result: ['abc'], index: 3 })
     })
   })
 
