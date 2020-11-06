@@ -4,7 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import { skip } from 'kessel/combinators/chaining'
-import { block, many, many1, seq } from 'kessel/combinators/sequence'
+import { block, many, many1, seq, seqA } from 'kessel/combinators/sequence'
 import { Status } from 'kessel/core'
 import { any, char, digit, eof, letter } from 'kessel/parsers/char'
 import { uspace } from 'kessel/parsers/regex'
@@ -29,7 +29,7 @@ describe('Sequence combinators', () => {
   })
 
   describe('seqA', () => {
-    const parser = seq([string('abc'), string('def'), string('ghi')])
+    const parser = seqA([string('abc'), string('def'), string('ghi')])
 
     it('fails if any of its parsers fail', () => {
       fail(parser, 'abd', { expected: '"abc"', actual: '"abd"', index: 0 })

@@ -106,19 +106,19 @@ export function fail(parser, test, message) {
   } else if (typeof message === 'string') {
     expect(first(state.errors, ErrorType.Unexpected)).to.equal(message)
   } else {
-    if (message.expected) {
+    if ('expected' in message) {
       expect(all(state.errors, ErrorType.Expected)).to.equal(message.expected)
     }
-    if (message.actual) {
+    if ('actual' in message) {
       expect(first(state.errors, ErrorType.Unexpected)).to.equal(message.actual)
     }
-    if (message.generic) {
+    if ('generic' in message) {
       expect(first(state.errors, ErrorType.Generic)).to.equal(message.generic)
     }
-    if (message.index) {
+    if ('index' in message) {
       expect(state.index).to.equal(message.index)
     }
-    if (message.status) {
+    if ('status' in message) {
       expect(state.status).to.equal(message.status)
     }
   }
