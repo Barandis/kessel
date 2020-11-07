@@ -4,7 +4,15 @@
 // https://opensource.org/licenses/MIT
 
 import { skip } from 'kessel/combinators/chaining'
-import { block, many, many1, seq, seqA } from 'kessel/combinators/sequence'
+import {
+  block,
+  many,
+  many1,
+  seq,
+  seqA,
+  skipMany,
+  skipMany1,
+} from 'kessel/combinators/sequence'
 import { Status } from 'kessel/core'
 import { any, char, digit, eof, letter } from 'kessel/parsers/char'
 import { spaceU } from 'kessel/parsers/regex'
@@ -143,6 +151,50 @@ describe('Sequence combinators', () => {
       fail(skip(seq([string('ab'), string('cd')])), 'abce', {
         expected: '"cd"',
         actual: '"ce"',
+        status: Status.Fatal,
+      })
+    })
+  })
+
+  describe('skipMany', () => {
+    it('succeeds zero times without consuming input', () => {
+      pass(skipMany(digit), 'abc123', { result: null, index: 0 })
+      pass(skipMany(digit), '', { result: null, index: 0 })
+    })
+    it('succeeds with all results until a non-match', () => {
+      pass(skipMany(digit), '123abc', { result: null, index: 3 })
+      pass(skipMany(digit), '123abc456', { result: null, index: 3 })
+    })
+    it('succeeds until EOF if matches continue until then', () => {
+      pass(skipMany(digit), '123', { result: null, index: 3 })
+    })
+    it('fails if its parser consumes while failing', () => {
+      fail(skipMany(seq([char('a'), char('b')])), 'ababac', {
+        expected: '"b"',
+        actual: '"c"',
+        index: 5,
+        status: Status.Fatal,
+      })
+    })
+  })
+
+  describe('skipMany1', () => {
+    it('fails if its parser does not match at least once', () => {
+      fail(skipMany1(digit), 'abc123', { expected: 'a digit', actual: '"a"' })
+      fail(skipMany1(digit), '', { expected: 'a digit', actual: 'EOF' })
+    })
+    it('succeeds with all results until a non-match', () => {
+      pass(skipMany1(digit), '123abc', { result: null, index: 3 })
+      pass(skipMany1(digit), '123abc456', { result: null, index: 3 })
+    })
+    it('succeeds until EOF if matches continue until then', () => {
+      pass(skipMany1(digit), '123', { result: null, index: 3 })
+    })
+    it('fails if its parser consumes while failing', () => {
+      fail(skipMany1(seq([char('a'), char('b')])), 'ababac', {
+        expected: '"b"',
+        actual: '"c"',
+        index: 5,
         status: Status.Fatal,
       })
     })

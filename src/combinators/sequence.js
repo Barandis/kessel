@@ -177,3 +177,55 @@ export const many1 = p => makeParser(state => {
   }
   return ok(next, values)
 })
+
+/**
+ * Creates a parser that applies the supplied parser until it fails,
+ * discarding all of the successful results. The returned parser only
+ * fails if the supplied parser consumes input when it fails. Otherwise,
+ * it succeeds even if the supplied parser doesn't succeed even once.
+ *
+ * @param {Parser} p A parser to be applied zero or more times.
+ * @returns {Parser} A parser that applies the supplied parser
+ *     repeatedly until it fails. Successful results are discarded.
+ */
+export const skipMany = p => makeParser(state => {
+  let next = state
+
+  while (true) {
+    const [tuple, [nextState, result]] = dup(p(next))
+    next = nextState
+
+    if (result.status === Status.Fatal) return tuple
+    if (result.status === Status.Error) break
+    if (next.index >= next.view.byteLength) break
+  }
+  return ok(next, null)
+})
+
+/**
+ * Creates a parser that applies the supplied parser until it fails,
+ * discarding all of the successful results. The contained parser must
+ * succeed at least once, or the returned parser will fail. Otherwise,
+ * the returned parser only fails if the supplied parser consumes input
+ * when it fails.
+ *
+ * @param {Parser} p A parser to be applied one or more times.
+ * @returns {Parser} A parser that applies the supplied parser
+ *     repeatedly until it fails. Successful results are discarded.
+ */
+export const skipMany1 = p => makeParser(state => {
+  const [tuple, [nextState, result]] = dup(p(state))
+  if (result.status !== Status.Ok) return tuple
+
+  let next = nextState
+
+  while (true) {
+    const [tuple, [nextState, result]] = dup(p(next))
+    next = nextState
+
+    if (result.status === Status.Fatal) return tuple
+    if (result.status === Status.Error) break
+    if (next.index >= next.view.byteLength) break
+  }
+  return ok(next, null)
+})
