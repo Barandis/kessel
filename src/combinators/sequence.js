@@ -3,8 +3,8 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { error, fatal, ok, makeParser, Status } from 'kessel/core'
-import { dup } from 'kessel/util'
+import { error, fatal, ok, makeParser, Status, maybeFatal } from 'kessel/core'
+import { dup, range } from 'kessel/util'
 
 /** @typedef {import('kessel/core').Parser} Parser */
 
@@ -42,37 +42,6 @@ export const seq = ps => makeParser(state => {
         ? error(next, result.errors)
         : fatal(next, result.errors)
     }
-    if (result.value !== null) values.push(result.value)
-  }
-  return ok(next, values)
-})
-
-/**
- * Creates a parser that implements a sequence. Each supplied parser is
- * executed in order until either they all succeed or the first one
- * fails. In the former case, all results are merged into an array that
- * becomes the returned parser's result.
- *
- * The returned parser will not fail fatally. If it consumes input
- * before or during a failure, backtracking will be done and the state
- * will be left as it was before the sequence begain. In this way, this
- * is a slightly optimized version of `back(seq(ps))` (hence the
- * postfixed 'B').
- *
- * @param {Parser[]} ps An array of parsers to be applied.
- * @returns {Parser} A parser that applies the supplied parsers one at a
- *     time, in order, and fails if any of those parsers fail.
- */
-export const seqB = ps => makeParser(state => {
-  const values = []
-  const index = state.index
-  let next = state
-
-  for (const p of ps) {
-    const [nextState, result] = p(next)
-    next = nextState
-
-    if (result.status !== Status.Ok) return error(next, result.errors, index)
     if (result.value !== null) values.push(result.value)
   }
   return ok(next, values)
@@ -432,4 +401,31 @@ export const sepEndBy1 = (p, sep) => makeParser(state => {
   }
   const [sepNext, _] = sep({ ...next, index })
   return ok(sepNext, values)
+})
+
+/**
+ * Creates a parser that applies the supplied parser `n` times,
+ * collecting the successful results into an array. If any application
+ * fails, the overall parser will fail; if input is consumed before or
+ * during that failure, the failure will be fatal.
+ *
+ * @param {Parser} p A parser to apply multiple times.
+ * @param {number} n The number of times to apply the parser.
+ * @returns {Parser} A parser that applies `p` `n` times and results in
+ *     an array of all of the successful results of `p`.
+ */
+export const count = (p, n) => makeParser(state => {
+  const index = state.index
+  const values = []
+  let next = state
+
+  for (const _ of range(n)) {
+    const [nextState, result] = p(next)
+    next = nextState
+    if (result.status !== Status.Ok) {
+      return maybeFatal(next.index !== index, next, result.errors)
+    }
+    values.push(result.value)
+  }
+  return ok(next, values)
 })

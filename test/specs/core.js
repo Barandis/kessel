@@ -6,7 +6,7 @@
 import { expect } from 'chai'
 
 import { seq } from 'kessel/combinators/sequence'
-import { error, fatal, ok, parse } from 'kessel/core'
+import { error, fatal, maybeFatal, ok, parse, Status } from 'kessel/core'
 import {
   ErrorType,
   makeExpected,
@@ -15,6 +15,7 @@ import {
 } from 'kessel/error'
 import { char } from 'kessel/parsers/char'
 import { string } from 'kessel/parsers/string'
+import { stringToView } from 'kessel/util'
 import { error as terror, pass } from 'test/helper'
 
 const encoder = new TextEncoder()
@@ -124,6 +125,21 @@ describe('Core functionality', () => {
         expect(state.index).to.equal(1)
         expect(ustate1.index).to.equal(17)
         expect(ustate2.index).to.equal(1)
+      })
+    })
+
+    describe('updating fatal/non-fatal parser state', () => {
+      const state = { view: stringToView('test'), index: 0 }
+      const fatal = maybeFatal(true, state)
+      const nonFatal = maybeFatal(false, state)
+
+      it('can set fatal state with a test', () => {
+        const [_, result] = fatal
+        expect(result.status).to.equal(Status.Fatal)
+      })
+      it('can set non-fatal state with a test', () => {
+        const [_, result] = nonFatal
+        expect(result.status).to.equal(Status.Error)
       })
     })
   })

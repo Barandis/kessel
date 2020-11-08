@@ -5,7 +5,7 @@
 
 import { error, fatal, ok, makeParser, Status } from 'kessel/core'
 import { makeExpected } from 'kessel/error'
-import { dup } from 'kessel/util'
+import { dup, range } from 'kessel/util'
 
 /** @typedef {import('kessel/core').Parser} Parser */
 
@@ -40,12 +40,13 @@ export const alt = ps => makeParser(state => {
 
 /**
  * Creates a parser that implements alternatives, but with a failure
- * message included. The parsers are tried one at a time as with
- * `choice`, but if they all fail (or if any fail fatally), the last
- * argument is used as the expected message rather than constructing it
- * out of the expected messages of each failed parser.
+ * message included. The parsers are tried one at a time as with `alt`,
+ * but if they all fail (or if any fail fatally), the last argument is
+ * used as the expected message rather than constructing it out of the
+ * expected messages of each failed parser.
  *
- * This is an optimized version of `label(choice(ps), message)`.
+ * `altL(ps, message)` is an optimized version of `label(alt(ps),
+ * message)`.
  *
  * @param {Parser[]} ps The parsers to apply to the input, one at a
  *     time, until one succeeds, one fails fatally, or all fail.
@@ -89,7 +90,8 @@ export const optional = p => makeParser(state => {
  * successful result or else (if that parser fails) the supplied value
  * `x`. This parser only fails if its contained parser fails fatally.
  *
- * This is an optimized implementation of `choice([p, constant(x)])`.
+ * `orElse(p, x)` is an optimized implementation of `alt([p,
+ * constant(x)])`.
  *
  * @param {Parser} p A parser whose result will be the created parser's
  *     result if it succeeds.
@@ -126,3 +128,201 @@ export const back = p => makeParser(state => {
   if (result.status !== Status.Fatal) return tuple
   return error(next, result.errors, index)
 })
+
+/**
+ * Creates a parser that implements a sequence. Each supplied parser is
+ * executed in order until either they all succeed or the first one
+ * fails. In the former case, all results are merged into an array that
+ * becomes the returned parser's result.
+ *
+ * If one of the parsers fails non-fatally, the entire parser will also
+ * fail non-fatally, reverting the state to what it was before the first
+ * parser was applied, even if previous parsers have consumed input. A
+ * fatal error from one of the contained parsers will still result in an
+ * overall fatal error.
+ *
+ * Note that `seqB(ps)` is not the same as `back(seq(ps))`, as the
+ * former will fail fatally if one of `ps` fails fatally, while the
+ * latter will fail non-fatally in that case.
+ *
+ * @param {Parser[]} ps An array of parsers to be applied.
+ * @returns {Parser} A parser that applies the supplied parsers one at a
+ *     time, in order, and fails if any of those parsers fail.
+ */
+export const seqB = ps => makeParser(state => {
+  const values = []
+  const index = state.index
+  let next = state
+
+  for (const p of ps) {
+    const [tuple, [nextState, result]] = dup(p(next))
+    next = nextState
+
+    if (result.status === Status.Fatal) return tuple
+    if (result.status === Status.Error) return error(next, result.errors, index)
+    if (result.value !== null) values.push(result.value)
+  }
+  return ok(next, values)
+})
+
+/**
+ * Creates a parser that chains the state after applying its contained
+ * parser to another parser returned by the supplied function. The
+ * parser returns that resulting state.
+ *
+ * If the second parser (the one provided by `fn`) fails non-fatally,
+ * the entire parser will also fail non-fatally, reverting the state to
+ * what it was before the first parser was applied, even if the first
+ * parser consumed input. A fatal error from either parser will still
+ * result in an overall fatal error.
+ *
+ * Note that `chainB(p, fn)` is not the same as `back(chain(p, fn))`, as
+ * the former will fail fatally if one of its parsers fails fatally,
+ * while the latter will fail non-fatally in that case.
+ *
+ * @param {Parser} p The first parser to apply.
+ * @param {function(*): Parser} fn A function that takes the result from
+ *     the first parser's successful application as its sole argument.
+ *     It uses this result to determine a second parser, which it
+ *     returns.
+ * @returns {Parser} A parser which will apply its contained parser,
+ *     pass the result to the supplied function, and use that function's
+ *     return value as a second parser to apply the input to.
+ */
+export const chainB = (p, fn) => makeParser(state => {
+  const index = state.index
+
+  const [tuple1, [next1, result1]] = dup(p(state))
+  if (result1.status !== Status.Ok) return tuple1
+
+  const [tuple2, [next2, result2]] = dup(fn(result1.value)(next1))
+  if (result2.status !== Status.Error) return tuple2
+  return error(next2, result2.errors, index)
+})
+
+/**
+ * Creates a parser that will apply the parsers `p1` and `p2` in
+ * sequence and then return the result of `p1`. If either `p1` or `p2`
+ * fail, this parser will also fail.
+ *
+ * If `p2` fails non-fatally, the entire parser will also fail
+ * non-fatally, reverting the state to what it was before the first
+ * parser was applied, even if the first parser consumed input. A fatal
+ * error from either parser will still result in an overall fatal error.
+ *
+ * Note that `leftB(p1, p2)` is not the same as `back(left(p1, p2))`, as
+ * the former will fail fatally if one of its parsers fails fatally,
+ * while the latter will fail non-fatally in that case.
+ *
+ * @param {Parser} p1 The first parser to apply.
+ * @param {Parser} p2 The second parser to apply.
+ * @returns {Parser} A parser that applies both contained parsers and
+ *     results in the value of the first.
+ */
+export const leftB = (p1, p2) => makeParser(state => {
+  const index = state.index
+
+  const [tuple1, [next1, result1]] = dup(p1(state))
+  if (result1.status !== Status.Ok) return tuple1
+
+  const [tuple2, [next2, result2]] = dup(p2(next1))
+  if (result2.status === Status.Fatal) return tuple2
+  if (result2.status === Status.Error) {
+    return error(next2, result2.errors, index)
+  }
+  return ok(next2, result1.value)
+})
+
+/**
+ * Creates a parser that will apply the parsers `p1` and `p2` in
+ * sequence and then return the result of `p2`. If either `p1` or `p2`
+ * fail, this parser will also fail.
+ *
+ * If `p2` fails non-fatally, the entire parser will also fail
+ * non-fatally, reverting the state to what it was before the first
+ * parser was applied, even if the first parser consumed input. A fatal
+ * error from either parser will still result in an overall fatal error.
+ *
+ * Note that `rightB(p1, p2)` is not the same as `back(right(p1, p2))`,
+ * as the former will fail fatally if one of its parsers fails fatally,
+ * while the latter will fail non-fatally in that case.
+ *
+ * @param {Parser} p1 The first parser to apply.
+ * @param {Parser} p2 The second parser to apply.
+ * @returns {Parser} A parser that applies both contained parsers and
+ *     results in the value of the second.
+ */
+export const rightB = (p1, p2) => makeParser(state => {
+  const index = state.index
+
+  const [tuple1, [next1, result1]] = dup(p1(state))
+  if (result1.status !== Status.Ok) return tuple1
+
+  const [tuple2, [next2, result2]] = dup(p2(next1))
+  if (result2.status !== Status.Error) return tuple2
+  return error(next2, result2.errors, index)
+})
+
+/**
+ * Creates a parser that will apply the parsers `p1` and `p2` in
+ * sequence and then return the result of both in an array. If either
+ * `p1` or `p2` fail, this parser will also fail.
+ *
+ * If `p2` fails non-fatally, the entire parser will also fail
+ * non-fatally, reverting the state to what it was before the first
+ * parser was applied, even if the first parser consumed input. A fatal
+ * error from either parser will still result in an overall fatal error.
+ *
+ * Note that `bothB(p1, p2)` is not the same as `back(both(p1, p2))`, as
+ * the former will fail fatally if one of its parsers fails fatally,
+ * while the latter will fail non-fatally in that case.
+ *
+ * @param {Parser} p1 The first parser to apply.
+ * @param {Parser} p2 The second parser to apply.
+ * @returns {Parser} A parser that applies both contained parsers and
+ *     results in the values of both parsers in an array.
+ */
+export const bothB = (p1, p2) => makeParser(state => {
+  const index = state.index
+
+  const [tuple1, [next1, result1]] = dup(p1(state))
+  if (result1.status !== Status.Ok) return tuple1
+
+  const [tuple2, [next2, result2]] = dup(p2(next1))
+  if (result2.status === Status.Fatal) return tuple2
+  if (result2.status === Status.Ok) {
+    return ok(next2, [result1.value, result2.value])
+  }
+  return error(next2, result2.errors, index)
+})
+
+/**
+ * Creates a parser that applies the supplied parser `n` times,
+ * collecting the successful results into an array. If any application
+ * fails, the overall parser will fail; if that failure is fatal, the
+ * overall failure will also be fatal.
+ *
+ * The parser will fail non-fatally if the underlying error was
+ * non-fatal, even if input was consumed (backtracking will happen in
+ * this case).
+ *
+ * @param {Parser} p A parser to apply multiple times.
+ * @param {number} n The number of times to apply the parser.
+ * @returns {Parser} A parser that applies `p` `n` times and results in
+ *     an array of all of the successful results of `p`.
+ */
+export const countB = (p, n) => makeParser(state => {
+  const index = state.index
+  const values = []
+  let next = state
+
+  for (const _ of range(n)) {
+    const [tuple, [nextState, result]] = dup(p(next))
+    next = nextState
+    if (result.status === Status.Fatal) return tuple
+    if (result.status === Status.Error) return error(next, result.errors, index)
+    values.push(result.value)
+  }
+  return ok(next, values)
+})
+

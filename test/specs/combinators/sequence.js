@@ -6,6 +6,7 @@
 import { skip } from 'kessel/combinators/chaining'
 import {
   block,
+  count,
   many,
   many1,
   sepBy,
@@ -13,7 +14,6 @@ import {
   sepEndBy,
   sepEndBy1,
   seq,
-  seqB,
   skipMany,
   skipMany1,
 } from 'kessel/combinators/sequence'
@@ -37,22 +37,6 @@ describe('Sequence combinators', () => {
     })
     it('does not add null to results', () => {
       pass(seq([string('abc'), eof]), 'abc', { result: ['abc'], index: 3 })
-    })
-  })
-
-  describe('seqB', () => {
-    const parser = seqB([string('abc'), string('def'), string('ghi')])
-
-    it('fails if any of its parsers fail', () => {
-      fail(parser, 'abd', { expected: '"abc"', actual: '"abd"', index: 0 })
-      fail(parser, 'abcdf', { expected: '"def"', actual: '"df"', index: 0 })
-      fail(parser, 'abcdefh', { expected: '"ghi"', actual: '"h"', index: 0 })
-    })
-    it('succeeds if all of its parsers succeed', () => {
-      pass(parser, 'abcdefghi', { result: ['abc', 'def', 'ghi'], index: 9 })
-    })
-    it('does not add null to results', () => {
-      pass(seqB([string('abc'), eof]), 'abc', { result: ['abc'], index: 3 })
     })
   })
 
@@ -411,6 +395,38 @@ describe('Sequence combinators', () => {
         '[sepEndBy1]: infinite loop detected; '
           + 'neither content nor separator parser consumed input',
       )
+    })
+  })
+
+  describe('count', () => {
+    it('applies one parser a number of times', () => {
+      pass(count(letter, 5), 'abcdef', ['a', 'b', 'c', 'd', 'e'])
+      pass(count(letter, 2), 'abcdef', ['a', 'b'])
+      pass(count(letter, 0), 'abcdef', [])
+    })
+    it('fails non-fatally if no input was consumed', () => {
+      fail(count(letter, 5), '12345', {
+        expected: 'a letter',
+        actual: '"1"',
+        index: 0,
+        status: Status.Error,
+      })
+    })
+    it('fails fatally if the parser fails fatally', () => {
+      fail(count(seq([letter, letter]), 5), 'a1b2c3d4e5', {
+        expected: 'a letter',
+        actual: '"1"',
+        index: 1,
+        status: Status.Fatal,
+      })
+    })
+    it('fails fatally on non-fatal errors if input was consumed', () => {
+      fail(count(letter, 5), 'abc123', {
+        expected: 'a letter',
+        actual: '"1"',
+        index: 3,
+        status: Status.Fatal,
+      })
     })
   })
 })
