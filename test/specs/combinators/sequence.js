@@ -9,6 +9,7 @@ import {
   count,
   many,
   many1,
+  manyTill,
   sepBy,
   sepBy1,
   sepEndBy,
@@ -425,6 +426,45 @@ describe('Sequence combinators', () => {
         expected: 'a letter',
         actual: '"1"',
         index: 3,
+        status: Status.Fatal,
+      })
+    })
+  })
+
+  describe('manyTill', () => {
+    it('succeeds with content parser results before the end', () => {
+      pass(manyTill(any, letter), '12./abc', ['1', '2', '.', '/'])
+    })
+    it('can succeed with zero successes', () => {
+      pass(manyTill(any, letter), 'abc', [])
+    })
+    it('fails if the content parser fails before the end', () => {
+      fail(manyTill(digit, letter), '.123abc', {
+        expected: 'a digit or a letter',
+        actual: '"."',
+        index: 0,
+        status: Status.Error,
+      })
+    })
+    it('fails fatally if input is consumed before content parser fails', () => {
+      fail(manyTill(digit, letter), '123.abc', {
+        expected: 'a digit or a letter',
+        actual: '"."',
+        index: 3,
+        status: Status.Fatal,
+      })
+    })
+    it('fails fatally if either of its parsers fail fatally', () => {
+      fail(manyTill(digit, seq([letter, digit])), '123abc', {
+        expected: 'a digit',
+        actual: '"b"',
+        index: 4,
+        status: Status.Fatal,
+      })
+      fail(manyTill(seq([letter, digit]), digit), 'a1b2cc3', {
+        expected: 'a digit',
+        actual: '"c"',
+        index: 5,
         status: Status.Fatal,
       })
     })

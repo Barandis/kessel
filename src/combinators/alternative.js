@@ -326,3 +326,47 @@ export const countB = (p, n) => makeParser(state => {
   return ok(next, values)
 })
 
+/**
+ * Creates a parser which applies its content parser zero or more times
+ * until its end parser is successful. This parser results in an array
+ * of all of the successful content parser results. The end parser is
+ * applied *first*, so it's fine to have the two parsers overlap. For
+ * example, `manyTill(any, letter)` will work fine, because `letter`
+ * will be tried first on each character (contrast with `between(letter,
+ * any, letter)`, which will never succeed becuase the `any` is applied
+ * before the final `letter` and will therefore consume a letter before
+ * the `letter` parser gets to see it).
+ *
+ * If the content parser fails non-fatally before the end parser does,
+ * the overall parser will fail (backtracking if input had already been
+ * consumed). A fatal error by either parser will result in a fatal
+ * error for the overall parser.
+ *
+ * @param {Parser} p The content parser. Its results are pushed into an
+ *     array and become the returned parser's result.
+ * @param {Parser} end The end parser. Parsing ends when this parser
+ *     succeeds. Its result is discarded.
+ * @returns {Parser} A parser which will apply the content zero or more
+ *     times until the end parser succeeds.
+ */
+export const manyTillB = (p, end) => makeParser(state => {
+  const index = state.index
+  const values = []
+  let next = state
+
+  while (true) {
+    const [tuple1, [next1, result1]] = dup(end(next))
+    next = next1
+    if (result1.status === Status.Fatal) return tuple1
+    if (result1.status === Status.Ok) break
+
+    const [tuple2, [next2, result2]] = dup(p(next))
+    next = next2
+    if (result2.status === Status.Fatal) return tuple2
+    if (result2.status === Status.Error) {
+      return error(next2, [...result2.errors, ...result1.errors], index)
+    }
+    values.push(result2.value)
+  }
+  return ok(next, values)
+})

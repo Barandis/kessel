@@ -13,6 +13,7 @@ import {
   chainB,
   countB,
   leftB,
+  manyTillB,
   optional,
   orElse,
   rightB,
@@ -326,6 +327,45 @@ describe('Alternative and error recovery combinators', () => {
         actual: '"1"',
         index: 0,
         status: Status.Error,
+      })
+    })
+  })
+
+  describe('manyTillB', () => {
+    it('succeeds with content parser results before the end', () => {
+      pass(manyTillB(any, letter), '12./abc', ['1', '2', '.', '/'])
+    })
+    it('can succeed with zero successes', () => {
+      pass(manyTillB(any, letter), 'abc', [])
+    })
+    it('fails if the content parser fails before the end', () => {
+      fail(manyTillB(digit, letter), '.123abc', {
+        expected: 'a digit or a letter',
+        actual: '"."',
+        index: 0,
+        status: Status.Error,
+      })
+    })
+    it('backtracks if input is consumed before content parser fails', () => {
+      fail(manyTillB(digit, letter), '123.abc', {
+        expected: 'a digit or a letter',
+        actual: '"."',
+        index: 0,
+        status: Status.Error,
+      })
+    })
+    it('fails fatally if either of its parsers fail fatally', () => {
+      fail(manyTillB(digit, seq([letter, digit])), '123abc', {
+        expected: 'a digit',
+        actual: '"b"',
+        index: 4,
+        status: Status.Fatal,
+      })
+      fail(manyTillB(seq([letter, digit]), digit), 'a1b2cc3', {
+        expected: 'a digit',
+        actual: '"c"',
+        index: 5,
+        status: Status.Fatal,
       })
     })
   })
