@@ -6,9 +6,9 @@
 import { expect } from 'chai'
 
 import {
-  attempt,
-  choice,
-  choiceL,
+  alt,
+  altL,
+  back,
   optional,
   orElse,
 } from 'kessel/combinators/alternative'
@@ -19,8 +19,8 @@ import { string } from 'kessel/parsers/string'
 import { fail, pass } from 'test/helper'
 
 describe('Alternative combinators', () => {
-  describe('choice', () => {
-    const parser = choice([
+  describe('alt', () => {
+    const parser = alt([
       seq([char('a'), char('b')]),
       seq([char('c'), char('d')]),
       seq([char('e'), char('f')]),
@@ -37,8 +37,8 @@ describe('Alternative combinators', () => {
     })
   })
 
-  describe('choiceL', () => {
-    const parser = choiceL([
+  describe('altL', () => {
+    const parser = altL([
       seq([char('a'), char('b')]),
       seq([char('c'), char('d')]),
       seq([char('e'), char('f')]),
@@ -70,28 +70,28 @@ describe('Alternative combinators', () => {
         index: 1,
         status: Status.Fatal,
       })
-      pass(optional(attempt(seq([char('a'), char('b')]))), 'acd', {
+      pass(optional(back(seq([char('a'), char('b')]))), 'acd', {
         result: null,
         index: 0,
       })
     })
   })
 
-  describe('attempt', () => {
+  describe('back', () => {
     it('does nothing if its parser succeeds', () => {
       const r1 = parse(char('a'), 'abc')
-      const r2 = parse(attempt(char('a')), 'abc')
+      const r2 = parse(back(char('a')), 'abc')
       expect(r1).to.deep.equal(r2)
     })
     it('does nothing if its parser fails without consuming input', () => {
       const r1 = parse(char('a'), 'bcd')
-      const r2 = parse(attempt(char('a')), 'bcd')
+      const r2 = parse(back(char('a')), 'bcd')
       expect(r1).to.deep.equal(r2)
     })
     it('resets the index if its parser fails with consuming input', () => {
       const parser = seq([string('te'), string('st')])
       fail(parser, 'tesl', { index: 2, status: Status.Fatal })
-      fail(attempt(parser), 'tesl', { index: 0, status: Status.Error })
+      fail(back(parser), 'tesl', { index: 0, status: Status.Error })
     })
   })
 

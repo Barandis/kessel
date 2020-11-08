@@ -25,7 +25,7 @@ import { dup } from 'kessel/util'
  * @returns {Parser} A parser that applies its contained parsers until
  *     one succeeds.
  */
-export const choice = ps => makeParser(state => {
+export const alt = ps => makeParser(state => {
   const errors = []
 
   for (const p of ps) {
@@ -54,7 +54,7 @@ export const choice = ps => makeParser(state => {
  * @returns {Parser} A parser that applies its contained parsers until
  *     one succeeds.
  */
-export const choiceL = (ps, message) => makeParser(state => {
+export const altL = (ps, message) => makeParser(state => {
   for (const p of ps) {
     const [tuple, [next, result]] = dup(p(state))
 
@@ -120,7 +120,7 @@ export const orElse = (p, x) => makeParser(state => {
  * @returns {Parser} A parser that cannot fail fatally. If its contained
  *     parser fails fatally, this one will instead fail non-fatally.
  */
-export const attempt = p => makeParser(state => {
+export const back = p => makeParser(state => {
   const index = state.index
   const [tuple, [next, result]] = dup(p(state))
   if (result.status !== Status.Fatal) return tuple

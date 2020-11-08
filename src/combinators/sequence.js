@@ -56,14 +56,14 @@ export const seq = ps => makeParser(state => {
  * The returned parser will not fail fatally. If it consumes input
  * before or during a failure, backtracking will be done and the state
  * will be left as it was before the sequence begain. In this way, this
- * is a slightly optimized version of `attempt(seq(ps))` (hence the
- * postfixed 'A').
+ * is a slightly optimized version of `back(seq(ps))` (hence the
+ * postfixed 'B').
  *
  * @param {Parser[]} ps An array of parsers to be applied.
  * @returns {Parser} A parser that applies the supplied parsers one at a
  *     time, in order, and fails if any of those parsers fail.
  */
-export const seqA = ps => makeParser(state => {
+export const seqB = ps => makeParser(state => {
   const values = []
   const index = state.index
   let next = state

@@ -13,7 +13,7 @@ import {
   sepEndBy,
   sepEndBy1,
   seq,
-  seqA,
+  seqB,
   skipMany,
   skipMany1,
 } from 'kessel/combinators/sequence'
@@ -40,8 +40,8 @@ describe('Sequence combinators', () => {
     })
   })
 
-  describe('seqA', () => {
-    const parser = seqA([string('abc'), string('def'), string('ghi')])
+  describe('seqB', () => {
+    const parser = seqB([string('abc'), string('def'), string('ghi')])
 
     it('fails if any of its parsers fail', () => {
       fail(parser, 'abd', { expected: '"abc"', actual: '"abd"', index: 0 })
@@ -52,7 +52,7 @@ describe('Sequence combinators', () => {
       pass(parser, 'abcdefghi', { result: ['abc', 'def', 'ghi'], index: 9 })
     })
     it('does not add null to results', () => {
-      pass(seqA([string('abc'), eof]), 'abc', { result: ['abc'], index: 3 })
+      pass(seqB([string('abc'), eof]), 'abc', { result: ['abc'], index: 3 })
     })
   })
 

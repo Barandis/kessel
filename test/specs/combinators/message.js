@@ -5,7 +5,7 @@
 
 import { expect } from 'chai'
 
-import { choice } from 'kessel/combinators/alternative'
+import { alt } from 'kessel/combinators/alternative'
 import { label } from 'kessel/combinators/message'
 import { seq } from 'kessel/combinators/sequence'
 import { parse } from 'kessel/core'
@@ -32,7 +32,7 @@ describe('Message combinators', () => {
       )
     })
     it('overwrites all of multiple expected messages', () => {
-      const parser = choice([char('a'), char('b'), char('c')])
+      const parser = alt([char('a'), char('b'), char('c')])
       fail(parser, 'def', { expected: '"a", "b", or "c"' })
       fail(label(parser, 'a, b, or c'), 'def', { expected: 'a, b, or c' })
     })
