@@ -3,7 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { makeParser, ok, Status } from 'kessel/core'
+import { makeParser, maybeFatal, ok, Status } from 'kessel/core'
 import { dup } from 'kessel/util'
 
 /** @typedef {import('kessel/core').Parser} Parser */
@@ -13,7 +13,9 @@ import { dup } from 'kessel/util'
  * parser to another parser returned by the supplied function. The
  * parser returns that resulting state.
  *
- * If the initial parser fails, that failure is instead returned.
+ * If the initial parser fails, that failure is instead returned. If the
+ * second parser (the return value of `fn`) fails and `p` consumed
+ * input, the failure is fatal.
  *
  * @param {Parser} p The first parser to apply.
  * @param {function(*): Parser} fn A function that takes the result from
@@ -25,9 +27,14 @@ import { dup } from 'kessel/util'
  *     return value as a second parser to apply the input to.
  */
 export const chain = (p, fn) => makeParser(state => {
-  const [tuple, [next, result]] = dup(p(state))
-  if (result.status !== Status.Ok) return tuple
-  return fn(result.value)(next)
+  const index = state.index
+
+  const [tuple1, [next1, result1]] = dup(p(state))
+  if (result1.status !== Status.Ok) return tuple1
+
+  const [tuple2, [next2, result2]] = dup(fn(result1.value)(next1))
+  if (result2.status === Status.Ok) return tuple2
+  return maybeFatal(next2.index !== index, next2, result2.errors)
 })
 
 /**
@@ -37,6 +44,9 @@ export const chain = (p, fn) => makeParser(state => {
  *
  * If the contained parser fails, that failure is propagated out as the
  * failure of the returned parser.
+ *
+ * `map(p, fn)` is an optimized implementation of `chain(p, x =>
+ * constant(fn(x)))`.
  *
  * @param {Parser} p The parser to apply to the input.
  * @param {function(*):*} fn A mapping function that is passed the
@@ -55,17 +65,17 @@ export const map = (p, fn) => makeParser(state => {
 /**
  * Creates a parser which applies the supplied parser. That parser is
  * expected to result in an array of strings, and if it succeeds, that
- * result's elements are joined together into a single string.
+ * result's elements are joined together into a single string. This is
+ * useful because JavaScript does not share the characteristic of some
+ * functional languages where a string is the same as a list of
+ * characters. JavaScript needs explicit conversion between the two, so
+ * this parser will turn an array of characters into a string.
  *
  * If the supplied parser fails, the created parser will also fail with
  * the same state.
  *
- * This is a slightly optimized version of `map(p, x => x.join(''))`. It
- * is useful because JavaScript strings are not lists of characters as
- * they are in some languages, so if a `many` parser (for instance)
- * results in an array of single-character strings, a separate mechanism
- * is necessary to turn them into a single string. This parser provides
- * that mechanism.
+ * `join(p)` is an optimized implementation of `chain(p, x =>
+ * constant(x.join('')))`.
  *
  * If the supplied parser does not result in an array, an exception will
  * be thrown because an attempt will be made to call `join` on the
@@ -89,6 +99,9 @@ export const join = p => makeParser(state => {
  * successful result while still consuming input. A failure will be
  * propagated without modification.
  *
+ * `skip(p)` is an optimized implementation of `chain(p, () =>
+ * constant(null))`,
+ *
  * @param {Parser} p The parser whose result is to be discarded.
  * @returns {Parser} A parser that will consume input as its contained
  *     parser does on success, but will produce no result.
@@ -97,4 +110,103 @@ export const skip = p => makeParser(state => {
   const [tuple, [next, result]] = dup(p(state))
   if (result.status !== Status.Ok) return tuple
   return ok(next, null)
+})
+
+/**
+ * Creates a parser that will run the supplied parser but, on success,
+ * result in the supplied value instead.
+ *
+ * `value(p, x)` is an optimized implemenation of `chain(p, () =>
+ * constant(x))`.
+ *
+ * @param {Parser} p The parser to apply. Its result is ignored.
+ * @param {*} x The value that the new parser will result in if `p`
+ *     succeeds.
+ * @returns {Parser} A parser that will apply `p` but return `x` on
+ *     success.
+ */
+export const value = (p, x) => makeParser(state => {
+  const [tuple, [next, result]] = dup(p(state))
+  if (result.status !== Status.Ok) return tuple
+  return ok(next, x)
+})
+
+/**
+ * Creates a parser that will apply the parsers `p1` and `p2` in
+ * sequence and then return the result of `p1`. If either `p1` or `p2`
+ * fail, this parser will also fail, and the failure will be fatal if
+ * any input had been consumed by either parser.
+ *
+ * `left(p1, p2)` is an optimized implementation of `chain(p1, x =>
+ * value(p2, x))`.
+ *
+ * @param {Parser} p1 The first parser to be applied.
+ * @param {Parser} p2 The second parser to be applied.
+ * @returns {Parser} A parser that applies both contained parsers and
+ *     results in the value of the first.
+ */
+export const left = (p1, p2) => makeParser(state => {
+  const index = state.index
+
+  const [tuple1, [next1, result1]] = dup(p1(state))
+  if (result1.status !== Status.Ok) return tuple1
+
+  const [next2, result2] = p2(next1)
+  if (result2.status !== Status.Ok) {
+    return maybeFatal(next2.index !== index, next2, result2.errors)
+  }
+  return ok(next2, result1.value)
+})
+
+/**
+ * Creates a parser that will apply the parsers `p1` and `p2` in
+ * sequence and then return the result of `p2`. If either `p1` or `p2`
+ * fail, this parser will also fail, and the failure will be fatal if
+ * any input had been consumed by either parser.
+ *
+ * `right(p1, p2)` is an optimized implementation of `chain(p1, () =>
+ * p2)`.
+ *
+ * @param {Parser} p1 The first parser to be applied.
+ * @param {Parser} p2 The second parser to be applied.
+ * @returns {Parser} A parser that applies both contained parsers and
+ *     results in the value of the second.
+ */
+export const right = (p1, p2) => makeParser(state => {
+  const index = state.index
+
+  const [tuple1, [next1, result1]] = dup(p1(state))
+  if (result1.status !== Status.Ok) return tuple1
+
+  const [tuple2, [next2, result2]] = dup(p2(next1))
+  if (result2.status === Status.Ok) return tuple2
+
+  return maybeFatal(next2.index !== index, next2, result2.errors)
+})
+
+/**
+ * Creates a parser that will apply the parsers `p1` and `p2` in
+ * sequence and then return the result of both in an array. If either
+ * `p1` or `p2` fail, this parser will also fail, and the failure will
+ * be fatal if any input had been consumed by either parser.
+ *
+ * `both(p1, p2)` is an optimized implementation of `chain(p1, a =>
+ * chain(p2, b => constant([a, b])))`.
+ *
+ * @param {Parser} p1 The first parser to be applied.
+ * @param {Parser} p2 The second parser to be applied.
+ * @returns {Parser} A parser that applies both contained parsers and
+ *     results in the values of both parsers in an array.
+ */
+export const both = (p1, p2) => makeParser(state => {
+  const index = state.index
+
+  const [tuple1, [next1, result1]] = dup(p1(state))
+  if (result1.status !== Status.Ok) return tuple1
+
+  const [next2, result2] = p2(next1)
+  if (result2.status === Status.Ok) {
+    return ok(next2, [result1.value, result2.value])
+  }
+  return maybeFatal(next2.index !== index, next2, result2.errors)
 })

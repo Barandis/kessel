@@ -184,6 +184,28 @@ export function fatal(state, errors = [], index = state.index) {
 }
 
 /**
+ * Produces a new `Result` indicating that a parser applicatoin failed.
+ * Whether this is a fatal error or not depends on whether `test` is
+ * `true` (fatal) or `false` (non-fatal).
+ *
+ * @param {boolean} test Used to determine whether the produced result
+ *     represents a fatal error (`true`) or not (`false`).
+ * @param {State} state The state prior to the parser being applied.
+ * @param {ParseError[]} [errors=[] The errors associated
+ *     with the state after the latest parser was applied.
+ * @param {number} [index=state.index] The updated index after the
+ *     latest parser was applied.
+ * @returns {[State, Result]} A new object representing the state and
+ *     result after the latest parser failed.
+ */
+export function maybeFatal(test, state, errors = [], index = state.index) {
+  return [
+    { ...state, index },
+    { status: test ? Status.Fatal : Status.Error, errors },
+  ]
+}
+
+/**
  * Runs a parser against an input. This input can be a string, a typed
  * array, an array buffer, or a data view. The return value is the final
  * parser state returned by the parser after being run.
