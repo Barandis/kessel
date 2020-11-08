@@ -46,7 +46,8 @@ export const chain = (p, fn) => makeParser(state => {
  * failure of the returned parser.
  *
  * `map(p, fn)` is an optimized implementation of `chain(p, x =>
- * constant(fn(x)))`.
+ * constant(fn(x)))`. This also makes it a more efficient version of
+ * `pipe([p], fn)` (a single-parser `pipe`).
  *
  * @param {Parser} p The parser to apply to the input.
  * @param {function(*):*} fn A mapping function that is passed the
@@ -140,8 +141,8 @@ export const value = (p, x) => makeParser(state => {
  * `left(p1, p2)` is an optimized implementation of `chain(p1, x =>
  * value(p2, x))`.
  *
- * @param {Parser} p1 The first parser to be applied.
- * @param {Parser} p2 The second parser to be applied.
+ * @param {Parser} p1 The first parser to apply.
+ * @param {Parser} p2 The second parser to apply.
  * @returns {Parser} A parser that applies both contained parsers and
  *     results in the value of the first.
  */
@@ -167,8 +168,8 @@ export const left = (p1, p2) => makeParser(state => {
  * `right(p1, p2)` is an optimized implementation of `chain(p1, () =>
  * p2)`.
  *
- * @param {Parser} p1 The first parser to be applied.
- * @param {Parser} p2 The second parser to be applied.
+ * @param {Parser} p1 The first parser to apply.
+ * @param {Parser} p2 The second parser to apply.
  * @returns {Parser} A parser that applies both contained parsers and
  *     results in the value of the second.
  */
@@ -193,8 +194,8 @@ export const right = (p1, p2) => makeParser(state => {
  * `both(p1, p2)` is an optimized implementation of `chain(p1, a =>
  * chain(p2, b => constant([a, b])))`.
  *
- * @param {Parser} p1 The first parser to be applied.
- * @param {Parser} p2 The second parser to be applied.
+ * @param {Parser} p1 The first parser to apply.
+ * @param {Parser} p2 The second parser to apply.
  * @returns {Parser} A parser that applies both contained parsers and
  *     results in the values of both parsers in an array.
  */
@@ -209,4 +210,83 @@ export const both = (p1, p2) => makeParser(state => {
     return ok(next2, [result1.value, result2.value])
   }
   return maybeFatal(next2.index !== index, next2, result2.errors)
+})
+
+/**
+ * Creates a parser that applies its parsers in sequence and passes
+ * those results to a function of the same arity as the number of
+ * parsers to apply. The return value of that function becomes the
+ * parser's result.
+ *
+ * Note that, unlike `seq`, `null` parser results are *not* discarded.
+ * This ensures that the same number of arguments are passed to `fn` no
+ * matter the results from the parsers.
+ *
+ * `pipe([p1, p2], fn)` is an optimized implementation of `chain(p1, a
+ * => chain(p2, b => constant(fn(a, b))))`, `pipe([p1, p2, p3], fn)` is
+ * an optimized implementation of `chain(p1, a => chain(p2, b =>
+ * chain(p3, c => constant(fn(a, b, c)))))`, and so on.
+ *
+ * If the array has one element, the parser becomes equivalent to `map`
+ * but less efficient.
+ *
+ * @param {Parser[]} ps An array of parsers to be applied one at a time,
+ *     in order.
+ * @param {function(...*):*} fn A function which will receive as
+ *     parameters the results of each parser. Its return value will
+ *     become the result of the created parser.
+ * @returns {Parser} A parser that will apply its parsers in sequence,
+ *     feed the results to its function, and result in the function's
+ *     return value.
+ */
+export const pipe = (ps, fn) => makeParser(state => {
+  const index = state.index
+  const values = []
+  let next = state
+
+  for (const p of ps) {
+    const [nextState, result] = p(next)
+    next = nextState
+
+    if (result.status !== Status.Ok) {
+      return maybeFatal(next.index !== index, next, result.errors)
+    }
+    values.push(result.value)
+  }
+  return ok(next, fn(...values))
+})
+
+/**
+ * Creates a parser which applies its before, content, and after parsers
+ * in order and results in the result of its content parser.
+ *
+ * Note that the content parser `p` is applied before the after parser
+ * `pafter`. This means that the content parser will have an opportunity
+ * to patch the "after" content before the after parser does, so take
+ * care that the parsers do not overlap in what they match.
+ *
+ * `between(pre, post, p)` is an optimized implementation of
+ * `left(right(pre, p), post)`.
+ *
+ * @param {Parser} pre The first parser to apply.
+ * @param {Parser} post The last parser to apply.
+ * @param {Parser} p The second parser to apply and whose result becomes
+ *     the result of the new parser.
+ * @returns {Parser} A parser which applies its parsers in the correct
+ *     order and then results in the result of its content parser.
+ */
+export const between = (pre, post, p) => makeParser(state => {
+  const index = state.index
+
+  const [tuple1, [next1, result1]] = dup(pre(state))
+  if (result1.status !== Status.Ok) return tuple1
+
+  const [next2, result2] = p(next1)
+  if (result2.status !== Status.Ok) {
+    return maybeFatal(next2.index !== index, next2, result2.errors)
+  }
+
+  const [next3, result3] = post(next2)
+  if (result3.status === Status.Ok) return ok(next3, result2.value)
+  return maybeFatal(next3.index !== index, next3, result3.errors)
 })

@@ -4,18 +4,20 @@
 // https://opensource.org/licenses/MIT
 
 import {
+  between,
   both,
   chain,
   join,
   left,
   map,
+  pipe,
   right,
   skip,
   value,
 } from 'kessel/combinators/chaining'
 import { many, many1, seq } from 'kessel/combinators/sequence'
 import { Status } from 'kessel/core'
-import { any, char, digit, eof, letter } from 'kessel/parsers/char'
+import { any, char, digit, eof, letter, noneOf } from 'kessel/parsers/char'
 import { fail, pass } from 'test/helper'
 
 describe('Chaining and piping combinators', () => {
@@ -191,6 +193,66 @@ describe('Chaining and piping combinators', () => {
         expected: 'a digit',
         actual: '"b"',
         index: 1,
+        status: Status.Fatal,
+      })
+    })
+  })
+
+  describe('pipe', () => {
+    it('passes parser results to a single function', () => {
+      pass(pipe([letter], a => a.toUpperCase()), 'a', 'A')
+      pass(pipe([letter, digit], (a, b) => b + a), 'a1', '1a')
+      pass(pipe([letter, digit, letter], (a, b, c) => c + b + a), 'a1b', 'b1a')
+    })
+    it('fails non-fatally if no input is consumed on failure', () => {
+      fail(pipe([letter], a => a), '1', {
+        expected: 'a letter',
+        actual: '"1"',
+        index: 0,
+        status: Status.Error,
+      })
+      fail(pipe([eof, letter], (a, b) => b + a), '', {
+        expected: 'a letter',
+        actual: 'EOF',
+        index: 0,
+        status: Status.Error,
+      })
+    })
+    it('fails fatally if input was consumed on failure', () => {
+      fail(pipe([letter, digit], (a, b) => b + a), 'aa', {
+        expected: 'a digit',
+        actual: '"a"',
+        index: 1,
+        status: Status.Fatal,
+      })
+    })
+  })
+
+  describe('between', () => {
+    const parser = between(char('('), char(')'), many(noneOf(')')))
+
+    it('succeeds with the result of its content parser', () => {
+      pass(parser, '(abc)', ['a', 'b', 'c'])
+    })
+    it('fails non-fatally if no content is consumed', () => {
+      fail(parser, 'abc)', {
+        expected: '"("',
+        actual: '"a"',
+        index: 0,
+        status: Status.Error,
+      })
+    })
+    it('fails fatally if content is consumed', () => {
+      fail(parser, '(abc', {
+        expected: '")"',
+        actual: 'EOF',
+        index: 4,
+        status: Status.Fatal,
+      })
+      fail(between(char('('), char(')'), seq([letter, letter])), '(a)', {
+        expected: 'a letter',
+        actual: '")"',
+        index: 2,
         status: Status.Fatal,
       })
     })
