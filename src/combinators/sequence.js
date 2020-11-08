@@ -8,6 +8,11 @@ import { dup } from 'kessel/util'
 
 /** @typedef {import('kessel/core').Parser} Parser */
 
+function loopMessage(name) {
+  return `[${name}]: infinite loop detected; `
+    + 'neither content nor separator parser consumed input'
+}
+
 /**
  * Creates a parser that implements a sequence. Each supplied parser is
  * executed in order until either they all succeed or the first one
@@ -228,4 +233,203 @@ export const skipMany1 = p => makeParser(state => {
     if (next.index >= next.view.byteLength) break
   }
   return ok(next, null)
+})
+
+/**
+ * Creates a parser that gathers values from a content parser,
+ * interspersing applications of a separator parser in between. The
+ * content parser can match zero times, so the only way for this parser
+ * to fail is for one of its parsers to fail fatally.
+ *
+ * Content parser results are gathered into an array, which becomes the
+ * result for the returned parser. The results of the separator parser
+ * are discarded.
+ *
+ * If the separator and content parsers both pass without consuming
+ * content, that would cause an infinite loop. In this case, an
+ * exception is thrown instead.
+ *
+ * @param {Parser} p A parser that will match the desired content when
+ *     applied to the input.
+ * @param {Parser} sep A parser that will match separators between the
+ *     chunks of content.
+ * @returns {Parser} A parser that results in an array of all of the
+ *     content parser results, discarding the separator parser results.
+ */
+export const sepBy = (p, sep) => makeParser(state => {
+  let index = state.index
+  const [tuple, [nextState, result]] = dup(p(state))
+  if (result.status === Status.Fatal) return tuple
+  if (result.status === Status.Error) return ok(nextState, [])
+
+  const values = [result.value]
+  let next = nextState
+
+  while (true) {
+    index = next.index
+
+    const [tuple1, [nextState1, result1]] = dup(sep(next))
+    next = nextState1
+    if (result1.status === Status.Fatal) return tuple1
+    if (result1.status === Status.Error) break
+
+    const [tuple2, [nextState2, result2]] = dup(p(next))
+    next = nextState2
+    if (result2.status === Status.Fatal) return tuple2
+    if (result2.status === Status.Error) break
+
+    if (next.index === index) throw new Error(loopMessage('sepBy'))
+    values.push(result2.value)
+  }
+  return ok(next, values, index)
+})
+
+/**
+ * Creates a parser that gathers values from a content parser,
+ * interspersing applications of a separator parser in between. The
+ * content parser must succeed at leeast once or a non-fatal failure
+ * will occur. Otherwise, the parser can only fail if one of its parsers
+ * fails fatally.
+ *
+ * Content parser results are gathered into an array, which becomes the
+ * result for the returned parser. The results of the separator parser
+ * are discarded.
+ *
+ * If the separator and content parsers both pass without consuming
+ * content, that would cause an infinite loop. In this case, an
+ * exception is thrown instead.
+ *
+ * @param {Parser} p A parser that will match the desired content when
+ *     applied to the input.
+ * @param {Parser} sep A parser that will match separators between the
+ *     chunks of content.
+ * @returns {Parser} A parser that results in an array of all of the
+ *     content parser results, discarding the separator parser results.
+ */
+export const sepBy1 = (p, sep) => makeParser(state => {
+  let index = state.index
+  const [tuple, [nextState, result]] = dup(p(state))
+  if (result.status !== Status.Ok) return tuple
+
+  const values = [result.value]
+  let next = nextState
+
+  while (true) {
+    index = next.index
+
+    const [tuple1, [nextState1, result1]] = dup(sep(next))
+    next = nextState1
+    if (result1.status === Status.Fatal) return tuple1
+    if (result1.status === Status.Error) break
+
+    const [tuple2, [nextState2, result2]] = dup(p(next))
+    next = nextState2
+    if (result2.status === Status.Fatal) return tuple2
+    if (result2.status === Status.Error) break
+
+    if (next.index === index) throw new Error(loopMessage('sepBy1'))
+    values.push(result2.value)
+  }
+  return ok(next, values, index)
+})
+
+/**
+ * Creates a parser that gathers values from a content parser,
+ * interspersing applications of a separator parser in between and
+ * optionally at the end. The content parser can match zero times, so
+ * the only way for this parser to fail is for one of its parsers to
+ * fail fatally.
+ *
+ * Content parser results are gathered into an array, which becomes the
+ * result for the returned parser. The results of the separator parser
+ * are discarded.
+ *
+ * If the separator and content parsers both pass without consuming
+ * content, that would cause an infinite loop. In this case, an
+ * exception is thrown instead.
+ *
+ * @param {Parser} p A parser that will match the desired content when
+ *     applied to the input.
+ * @param {Parser} sep A parser that will match separators between the
+ *     chunks of content.
+ * @returns {Parser} A parser that results in an array of all of the
+ *     content parser results, discarding the separator parser results.
+ */
+export const sepEndBy = (p, sep) => makeParser(state => {
+  let index = state.index
+  const [tuple, [nextState, result]] = dup(p(state))
+  if (result.status === Status.Fatal) return tuple
+  if (result.status === Status.Error) return ok(nextState, [])
+
+  const values = [result.value]
+  let next = nextState
+
+  while (true) {
+    index = next.index
+
+    const [tuple1, [nextState1, result1]] = dup(sep(next))
+    next = nextState1
+    if (result1.status === Status.Fatal) return tuple1
+    if (result1.status === Status.Error) break
+
+    const [tuple2, [nextState2, result2]] = dup(p(next))
+    next = nextState2
+    if (result2.status === Status.Fatal) return tuple2
+    if (result2.status === Status.Error) break
+
+    if (next.index === index) throw new Error(loopMessage('sepEndBy'))
+    values.push(result2.value)
+  }
+  const [sepNext, _] = sep({ ...next, index })
+  return ok(sepNext, values)
+})
+
+/**
+ * Creates a parser that gathers values from a content parser,
+ * interspersing applications of a separator parser in between and
+ * optionally at the end. The content parser must succeed at leeast once
+ * or a non-fatal failure will occur. Otherwise, the parser can only
+ * fail if one of its parsers fails fatally.
+ *
+ * Content parser results are gathered into an array, which becomes the
+ * result for the returned parser. The results of the separator parser
+ * are discarded.
+ *
+ * If the separator and content parsers both pass without consuming
+ * content, that would cause an infinite loop. In this case, an
+ * exception is thrown instead.
+ *
+ * @param {Parser} p A parser that will match the desired content when
+ *     applied to the input.
+ * @param {Parser} sep A parser that will match separators between the
+ *     chunks of content.
+ * @returns {Parser} A parser that results in an array of all of the
+ *     content parser results, discarding the separator parser results.
+ */
+export const sepEndBy1 = (p, sep) => makeParser(state => {
+  let index = state.index
+  const [tuple, [nextState, result]] = dup(p(state))
+  if (result.status !== Status.Ok) return tuple
+
+  const values = [result.value]
+  let next = nextState
+
+  while (true) {
+    index = next.index
+
+    const [tuple1, [nextState1, result1]] = dup(sep(next))
+    next = nextState1
+    if (result1.status === Status.Fatal) return tuple1
+    if (result1.status === Status.Error) break
+
+    const [tuple2, [nextState2, result2]] = dup(p(next))
+    next = nextState2
+    if (result2.status === Status.Fatal) return tuple2
+    if (result2.status === Status.Error) break
+
+    if (next.index === index) throw new Error(loopMessage('sepEndBy1'))
+    values.push(result2.value)
+  }
+  const [sepNext, _] = sep({ ...next, index })
+  return ok(sepNext, values)
 })
