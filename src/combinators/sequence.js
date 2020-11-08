@@ -476,3 +476,223 @@ export const manyTill = (p, end) => makeParser(state => {
   }
   return ok(next, values)
 })
+
+/**
+ * Creates a parser that parses zero or more applications of `p`
+ * separated by `op`. It results in the value obtained by left
+ * associative application of the functions that are the `op` results to
+ * the results of `p`.
+ *
+ * The parser does not fail unless one of its two parsers fails fatally.
+ * If there are zero matches of `p`, then the default value `x` becomes
+ * the result. If there is one match of `p` but no matches of `op`, then
+ * that result of `p` becomes the overall result.
+ *
+ * If any result of `op` is not a function, an exception will be thrown
+ * when this parser tries to call that result as a function.
+ *
+ * @param {Parser} p The content parser to match zero or more times.
+ * @param {Parser} op The operation parser to match in between each
+ *     application of `p`.
+ * @param {*} x The default result if there are no matches of `p`.
+ * @returns {Parser} A parser which will match zero or more occurences
+ *     of `p` separated by `op` and result in the value obtained by
+ *     applying the functions from `op` left associtively to the values
+ *     that result from `p`.
+ */
+export const chainl = (p, op, x) => makeParser(state => {
+  const [tuple, [nextState, result]] = dup(p(state))
+  if (result.status === Status.Fatal) return tuple
+  if (result.status === Status.Error) return ok(nextState, x)
+
+  const values = [result.value]
+  const ops = []
+  let next = nextState
+  let index = next.index
+
+  while (true) {
+    const [tupleop, [nextop, resultop]] = dup(op(next))
+    next = nextop
+    if (resultop.status === Status.Fatal) return tupleop
+    if (resultop.status === Status.Error) break
+
+    const [tuplep, [nextp, resultp]] = dup(p(next))
+    next = nextp
+    if (resultp.status === Status.Fatal) return tuplep
+    if (resultp.status === Status.Error) break
+
+    ops.push(resultop.value)
+    values.push(resultp.value)
+    index = next.index
+  }
+
+  let value = values[0]
+  for (const i of range(ops.length)) {
+    value = ops[i](value, values[i + 1])
+  }
+  return ok(next, value, index)
+})
+
+/**
+ * Creates a parser that parses one or more applications of `p`
+ * separated by `op`. It results in the value obtained by left
+ * associative application of the functions that are the `op` results to
+ * the results of `p`.
+ *
+ * The parser does not fail unless either one of its two parsers fails
+ * fatally or the content parser does not succeed at least once. If
+ * there is one match of `p` but no matches of `op`, then that result of
+ * `p` becomes the overall result.
+ *
+ * If any result of `op` is not a function, an exception will be thrown
+ * when this parser tries to call that result as a function.
+ *
+ * @param {Parser} p The content parser to match zero or more times.
+ * @param {Parser} op The operation parser to match in between each
+ *     application of `p`.
+ * @returns {Parser} A parser which will match zero or more occurences
+ *     of `p` separated by `op` and result in the value obtained by
+ *     applying the functions from `op` left associtively to the values
+ *     that result from `p`.
+ */
+export const chainl1 = (p, op) => makeParser(state => {
+  const [tuple, [nextState, result]] = dup(p(state))
+  if (result.status !== Status.Ok) return tuple
+
+  const values = [result.value]
+  const ops = []
+  let next = nextState
+  let index = next.index
+
+  while (true) {
+    const [tupleop, [nextop, resultop]] = dup(op(next))
+    next = nextop
+    if (resultop.status === Status.Fatal) return tupleop
+    if (resultop.status === Status.Error) break
+
+    const [tuplep, [nextp, resultp]] = dup(p(next))
+    next = nextp
+    if (resultp.status === Status.Fatal) return tuplep
+    if (resultp.status === Status.Error) break
+
+    ops.push(resultop.value)
+    values.push(resultp.value)
+    index = next.index
+  }
+
+  let value = values[0]
+  for (const i of range(ops.length)) {
+    value = ops[i](value, values[i + 1])
+  }
+  return ok(next, value, index)
+})
+
+/**
+ * Creates a parser that parses zero or more applications of `p`
+ * separated by `op`. It results in the value obtained by right
+ * associative application of the functions that are the `op` results to
+ * the results of `p`.
+ *
+ * The parser does not fail unless one of its two parsers fails fatally.
+ * If there are zero matches of `p`, then the default value `x` becomes
+ * the result. If there is one match of `p` but no matches of `op`, then
+ * that result of `p` becomes the overall result.
+ *
+ * If any result of `op` is not a function, an exception will be thrown
+ * when this parser tries to call that result as a function.
+ *
+ * @param {Parser} p The content parser to match zero or more times.
+ * @param {Parser} op The operation parser to match in between each
+ *     application of `p`.
+ * @param {*} x The default result if there are no matches of `p`.
+ * @returns {Parser} A parser which will match zero or more occurences
+ *     of `p` separated by `op` and result in the value obtained by
+ *     applying the functions from `op` right associtively to the values
+ *     that result from `p`.
+ */
+export const chainr = (p, op, x) => makeParser(state => {
+  const [tuple, [nextState, result]] = dup(p(state))
+  if (result.status === Status.Fatal) return tuple
+  if (result.status === Status.Error) return ok(nextState, x)
+
+  const values = [result.value]
+  const ops = []
+  let next = nextState
+  let index = next.index
+
+  while (true) {
+    const [tupleop, [nextop, resultop]] = dup(op(next))
+    next = nextop
+    if (resultop.status === Status.Fatal) return tupleop
+    if (resultop.status === Status.Error) break
+
+    const [tuplep, [nextp, resultp]] = dup(p(next))
+    next = nextp
+    if (resultp.status === Status.Fatal) return tuplep
+    if (resultp.status === Status.Error) break
+
+    ops.push(resultop.value)
+    values.push(resultp.value)
+    index = next.index
+  }
+
+  let value = values[values.length - 1]
+  for (const i of range(ops.length - 1, -1)) {
+    value = ops[i](values[i], value)
+  }
+  return ok(next, value, index)
+})
+
+/**
+ * Creates a parser that parses one or more applications of `p`
+ * separated by `op`. It results in the value obtained by right
+ * associative application of the functions that are the `op` results to
+ * the results of `p`.
+ *
+ * The parser does not fail unless either one of its two parsers fails
+ * fatally or the content parser does not succeed at least once. If
+ * there is one match of `p` but no matches of `op`, then that result of
+ * `p` becomes the overall result.
+ *
+ * If any result of `op` is not a function, an exception will be thrown
+ * when this parser tries to call that result as a function.
+ *
+ * @param {Parser} p The content parser to match zero or more times.
+ * @param {Parser} op The operation parser to match in between each
+ *     application of `p`.
+ * @returns {Parser} A parser which will match zero or more occurences
+ *     of `p` separated by `op` and result in the value obtained by
+ *     applying the functions from `op` right associtively to the values
+ *     that result from `p`.
+ */
+export const chainr1 = (p, op) => makeParser(state => {
+  const [tuple, [nextState, result]] = dup(p(state))
+  if (result.status !== Status.Ok) return tuple
+
+  const values = [result.value]
+  const ops = []
+  let next = nextState
+  let index = next.index
+
+  while (true) {
+    const [tupleop, [nextop, resultop]] = dup(op(next))
+    next = nextop
+    if (resultop.status === Status.Fatal) return tupleop
+    if (resultop.status === Status.Error) break
+
+    const [tuplep, [nextp, resultp]] = dup(p(next))
+    next = nextp
+    if (resultp.status === Status.Fatal) return tuplep
+    if (resultp.status === Status.Error) break
+
+    ops.push(resultop.value)
+    values.push(resultp.value)
+    index = next.index
+  }
+
+  let value = values[values.length - 1]
+  for (const i of range(ops.length - 1, -1)) {
+    value = ops[i](values[i], value)
+  }
+  return ok(next, value, index)
+})

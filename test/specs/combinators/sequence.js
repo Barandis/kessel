@@ -3,9 +3,14 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { skip } from 'kessel/combinators/chaining'
+import { alt } from 'kessel/combinators/alternative'
+import { join, map, skip, value } from 'kessel/combinators/chaining'
 import {
   block,
+  chainl,
+  chainl1,
+  chainr,
+  chainr1,
   count,
   many,
   many1,
@@ -465,6 +470,201 @@ describe('Sequence combinators', () => {
         expected: 'a digit',
         actual: '"c"',
         index: 5,
+        status: Status.Fatal,
+      })
+    })
+  })
+
+  describe('chainl', () => {
+    const p = map(join(many1(digit)), x => parseInt(x))
+    const op = alt([
+      value(char('+'), (a, b) => a + b),
+      value(char('-'), (a, b) => a - b),
+    ])
+
+    it('succeeds with a default value if there are no matches', () => {
+      pass(chainl(p, op, 0), '', { result: 0, index: 0 })
+    })
+    it('succeeds with the first match if op never matches', () => {
+      pass(chainl(p, op, 0), '23', { result: 23, index: 2 })
+    })
+    it('succeeds with one match of op', () => {
+      pass(chainl(p, op, 0), '23+17', { result: 40, index: 5 })
+      pass(chainl(p, op, 0), '23-17', { result: 6, index: 5 })
+    })
+    it('succeeds left-associatively with more than one match of op', () => {
+      pass(chainl(p, op, 0), '23+17-42', { result: -2, index: 8 })
+      pass(chainl(p, op, 0), '23-17+42', { result: 48, index: 8 })
+    })
+    it('ignores the last op if there is no p match after', () => {
+      pass(chainl(p, op, 0), '23+17-', { result: 40, index: 5 })
+    })
+    it('fails fatally if either parser fails fatally', () => {
+      fail(chainl(seq([digit, digit]), op, 0), '1a', {
+        expected: 'a digit',
+        actual: '"a"',
+        index: 1,
+        status: Status.Fatal,
+      })
+      fail(chainl(seq([digit, digit]), op, 0), '12+1a', {
+        expected: 'a digit',
+        actual: '"a"',
+        index: 4,
+        status: Status.Fatal,
+      })
+      fail(chainl(p, seq([letter, letter]), 0), '23a1', {
+        expected: 'a letter',
+        actual: '"1"',
+        index: 3,
+        status: Status.Fatal,
+      })
+    })
+  })
+
+  describe('chainl1', () => {
+    const p = map(join(many1(digit)), x => parseInt(x))
+    const op = alt([
+      value(char('+'), (a, b) => a + b),
+      value(char('-'), (a, b) => a - b),
+    ])
+
+    it('fails if there are no matches', () => {
+      fail(chainl1(p, op), '', {
+        expected: 'a digit',
+        actual: 'EOF',
+        index: 0,
+        status: Status.Error,
+      })
+    })
+    it('succeeds with the first match if op never matches', () => {
+      pass(chainl1(p, op), '23', { result: 23, index: 2 })
+    })
+    it('succeeds with one match of op', () => {
+      pass(chainl1(p, op), '23+17', { result: 40, index: 5 })
+      pass(chainl1(p, op), '23-17', { result: 6, index: 5 })
+    })
+    it('succeeds left-associatively with more than one match of op', () => {
+      pass(chainl1(p, op), '23+17-42', { result: -2, index: 8 })
+      pass(chainl1(p, op), '23-17+42', { result: 48, index: 8 })
+    })
+    it('ignores the last op if there is no p match after', () => {
+      pass(chainl1(p, op), '23+17-', { result: 40, index: 5 })
+    })
+    it('fails fatally if either parser fails fatally', () => {
+      fail(chainl1(seq([digit, digit]), op), '1a', {
+        expected: 'a digit',
+        actual: '"a"',
+        index: 1,
+        status: Status.Fatal,
+      })
+      fail(chainl1(seq([digit, digit]), op), '12+1a', {
+        expected: 'a digit',
+        actual: '"a"',
+        index: 4,
+        status: Status.Fatal,
+      })
+      fail(chainl1(p, seq([letter, letter])), '23a1', {
+        expected: 'a letter',
+        actual: '"1"',
+        index: 3,
+        status: Status.Fatal,
+      })
+    })
+  })
+})
+
+describe('chainr', () => {
+  const p = map(join(many1(digit)), x => parseInt(x))
+  const op = alt([
+    value(char('+'), (a, b) => a + b),
+    value(char('-'), (a, b) => a - b),
+  ])
+
+  it('succeeds with a default value if there are no matches', () => {
+    pass(chainr(p, op, 0), '', { result: 0, index: 0 })
+  })
+  it('succeeds with the first match if op never matches', () => {
+    pass(chainr(p, op, 0), '23', { result: 23, index: 2 })
+  })
+  it('succeeds with one match of op', () => {
+    pass(chainr(p, op, 0), '23+17', { result: 40, index: 5 })
+    pass(chainr(p, op, 0), '23-17', { result: 6, index: 5 })
+  })
+  it('succeeds right-associatively with more than one match of op', () => {
+    // incorrect math, good testing
+    pass(chainr(p, op, 0), '23+17-42', { result: -2, index: 8 })
+    pass(chainr(p, op, 0), '23-17+42', { result: -36, index: 8 })
+  })
+  it('ignores the last op if there is no p match after', () => {
+    pass(chainr(p, op, 0), '23+17-', { result: 40, index: 5 })
+  })
+  it('fails fatally if either parser fails fatally', () => {
+    fail(chainr(seq([digit, digit]), op, 0), '1a', {
+      expected: 'a digit',
+      actual: '"a"',
+      index: 1,
+      status: Status.Fatal,
+    })
+    fail(chainr(seq([digit, digit]), op, 0), '12+1a', {
+      expected: 'a digit',
+      actual: '"a"',
+      index: 4,
+      status: Status.Fatal,
+    })
+    fail(chainr(p, seq([letter, letter]), 0), '23a1', {
+      expected: 'a letter',
+      actual: '"1"',
+      index: 3,
+      status: Status.Fatal,
+    })
+  })
+
+  describe('chainr1', () => {
+    const p = map(join(many1(digit)), x => parseInt(x))
+    const op = alt([
+      value(char('+'), (a, b) => a + b),
+      value(char('-'), (a, b) => a - b),
+    ])
+
+    it('fails if there are no matches', () => {
+      fail(chainr1(p, op), '', {
+        expected: 'a digit',
+        actual: 'EOF',
+        index: 0,
+        status: Status.Error,
+      })
+    })
+    it('succeeds with the first match if op never matches', () => {
+      pass(chainr1(p, op), '23', { result: 23, index: 2 })
+    })
+    it('succeeds with one match of op', () => {
+      pass(chainr1(p, op), '23+17', { result: 40, index: 5 })
+      pass(chainr1(p, op), '23-17', { result: 6, index: 5 })
+    })
+    it('succeeds left-associatively with more than one match of op', () => {
+      pass(chainr1(p, op), '23+17-42', { result: -2, index: 8 })
+      pass(chainr1(p, op), '23-17+42', { result: -36, index: 8 })
+    })
+    it('ignores the last op if there is no p match after', () => {
+      pass(chainr1(p, op), '23+17-', { result: 40, index: 5 })
+    })
+    it('fails fatally if either parser fails fatally', () => {
+      fail(chainr1(seq([digit, digit]), op), '1a', {
+        expected: 'a digit',
+        actual: '"a"',
+        index: 1,
+        status: Status.Fatal,
+      })
+      fail(chainr1(seq([digit, digit]), op), '12+1a', {
+        expected: 'a digit',
+        actual: '"a"',
+        index: 4,
+        status: Status.Fatal,
+      })
+      fail(chainr1(p, seq([letter, letter])), '23a1', {
+        expected: 'a letter',
+        actual: '"1"',
+        index: 3,
         status: Status.Fatal,
       })
     })
