@@ -16,6 +16,7 @@ import {
   getCharIndex,
   getColNumber,
   getLineIndexes,
+  getPosition,
   isNewline,
   otherError,
   overwrite,
@@ -724,6 +725,31 @@ describe('Parse errors', () => {
         expect(
           formatErrors(state, result, undefined, undefined, fn),
         ).to.equal(exp)
+      })
+    })
+  })
+
+  describe('getPosition', () => {
+    const view = stringToView(
+      '\tOnomatopoeia\t\t\t\tคำเลียนเสียง\nЗвукоподражание',
+    )
+
+    it('calculates the position with default tab stops', () => {
+      expect(getPosition({ view, index: 58 })).to.deep.equal({
+        line: 2, column: 3,
+      })
+      expect(getPosition({ view, index: 5 })).to.deep.equal({
+        line: 1, column: 13,
+      })
+    })
+    it('accounts for zero-with characters', () => {
+      expect(getPosition({ view, index: 29 })).to.deep.equal({
+        line: 1, column: 53,
+      })
+    })
+    it('accounts for different tab stops', () => {
+      expect(getPosition({ view, index: 5 }, 4)).to.deep.equal({
+        line: 1, column: 9,
       })
     })
   })

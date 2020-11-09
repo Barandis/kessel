@@ -213,6 +213,17 @@ export function overwrite(list, ...errors) {
  */
 
 /**
+  * Object containing line and column numbers.
+  *
+  * @typedef {object} Position
+  * @property {number} line The line number of the byte pointed to by
+  *     the index within the view.
+  * @property {number} column The column number of the byte pointed to
+  *     by the index within the view, adjusted for character width and
+  *     tab size.
+  */
+
+/**
  * A function called by `formatErrors` to do the actual formatting. A
  * default formatter function is provided but can be replaced if
  * desired.
@@ -597,4 +608,30 @@ export function formatErrors(
 ) {
   const { index, view } = state
   return formatter(result.errors, index, view, tabSize, maxWidth)
+}
+
+/**
+ * Returns the position of the next byte of the supplied state. The
+ * position is an object with `line` and `column` properties that are
+ * the 1-based line and column numbers of the byte at the state's index
+ * within the state's data view.
+ *
+ * @param {State} state The state whose current position is being
+ *     calculated.
+ * @param {number} [tabSize=8] A number whose multiples define where
+ *     tabs stop. The current position's column number is adjusted based
+ *     on this parameter when tab characters are present.
+ * @returns {Position} A two-property object with `line` and `column`
+ *     properties.
+ */
+export function getPosition(state, tabSize = 8) {
+  const { index, view } = state
+  const { start, end, lineno } = getLineIndexes(index, view)
+  const charIndex = getCharIndex(index, view, start)
+
+  const rawLine = viewToString(start, end - start + 1, view)
+  const { colIndex, line } = tabify(charIndex, rawLine, tabSize)
+  const { colno, _ } = getColNumber(colIndex, line)
+
+  return { line: lineno, column: colno }
 }
