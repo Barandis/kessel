@@ -4,7 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import { error, makeParser, ok, Status } from 'kessel/core'
-import { makeExpected, makeUnexpected } from 'kessel/error'
+import { expectedError, unexpectedError } from 'kessel/error'
 import { charLength, dup, nextChars, quote, viewToString } from 'kessel/util'
 
 /** @typedef {import('kessel/core').Parser} Parser */
@@ -31,12 +31,12 @@ const StringParser = (length, fn) => makeParser(state => {
 
   const { index, view } = state
   if (index >= view.byteLength) {
-    return error(state, [makeUnexpected('EOF')])
+    return error(state, [unexpectedError('EOF')])
   }
 
   const { width, next } = nextChars(index, view, length)
   if (charLength(next) !== length || !fn(next)) {
-    return error(state, [makeUnexpected(quote(next))])
+    return error(state, [unexpectedError(quote(next))])
   }
   return ok(state, next, index + width)
 })
@@ -60,7 +60,7 @@ export const string = str => makeParser(state => {
     charLength(str), chars => str === chars,
   )(state))
   if (result.status === Status.Ok) return tuple
-  return error(next, [...result.errors, makeExpected(quote(str))])
+  return error(next, [...result.errors, expectedError(quote(str))])
 })
 
 /**
@@ -84,7 +84,7 @@ export const stringi = str => makeParser(state => {
     charLength(str), chars => str.toLowerCase() === chars.toLowerCase(),
   )(state))
   if (result.status === Status.Ok) return tuple
-  return error(next, [...result.errors, makeExpected(quote(str))])
+  return error(next, [...result.errors, expectedError(quote(str))])
 })
 
 /**
@@ -110,6 +110,6 @@ export const anyString = n => makeParser(state => {
   const [tuple, [next, result]] = dup(StringParser(n, () => true)(state))
   if (result.status === Status.Ok) return tuple
   return error(
-    next, [...result.errors, makeExpected(`a string of ${n} characters`)],
+    next, [...result.errors, expectedError(`a string of ${n} characters`)],
   )
 })

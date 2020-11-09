@@ -9,9 +9,9 @@ import { seq } from 'kessel/combinators/sequence'
 import { error, fatal, maybeFatal, ok, parse, Status } from 'kessel/core'
 import {
   ErrorType,
-  makeExpected,
+  expectedError,
   overwrite,
-  makeUnexpected,
+  unexpectedError,
 } from 'kessel/error'
 import { char } from 'kessel/parsers/char'
 import { string } from 'kessel/parsers/string'
@@ -73,9 +73,9 @@ describe('Core functionality', () => {
         const [state, result] = parse(string('123'), 'abc')
         const [ustate1, uresult1] = error(state, overwrite(
           result.errors,
-          makeExpected('"x"'),
-          makeExpected('"y"'),
-          makeUnexpected('"z"'),
+          expectedError('"x"'),
+          expectedError('"y"'),
+          unexpectedError('"z"'),
         ))
         const [ustate2, uresult2] = error(state)
 
@@ -106,9 +106,9 @@ describe('Core functionality', () => {
         const [state, result] = parse(seq([char('a'), char('1')]), 'abc')
         const [ustate1, uresult1] = fatal(state, overwrite(
           result.errors,
-          makeExpected('"x"'),
-          makeExpected('"y"'),
-          makeUnexpected('"z"'),
+          expectedError('"x"'),
+          expectedError('"y"'),
+          unexpectedError('"z"'),
         ), 17)
         const [ustate2, uresult2] = fatal(state)
 

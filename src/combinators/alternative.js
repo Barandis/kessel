@@ -4,7 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import { error, fatal, ok, makeParser, Status } from 'kessel/core'
-import { makeExpected } from 'kessel/error'
+import { expectedError } from 'kessel/error'
 import { dup, range } from 'kessel/util'
 
 /** @typedef {import('kessel/core').Parser} Parser */
@@ -61,10 +61,10 @@ export const altL = (ps, message) => makeParser(state => {
 
     if (result.status === Status.Ok) return tuple
     if (result.status === Status.Fatal) {
-      return fatal(next, [makeExpected(message)])
+      return fatal(next, [expectedError(message)])
     }
   }
-  return error(state, [makeExpected(message)])
+  return error(state, [expectedError(message)])
 })
 
 /**

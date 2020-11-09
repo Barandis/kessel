@@ -23,12 +23,12 @@ describe('Message combinators', () => {
       fail(char('a'), 'bcd', { expected: '"a"' })
       fail(label(char('a'), 'letter a'), 'bcd', { expected: 'letter a' })
     })
-    it('changes the expected message on a fatal error', () => {
+    it('does not change the expected message on a fatal error', () => {
       fail(seq([char('a'), char('b')]), 'a1', { expected: '"b"' })
       fail(
         label(seq([char('a'), char('b')]), 'letter b'),
         'a1',
-        { expected: 'letter b' },
+        { expected: '"b"' },
       )
     })
     it('overwrites all of multiple expected messages', () => {

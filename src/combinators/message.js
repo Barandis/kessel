@@ -3,17 +3,17 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { error, fatal, makeParser, Status } from 'kessel/core'
-import { makeExpected, overwrite } from 'kessel/error'
+import { error, makeParser, Status } from 'kessel/core'
+import { expectedError } from 'kessel/error'
 import { dup } from 'kessel/util'
 
 /** @typedef {import('kessel/core').Parser} Parser */
 
 /**
  * Creates a parser that applies the supplied parser. If that parser
- * succeeds, nothing additional happens. If it fails (fatally or not),
+ * consumes input, nothing additional happens. If it fails non-fatally,
  * the returned parser fails in the same way, but it replaces the
- * supplied parser's `Expected` errors with one whose message is the
+ * supplied parser's errors with an expected error whose message is the
  * supplied string.
  *
  * This can be used to provide better error messages in cases where the
@@ -28,11 +28,6 @@ import { dup } from 'kessel/util'
  */
 export const label = (p, message) => makeParser(state => {
   const [tuple, [next, result]] = dup(p(state))
-  if (result.status === Status.Error) {
-    return error(next, overwrite(result.errors, makeExpected(message)))
-  }
-  if (result.status === Status.Fatal) {
-    return fatal(next, overwrite(result.errors, makeExpected(message)))
-  }
-  return tuple
+  if (result.status !== Status.Error) return tuple
+  return error(next, [expectedError(message)])
 })

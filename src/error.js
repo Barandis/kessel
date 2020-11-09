@@ -62,7 +62,7 @@ export function makeError(type, message) {
  * @param {string} message The message describing what was expected.
  * @returns {ParseError} A new parse error of the expected type.
  */
-export function makeExpected(message) {
+export function expectedError(message) {
   return makeError(ErrorType.Expected, message)
 }
 
@@ -75,7 +75,7 @@ export function makeExpected(message) {
  *     not expected.
  * @returns {ParseError} A new parse error of the unexpected type.
  */
-export function makeUnexpected(message) {
+export function unexpectedError(message) {
   return makeError(ErrorType.Unexpected, message)
 }
 
@@ -87,7 +87,7 @@ export function makeUnexpected(message) {
  * @param {string} message The generic error's message.
  * @returns {ParseError} A new parse error of the generic type.
  */
-export function makeGeneric(message) {
+export function genericError(message) {
   return makeError(ErrorType.Generic, message)
 }
 
@@ -98,7 +98,7 @@ export function makeGeneric(message) {
  * @param {string} message The other error's message.
  * @returns {ParseError} A new parse error of the other type.
  */
-export function makeOther(message) {
+export function otherError(message) {
   return makeError(ErrorType.Other, message)
 }
 
