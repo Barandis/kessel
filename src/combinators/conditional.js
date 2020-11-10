@@ -27,7 +27,7 @@ export const lookAhead = p => makeParser(state => {
   const index = state.index
   const [next, result] = p(state)
   return result.status === Status.Ok
-    ? ok(next, undefined, index)
+    ? ok(next, result.value, index)
     : error(next, result.errors, index)
 })
 

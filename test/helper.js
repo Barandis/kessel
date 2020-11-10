@@ -79,8 +79,8 @@ export function pass(parser, test, value) {
     if ('index' in value) {
       expect(state.index).to.equal(value.index)
     }
-    if ('value' in value) {
-      expect(result.value).to.equal(value.value)
+    if ('result' in value) {
+      expect(result.value).to.deep.equal(value.result)
     }
   }
 }
