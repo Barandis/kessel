@@ -107,6 +107,9 @@ describe('Sequence combinators', () => {
         status: Status.Fatal,
       })
     })
+    it('does not add null to the results', () => {
+      pass(many(alt([any, eof])), 'abc', ['a', 'b', 'c'])
+    })
   })
 
   describe('many1', () => {
@@ -128,6 +131,9 @@ describe('Sequence combinators', () => {
         index: 5,
         status: Status.Fatal,
       })
+    })
+    it('does not add null to the results', () => {
+      pass(many1(alt([any, eof])), 'abc', ['a', 'b', 'c'])
     })
   })
 

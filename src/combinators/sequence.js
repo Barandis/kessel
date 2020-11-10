@@ -94,10 +94,10 @@ export const block = genFn => makeParser(state => {
 
 /**
  * Creates a parser that applies the supplied parser until it fails,
- * collecting all of the successful results into an array and providing
- * that as its own result. The returned parser only fails if the
- * supplied parser consumes input when it fails. Otherwise, it succeeds
- * even if the supplied parser doesn't succeed even once.
+ * collecting all of the successful non-null results into an array and
+ * providing that as its own result. The returned parser only fails if
+ * the supplied parser consumes input when it fails. Otherwise, it
+ * succeeds even if the supplied parser doesn't succeed even once.
  *
  * @param {Parser} p A parser to be applied zero or more times.
  * @returns {Parser} A parser that applies the supplied parser
@@ -114,7 +114,7 @@ export const many = p => makeParser(state => {
 
     if (result.status === Status.Fatal) return tuple
     if (result.status === Status.Error) break
-    values.push(result.value)
+    if (result.value !== null) values.push(result.value)
     if (next.index >= next.view.byteLength) break
   }
   return ok(next, values)
@@ -122,11 +122,11 @@ export const many = p => makeParser(state => {
 
 /**
  * Creates a parser that applies the supplied parser until it fails,
- * collecting all of the successful results into an array and providing
- * that as its own result. The contained parser must succeed at least
- * once, or the returned parser will fail. Otherwise, the returned
- * parser only fails if the supplied parser consumes input when it
- * fails.
+ * collecting all of the successful non-null results into an array and
+ * providing that as its own result. The contained parser must succeed
+ * at least once, or the returned parser will fail. Otherwise, the
+ * returned parser only fails if the supplied parser consumes input when
+ * it fails.
  *
  * @param {Parser} p A parser to be applied one or more times.
  * @returns {Parser} A parser that applies the supplied parser
@@ -146,7 +146,7 @@ export const many1 = p => makeParser(state => {
 
     if (result.status === Status.Fatal) return tuple
     if (result.status === Status.Error) break
-    values.push(result.value)
+    if (result.value !== null) values.push(result.value)
     if (next.index >= next.view.byteLength) break
   }
   return ok(next, values)
