@@ -472,7 +472,7 @@ export const manyTill = (p, end) => makeParser(state => {
         next.index !== index, next, [...result2.errors, ...result1.errors],
       )
     }
-    values.push(result2.value)
+    if (result2.value !== null) values.push(result2.value)
   }
   return ok(next, values)
 })

@@ -25,7 +25,7 @@ import {
 } from 'kessel/combinators/sequence'
 import { Status } from 'kessel/core'
 import { any, char, digit, eof, letter } from 'kessel/parsers/char'
-import { spaceU } from 'kessel/parsers/regex'
+import { space, spaceU } from 'kessel/parsers/regex'
 import { string } from 'kessel/parsers/string'
 import { error, fail, pass } from 'test/helper'
 
@@ -478,6 +478,11 @@ describe('Sequence combinators', () => {
         index: 5,
         status: Status.Fatal,
       })
+    })
+    it('does not add null to the results', () => {
+      pass(
+        manyTill(alt([letter, skip(space)]), digit), 'a b c 1', ['a', 'b', 'c'],
+      )
     })
   })
 
