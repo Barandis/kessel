@@ -4,7 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import { error, fatal, makeParser, ok } from 'kessel/core'
-import { genericError, unexpectedError } from 'kessel/error'
+import { generic, unexpected } from 'kessel/error'
 
 /** @typedef {import('kessel/core').Parser} Parser */
 
@@ -25,9 +25,8 @@ export const constant = x => makeParser(state => ok(state, x))
  * @returns {Parser} A parser that automatically fails with the supplied
  *     error message.
  */
-export const fail = message => makeParser(state => error(
-  state, [genericError(message)],
-))
+export const fail = message => makeParser(state =>
+  error(state, generic(message)))
 
 /**
  * Creates a parser that fails without consuming input, setting the
@@ -38,9 +37,8 @@ export const fail = message => makeParser(state => error(
  * @returns {Parser} A parser that automatically fails fatally with the
  *     supplied error message.
  */
-export const failFatally = message => makeParser(state => fatal(
-  state, [genericError(message)],
-))
+export const failFatally = message => makeParser(state =>
+  fatal(state, generic(message)))
 
 /**
  * Creates a parser that fails without consuming input, setting the
@@ -51,6 +49,5 @@ export const failFatally = message => makeParser(state => fatal(
  * @returns {Parser} A parser that automatically fails with the supplied
  *     error message.
  */
-export const unexpected = message => makeParser(state => error(
-  state, [unexpectedError(message)],
-))
+export const failUnexpected = message => makeParser(state =>
+  error(state, unexpected(message)))

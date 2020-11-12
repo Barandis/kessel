@@ -4,8 +4,10 @@
 // https://opensource.org/licenses/MIT
 
 import { error, makeParser, ok, Status } from 'kessel/core'
-import { expectedError, unexpectedError } from 'kessel/error'
-import { charLength, dup, quote, stringToView, viewToString } from 'kessel/util'
+import { expecteds } from 'kessel/messages'
+import { dup, stringToView, viewToString } from 'kessel/util'
+
+const { Ok } = Status
 
 /** @typedef {import('kessel/core').Parser} Parser */
 
@@ -47,36 +49,20 @@ const reUnewline = /^(?:\r\n|[\r\n\u0085\u2028\u2029])/u
  * ensures that the match is only against the text directly at the
  * current pointer location.
  *
- * `length` is the length of the returned `actual` state property upon
- * failure. If it's not provided, the length will be the same as the
- * length of the regular expression's source.
- *
  * @param {RegExp} re The regular expression used to match against the
  *     input text starting at its current position.
- * @param {number} [length] The length of the resulting `Unexpected`
- *     error message if the parser fails. If this is not present, that
- *     message will be as long as the string representation of the
- *     regular expression, just as a guess.
  * @returns {Parser} A parser that attempts to match the regular
  *     expression against the input at its current position and succeeds
  *     if a match is found.
  */
-const RegexParser = (re, length = null) => makeParser(state => {
+const RegexParser = re => makeParser(state => {
   const { index, view } = state
   const rest = viewToString(index, view.byteLength - index, view)
 
   const match = rest.match(re)
-  if (match) {
-    return ok(state, match[0], index + stringToView(match[0]).byteLength)
-  }
-
-  let len = length ?? charLength(re.source) - 1 // to ignore anchor
-  if (len > view.byteLength - index) {
-    len = view.byteLength - index
-  }
-  const actual = len === 0 ? 'EOF' : quote([...rest].slice(0, len).join(''))
-
-  return error(state, [unexpectedError(actual)])
+  return match
+    ? ok(state, match[0], index + stringToView(match[0]).byteLength)
+    : error(state)
 })
 
 /**
@@ -112,11 +98,8 @@ export const regex = re => makeParser(state => {
     regex = new RegExp(newSource, flags)
   }
 
-  const [tuple, [next, result]] = dup(RegexParser(regex)(state))
-  if (result.status === Status.Ok) return tuple
-  return error(
-    next, [...result.errors, expectedError(`a string matching ${regex}`)],
-  )
+  const [reply, [next, result]] = dup(RegexParser(regex)(state))
+  return result.status === Ok ? reply : error(next, expecteds.regex(regex))
 })
 
 /**
@@ -125,9 +108,8 @@ export const regex = re => makeParser(state => {
  * Unicode `Alphabetic` property.
  */
 export const letterU = makeParser(state => {
-  const [tuple, [next, result]] = dup(RegexParser(reLetter, 1)(state))
-  if (result.status === Status.Ok) return tuple
-  return error(next, [...result.errors, expectedError('a letter')])
+  const [reply, [next, result]] = dup(RegexParser(reLetter)(state))
+  return result.status === Ok ? reply : error(next, expecteds.letterU)
 })
 
 /**
@@ -136,11 +118,8 @@ export const letterU = makeParser(state => {
  * Unicode `Alphabetic` property or the Unicode `Number` property.
  */
 export const alphaU = makeParser(state => {
-  const [tuple, [next, result]] = dup(RegexParser(reAlpha, 1)(state))
-  if (result.status === Status.Ok) return tuple
-  return error(
-    next, [...result.errors, expectedError('an alphanumeric character')],
-  )
+  const [reply, [next, result]] = dup(RegexParser(reAlpha)(state))
+  return result.status === Ok ? reply : error(next, expecteds.alphaU)
 })
 
 /**
@@ -150,9 +129,8 @@ export const alphaU = makeParser(state => {
  * if it has the Unicode `Letter, Titlecase` property.
  */
 export const upperU = makeParser(state => {
-  const [tuple, [next, result]] = dup(RegexParser(reUpper, 1)(state))
-  if (result.status === Status.Ok) return tuple
-  return error(next, [...result.errors, expectedError('an uppercase letter')])
+  const [reply, [next, result]] = dup(RegexParser(reUpper)(state))
+  return result.status === Ok ? reply : error(next, expecteds.upperU)
 })
 
 /**
@@ -161,9 +139,8 @@ export const upperU = makeParser(state => {
  * Unicode `Lowercase` property.
  */
 export const lowerU = makeParser(state => {
-  const [tuple, [next, result]] = dup(RegexParser(reLower, 1)(state))
-  if (result.status === Status.Ok) return tuple
-  return error(next, [...result.errors, expectedError('a lowercase letter')])
+  const [reply, [next, result]] = dup(RegexParser(reLower)(state))
+  return result.status === Ok ? reply : error(next, expecteds.lowerU)
 })
 
 /**
@@ -173,9 +150,8 @@ export const lowerU = makeParser(state => {
  * or `\r\n`).
  */
 export const space = makeParser(state => {
-  const [tuple, [next, result]] = dup(RegexParser(reSpace, 1)(state))
-  if (result.status === Status.Ok) return tuple
-  return error(next, [...result.errors, expectedError('whitespace')])
+  const [reply, [next, result]] = dup(RegexParser(reSpace)(state))
+  return result.status === Ok ? reply : error(next, expecteds.space)
 })
 
 /**
@@ -187,9 +163,8 @@ export const space = makeParser(state => {
  * as a single instance of whitespace.
  */
 export const spaceU = makeParser(state => {
-  const [tuple, [next, result]] = dup(RegexParser(reUspace, 1)(state))
-  if (result.status === Status.Ok) return tuple
-  return error(next, [...result.errors, expectedError('whitespace')])
+  const [reply, [next, result]] = dup(RegexParser(reUspace)(state))
+  return result.status === Ok ? reply : error(next, expecteds.spaceU)
 })
 
 /**
@@ -200,7 +175,7 @@ export const spaceU = makeParser(state => {
  * whitespace and does not produde a result.
  */
 export const spaces = makeParser(state => {
-  const [next, _] = RegexParser(reSpaces, 1)(state)
+  const [next, _] = RegexParser(reSpaces)(state)
   return ok(next, null)
 })
 
@@ -212,7 +187,7 @@ export const spaces = makeParser(state => {
  * produde a result.
  */
 export const spacesU = makeParser(state => {
-  const [next, _] = RegexParser(reUspaces, 1)(state)
+  const [next, _] = RegexParser(reUspaces)(state)
   return ok(next, null)
 })
 
@@ -223,9 +198,8 @@ export const spacesU = makeParser(state => {
  * success, it skips the whitespace and does not produde a result.
  */
 export const spaces1 = makeParser(state => {
-  const [next, result] = RegexParser(reSpaces1, 1)(state)
-  if (result.status === Status.Ok) return ok(next, null)
-  return error(next, [...result.errors, expectedError('whitespace')])
+  const [next, result] = RegexParser(reSpaces1)(state)
+  return result.status === Ok ? ok(next, null) : error(next, expecteds.spaces1)
 })
 
 /**
@@ -235,9 +209,8 @@ export const spaces1 = makeParser(state => {
  * whitespace and does not produde a result.
  */
 export const spaces1U = makeParser(state => {
-  const [next, result] = RegexParser(reUspaces1, 1)(state)
-  if (result.status === Status.Ok) return ok(next, null)
-  return error(next, [...result.errors, expectedError('whitespace')])
+  const [next, result] = RegexParser(reUspaces1)(state)
+  return result.status === Ok ? ok(next, null) : error(next, expecteds.spaces1U)
 })
 
 /**
@@ -255,9 +228,8 @@ export const spaces1U = makeParser(state => {
  * `\r\n`.
  */
 export const newline = makeParser(state => {
-  const [tuple, [next, result]] = dup(RegexParser(reNewline, 1)(state))
-  if (result.status === Status.Ok) return tuple
-  return error(next, [...result.errors, expectedError('a newline')])
+  const [reply, [next, result]] = dup(RegexParser(reNewline)(state))
+  return result.status === Ok ? reply : error(next, expecteds.newline)
 })
 
 /**
@@ -280,7 +252,6 @@ export const newline = makeParser(state => {
  * `\r\n`.
  */
 export const newlineU = makeParser(state => {
-  const [tuple, [next, result]] = dup(RegexParser(reUnewline, 1)(state))
-  if (result.status === Status.Ok) return tuple
-  return error(next, [...result.errors, expectedError('a newline')])
+  const [reply, [next, result]] = dup(RegexParser(reUnewline)(state))
+  return result.status === Ok ? reply : error(next, expecteds.newlineU)
 })

@@ -175,13 +175,13 @@ export function nextChars(index, view, count) {
 }
 
 /**
- * Surrounds the supplied string in double quotes.
+ * Surrounds the supplied string in single quotes.
  *
- * @param {string} str The string to surround in double quotes.
- * @returns {string} The same string, led and trailed by double quotes.
+ * @param {string} str The string to surround in single quotes.
+ * @returns {string} The same string, led and trailed by single quotes.
  */
 export function quote(str) {
-  return `"${str}"`
+  return `'${str}'`
 }
 
 /**

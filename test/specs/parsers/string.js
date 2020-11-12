@@ -6,10 +6,10 @@
 import { all, anyString, string, stringi } from 'kessel/parsers/string'
 import { fail, pass } from 'test/helper'
 
-describe('String parsers', () => {
+describe.only('String parsers', () => {
   describe('string', () => {
     it('fails at the end of input', () => {
-      fail(string('abc'), '', { expected: '"abc"', actual: 'EOF' })
+      fail(string('abc'), '', "'abc'")
     })
 
     context('1-byte characters', () => {
@@ -19,25 +19,13 @@ describe('String parsers', () => {
         pass(parser, 'Onomatopoeia', { result: 'Onoma', index: 5 })
       })
       it('fails if case does not match', () => {
-        fail(parser, 'onomatopoeia', {
-          expected: '"Onoma"',
-          actual: '"onoma"',
-          index: 0,
-        })
+        fail(parser, 'onomatopoeia', { expected: "'Onoma'", index: 0 })
       })
       it('does not consume input on failure', () => {
-        fail(parser, 'Onosho', {
-          expected: '"Onoma"',
-          actual: '"Onosh"',
-          index: 0,
-        })
+        fail(parser, 'Onosho', { expected: "'Onoma'", index: 0 })
       })
       it('fails if the string is longer than the remaining text', () => {
-        fail(parser, 'Ono', {
-          expected: '"Onoma"',
-          actual: '"Ono"',
-          index: 0,
-        })
+        fail(parser, 'Ono', { expected: "'Onoma'", index: 0 })
       })
       it('succeeds with an empty string', () => {
         pass(string(''), 'Onomatopoeia', { result: '', index: 0 })
@@ -51,10 +39,10 @@ describe('String parsers', () => {
         pass(parser, 'Звукоподражание', { result: 'Звуко', index: 10 })
       })
       it('fails if case does not match', () => {
-        fail(parser, 'звукоподражание', { actual: '"звуко"', index: 0 })
+        fail(parser, 'звукоподражание', { expected: "'Звуко'", index: 0 })
       })
       it('fails if the string is longer than the remaining text', () => {
-        fail(parser, 'Зву', { actual: '"Зву"', index: 0 })
+        fail(parser, 'Зву', { expected: "'Звуко'", index: 0 })
       })
       it('succeeds with an empty string', () => {
         pass(string(''), 'Звукоподражание', { result: '', index: 0 })
@@ -68,7 +56,7 @@ describe('String parsers', () => {
         pass(parser, 'คำเลียนเสียง', { result: 'คำเลี', index: 15 })
       })
       it('fails if the string is longer than the remaining text', () => {
-        fail(parser, 'คำเ', { actual: '"คำเ"', index: 0 })
+        fail(parser, 'คำเ', { expected: "'คำเลี'", index: 0 })
       })
       it('succeeds with an empty string', () => {
         pass(string(''), 'คำเลียนเสียง', { result: '', index: 0 })
@@ -82,7 +70,7 @@ describe('String parsers', () => {
         pass(parser, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂𝑛𝑜𝑚𝑎', index: 20 })
       })
       it('fails if the string is longer than the remaining text', () => {
-        fail(parser, '𝑂𝑛𝑜', { actual: '"𝑂𝑛𝑜"', index: 0 })
+        fail(parser, '𝑂𝑛𝑜', { expect: "'𝑂𝑛𝑜𝑚𝑎'", index: 0 })
       })
       it('succeeds with an empty string', () => {
         pass(string(''), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '', index: 0 })
@@ -92,7 +80,7 @@ describe('String parsers', () => {
 
   describe('stringi', () => {
     it('fails at the end of input', () => {
-      fail(stringi('abc'), '', { expected: '"abc"', actual: 'EOF' })
+      fail(stringi('abc'), '', { expected: "'abc'", actual: 'EOF' })
     })
 
     context('1-byte characters', () => {
@@ -105,11 +93,7 @@ describe('String parsers', () => {
         pass(parser, 'onomatopoeia', { result: 'onoma', index: 5 })
       })
       it('fails if the string is longer than the remaining text', () => {
-        fail(parser, 'Ono', {
-          expected: '"Onoma"',
-          actual: '"Ono"',
-          index: 0,
-        })
+        fail(parser, 'Ono', { expected: "'Onoma'", index: 0 })
       })
       it('succeeds with an empty string', () => {
         pass(string(''), 'Onomatopoeia', { result: '', index: 0 })
@@ -126,7 +110,7 @@ describe('String parsers', () => {
         pass(parser, 'звукоподражание', { result: 'звуко', index: 10 })
       })
       it('fails if the string is longer than the remaining text', () => {
-        fail(parser, 'Зву', { actual: '"Зву"', index: 0 })
+        fail(parser, 'Зву', { expected: "'Звуко'", index: 0 })
       })
       it('succeeds with an empty string', () => {
         pass(string(''), 'Звукоподражание', { result: '', index: 0 })
@@ -140,7 +124,7 @@ describe('String parsers', () => {
         pass(parser, 'คำเลียนเสียง', { result: 'คำเลี', index: 15 })
       })
       it('fails if the string is longer than the remaining text', () => {
-        fail(parser, 'คำเ', { actual: '"คำเ"', index: 0 })
+        fail(parser, 'คำเ', { expected: "'คำเลี'", index: 0 })
       })
       it('succeeds with an empty string', () => {
         pass(string(''), 'คำเลียนเสียง', { result: '', index: 0 })
@@ -154,7 +138,7 @@ describe('String parsers', () => {
         pass(parser, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂𝑛𝑜𝑚𝑎', index: 20 })
       })
       it('fails if the string is longer than the remaining text', () => {
-        fail(parser, '𝑂𝑛𝑜', { actual: '"𝑂𝑛𝑜"', index: 0 })
+        fail(parser, '𝑂𝑛𝑜', { expected: "'𝑂𝑛𝑜𝑚𝑎'", index: 0 })
       })
       it('succeeds with an empty string', () => {
         pass(string(''), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '', index: 0 })
@@ -196,7 +180,6 @@ describe('String parsers', () => {
     it('fails if there aren\'t enough characters remaining', () => {
       fail(anyString(5), 'Ono', {
         expected: 'a string of 5 characters',
-        actual: '"Ono"',
         index: 0,
       })
     })

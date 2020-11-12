@@ -3,15 +3,18 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+import { Status } from 'kessel/core'
 import {
   constant,
   fail as pfail,
   failFatally,
-  unexpected,
+  failUnexpected,
 } from 'kessel/parsers/misc'
 import { fail, pass } from 'test/helper'
 
-describe('Miscellaneous parsers', () => {
+const { Error, Fatal } = Status
+
+describe.only('Miscellaneous parsers', () => {
   describe('constant', () => {
     it('succeeds with the passed-in value', () => {
       pass(constant('a'), '', 'a')
@@ -22,7 +25,11 @@ describe('Miscellaneous parsers', () => {
 
   describe('fail', () => {
     it('fails with the supplied generic message', () => {
-      fail(pfail('test message'), '', { generic: 'test message', index: 0 })
+      fail(pfail('test message'), '', {
+        generic: 'test message',
+        index: 0,
+        status: Error,
+      })
     })
   })
 
@@ -31,15 +38,17 @@ describe('Miscellaneous parsers', () => {
       fail(failFatally('test message'), '', {
         generic: 'test message',
         index: 0,
+        status: Fatal,
       })
     })
   })
 
   describe('unexpected', () => {
     it('fails with the supplied unexpected message', () => {
-      fail(unexpected('test message'), '', {
-        actual: 'test message',
+      fail(failUnexpected('test message'), '', {
+        unexpected: 'test message',
         index: 0,
+        status: Error,
       })
     })
   })

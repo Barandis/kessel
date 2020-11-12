@@ -4,8 +4,10 @@
 // https://opensource.org/licenses/MIT
 
 import { error, makeParser, ok, Status } from 'kessel/core'
-import { expectedError, unexpectedError } from 'kessel/error'
-import { commaSeparate, dup, nextChar, quote } from 'kessel/util'
+import { expecteds } from 'kessel/messages'
+import { dup, nextChar } from 'kessel/util'
+
+const { Ok } = Status
 
 /** @typedef {import('kessel/core').Parser} Parser */
 
@@ -27,17 +29,10 @@ import { commaSeparate, dup, nextChar, quote } from 'kessel/util'
  */
 const CharParser = fn => makeParser(state => {
   const { index, view } = state
-
-  if (index >= view.byteLength) {
-    return error(state, [unexpectedError('EOF')])
-  }
+  if (index >= view.byteLength) return error(state)
 
   const { width, next } = nextChar(index, view)
-
-  if (fn(next)) {
-    return ok(state, next, index + width)
-  }
-  return error(state, [unexpectedError(quote(next))])
+  return fn(next) ? ok(state, next, index + width) : error(state)
 })
 
 /**
@@ -52,9 +47,8 @@ const CharParser = fn => makeParser(state => {
  *     character in the input.
  */
 export const char = c => makeParser(state => {
-  const [tuple, [next, result]] = dup(CharParser(next => c === next)(state))
-  if (result.status === Status.Ok) return tuple
-  return error(next, [...result.errors, expectedError(quote(c))])
+  const [reply, [next, result]] = dup(CharParser(next => c === next)(state))
+  return result.status === Ok ? reply : error(next, expecteds.char(c))
 })
 
 /**
@@ -70,11 +64,10 @@ export const char = c => makeParser(state => {
  *     other-cased counterpart) is the next character in the input.
  */
 export const chari = c => makeParser(state => {
-  const [tuple, [next, result]] = dup(CharParser(
+  const [reply, [next, result]] = dup(CharParser(
     read => c.toLowerCase() === read.toLowerCase(),
   )(state))
-  if (result.status === Status.Ok) return tuple
-  return error(next, [...result.errors, expectedError(quote(c))])
+  return result.status === Ok ? reply : error(next, expecteds.chari(c))
 })
 
 /**
@@ -90,12 +83,8 @@ export const chari = c => makeParser(state => {
  *     on it when applied to input.
  */
 export const satisfy = fn => makeParser(state => {
-  const name = fn.name.length ? fn.name : '<anonymous>'
-  const message = `a character that satisfies function "${name}"`
-
-  const [tuple, [next, result]] = dup(CharParser(fn)(state))
-  if (result.status === Status.Ok) return tuple
-  return error(next, [...result.errors, expectedError(message)])
+  const [reply, [next, result]] = dup(CharParser(fn)(state))
+  return result.status === Ok ? reply : error(next, expecteds.satisfy(fn))
 })
 
 /**
@@ -124,11 +113,8 @@ export const satisfy = fn => makeParser(state => {
  */
 export const range = (start, end) => makeParser(state => {
   const fn = c => c >= start && c <= end
-  const message = `a character between "${start}" and "${end}"`
-
-  const [tuple, [next, result]] = dup(CharParser(fn)(state))
-  if (result.status === Status.Ok) return tuple
-  return error(next, [...result.errors, expectedError(message)])
+  const [reply, [next, result]] = dup(CharParser(fn)(state))
+  return result.status === Ok ? reply : error(next, expecteds.range(start, end))
 })
 
 /**
@@ -137,11 +123,8 @@ export const range = (start, end) => makeParser(state => {
  */
 export const any = makeParser(state => {
   const { index, view } = state
-  if (index === view.byteLength) {
-    return error(
-      state, [expectedError('any character'), unexpectedError('EOF')],
-    )
-  }
+  if (index >= view.byteLength) return error(state, expecteds.any)
+
   const { width, next } = nextChar(index, view)
   return ok(state, next, index + width)
 })
@@ -153,11 +136,8 @@ export const any = makeParser(state => {
  */
 export const eof = makeParser(state => {
   const { index, view } = state
-  if (index === view.byteLength) {
-    return ok(state, null)
-  }
-  const { _, next } = nextChar(index, view)
-  return error(state, [expectedError('EOF'), unexpectedError(quote(next))])
+  return index >= view.byteLength
+    ? ok(state, null) : error(state, expecteds.eof)
 })
 
 /**
@@ -178,9 +158,8 @@ export const anyOf = chars => makeParser(state => {
   const { width, next } = nextChar(index, view)
   const arr = [...chars]
 
-  if (arr.includes(next)) return ok(state, next, index + width)
-  const message = 'any of ' + commaSeparate(arr.map(c => `"${c}"`))
-  return error(state, [expectedError(message), unexpectedError(quote(next))])
+  return arr.includes(next)
+    ? ok(state, next, index + width) : error(state, expecteds.anyOf(arr))
 })
 
 /**
@@ -201,11 +180,8 @@ export const noneOf = chars => makeParser(state => {
   const { width, next } = nextChar(index, view)
   const arr = [...chars]
 
-  if (arr.includes(next)) {
-    const message = 'none of ' + commaSeparate(arr.map(c => `"${c}"`))
-    return error(state, [expectedError(message), unexpectedError(quote(next))])
-  }
-  return ok(state, next, index + width)
+  return arr.includes(next)
+    ? error(state, expecteds.noneOf(arr)) : ok(state, next, index + width)
 })
 
 /**
@@ -216,9 +192,8 @@ export const noneOf = chars => makeParser(state => {
  */
 export const digit = makeParser(state => {
   const fn = c => c >= '0' && c <= '9'
-  const [tuple, [next, result]] = dup(CharParser(fn)(state))
-  if (result.status === Status.Ok) return tuple
-  return error(next, [...result.errors, expectedError('a digit')])
+  const [reply, [next, result]] = dup(CharParser(fn)(state))
+  return result.status === Ok ? reply : error(next, expecteds.digit)
 })
 
 /**
@@ -229,9 +204,8 @@ export const hex = makeParser(state => {
   const fn = c => c >= '0' && c <= '9'
     || c >= 'a' && c <= 'f'
     || c >= 'A' && c <= 'F'
-  const [tuple, [next, result]] = dup(CharParser(fn)(state))
-  if (result.status === Status.Ok) return tuple
-  return error(next, [...result.errors, expectedError('a hex digit')])
+  const [reply, [next, result]] = dup(CharParser(fn)(state))
+  return result.status === Ok ? reply : error(next, expecteds.hex)
 })
 
 /**
@@ -240,9 +214,8 @@ export const hex = makeParser(state => {
  */
 export const octal = makeParser(state => {
   const fn = c => c >= '0' && c <= '7'
-  const [tuple, [next, result]] = dup(CharParser(fn)(state))
-  if (result.status === Status.Ok) return tuple
-  return error(next, [...result.errors, expectedError('an octal digit')])
+  const [reply, [next, result]] = dup(CharParser(fn)(state))
+  return result.status === Ok ? reply : error(next, expecteds.octal)
 })
 
 /**
@@ -252,9 +225,8 @@ export const octal = makeParser(state => {
  */
 export const letter = makeParser(state => {
   const fn = c => c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z'
-  const [tuple, [next, result]] = dup(CharParser(fn)(state))
-  if (result.status === Status.Ok) return tuple
-  return error(next, [...result.errors, expectedError('a letter')])
+  const [reply, [next, result]] = dup(CharParser(fn)(state))
+  return result.status === Ok ? reply : error(next, expecteds.letter)
 })
 
 /**
@@ -266,11 +238,8 @@ export const alpha = makeParser(state => {
   const fn = c => c >= 'a' && c <= 'z'
     || c >= 'A' && c <= 'Z'
     || c >= '0' && c <= '9'
-  const [tuple, [next, result]] = dup(CharParser(fn)(state))
-  if (result.status === Status.Ok) return tuple
-  return error(
-    next, [...result.errors, expectedError('an alphanumeric character')],
-  )
+  const [reply, [next, result]] = dup(CharParser(fn)(state))
+  return result.status === Ok ? reply : error(next, expecteds.alpha)
 })
 
 /**
@@ -280,9 +249,8 @@ export const alpha = makeParser(state => {
  */
 export const upper = makeParser(state => {
   const fn = c => c >= 'A' && c <= 'Z'
-  const [tuple, [next, result]] = dup(CharParser(fn)(state))
-  if (result.status === Status.Ok) return tuple
-  return error(next, [...result.errors, expectedError('an uppercase letter')])
+  const [reply, [next, result]] = dup(CharParser(fn)(state))
+  return result.status === Ok ? reply : error(next, expecteds.upper)
 })
 
 /**
@@ -292,7 +260,6 @@ export const upper = makeParser(state => {
  */
 export const lower = makeParser(state => {
   const fn = c => c >= 'a' && c <= 'z'
-  const [tuple, [next, result]] = dup(CharParser(fn)(state))
-  if (result.status === Status.Ok) return tuple
-  return error(next, [...result.errors, expectedError('a lowercase letter')])
+  const [reply, [next, result]] = dup(CharParser(fn)(state))
+  return result.status === Ok ? reply : error(next, expecteds.lower)
 })

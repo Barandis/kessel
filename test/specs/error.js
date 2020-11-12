@@ -7,115 +7,23 @@ import { expect } from 'chai'
 
 import { makeState, Status } from 'kessel/core'
 import {
-  clear,
-  ErrorType,
-  expectedError,
+  expected,
   format,
   formatErrors,
-  genericError,
+  generic,
   getCharIndex,
   getColNumber,
   getLineIndexes,
   getPosition,
   isNewline,
-  otherError,
-  overwrite,
-  push,
+  other,
   show,
   tabify,
-  unexpectedError,
+  unexpected,
 } from 'kessel/error'
 import { commaSeparate, stringToView } from 'kessel/util'
 
 describe('Parse errors', () => {
-  describe('constructing error lists', () => {
-    describe('push', () => {
-      it('adds an error to the end of an array', () => {
-        let list = push([], expectedError('expected'))
-        expect(list).to.deep.equal([
-          { type: ErrorType.Expected, message: 'expected' },
-        ])
-
-        list = push(list, unexpectedError('unexpected'))
-        expect(list).to.deep.equal([
-          { type: ErrorType.Expected, message: 'expected' },
-          { type: ErrorType.Unexpected, message: 'unexpected' },
-        ])
-
-        list = push(list, genericError('message'), otherError('other'))
-        expect(list).to.deep.equal([
-          { type: ErrorType.Expected, message: 'expected' },
-          { type: ErrorType.Unexpected, message: 'unexpected' },
-          { type: ErrorType.Generic, message: 'message' },
-          { type: ErrorType.Other, message: 'other' },
-        ])
-      })
-    })
-
-    describe('clear', () => {
-      const list = [
-        expectedError('expected 1'),
-        unexpectedError('unexpected'),
-        expectedError('expected 2'),
-        genericError('message'),
-        otherError('other'),
-      ]
-
-      it('removes all errors if no type is passed in', () => {
-        expect(clear(list)).to.deep.equal([])
-      })
-
-      it('removes a single type of error if one is passed in', () => {
-        expect(clear(list, ErrorType.Generic)).to.deep.equal([
-          expectedError('expected 1'),
-          unexpectedError('unexpected'),
-          expectedError('expected 2'),
-          otherError('other'),
-        ])
-        expect(clear(list, ErrorType.Expected)).to.deep.equal([
-          unexpectedError('unexpected'),
-          genericError('message'),
-          otherError('other'),
-        ])
-      })
-
-      it('can remove multiple types of errors', () => {
-        expect(clear(list, ErrorType.Expected, ErrorType.Unexpected))
-          .to.deep.equal([
-            genericError('message'),
-            otherError('other'),
-          ])
-      })
-    })
-
-    describe('overwrite', () => {
-      const list = [
-        expectedError('expected 1'),
-        unexpectedError('unexpected'),
-        expectedError('expected 2'),
-        genericError('message'),
-      ]
-
-      it('replaces all errors of one type with another error', () => {
-        expect(overwrite(list, expectedError('new expected'))).to.deep.equal([
-          { type: ErrorType.Unexpected, message: 'unexpected' },
-          { type: ErrorType.Generic, message: 'message' },
-          { type: ErrorType.Expected, message: 'new expected' },
-        ])
-      })
-
-      it('only adds if there are no errors of that type', () => {
-        expect(overwrite(list, otherError('new other'))).to.deep.equal([
-          { type: ErrorType.Expected, message: 'expected 1' },
-          { type: ErrorType.Unexpected, message: 'unexpected' },
-          { type: ErrorType.Expected, message: 'expected 2' },
-          { type: ErrorType.Generic, message: 'message' },
-          { type: ErrorType.Other, message: 'new other' },
-        ])
-      })
-    })
-  })
-
   describe('error message formatting', () => {
     describe('isNewLine', () => {
       const view = stringToView('\n\v\f\r\r\n\u0085\u2028\u2029OЗค𝑂')
@@ -617,15 +525,15 @@ describe('Parse errors', () => {
 
     describe('format', () => {
       const expecteds = [
-        expectedError('a letter'),
-        expectedError('a digit'),
-        expectedError('whitespace'),
+        expected('a letter'),
+        expected('a digit'),
+        expected('whitespace'),
       ]
       const unexpecteds = [
-        unexpectedError('end of input'), unexpectedError('"a"'),
+        unexpected('end of input'), unexpected('"a"'),
       ]
-      const generics = [genericError('Test message')]
-      const others = [otherError('Other message')]
+      const generics = [generic('Test message')]
+      const others = [other('Other message')]
       const view = stringToView(
         '\tOnomatopoeia\t\t\t\tคำเลียนเสียง\nЗвукоподражание',
       )
@@ -691,7 +599,7 @@ describe('Parse errors', () => {
       state.success = false
       state.index = 4
       const result = {
-        errors: [expectedError('a digit')],
+        errors: [expected('a digit')],
         status: Status.Error,
       }
 

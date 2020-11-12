@@ -21,18 +21,55 @@ const zeroWidth = /(?:\p{Mn}|\p{Cf})/gu
  * @enum {symbol}
  */
 export const ErrorType = {
-  /** Error type representing an expected result. */
+  /**
+   * Error type representing an expected result. Produced by the vast
+   * majority of parsers.
+   */
   Expected: Symbol('expected'),
-  /** Error type representing a result that was not expected. */
+  /**
+   * Error type representing a result that was not expected. Typically
+   * produced by parsers such as `unexpected` and `notFollowedBy`.
+   */
   Unexpected: Symbol('unexpected'),
-  /** Error type representing a generic error message. */
+  /**
+   * Error type representing a generic error message. Typically produced
+   * by parsers such as `fail` and `failFatally`.
+   */
   Generic: Symbol('message'),
+  /**
+   * Error type representing an error within another error. This is
+   * generally used for an error that caused backtracking, where the
+   * parent error is reported after backtracking.
+   */
+  Nested: Symbol('message'),
+  /**
+   * Error type representing a nested error with its own separate error
+   * message. This is produced specifically by the `compound` parser.
+   */
+  Compound: Symbol('compound'),
   /**
    * Error type representing some other kind of error message to be
    * displayed in a custom error formatter.
    */
   Other: Symbol('other'),
 }
+
+/**
+ * @typedef {(ParserError|ErrorMessage)[]} ErrorList
+ */
+
+/**
+ * @typedef {object} ParserError
+ * @property {State} state
+ * @property {string} message
+ * @property {ErrorList} errors
+ */
+
+/**
+ * @typedef {object} ErrorMessage
+ * @property {ErrorType} type
+ * @property {string} message
+ */
 
 /**
  * An error generated when a parser fails.
@@ -43,52 +80,50 @@ export const ErrorType = {
  */
 
 /**
- * Creates a new `ParseError`.
+ * Creates a new `ErrorMessage`.
  *
  * @param {ErrorType} type The type of the parse error.
  * @param {string} message The error message.
- * @returns {ParseError} A new `ParseError` with the given type and
+ * @returns {ErrorMessage} A new `ErrorMessage` with the given type and
  *     message.
  */
-export function makeError(type, message) {
+export function makeErrorMessage(type, message) {
   return { type, message }
 }
 
 /**
- * Creates an expected error. Multiple expected errors can be a part of
- * a single error message, and the default formatter will comma-separate
- * them and preface them with the word 'Expected'.
+ * Creates a new error list containing one expected error message.
  *
  * @param {string} message The message describing what was expected.
- * @returns {ParseError} A new parse error of the expected type.
+ * @returns {[ErrorMessage]} A new error message of the expected type.
  */
-export function expectedError(message) {
-  return makeError(ErrorType.Expected, message)
+export function expected(message) {
+  return [makeErrorMessage(ErrorType.Expected, message)]
 }
 
 /**
- * Creates an unexpected error. The default formatter will display only
- * the first unexpected error, and it will be prefaced with
- * 'Unexpected'.
+ * Creates an unexpected error message. It is expected that one array of
+ * error messages may have multiple unexpected errors, but only the
+ * first will be displayed by the default formatter.
  *
  * @param {string} message The message describing what was found but was
  *     not expected.
- * @returns {ParseError} A new parse error of the unexpected type.
+ * @returns {[ErrorMessage]} A new error message of the unexpected type.
  */
-export function unexpectedError(message) {
-  return makeError(ErrorType.Unexpected, message)
+export function unexpected(message) {
+  return [makeErrorMessage(ErrorType.Unexpected, message)]
 }
 
 /**
- * Creates a generic error. The default formatter will display only
- * the first generic error, below the other errors, and it will be
- * unprefaced.
+ * Creates a generic error message. There can be more than one generic
+ * error message in an array of error messages, but only the first will
+ * be displayed by the default formatter.
  *
  * @param {string} message The generic error's message.
- * @returns {ParseError} A new parse error of the generic type.
+ * @returns {ErrorMessage} A new error message of the generic type.
  */
-export function genericError(message) {
-  return makeError(ErrorType.Generic, message)
+export function generic(message) {
+  return [makeErrorMessage(ErrorType.Generic, message)]
 }
 
 /**
@@ -96,59 +131,22 @@ export function genericError(message) {
  * formatter at all and are only useful for custom formatters.
  *
  * @param {string} message The other error's message.
- * @returns {ParseError} A new parse error of the other type.
+ * @returns {ErrorMessage} A new parse error of the other type.
  */
-export function otherError(message) {
-  return makeError(ErrorType.Other, message)
+export function other(message) {
+  return [makeErrorMessage(ErrorType.Other, message)]
 }
 
 /**
- * Adds one or more parse errors to an array of errors.
+ * Merges two arrays of errors.
  *
- * @param {ParseError[]} list The array of errors to add to.
- * @param {...ParseError} errors The error(s) to be pushed onto the end
- *     of the array.
- * @returns {ParseError[]} A new array that is a shallow copy of `list`
- *     with the elements of `errors` added to the end.
+ * @param {ErrorList} errors1 The first array of errors.
+ * @param {ErrorList} errors2 The second array of errors.
+ * @returns {ErrorList} A new array containing all of the errors from
+ *     the first two arrays.
  */
-export function push(list, ...errors) {
-  return [...list, ...errors]
-}
-
-// Clears all errors of a particular type from a list of errors. If
-// `type` is not provided, all errors will be cleared. Multiple types
-// can be provided.
-/**
- * Clears all errors of a particular type from a list of errors. If no
- * `types` are provided, all errors will be cleared.
- *
- * @param {ParseError[]} list The array of errors to clear from.
- * @param {...ErrorType} types The error types to be removed from the
- *     array. If no types are provided, all errors will be removed.
- * @returns {ParseError[]} A shallow copy of `list` with all errors of
- *     the provided type(s) removed.
- */
-export function clear(list, ...types) {
-  if (types.length === 0) return []
-  return list.filter(error => !types.includes(error.type))
-}
-
-/**
- * Clears all errors from an array of errors that are of the same error
- * type as any of the provided errors, and then adds those errors to the
- * end of the array.
- *
- * @param {ParseError[]} list The array of errors to overwrite to.
- * @param {...ParseError} errors The error(s) to be pushed onto the end
- *     of the array, after all errors of those types are removed.
- * @returns {ParseError[]} A new array that is a shallow copy of `list`
- *     with the elements of `errors` replacing those of the same type
- *     from the original array.
- */
-export function overwrite(list, ...errors) {
-  const types = errors.map(error => error.type)
-  const result = list.filter(error => !types.includes(error.type))
-  return [...result, ...errors]
+export function merge(errors1, errors2) {
+  return [...errors1, ...errors2]
 }
 
 // #region Formatting utility functions

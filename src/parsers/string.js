@@ -4,8 +4,10 @@
 // https://opensource.org/licenses/MIT
 
 import { error, makeParser, ok, Status } from 'kessel/core'
-import { expectedError, unexpectedError } from 'kessel/error'
-import { charLength, dup, nextChars, quote, viewToString } from 'kessel/util'
+import { expecteds } from 'kessel/messages'
+import { charLength, dup, nextChars, viewToString } from 'kessel/util'
+
+const { Ok } = Status
 
 /** @typedef {import('kessel/core').Parser} Parser */
 
@@ -30,15 +32,11 @@ const StringParser = (length, fn) => makeParser(state => {
   if (length === 0) return ok(state, '')
 
   const { index, view } = state
-  if (index >= view.byteLength) {
-    return error(state, [unexpectedError('EOF')])
-  }
+  if (index >= view.byteLength) return error(state)
 
   const { width, next } = nextChars(index, view, length)
-  if (charLength(next) !== length || !fn(next)) {
-    return error(state, [unexpectedError(quote(next))])
-  }
-  return ok(state, next, index + width)
+  return charLength(next) !== length || !fn(next)
+    ? error(state) : ok(state, next, index + width)
 })
 
 /**
@@ -56,11 +54,10 @@ const StringParser = (length, fn) => makeParser(state => {
  *     matches the next characters in the input.
  */
 export const string = str => makeParser(state => {
-  const [tuple, [next, result]] = dup(StringParser(
+  const [reply, [next, result]] = dup(StringParser(
     charLength(str), chars => str === chars,
   )(state))
-  if (result.status === Status.Ok) return tuple
-  return error(next, [...result.errors, expectedError(quote(str))])
+  return result.status === Ok ? reply : error(next, expecteds.string(str))
 })
 
 /**
@@ -80,11 +77,10 @@ export const string = str => makeParser(state => {
  *     case-insensitively matches the next characters in the input.
  */
 export const stringi = str => makeParser(state => {
-  const [tuple, [next, result]] = dup(StringParser(
+  const [reply, [next, result]] = dup(StringParser(
     charLength(str), chars => str.toLowerCase() === chars.toLowerCase(),
   )(state))
-  if (result.status === Status.Ok) return tuple
-  return error(next, [...result.errors, expectedError(quote(str))])
+  return result.status === Ok ? reply : error(next, expecteds.stringi(str))
 })
 
 /**
@@ -107,9 +103,6 @@ export const all = makeParser(state => {
  *     them into a string for its result.
  */
 export const anyString = n => makeParser(state => {
-  const [tuple, [next, result]] = dup(StringParser(n, () => true)(state))
-  if (result.status === Status.Ok) return tuple
-  return error(
-    next, [...result.errors, expectedError(`a string of ${n} characters`)],
-  )
+  const [reply, [next, result]] = dup(StringParser(n, () => true)(state))
+  return result.status === Ok ? reply : error(next, expecteds.anyString(n))
 })

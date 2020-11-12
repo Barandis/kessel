@@ -20,7 +20,7 @@ import {
 } from 'kessel/parsers/regex'
 import { fail, pass } from 'test/helper'
 
-describe('Regular expression parsers', () => {
+describe.only('Regular expression parsers', () => {
   describe('regex', () => {
     it('accepts a string as input', () => {
       pass(regex('^\\w{3}'), 'Onomatopoeia', 'Ono')
@@ -29,13 +29,10 @@ describe('Regular expression parsers', () => {
       pass(regex(/^\w{3}/i), 'onomatopoeia', 'ono')
     })
     it('is anchored even if an anchor is not in the regex', () => {
-      fail(regex(/poe/), 'Onomatopoeia', {
-        actual: '"Ono"',
-        expected: 'a string matching /^poe/',
-      })
+      fail(regex(/poe/), 'Onomatopoeia', 'a string matching /^poe/')
     })
     it('fails if the input is at its end', () => {
-      fail(regex(/^./), '', 'EOF')
+      fail(regex(/^./), '', 'a string matching /^./')
     })
     it('succeeds at EOF if the match can be zero-length', () => {
       pass(regex(/^.*/), '', '')
@@ -43,22 +40,22 @@ describe('Regular expression parsers', () => {
     it('matches 1-byte characters', () => {
       pass(regex(/^Onoma/), 'Onomatopoeia', 'Onoma')
       pass(regex(/^.{5}/), 'Onomatopoeia', 'Onoma')
-      fail(regex(/^\d/), 'Onomatopoeia', '"On"')
+      fail(regex(/^\d/), 'Onomatopoeia', 'a string matching /^\\d/')
     })
     it('matches 2-byte characters', () => {
       pass(regex(/^Звуко/), 'Звукоподражание', 'Звуко')
       pass(regex(/^.{5}/), 'Звукоподражание', 'Звуко')
-      fail(regex(/^\d/), 'Звукоподражание', '"Зв"')
+      fail(regex(/^\d/), 'Звукоподражание', 'a string matching /^\\d/')
     })
     it('matches 3-byte characters (with the u flag)', () => {
       pass(regex(/^คำเลี/u), 'คำเลียนเสียง', 'คำเลี')
       pass(regex(/^.{5}/u), 'คำเลียนเสียง', 'คำเลี')
-      fail(regex(/^\d/u), 'คำเลียนเสียง', '"คำ"')
+      fail(regex(/^\d/u), 'คำเลียนเสียง', 'a string matching /^\\d/u')
     })
     it('matches 4-byte characters (with the u flag)', () => {
       pass(regex(/^𝑂𝑛𝑜𝑚𝑎/u), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', '𝑂𝑛𝑜𝑚𝑎')
       pass(regex(/^.{5}/u), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', '𝑂𝑛𝑜𝑚𝑎')
-      fail(regex(/^\d/u), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', '"𝑂𝑛"')
+      fail(regex(/^\d/u), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', 'a string matching /^\\d/u')
     })
   })
 
@@ -91,13 +88,13 @@ describe('Regular expression parsers', () => {
       pass(letterU, 'ⰽ', 'ⰽ') // GLAGOLITIC SMALL LETTER KAKO
     })
     it('fails on decimal digits', () => {
-      fail(letterU, '4', { expected: 'a letter', actual: '"4"' })
-      fail(letterU, '۴', { expected: 'a letter', actual: '"۴"' })
-      fail(letterU, '४', { expected: 'a letter', actual: '"४"' })
-      fail(letterU, '৪', { expected: 'a letter', actual: '"৪"' })
-      fail(letterU, '๔', { expected: 'a letter', actual: '"๔"' })
-      fail(letterU, '᠔', { expected: 'a letter', actual: '"᠔"' })
-      fail(letterU, '𝟜', { expected: 'a letter', actual: '"𝟜"' })
+      fail(letterU, '4', 'a Unicode letter')
+      fail(letterU, '۴', 'a Unicode letter')
+      fail(letterU, '४', 'a Unicode letter')
+      fail(letterU, '৪', 'a Unicode letter')
+      fail(letterU, '๔', 'a Unicode letter')
+      fail(letterU, '᠔', 'a Unicode letter')
+      fail(letterU, '𝟜', 'a Unicode letter')
     })
     it('succeeds on a single uppercase letter number', () => {
       pass(letterU, 'Ⅳ', 'Ⅳ') // ROMAN NUMERAL FOUR
@@ -106,36 +103,36 @@ describe('Regular expression parsers', () => {
       pass(letterU, 'ⅳ', 'ⅳ') // SMALL ROMAN NUMERAL FOUR
     })
     it('fails on other numbers', () => {
-      fail(letterU, '¼', { expected: 'a letter', actual: '"¼"' })
-      fail(letterU, '፬', { expected: 'a letter', actual: '"፬"' })
-      fail(letterU, '⁴', { expected: 'a letter', actual: '"⁴"' })
-      fail(letterU, '₄', { expected: 'a letter', actual: '"₄"' })
-      fail(letterU, '④', { expected: 'a letter', actual: '"④"' })
-      fail(letterU, '❹', { expected: 'a letter', actual: '"❹"' })
+      fail(letterU, '¼', 'a Unicode letter')
+      fail(letterU, '፬', 'a Unicode letter')
+      fail(letterU, '⁴', 'a Unicode letter')
+      fail(letterU, '₄', 'a Unicode letter')
+      fail(letterU, '④', 'a Unicode letter')
+      fail(letterU, '❹', 'a Unicode letter')
     })
     it('fails on whitespace', () => {
-      fail(letterU, ' ', { expected: 'a letter', actual: '" "' })
-      fail(letterU, '\t', { expected: 'a letter', actual: '"\t"' })
-      fail(letterU, '\n', { expected: 'a letter', actual: '"\n"' })
-      fail(letterU, ' ', { expected: 'a letter', actual: '" "' })
-      fail(letterU, '\u2003', { expected: 'a letter', actual: '"\u2003"' })
-      fail(letterU, '\u202f', { expected: 'a letter', actual: '"\u202f"' })
+      fail(letterU, ' ', 'a Unicode letter')
+      fail(letterU, '\t', 'a Unicode letter')
+      fail(letterU, '\n', 'a Unicode letter')
+      fail(letterU, ' ', 'a Unicode letter')
+      fail(letterU, '\u2003', 'a Unicode letter')
+      fail(letterU, '\u202f', 'a Unicode letter')
     })
     it('fails on punctuation', () => {
-      fail(letterU, '(', { expected: 'a letter', actual: '"("' })
-      fail(letterU, '｢', { expected: 'a letter', actual: '"｢"' })
-      fail(letterU, ')', { expected: 'a letter', actual: '")"' })
-      fail(letterU, '｣', { expected: 'a letter', actual: '"｣"' })
-      fail(letterU, '!', { expected: 'a letter', actual: '"!"' })
-      fail(letterU, '፣', { expected: 'a letter', actual: '"፣"' })
+      fail(letterU, '(', 'a Unicode letter')
+      fail(letterU, '｢', 'a Unicode letter')
+      fail(letterU, ')', 'a Unicode letter')
+      fail(letterU, '｣', 'a Unicode letter')
+      fail(letterU, '!', 'a Unicode letter')
+      fail(letterU, '፣', 'a Unicode letter')
     })
     it('fails on symbols', () => {
-      fail(letterU, '$', { expected: 'a letter', actual: '"$"' })
-      fail(letterU, '₯', { expected: 'a letter', actual: '"₯"' })
-      fail(letterU, '+', { expected: 'a letter', actual: '"+"' })
-      fail(letterU, '⫇', { expected: 'a letter', actual: '"⫇"' })
-      fail(letterU, '©', { expected: 'a letter', actual: '"©"' })
-      fail(letterU, '🀄', { expected: 'a letter', actual: '"🀄"' })
+      fail(letterU, '$', 'a Unicode letter')
+      fail(letterU, '₯', 'a Unicode letter')
+      fail(letterU, '+', 'a Unicode letter')
+      fail(letterU, '⫇', 'a Unicode letter')
+      fail(letterU, '©', 'a Unicode letter')
+      fail(letterU, '🀄', 'a Unicode letter')
     })
   })
 
@@ -191,82 +188,28 @@ describe('Regular expression parsers', () => {
       pass(alphaU, '❹', '❹') // DINGBAT NEGATIVE CIRCLED DIGIT FOUR
     })
     it('fails on whitespace', () => {
-      fail(alphaU, ' ', {
-        expected: 'an alphanumeric character',
-        actual: '" "',
-      })
-      fail(alphaU, '\t', {
-        expected: 'an alphanumeric character',
-        actual: '"\t"',
-      })
-      fail(alphaU, '\n', {
-        expected: 'an alphanumeric character',
-        actual: '"\n"',
-      })
-      fail(alphaU, ' ', {
-        expected: 'an alphanumeric character',
-        actual: '" "',
-      })
-      fail(alphaU, '\u2003', {
-        expected: 'an alphanumeric character',
-        actual: '"\u2003"',
-      })
-      fail(alphaU, '\u202f', {
-        expected: 'an alphanumeric character',
-        actual: '"\u202f"',
-      })
+      fail(alphaU, ' ', 'a Unicode alphanumeric character')
+      fail(alphaU, '\t', 'a Unicode alphanumeric character')
+      fail(alphaU, '\n', 'a Unicode alphanumeric character')
+      fail(alphaU, ' ', 'a Unicode alphanumeric character')
+      fail(alphaU, '\u2003', 'a Unicode alphanumeric character')
+      fail(alphaU, '\u202f', 'a Unicode alphanumeric character')
     })
     it('fails on punctuation', () => {
-      fail(alphaU, '(', {
-        expected: 'an alphanumeric character',
-        actual: '"("',
-      })
-      fail(alphaU, '｢', {
-        expected: 'an alphanumeric character',
-        actual: '"｢"',
-      })
-      fail(alphaU, ')', {
-        expected: 'an alphanumeric character',
-        actual: '")"',
-      })
-      fail(alphaU, '｣', {
-        expected: 'an alphanumeric character',
-        actual: '"｣"',
-      })
-      fail(alphaU, '!', {
-        expected: 'an alphanumeric character',
-        actual: '"!"',
-      })
-      fail(alphaU, '፣', {
-        expected: 'an alphanumeric character',
-        actual: '"፣"',
-      })
+      fail(alphaU, '(', 'a Unicode alphanumeric character')
+      fail(alphaU, '｢', 'a Unicode alphanumeric character')
+      fail(alphaU, ')', 'a Unicode alphanumeric character')
+      fail(alphaU, '｣', 'a Unicode alphanumeric character')
+      fail(alphaU, '!', 'a Unicode alphanumeric character')
+      fail(alphaU, '፣', 'a Unicode alphanumeric character')
     })
     it('fails on symbols', () => {
-      fail(alphaU, '$', {
-        expected: 'an alphanumeric character',
-        actual: '"$"',
-      })
-      fail(alphaU, '₯', {
-        expected: 'an alphanumeric character',
-        actual: '"₯"',
-      })
-      fail(alphaU, '+', {
-        expected: 'an alphanumeric character',
-        actual: '"+"',
-      })
-      fail(alphaU, '⫇', {
-        expected: 'an alphanumeric character',
-        actual: '"⫇"',
-      })
-      fail(alphaU, '©', {
-        expected: 'an alphanumeric character',
-        actual: '"©"',
-      })
-      fail(alphaU, '🀄', {
-        expected: 'an alphanumeric character',
-        actual: '"🀄"',
-      })
+      fail(alphaU, '$', 'a Unicode alphanumeric character')
+      fail(alphaU, '₯', 'a Unicode alphanumeric character')
+      fail(alphaU, '+', 'a Unicode alphanumeric character')
+      fail(alphaU, '⫇', 'a Unicode alphanumeric character')
+      fail(alphaU, '©', 'a Unicode alphanumeric character')
+      fail(alphaU, '🀄', 'a Unicode alphanumeric character')
     })
   })
 
@@ -290,80 +233,78 @@ describe('Regular expression parsers', () => {
       pass(upperU, 'ῼ', 'ῼ')
     })
     it('fails on lowercase letters', () => {
-      fail(upperU, 'a', { expected: 'an uppercase letter', actual: '"a"' })
-      fail(upperU, 'ž', { expected: 'an uppercase letter', actual: '"ž"' })
-      fail(upperU, 'γ', { expected: 'an uppercase letter', actual: '"γ"' })
-      fail(upperU, 'л', { expected: 'an uppercase letter', actual: '"л"' })
-      fail(upperU, 'յ', { expected: 'an uppercase letter', actual: '"յ"' })
-      fail(upperU, 'ე', { expected: 'an uppercase letter', actual: '"ე"' })
-      fail(upperU, 'ⰽ', { expected: 'an uppercase letter', actual: '"ⰽ"' })
+      fail(upperU, 'a', 'a Unicode uppercase letter')
+      fail(upperU, 'ž', 'a Unicode uppercase letter')
+      fail(upperU, 'γ', 'a Unicode uppercase letter')
+      fail(upperU, 'л', 'a Unicode uppercase letter')
+      fail(upperU, 'յ', 'a Unicode uppercase letter')
+      fail(upperU, 'ე', 'a Unicode uppercase letter')
+      fail(upperU, 'ⰽ', 'a Unicode uppercase letter')
     })
     it('fails on decimal digits', () => {
-      fail(upperU, '4', { expected: 'an uppercase letter', actual: '"4"' })
-      fail(upperU, '۴', { expected: 'an uppercase letter', actual: '"۴"' })
-      fail(upperU, '४', { expected: 'an uppercase letter', actual: '"४"' })
-      fail(upperU, '৪', { expected: 'an uppercase letter', actual: '"৪"' })
-      fail(upperU, '๔', { expected: 'an uppercase letter', actual: '"๔"' })
-      fail(upperU, '᠔', { expected: 'an uppercase letter', actual: '"᠔"' })
-      fail(upperU, '𝟜', { expected: 'an uppercase letter', actual: '"𝟜"' })
+      fail(upperU, '4', 'a Unicode uppercase letter')
+      fail(upperU, '۴', 'a Unicode uppercase letter')
+      fail(upperU, '४', 'a Unicode uppercase letter')
+      fail(upperU, '৪', 'a Unicode uppercase letter')
+      fail(upperU, '๔', 'a Unicode uppercase letter')
+      fail(upperU, '᠔', 'a Unicode uppercase letter')
+      fail(upperU, '𝟜', 'a Unicode uppercase letter')
     })
     it('succeeds on a single uppercase letter number', () => {
       pass(upperU, 'Ⅳ', 'Ⅳ') // ROMAN NUMERAL FOUR
     })
     it('fails on lowercase letter numbers', () => {
-      fail(upperU, 'ⅳ', { expected: 'an uppercase letter', actual: '"ⅳ"' })
+      fail(upperU, 'ⅳ', 'a Unicode uppercase letter')
     })
     it('fails on other numbers', () => {
-      fail(upperU, '¼', { expected: 'an uppercase letter', actual: '"¼"' })
-      fail(upperU, '፬', { expected: 'an uppercase letter', actual: '"፬"' })
-      fail(upperU, '⁴', { expected: 'an uppercase letter', actual: '"⁴"' })
-      fail(upperU, '₄', { expected: 'an uppercase letter', actual: '"₄"' })
-      fail(upperU, '④', { expected: 'an uppercase letter', actual: '"④"' })
-      fail(upperU, '❹', { expected: 'an uppercase letter', actual: '"❹"' })
+      fail(upperU, '¼', 'a Unicode uppercase letter')
+      fail(upperU, '፬', 'a Unicode uppercase letter')
+      fail(upperU, '⁴', 'a Unicode uppercase letter')
+      fail(upperU, '₄', 'a Unicode uppercase letter')
+      fail(upperU, '④', 'a Unicode uppercase letter')
+      fail(upperU, '❹', 'a Unicode uppercase letter')
     })
     it('fails on whitespace', () => {
-      fail(upperU, ' ', { expected: 'an uppercase letter', actual: '" "' })
-      fail(upperU, '\t', { expected: 'an uppercase letter', actual: '"\t"' })
-      fail(upperU, '\n', { expected: 'an uppercase letter', actual: '"\n"' })
-      fail(upperU, ' ', { expected: 'an uppercase letter', actual: '" "' })
-      fail(upperU, '\u2003',
-        { expected: 'an uppercase letter', actual: '"\u2003"' })
-      fail(upperU, '\u202f',
-        { expected: 'an uppercase letter', actual: '"\u202f"' })
+      fail(upperU, ' ', 'a Unicode uppercase letter')
+      fail(upperU, '\t', 'a Unicode uppercase letter')
+      fail(upperU, '\n', 'a Unicode uppercase letter')
+      fail(upperU, ' ', 'a Unicode uppercase letter')
+      fail(upperU, '\u2003', 'a Unicode uppercase letter')
+      fail(upperU, '\u202f', 'a Unicode uppercase letter')
     })
     it('fails on punctuation', () => {
-      fail(upperU, '(', { expected: 'an uppercase letter', actual: '"("' })
-      fail(upperU, '｢', { expected: 'an uppercase letter', actual: '"｢"' })
-      fail(upperU, ')', { expected: 'an uppercase letter', actual: '")"' })
-      fail(upperU, '｣', { expected: 'an uppercase letter', actual: '"｣"' })
-      fail(upperU, '!', { expected: 'an uppercase letter', actual: '"!"' })
-      fail(upperU, '፣', { expected: 'an uppercase letter', actual: '"፣"' })
+      fail(upperU, '(', 'a Unicode uppercase letter')
+      fail(upperU, '｢', 'a Unicode uppercase letter')
+      fail(upperU, ')', 'a Unicode uppercase letter')
+      fail(upperU, '｣', 'a Unicode uppercase letter')
+      fail(upperU, '!', 'a Unicode uppercase letter')
+      fail(upperU, '፣', 'a Unicode uppercase letter')
     })
     it('fails on symbols', () => {
-      fail(upperU, '$', { expected: 'an uppercase letter', actual: '"$"' })
-      fail(upperU, '₯', { expected: 'an uppercase letter', actual: '"₯"' })
-      fail(upperU, '+', { expected: 'an uppercase letter', actual: '"+"' })
-      fail(upperU, '⫇', { expected: 'an uppercase letter', actual: '"⫇"' })
-      fail(upperU, '©', { expected: 'an uppercase letter', actual: '"©"' })
-      fail(upperU, '🀄', { expected: 'an uppercase letter', actual: '"🀄"' })
+      fail(upperU, '$', 'a Unicode uppercase letter')
+      fail(upperU, '₯', 'a Unicode uppercase letter')
+      fail(upperU, '+', 'a Unicode uppercase letter')
+      fail(upperU, '⫇', 'a Unicode uppercase letter')
+      fail(upperU, '©', 'a Unicode uppercase letter')
+      fail(upperU, '🀄', 'a Unicode uppercase letter')
     })
   })
 
   describe('lowerU', () => {
     it('fails on uppercase letters', () => {
-      fail(lowerU, 'A', { expected: 'a lowercase letter', actual: '"A"' })
-      fail(lowerU, 'Ž', { expected: 'a lowercase letter', actual: '"Ž"' })
-      fail(lowerU, 'Γ', { expected: 'a lowercase letter', actual: '"Γ"' })
-      fail(lowerU, 'Л', { expected: 'a lowercase letter', actual: '"Л"' })
-      fail(lowerU, 'Յ', { expected: 'a lowercase letter', actual: '"Յ"' })
-      fail(lowerU, 'Ⴄ', { expected: 'a lowercase letter', actual: '"Ⴄ"' })
-      fail(lowerU, 'Ꮅ', { expected: 'a lowercase letter', actual: '"Ꮅ"' })
-      fail(lowerU, 'Ⰽ', { expected: 'a lowercase letter', actual: '"Ⰽ"' })
+      fail(lowerU, 'A', 'a Unicode lowercase letter')
+      fail(lowerU, 'Ž', 'a Unicode lowercase letter')
+      fail(lowerU, 'Γ', 'a Unicode lowercase letter')
+      fail(lowerU, 'Л', 'a Unicode lowercase letter')
+      fail(lowerU, 'Յ', 'a Unicode lowercase letter')
+      fail(lowerU, 'Ⴄ', 'a Unicode lowercase letter')
+      fail(lowerU, 'Ꮅ', 'a Unicode lowercase letter')
+      fail(lowerU, 'Ⰽ', 'a Unicode lowercase letter')
     })
     it('fails on titlecase letters', () => {
-      fail(lowerU, 'ǅ', { expected: 'a lowercase letter', actual: '"ǅ"' })
-      fail(lowerU, 'ǋ', { expected: 'a lowercase letter', actual: '"ǋ"' })
-      fail(lowerU, 'ῼ', { expected: 'a lowercase letter', actual: '"ῼ"' })
+      fail(lowerU, 'ǅ', 'a Unicode lowercase letter')
+      fail(lowerU, 'ǋ', 'a Unicode lowercase letter')
+      fail(lowerU, 'ῼ', 'a Unicode lowercase letter')
     })
     it('succeeds on a single lowercase letter', () => {
       pass(lowerU, 'a', 'a') // LATIN SMALL LETTER A
@@ -375,53 +316,51 @@ describe('Regular expression parsers', () => {
       pass(lowerU, 'ⰽ', 'ⰽ') // GLAGOLITIC SMALL LETTER KAKO
     })
     it('fails on decimal digits', () => {
-      fail(lowerU, '4', { expected: 'a lowercase letter', actual: '"4"' })
-      fail(lowerU, '۴', { expected: 'a lowercase letter', actual: '"۴"' })
-      fail(lowerU, '४', { expected: 'a lowercase letter', actual: '"४"' })
-      fail(lowerU, '৪', { expected: 'a lowercase letter', actual: '"৪"' })
-      fail(lowerU, '๔', { expected: 'a lowercase letter', actual: '"๔"' })
-      fail(lowerU, '᠔', { expected: 'a lowercase letter', actual: '"᠔"' })
-      fail(lowerU, '𝟜', { expected: 'a lowercase letter', actual: '"𝟜"' })
+      fail(lowerU, '4', 'a Unicode lowercase letter')
+      fail(lowerU, '۴', 'a Unicode lowercase letter')
+      fail(lowerU, '४', 'a Unicode lowercase letter')
+      fail(lowerU, '৪', 'a Unicode lowercase letter')
+      fail(lowerU, '๔', 'a Unicode lowercase letter')
+      fail(lowerU, '᠔', 'a Unicode lowercase letter')
+      fail(lowerU, '𝟜', 'a Unicode lowercase letter')
     })
     it('fails on uppercase letter numbers', () => {
-      fail(lowerU, 'Ⅳ', { expected: 'a lowercase letter', actual: '"Ⅳ"' })
+      fail(lowerU, 'Ⅳ', 'a Unicode lowercase letter')
     })
     it('succeeds on a single lowercase letter number', () => {
       pass(lowerU, 'ⅳ', 'ⅳ') // SMALL ROMAN NUMERAL FOUR
     })
     it('fails on other numbers', () => {
-      fail(lowerU, '¼', { expected: 'a lowercase letter', actual: '"¼"' })
-      fail(lowerU, '፬', { expected: 'a lowercase letter', actual: '"፬"' })
-      fail(lowerU, '⁴', { expected: 'a lowercase letter', actual: '"⁴"' })
-      fail(lowerU, '₄', { expected: 'a lowercase letter', actual: '"₄"' })
-      fail(lowerU, '④', { expected: 'a lowercase letter', actual: '"④"' })
-      fail(lowerU, '❹', { expected: 'a lowercase letter', actual: '"❹"' })
+      fail(lowerU, '¼', 'a Unicode lowercase letter')
+      fail(lowerU, '፬', 'a Unicode lowercase letter')
+      fail(lowerU, '⁴', 'a Unicode lowercase letter')
+      fail(lowerU, '₄', 'a Unicode lowercase letter')
+      fail(lowerU, '④', 'a Unicode lowercase letter')
+      fail(lowerU, '❹', 'a Unicode lowercase letter')
     })
     it('fails on whitespace', () => {
-      fail(lowerU, ' ', { expected: 'a lowercase letter', actual: '" "' })
-      fail(lowerU, '\t', { expected: 'a lowercase letter', actual: '"\t"' })
-      fail(lowerU, '\n', { expected: 'a lowercase letter', actual: '"\n"' })
-      fail(lowerU, ' ', { expected: 'a lowercase letter', actual: '" "' })
-      fail(lowerU, '\u2003',
-        { expected: 'a lowercase letter', actual: '"\u2003"' })
-      fail(lowerU, '\u202f',
-        { expected: 'a lowercase letter', actual: '"\u202f"' })
+      fail(lowerU, ' ', 'a Unicode lowercase letter')
+      fail(lowerU, '\t', 'a Unicode lowercase letter')
+      fail(lowerU, '\n', 'a Unicode lowercase letter')
+      fail(lowerU, ' ', 'a Unicode lowercase letter')
+      fail(lowerU, '\u2003', 'a Unicode lowercase letter')
+      fail(lowerU, '\u202f', 'a Unicode lowercase letter')
     })
     it('fails on punctuation', () => {
-      fail(lowerU, '(', { expected: 'a lowercase letter', actual: '"("' })
-      fail(lowerU, '｢', { expected: 'a lowercase letter', actual: '"｢"' })
-      fail(lowerU, ')', { expected: 'a lowercase letter', actual: '")"' })
-      fail(lowerU, '｣', { expected: 'a lowercase letter', actual: '"｣"' })
-      fail(lowerU, '!', { expected: 'a lowercase letter', actual: '"!"' })
-      fail(lowerU, '፣', { expected: 'a lowercase letter', actual: '"፣"' })
+      fail(lowerU, '(', 'a Unicode lowercase letter')
+      fail(lowerU, '｢', 'a Unicode lowercase letter')
+      fail(lowerU, ')', 'a Unicode lowercase letter')
+      fail(lowerU, '｣', 'a Unicode lowercase letter')
+      fail(lowerU, '!', 'a Unicode lowercase letter')
+      fail(lowerU, '፣', 'a Unicode lowercase letter')
     })
     it('fails on symbols', () => {
-      fail(lowerU, '$', { expected: 'a lowercase letter', actual: '"$"' })
-      fail(lowerU, '₯', { expected: 'a lowercase letter', actual: '"₯"' })
-      fail(lowerU, '+', { expected: 'a lowercase letter', actual: '"+"' })
-      fail(lowerU, '⫇', { expected: 'a lowercase letter', actual: '"⫇"' })
-      fail(lowerU, '©', { expected: 'a lowercase letter', actual: '"©"' })
-      fail(lowerU, '🀄', { expected: 'a lowercase letter', actual: '"🀄"' })
+      fail(lowerU, '$', 'a Unicode lowercase letter')
+      fail(lowerU, '₯', 'a Unicode lowercase letter')
+      fail(lowerU, '+', 'a Unicode lowercase letter')
+      fail(lowerU, '⫇', 'a Unicode lowercase letter')
+      fail(lowerU, '©', 'a Unicode lowercase letter')
+      fail(lowerU, '🀄', 'a Unicode lowercase letter')
     })
   })
 
@@ -434,42 +373,42 @@ describe('Regular expression parsers', () => {
       pass(space, ' ', ' ')
     })
     it('fails on Unicode whitespace of other kinds', () => {
-      fail(space, '\v', { expected: 'whitespace', actual: '"\v"' })
-      fail(space, '\f', { expected: 'whitespace', actual: '"\f"' })
-      fail(space, '\u0085', '"\u0085"')
-      fail(space, '\u00a0', '"\u00a0"')
-      fail(space, '\u1680', '"\u1680"')
-      fail(space, '\u2000', '"\u2000"')
-      fail(space, '\u2001', '"\u2001"')
-      fail(space, '\u2002', '"\u2002"')
-      fail(space, '\u2003', '"\u2003"')
-      fail(space, '\u2004', '"\u2004"')
-      fail(space, '\u2005', '"\u2005"')
-      fail(space, '\u2006', '"\u2006"')
-      fail(space, '\u2007', '"\u2007"')
-      fail(space, '\u2008', '"\u2008"')
-      fail(space, '\u2009', '"\u2009"')
-      fail(space, '\u200a', '"\u200a"')
-      fail(space, '\u2028', '"\u2028"')
-      fail(space, '\u2029', '"\u2029"')
-      fail(space, '\u202f', '"\u202f"')
-      fail(space, '\u205f', '"\u205f"')
-      fail(space, '\u3000', '"\u3000"')
+      fail(space, '\v', 'a whitespace character')
+      fail(space, '\f', 'a whitespace character')
+      fail(space, '\u0085', 'a whitespace character')
+      fail(space, '\u00a0', 'a whitespace character')
+      fail(space, '\u1680', 'a whitespace character')
+      fail(space, '\u2000', 'a whitespace character')
+      fail(space, '\u2001', 'a whitespace character')
+      fail(space, '\u2002', 'a whitespace character')
+      fail(space, '\u2003', 'a whitespace character')
+      fail(space, '\u2004', 'a whitespace character')
+      fail(space, '\u2005', 'a whitespace character')
+      fail(space, '\u2006', 'a whitespace character')
+      fail(space, '\u2007', 'a whitespace character')
+      fail(space, '\u2008', 'a whitespace character')
+      fail(space, '\u2009', 'a whitespace character')
+      fail(space, '\u200a', 'a whitespace character')
+      fail(space, '\u2028', 'a whitespace character')
+      fail(space, '\u2029', 'a whitespace character')
+      fail(space, '\u202f', 'a whitespace character')
+      fail(space, '\u205f', 'a whitespace character')
+      fail(space, '\u3000', 'a whitespace character')
     })
     it('succeeds only once', () => {
       pass(space, '     123', ' ')
       pass(space, '\t\n\r ', '\t')
     })
     it('fails on non-whitespace characters', () => {
-      fail(space, 'O', { expected: 'whitespace', actual: '"O"' })
-      fail(space, 'З', { expected: 'whitespace', actual: '"З"' })
-      fail(space, 'ค', { expected: 'whitespace', actual: '"ค"' })
-      fail(space, '𝑂', { expected: 'whitespace', actual: '"𝑂"' })
-      fail(space, '\u180e', { expected: 'whitespace', actual: '"\u180e"' })
-      fail(space, '\u200b', { expected: 'whitespace', actual: '"\u200b"' })
-      fail(space, '\u200c', { expected: 'whitespace', actual: '"\u200c"' })
-      fail(space, '\u200d', { expected: 'whitespace', actual: '"\u200d"' })
-      fail(space, '\u2060', { expected: 'whitespace', actual: '"\u2060"' })
+      fail(space, 'O', 'a whitespace character')
+      fail(space, 'З', 'a whitespace character')
+      fail(space, 'ค', 'a whitespace character')
+      fail(space, '𝑂', 'a whitespace character')
+      fail(space, '\u180e', 'a whitespace character')
+      fail(space, '\u200b', 'a whitespace character')
+      fail(space, '\u200c', 'a whitespace character')
+      fail(space, '\u200d', 'a whitespace character')
+      fail(space, '\u2060', 'a whitespace character')
     })
   })
 
@@ -507,15 +446,15 @@ describe('Regular expression parsers', () => {
       pass(spaceU, '\u3000\u1680\u202f', '\u3000')
     })
     it('fails on non-whitespace characters', () => {
-      fail(spaceU, 'O', { expected: 'whitespace', actual: '"O"' })
-      fail(spaceU, 'З', { expected: 'whitespace', actual: '"З"' })
-      fail(spaceU, 'ค', { expected: 'whitespace', actual: '"ค"' })
-      fail(spaceU, '𝑂', { expected: 'whitespace', actual: '"𝑂"' })
-      fail(spaceU, '\u180e', { expected: 'whitespace', actual: '"\u180e"' })
-      fail(spaceU, '\u200b', { expected: 'whitespace', actual: '"\u200b"' })
-      fail(spaceU, '\u200c', { expected: 'whitespace', actual: '"\u200c"' })
-      fail(spaceU, '\u200d', { expected: 'whitespace', actual: '"\u200d"' })
-      fail(spaceU, '\u2060', { expected: 'whitespace', actual: '"\u2060"' })
+      fail(spaceU, 'O', 'a Unicode whitespace character')
+      fail(spaceU, 'З', 'a Unicode whitespace character')
+      fail(spaceU, 'ค', 'a Unicode whitespace character')
+      fail(spaceU, '𝑂', 'a Unicode whitespace character')
+      fail(spaceU, '\u180e', 'a Unicode whitespace character')
+      fail(spaceU, '\u200b', 'a Unicode whitespace character')
+      fail(spaceU, '\u200c', 'a Unicode whitespace character')
+      fail(spaceU, '\u200d', 'a Unicode whitespace character')
+      fail(spaceU, '\u2060', 'a Unicode whitespace character')
     })
   })
 
@@ -591,8 +530,8 @@ describe('Regular expression parsers', () => {
 
   describe('spaces1', () => {
     it('fails if no whitespace is found', () => {
-      fail(spaces1, '', { expected: 'whitespace', actual: 'EOF' })
-      fail(spaces1, 'abc', { expected: 'whitespace', actual: '"a"' })
+      fail(spaces1, '', 'one or more whitespace characters')
+      fail(spaces1, 'abc', 'one or more whitespace characters')
     })
     it('skips all whitespace until the first non-whitespace', () => {
       pass(spaces1, '\t\t\tabc', { result: null, index: 3 })
@@ -601,34 +540,34 @@ describe('Regular expression parsers', () => {
       pass(spaces1, ' abc', { result: null, index: 1 })
     })
     it('fails on non-conventional Unicode whitespace', () => {
-      fail(spaces1, '\vabc', { expected: 'whitespace', actual: '"\v"' })
-      fail(spaces1, '\f\f\f\fabc', { expected: 'whitespace', actual: '"\f"' })
-      fail(spaces1, '\u0085abc', { expected: 'whitespace', actual: '"\u0085"' })
-      fail(spaces1, '\u00a0abc', { expected: 'whitespace', actual: '"\u00a0"' })
-      fail(spaces1, '\u1680abc', { expected: 'whitespace', actual: '"\u1680"' })
-      fail(spaces1, '\u2000abc', { expected: 'whitespace', actual: '"\u2000"' })
-      fail(spaces1, '\u2001abc', { expected: 'whitespace', actual: '"\u2001"' })
-      fail(spaces1, '\u2002abc', { expected: 'whitespace', actual: '"\u2002"' })
-      fail(spaces1, '\u2003abc', { expected: 'whitespace', actual: '"\u2003"' })
-      fail(spaces1, '\u2004abc', { expected: 'whitespace', actual: '"\u2004"' })
-      fail(spaces1, '\u2005abc', { expected: 'whitespace', actual: '"\u2005"' })
-      fail(spaces1, '\u2006abc', { expected: 'whitespace', actual: '"\u2006"' })
-      fail(spaces1, '\u2007abc', { expected: 'whitespace', actual: '"\u2007"' })
-      fail(spaces1, '\u2008abc', { expected: 'whitespace', actual: '"\u2008"' })
-      fail(spaces1, '\u2009abc', { expected: 'whitespace', actual: '"\u2009"' })
-      fail(spaces1, '\u200aabc', { expected: 'whitespace', actual: '"\u200a"' })
-      fail(spaces1, '\u2028abc', { expected: 'whitespace', actual: '"\u2028"' })
-      fail(spaces1, '\u2029abc', { expected: 'whitespace', actual: '"\u2029"' })
-      fail(spaces1, '\u202fabc', { expected: 'whitespace', actual: '"\u202f"' })
-      fail(spaces1, '\u205fabc', { expected: 'whitespace', actual: '"\u205f"' })
-      fail(spaces1, '\u3000abc', { expected: 'whitespace', actual: '"\u3000"' })
+      fail(spaces1, '\vabc', 'one or more whitespace characters')
+      fail(spaces1, '\f\f\f\fabc', 'one or more whitespace characters')
+      fail(spaces1, '\u0085abc', 'one or more whitespace characters')
+      fail(spaces1, '\u00a0abc', 'one or more whitespace characters')
+      fail(spaces1, '\u1680abc', 'one or more whitespace characters')
+      fail(spaces1, '\u2000abc', 'one or more whitespace characters')
+      fail(spaces1, '\u2001abc', 'one or more whitespace characters')
+      fail(spaces1, '\u2002abc', 'one or more whitespace characters')
+      fail(spaces1, '\u2003abc', 'one or more whitespace characters')
+      fail(spaces1, '\u2004abc', 'one or more whitespace characters')
+      fail(spaces1, '\u2005abc', 'one or more whitespace characters')
+      fail(spaces1, '\u2006abc', 'one or more whitespace characters')
+      fail(spaces1, '\u2007abc', 'one or more whitespace characters')
+      fail(spaces1, '\u2008abc', 'one or more whitespace characters')
+      fail(spaces1, '\u2009abc', 'one or more whitespace characters')
+      fail(spaces1, '\u200aabc', 'one or more whitespace characters')
+      fail(spaces1, '\u2028abc', 'one or more whitespace characters')
+      fail(spaces1, '\u2029abc', 'one or more whitespace characters')
+      fail(spaces1, '\u202fabc', 'one or more whitespace characters')
+      fail(spaces1, '\u205fabc', 'one or more whitespace characters')
+      fail(spaces1, '\u3000abc', 'one or more whitespace characters')
     })
   })
 
   describe('spaces1U', () => {
     it('fails if no whitespace is found', () => {
-      fail(spaces1U, '', { expected: 'whitespace', actual: 'EOF' })
-      fail(spaces1U, 'abc', { expected: 'whitespace', actual: '"a"' })
+      fail(spaces1U, '', 'one or more Unicode whitespace characters')
+      fail(spaces1U, 'abc', 'one or more Unicode whitespace characters')
     })
     it('skips all whitespace until the first non-whitespace', () => {
       pass(spaces1U, '\t\t\tabc', { result: null, index: 3 })
@@ -666,10 +605,10 @@ describe('Regular expression parsers', () => {
       pass(newline, '\r\nabc', '\r\n')
     })
     it('fails on any other character combination', () => {
-      fail(newline, '\u0085abc', { expected: 'a newline', actual: '"\u0085"' })
-      fail(newline, '\u2028abc', { expected: 'a newline', actual: '"\u2028"' })
-      fail(newline, '\u2029abc', { expected: 'a newline', actual: '"\u2029"' })
-      fail(newline, 'Onoma', { expected: 'a newline', actual: '"O"' })
+      fail(newline, '\u0085abc', 'a newline')
+      fail(newline, '\u2028abc', 'a newline')
+      fail(newline, '\u2029abc', 'a newline')
+      fail(newline, 'Onoma', 'a newline')
     })
     it('fails at EOF', () => {
       fail(newline, '', { expected: 'a newline', actual: 'EOF' })
@@ -686,10 +625,10 @@ describe('Regular expression parsers', () => {
       pass(newlineU, '\u2029abc', '\u2029')
     })
     it('fails on any other character combination', () => {
-      fail(newlineU, 'Onoma', { expected: 'a newline', actual: '"O"' })
+      fail(newlineU, 'Onoma', 'a Unicode newline')
     })
     it('fails at EOF', () => {
-      fail(newlineU, '', { expected: 'a newline', actual: 'EOF' })
+      fail(newlineU, '', 'a Unicode newline')
     })
   })
 })

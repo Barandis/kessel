@@ -22,7 +22,7 @@ import {
 } from 'kessel/parsers/char'
 import { fail, pass } from 'test/helper'
 
-describe('Character parsers', () => {
+describe.only('Character parsers', () => {
   describe('char', () => {
     context('1-byte characters', () => {
       const parser = char('O')
@@ -31,13 +31,13 @@ describe('Character parsers', () => {
         pass(parser, 'Onomatopoeia', 'O')
       })
       it('fails if the next character does not match', () => {
-        fail(parser, 'topoeia', '"t"')
+        fail(parser, 'topoeia', "'O'")
       })
       it('fails if the case does not match', () => {
-        fail(parser, 'onomatopoeia', '"o"')
+        fail(parser, 'onomatopoeia', "'O'")
       })
       it('fails at EOF', () => {
-        fail(parser, '', 'EOF')
+        fail(parser, '', "'O'")
       })
     })
 
@@ -48,13 +48,13 @@ describe('Character parsers', () => {
         pass(parser, 'Звукоподражание', 'З')
       })
       it('fails if the next character does not match', () => {
-        fail(parser, 'подражание', '"п"')
+        fail(parser, 'подражание', "'З'")
       })
       it('fails if the case does not match', () => {
-        fail(parser, 'звукоподражание', '"з"')
+        fail(parser, 'звукоподражание', "'З'")
       })
       it('fails at EOF', () => {
-        fail(parser, '', 'EOF')
+        fail(parser, '', "'З'")
       })
     })
 
@@ -65,10 +65,10 @@ describe('Character parsers', () => {
         pass(parser, 'คำเลียนเสียง', 'ค')
       })
       it('fails if the next character does not match', () => {
-        fail(parser, 'ยนเสียง', '"ย"')
+        fail(parser, 'ยนเสียง', "'ค'")
       })
       it('fails at EOF', () => {
-        fail(parser, '', 'EOF')
+        fail(parser, '', "'ค'")
       })
     })
 
@@ -79,10 +79,10 @@ describe('Character parsers', () => {
         pass(parser, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', '𝑂')
       })
       it('fails if the next character does not match', () => {
-        fail(parser, '𝑡𝑜𝑝𝑜𝑒𝑖𝑎', '"𝑡"')
+        fail(parser, '𝑡𝑜𝑝𝑜𝑒𝑖𝑎', "'𝑂'")
       })
       it('fails at EOF', () => {
-        fail(parser, '', 'EOF')
+        fail(parser, '', "'𝑂'")
       })
     })
   })
@@ -95,13 +95,13 @@ describe('Character parsers', () => {
         pass(parser, 'Onomatopoeia', 'O')
       })
       it('fails if the next character does not match', () => {
-        fail(parser, 'topoeia', '"t"')
+        fail(parser, 'topoeia', "'O'")
       })
       it('succeeds if the case does not match', () => {
         pass(parser, 'onomatopoeia', 'o')
       })
       it('fails at EOF', () => {
-        fail(parser, '', 'EOF')
+        fail(parser, '', "'O'")
       })
     })
 
@@ -112,13 +112,13 @@ describe('Character parsers', () => {
         pass(parser, 'Звукоподражание', 'З')
       })
       it('fails if the next character does not match', () => {
-        fail(parser, 'подражание', '"п"')
+        fail(parser, 'подражание', "'З'")
       })
       it('fails if the case does not match', () => {
         pass(parser, 'звукоподражание', 'з')
       })
       it('fails at EOF', () => {
-        fail(parser, '', 'EOF')
+        fail(parser, '', "'З'")
       })
     })
 
@@ -129,10 +129,10 @@ describe('Character parsers', () => {
         pass(parser, 'คำเลียนเสียง', 'ค')
       })
       it('fails if the next character does not match', () => {
-        fail(parser, 'ยนเสียง', '"ย"')
+        fail(parser, 'ยนเสียง', "'ค'")
       })
       it('fails at EOF', () => {
-        fail(parser, '', 'EOF')
+        fail(parser, '', "'ค'")
       })
     })
 
@@ -143,10 +143,10 @@ describe('Character parsers', () => {
         pass(parser, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', '𝑂')
       })
       it('fails if the next character does not match', () => {
-        fail(parser, '𝑡𝑜𝑝𝑜𝑒𝑖𝑎', '"𝑡"')
+        fail(parser, '𝑡𝑜𝑝𝑜𝑒𝑖𝑎', "'𝑂'")
       })
       it('fails at EOF', () => {
-        fail(parser, '', 'EOF')
+        fail(parser, '', "'𝑂'")
       })
     })
   })
@@ -156,18 +156,18 @@ describe('Character parsers', () => {
 
     it('tests the next 1-byte character', () => {
       pass(satisfy(fn), 'Onomatopoeia', { result: 'O', index: 1 })
-      fail(satisfy(fn), 'onomatopoeia', {
-        expected: 'a character that satisfies function "fn"',
-        actual: '"o"',
-      })
+      fail(
+        satisfy(fn), 'onomatopoeia', "a character that satisfies function 'fn'",
+      )
     })
 
     it('tests the next 2-byte character', () => {
       pass(satisfy(fn), 'Звукоподражание', { result: 'З', index: 2 })
-      fail(satisfy(fn), 'звукоподражание', {
-        expected: 'a character that satisfies function "fn"',
-        actual: '"з"',
-      })
+      fail(
+        satisfy(fn),
+        'звукоподражание',
+        "a character that satisfies function 'fn'",
+      )
     })
 
     it('tests the next 3-byte character', () => {
@@ -179,17 +179,15 @@ describe('Character parsers', () => {
     })
 
     it('names an unnamed function <anonymous>', () => {
-      fail(satisfy(char => char === char.toUpperCase()), 'onomatopoeia', {
-        expected: 'a character that satisfies function "<anonymous>"',
-        actual: '"o"',
-      })
+      fail(
+        satisfy(char => char === char.toUpperCase()),
+        'onomatopoeia',
+        "a character that satisfies function '<anonymous>'",
+      )
     })
 
     it('fails automatically at EOF', () => {
-      fail(satisfy(fn), '', {
-        expected: 'a character that satisfies function "fn"',
-        actual: 'EOF',
-      })
+      fail(satisfy(fn), '', "a character that satisfies function 'fn'")
     })
   })
 
@@ -201,13 +199,13 @@ describe('Character parsers', () => {
       pass(range('𝑎', '𝑧'), '𝑖𝑗𝑘', '𝑖')
     })
     it('fails if the next character is not between the supplied two', () => {
-      fail(range('a', 'z'), '123', '"1"')
-      fail(range('а', 'я'), 'աբգ', '"ա"')
-      fail(range('ก', 'ฮ'), 'ａｂｃ', '"ａ"')
-      fail(range('𝑎', '𝑧'), '𝒊𝒋𝒌', '"𝒊"')
+      fail(range('a', 'z'), '123', "a character between 'a' and 'z'")
+      fail(range('а', 'я'), 'աբգ', "a character between 'а' and 'я'")
+      fail(range('ก', 'ฮ'), 'ａｂｃ', "a character between 'ก' and 'ฮ'")
+      fail(range('𝑎', '𝑧'), '𝒊𝒋𝒌', "a character between '𝑎' and '𝑧'")
     })
     it('fails at EOF', () => {
-      fail(range('a', 'z'), '', 'EOF')
+      fail(range('a', 'z'), '', "a character between 'a' and 'z'")
     })
   })
 
@@ -225,22 +223,22 @@ describe('Character parsers', () => {
       pass(any, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂', index: 4 })
     })
     it('fails at EOF', () => {
-      fail(any, '', { expected: 'any character', actual: 'EOF' })
+      fail(any, '', 'any character')
     })
   })
 
   describe('eof', () => {
     it('fails if there are any remaining 1-byte characters', () => {
-      fail(eof, 'Onomatopoeia', { expected: 'EOF', actual: '"O"' })
+      fail(eof, 'Onomatopoeia', 'end of input')
     })
     it('fails if there are any remaining 2-byte characters', () => {
-      fail(eof, 'Звукоподражание', { expected: 'EOF', actual: '"З"' })
+      fail(eof, 'Звукоподражание', 'end of input')
     })
     it('fails if there are any remaining 3-byte characters', () => {
-      fail(eof, 'คำเลียนเสียง', { expected: 'EOF', actual: '"ค"' })
+      fail(eof, 'คำเลียนเสียง', 'end of input')
     })
     it('fails if there are any remaining 4-byte characters', () => {
-      fail(eof, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { expected: 'EOF', actual: '"𝑂"' })
+      fail(eof, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', 'end of input')
     })
     it('succeeds only at EOF', () => {
       pass(eof, '', { result: null, index: 0 })
@@ -252,93 +250,57 @@ describe('Character parsers', () => {
       const parser = anyOf('Onoma')
       pass(parser, 'Onomatopoeia', { result: 'O', index: 1 })
       pass(parser, 'matriculate', { result: 'm', index: 1 })
-      fail(parser, 'Matriculate', {
-        expected: 'any of "O", "n", "o", "m", or "a"',
-        actual: '"M"',
-      })
+      fail(parser, 'Matriculate', "any of 'O', 'n', 'o', 'm', or 'a'")
     })
 
     it('checks the next character against 2-byte characters', () => {
       const parser = anyOf('Звуко')
       pass(parser, 'Звукоподражание', { result: 'З', index: 2 })
       pass(parser, 'учитель', { result: 'у', index: 2 })
-      fail(parser, 'Учитель', {
-        expected: 'any of "З", "в", "у", "к", or "о"',
-        actual: '"У"',
-      })
+      fail(parser, 'Учитель', "any of 'З', 'в', 'у', 'к', or 'о'")
     })
 
     it('checks the next character against 3-byte characters', () => {
       const parser = anyOf('คำเลี')
       pass(parser, 'คำเลียนเสียง', { result: 'ค', index: 3 })
       pass(parser, 'ลียน', { result: 'ล', index: 3 })
-      fail(parser, 'ยง', {
-        expected: 'any of "ค", "ำ", "เ", "ล", or "ี"',
-        actual: '"ย"',
-      })
+      fail(parser, 'ยง', "any of 'ค', 'ำ', 'เ', 'ล', or 'ี'")
     })
 
     it('checks the next character against 4-byte characters', () => {
       const parser = anyOf('𝑂𝑛𝑜𝑚𝑎')
       pass(parser, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂', index: 4 })
       pass(parser, '𝑚𝑎𝑡𝑟𝑖𝑐𝑢𝑙𝑎𝑡𝑒', { result: '𝑚', index: 4 })
-      fail(parser, 'matriculate', {
-        expected: 'any of "𝑂", "𝑛", "𝑜", "𝑚", or "𝑎"',
-        actual: '"m"',
-      })
+      fail(parser, 'matriculate', "any of '𝑂', '𝑛', '𝑜', '𝑚', or '𝑎'")
     })
   })
 
   describe('noneOf', () => {
     it('checks the next charater against 1-byte characters', () => {
       const parser = noneOf('Onoma')
-      fail(parser, 'Onomatopoeia', {
-        expected: 'none of "O", "n", "o", "m", or "a"',
-        actual: '"O"',
-      })
-      fail(parser, 'matriculate', {
-        expected: 'none of "O", "n", "o", "m", or "a"',
-        actual: '"m"',
-      })
+      fail(parser, 'Onomatopoeia', "none of 'O', 'n', 'o', 'm', or 'a'")
+      fail(parser, 'matriculate', "none of 'O', 'n', 'o', 'm', or 'a'")
       pass(parser, 'Matriculate', { result: 'M', index: 1 })
     })
 
     it('checks the next character against 2-byte characters', () => {
       const parser = noneOf('Звуко')
-      fail(parser, 'Звукоподражание', {
-        expected: 'none of "З", "в", "у", "к", or "о"',
-        actual: '"З"',
-      })
-      fail(parser, 'учитель', {
-        expected: 'none of "З", "в", "у", "к", or "о"',
-        actual: '"у"',
-      })
+      fail(parser, 'Звукоподражание', "none of 'З', 'в', 'у', 'к', or 'о'")
+      fail(parser, 'учитель', "none of 'З', 'в', 'у', 'к', or 'о'")
       pass(parser, 'Учитель', { result: 'У', index: 2 })
     })
 
     it('checks the next character against 3-byte characters', () => {
       const parser = noneOf('คำเลี')
-      fail(parser, 'คำเลียนเสียง', {
-        expected: 'none of "ค", "ำ", "เ", "ล", or "ี"',
-        actual: '"ค"',
-      })
-      fail(parser, 'ลียน', {
-        expected: 'none of "ค", "ำ", "เ", "ล", or "ี"',
-        actual: '"ล"',
-      })
+      fail(parser, 'คำเลียนเสียง', "none of 'ค', 'ำ', 'เ', 'ล', or 'ี'")
+      fail(parser, 'ลียน', "none of 'ค', 'ำ', 'เ', 'ล', or 'ี'")
       pass(parser, 'ยง', { result: 'ย', index: 3 })
     })
 
     it('checks the next character against 4-byte characters', () => {
       const parser = noneOf('𝑂𝑛𝑜𝑚𝑎')
-      fail(parser, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', {
-        expected: 'none of "𝑂", "𝑛", "𝑜", "𝑚", or "𝑎"',
-        actual: '"𝑂"',
-      })
-      fail(parser, '𝑚𝑎𝑡𝑟𝑖𝑐𝑢𝑙𝑎𝑡𝑒', {
-        expected: 'none of "𝑂", "𝑛", "𝑜", "𝑚", or "𝑎"',
-        actual: '"𝑚"',
-      })
+      fail(parser, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', "none of '𝑂', '𝑛', '𝑜', '𝑚', or '𝑎'")
+      fail(parser, '𝑚𝑎𝑡𝑟𝑖𝑐𝑢𝑙𝑎𝑡𝑒', "none of '𝑂', '𝑛', '𝑜', '𝑚', or '𝑎'")
       pass(parser, 'matriculate', { result: 'm', index: 1 })
     })
   })
@@ -348,10 +310,10 @@ describe('Character parsers', () => {
       pass(digit, '123', '1')
     })
     it('fails on any other character', () => {
-      fail(digit, 'abc', { expected: 'a digit', actual: '"a"' })
+      fail(digit, 'abc', 'a digit')
     })
     it('fails at EOF', () => {
-      fail(digit, '', { expected: 'a digit', actual: 'EOF' })
+      fail(digit, '', 'a digit')
     })
   })
 
@@ -361,10 +323,10 @@ describe('Character parsers', () => {
       pass(hex, 'abc', 'a')
     })
     it('fails on any other character', () => {
-      fail(hex, 'ghi', { expected: 'a hex digit', actual: '"g"' })
+      fail(hex, 'ghi', 'a hexadecimal digit')
     })
     it('fails at EOF', () => {
-      fail(hex, '', { expected: 'a hex digit', actual: 'EOF' })
+      fail(hex, '', 'a hexadecimal digit')
     })
   })
 
@@ -373,11 +335,11 @@ describe('Character parsers', () => {
       pass(octal, '123', '1')
     })
     it('fails on any other character', () => {
-      fail(octal, '890', { expected: 'an octal digit', actual: '"8"' })
-      fail(octal, 'abc', { expected: 'an octal digit', actual: '"a"' })
+      fail(octal, '890', 'an octal digit')
+      fail(octal, 'abc', 'an octal digit')
     })
     it('fails at EOF', () => {
-      fail(octal, '', { expected: 'an octal digit', actual: 'EOF' })
+      fail(octal, '', 'an octal digit')
     })
   })
 
@@ -389,10 +351,10 @@ describe('Character parsers', () => {
       pass(letter, 'a', 'a')
     })
     it('fails on digits', () => {
-      fail(letter, '0', { expected: 'a letter', actual: '"0"' })
+      fail(letter, '0', 'a letter')
     })
     it('fails on whitespace', () => {
-      fail(letter, ' ', { expected: 'a letter', actual: '" "' })
+      fail(letter, ' ', 'a letter')
     })
   })
 
@@ -407,7 +369,7 @@ describe('Character parsers', () => {
       pass(alpha, '0', '0')
     })
     it('fails on whitespace', () => {
-      fail(alpha, ' ', { expected: 'an alphanumeric character', actual: '" "' })
+      fail(alpha, ' ', 'an alphanumeric character')
     })
   })
 
@@ -416,28 +378,28 @@ describe('Character parsers', () => {
       pass(upper, 'A', 'A')
     })
     it('fails on lowercase letters', () => {
-      fail(upper, 'a', { expected: 'an uppercase letter', actual: '"a"' })
+      fail(upper, 'a', 'an uppercase letter')
     })
     it('fails on digits', () => {
-      fail(upper, '0', { expected: 'an uppercase letter', actual: '"0"' })
+      fail(upper, '0', 'an uppercase letter')
     })
     it('fails on whitespace', () => {
-      fail(upper, ' ', { expected: 'an uppercase letter', actual: '" "' })
+      fail(upper, ' ', 'an uppercase letter')
     })
   })
 
   describe('lower', () => {
     it('fails on uppercase letters', () => {
-      fail(lower, 'A', { expected: 'a lowercase letter', actual: '"A"' })
+      fail(lower, 'A', 'a lowercase letter')
     })
     it('succeeds on lowercase letters', () => {
       pass(lower, 'a', 'a')
     })
     it('fails on digits', () => {
-      fail(lower, '0', { expected: 'a lowercase letter', actual: '"0"' })
+      fail(lower, '0', 'a lowercase letter')
     })
     it('fails on whitespace', () => {
-      fail(lower, ' ', { expected: 'a lowercase letter', actual: '" "' })
+      fail(lower, ' ', 'a lowercase letter')
     })
   })
 })

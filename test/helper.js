@@ -114,19 +114,21 @@ export function pass(parser, test, value) {
  *     containing one or more properties that can be tested against the
  *     parser state.
  */
-export function fail(parser, test, error) {
+export function fail(parser, test, error = {}) {
   const [state, result] = parse(parser, test)
 
   if (result.status === Status.Ok) {
     expect.fail(`Unexpected success: ${result.value}`)
   } else if (typeof error === 'string') {
-    expect(first(result.errors, ErrorType.Unexpected)).to.equal(error)
+    expect(all(result.errors, ErrorType.Expected)).to.equal(error)
   } else {
     if ('expected' in error) {
       expect(all(result.errors, ErrorType.Expected)).to.equal(error.expected)
     }
-    if ('actual' in error) {
-      expect(first(result.errors, ErrorType.Unexpected)).to.equal(error.actual)
+    if ('unexpected' in error) {
+      expect(
+        first(result.errors, ErrorType.Unexpected),
+      ).to.equal(error.unexpected)
     }
     if ('generic' in error) {
       expect(first(result.errors, ErrorType.Generic)).to.equal(error.generic)
