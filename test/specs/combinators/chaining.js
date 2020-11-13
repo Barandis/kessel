@@ -22,7 +22,7 @@ import { fail, pass } from 'test/helper'
 
 const { Error, Fatal } = Status
 
-describe.only('Chaining and piping combinators', () => {
+describe('Chaining and piping combinators', () => {
   describe('chain', () => {
     it('passes successful result to function to get the next parser', () => {
       pass(chain(any, c => char(c)), 'aa', { result: 'a', index: 2 })

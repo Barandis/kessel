@@ -31,7 +31,7 @@ import { error, fail, pass } from 'test/helper'
 
 const { Error, Fatal } = Status
 
-describe.only('Sequence combinators', () => {
+describe('Sequence combinators', () => {
   describe('seq', () => {
     const parser = seq([string('abc'), string('def'), string('ghi')])
 

@@ -14,7 +14,7 @@ import { fail, pass } from 'test/helper'
 
 const { Error, Fatal } = Status
 
-describe.only('Miscellaneous parsers', () => {
+describe('Miscellaneous parsers', () => {
   describe('constant', () => {
     it('succeeds with the passed-in value', () => {
       pass(constant('a'), '', 'a')

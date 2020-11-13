@@ -16,6 +16,7 @@ import {
   getLineIndexes,
   getPosition,
   isNewline,
+  merge,
   other,
   show,
   tabify,
@@ -524,16 +525,16 @@ describe('Parse errors', () => {
     })
 
     describe('format', () => {
-      const expecteds = [
+      const expecteds = merge(merge(
         expected('a letter'),
         expected('a digit'),
-        expected('whitespace'),
-      ]
-      const unexpecteds = [
+      ),
+      expected('whitespace'))
+      const unexpecteds = merge(
         unexpected('end of input'), unexpected('"a"'),
-      ]
-      const generics = [generic('Test message')]
-      const others = [other('Other message')]
+      )
+      const generics = generic('Test message')
+      const others = other('Other message')
       const view = stringToView(
         '\tOnomatopoeia\t\t\t\tคำเลียนเสียง\nЗвукоподражание',
       )
@@ -596,10 +597,9 @@ describe('Parse errors', () => {
     describe('formatErrors', () => {
       const input = '\t\tOnomatopoeia'
       const state = makeState(input)
-      state.success = false
       state.index = 4
       const result = {
-        errors: [expected('a digit')],
+        errors: expected('a digit'),
         status: Status.Error,
       }
 

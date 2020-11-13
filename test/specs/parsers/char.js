@@ -22,7 +22,7 @@ import {
 } from 'kessel/parsers/char'
 import { fail, pass } from 'test/helper'
 
-describe.only('Character parsers', () => {
+describe('Character parsers', () => {
   describe('char', () => {
     context('1-byte characters', () => {
       const parser = char('O')

@@ -20,7 +20,7 @@ import {
 } from 'kessel/parsers/regex'
 import { fail, pass } from 'test/helper'
 
-describe.only('Regular expression parsers', () => {
+describe('Regular expression parsers', () => {
   describe('regex', () => {
     it('accepts a string as input', () => {
       pass(regex('^\\w{3}'), 'Onomatopoeia', 'Ono')

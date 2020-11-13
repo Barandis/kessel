@@ -12,7 +12,7 @@ import { parse } from 'kessel/core'
 import { char } from 'kessel/parsers/char'
 import { fail } from 'test/helper'
 
-describe.only('Message combinators', () => {
+describe('Message combinators', () => {
   describe('label', () => {
     it('does nothing if its parser succeeds', () => {
       const r1 = parse(char('a'), 'abc')

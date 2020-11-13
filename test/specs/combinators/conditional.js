@@ -20,7 +20,7 @@ import { fail, pass } from 'test/helper'
 
 const { Error, Fatal } = Status
 
-describe.only('Conditional and look-ahead combinators', () => {
+describe('Conditional and look-ahead combinators', () => {
   describe('lookAhead', () => {
     const parser = lookAhead(seq([string('ab'), string('cd')]))
 

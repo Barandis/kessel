@@ -7,16 +7,11 @@ import { expect } from 'chai'
 
 import { seq } from 'kessel/combinators/sequence'
 import { error, fatal, maybeFatal, ok, parse, Status } from 'kessel/core'
-import {
-  ErrorType,
-  expectedError,
-  overwrite,
-  unexpectedError,
-} from 'kessel/error'
+import { ErrorType, merge, unexpected } from 'kessel/error'
 import { char } from 'kessel/parsers/char'
 import { string } from 'kessel/parsers/string'
 import { stringToView } from 'kessel/util'
-import { error as terror, pass } from 'test/helper'
+import { error as perror, pass } from 'test/helper'
 
 const encoder = new TextEncoder()
 
@@ -36,7 +31,7 @@ describe('Core functionality', () => {
         pass(string('abc'), new DataView(encoder.encode('abc').buffer), 'abc')
       })
       it('throws an error if anything else is passed', () => {
-        terror(
+        perror(
           string('123'),
           123,
           'Parser input must be a string, a typed array, an array buffer, or '
@@ -71,22 +66,17 @@ describe('Core functionality', () => {
       })
       it('can update errors and/or index properties', () => {
         const [state, result] = parse(string('123'), 'abc')
-        const [ustate1, uresult1] = error(state, overwrite(
-          result.errors,
-          expectedError('"x"'),
-          expectedError('"y"'),
-          unexpectedError('"z"'),
+        const [ustate1, uresult1] = error(state, merge(
+          result.errors, unexpected("'z'"),
         ))
         const [ustate2, uresult2] = error(state)
 
         expect(result.errors).to.deep.equal([
-          { type: ErrorType.Unexpected, message: '"abc"' },
-          { type: ErrorType.Expected, message: '"123"' },
+          { type: ErrorType.Expected, message: "'123'" },
         ])
         expect(uresult1.errors).to.deep.equal([
-          { type: ErrorType.Expected, message: '"x"' },
-          { type: ErrorType.Expected, message: '"y"' },
-          { type: ErrorType.Unexpected, message: '"z"' },
+          { type: ErrorType.Expected, message: "'123'" },
+          { type: ErrorType.Unexpected, message: "'z'" },
         ])
         expect(uresult2.errors).to.deep.equal([])
         expect(state.index).to.equal(0)
@@ -104,22 +94,17 @@ describe('Core functionality', () => {
       })
       it('can update errors and/or index properties', () => {
         const [state, result] = parse(seq([char('a'), char('1')]), 'abc')
-        const [ustate1, uresult1] = fatal(state, overwrite(
-          result.errors,
-          expectedError('"x"'),
-          expectedError('"y"'),
-          unexpectedError('"z"'),
+        const [ustate1, uresult1] = fatal(state, merge(
+          result.errors, unexpected("'z'"),
         ), 17)
         const [ustate2, uresult2] = fatal(state)
 
         expect(result.errors).to.deep.equal([
-          { type: ErrorType.Unexpected, message: '"b"' },
-          { type: ErrorType.Expected, message: '"1"' },
+          { type: ErrorType.Expected, message: "'1'" },
         ])
         expect(uresult1.errors).to.deep.equal([
-          { type: ErrorType.Expected, message: '"x"' },
-          { type: ErrorType.Expected, message: '"y"' },
-          { type: ErrorType.Unexpected, message: '"z"' },
+          { type: ErrorType.Expected, message: "'1'" },
+          { type: ErrorType.Unexpected, message: "'z'" },
         ])
         expect(uresult2.errors).to.deep.equal([])
         expect(state.index).to.equal(1)

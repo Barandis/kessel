@@ -6,7 +6,7 @@
 import { all, anyString, string, stringi } from 'kessel/parsers/string'
 import { fail, pass } from 'test/helper'
 
-describe.only('String parsers', () => {
+describe('String parsers', () => {
   describe('string', () => {
     it('fails at the end of input', () => {
       fail(string('abc'), '', "'abc'")

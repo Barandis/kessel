@@ -27,7 +27,7 @@ import { fail, pass } from 'test/helper'
 
 const { Error, Fatal } = Status
 
-describe.only('Alternative and error recovery combinators', () => {
+describe('Alternative and error recovery combinators', () => {
   describe('alt', () => {
     const parser = alt([
       seq([char('a'), char('b')]),
