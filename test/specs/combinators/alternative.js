@@ -25,7 +25,9 @@ import { any, char, digit, eof, letter } from 'kessel/parsers/char'
 import { string } from 'kessel/parsers/string'
 import { fail, pass } from 'test/helper'
 
-describe('Alternative and error recovery combinators', () => {
+const { Error, Fatal } = Status
+
+describe.only('Alternative and error recovery combinators', () => {
   describe('alt', () => {
     const parser = alt([
       seq([char('a'), char('b')]),
@@ -34,10 +36,10 @@ describe('Alternative and error recovery combinators', () => {
     ])
 
     it('fails with all expecteds if all parsers fail without consuming', () => {
-      fail(parser, 'yz', { expected: '"a", "c", or "e"' })
+      fail(parser, 'yz', "'a', 'c', or 'e'")
     })
     it('fails immediately if a failed parser consumes input', () => {
-      fail(parser, 'ce', { expected: '"a" or "d"' })
+      fail(parser, 'ce', "'a' or 'd'")
     })
     it('succeeds if one parser succeeds first', () => {
       pass(parser, 'cd', { result: ['c', 'd'] })
@@ -53,10 +55,10 @@ describe('Alternative and error recovery combinators', () => {
     '"ab", "cd", or "ef"')
 
     it('fails with its message if all parsers fail without consuming', () => {
-      fail(parser, 'yz', { expected: '"ab", "cd", or "ef"' })
+      fail(parser, 'yz', '"ab", "cd", or "ef"')
     })
     it('fails immediately if a failed parser consumes input', () => {
-      fail(parser, 'ce', { expected: '"ab", "cd", or "ef"' })
+      fail(parser, 'ce', '"ab", "cd", or "ef"')
     })
     it('succeeds if one parser succeeds first', () => {
       pass(parser, 'cd', { result: ['c', 'd'] })
@@ -72,10 +74,9 @@ describe('Alternative and error recovery combinators', () => {
     })
     it('fails fatally if its parser fails fatally', () => {
       fail(optional(seq([char('a'), char('b')])), 'acd', {
-        expected: '"b"',
-        actual: '"c"',
+        expected: "'b'",
         index: 1,
-        status: Status.Fatal,
+        status: Fatal,
       })
       pass(optional(back(seq([char('a'), char('b')]))), 'acd', {
         result: null,
@@ -97,8 +98,8 @@ describe('Alternative and error recovery combinators', () => {
     })
     it('resets the index if its parser fails with consuming input', () => {
       const parser = seq([string('te'), string('st')])
-      fail(parser, 'tesl', { index: 2, status: Status.Fatal })
-      fail(back(parser), 'tesl', { index: 0, status: Status.Error })
+      fail(parser, 'tesl', { index: 2, status: Fatal })
+      fail(back(parser), 'tesl', { index: 0, status: Error })
     })
   })
 
@@ -111,9 +112,8 @@ describe('Alternative and error recovery combinators', () => {
     })
     it('fails fatally if its parser does', () => {
       fail(orElse(seq([string('ab'), string('cd')]), 'z'), 'abce', {
-        expected: '"cd"',
-        actual: '"ce"',
-        status: Status.Fatal,
+        expected: "'cd'",
+        status: Fatal,
       })
     })
   })
@@ -122,9 +122,9 @@ describe('Alternative and error recovery combinators', () => {
     const parser = seqB([string('abc'), string('def'), string('ghi')])
 
     it('fails if any of its parsers fail', () => {
-      fail(parser, 'abd', { expected: '"abc"', actual: '"abd"', index: 0 })
-      fail(parser, 'abcdf', { expected: '"def"', actual: '"df"', index: 0 })
-      fail(parser, 'abcdefh', { expected: '"ghi"', actual: '"h"', index: 0 })
+      fail(parser, 'abd', { expected: "'abc'", index: 0 })
+      fail(parser, 'abcdf', { expected: "'def'", index: 0 })
+      fail(parser, 'abcdefh', { expected: "'ghi'", index: 0 })
     })
     it('succeeds if all of its parsers succeed', () => {
       pass(parser, 'abcdefghi', { result: ['abc', 'def', 'ghi'], index: 9 })
@@ -134,12 +134,7 @@ describe('Alternative and error recovery combinators', () => {
     })
     it('still fails fatally if any of its parsers does', () => {
       const parser = seqB([seq([letter, digit]), letter, digit])
-      fail(parser, 'aaa1', {
-        expected: 'a digit',
-        actual: '"a"',
-        index: 1,
-        status: Status.Fatal,
-      })
+      fail(parser, 'aaa1', { expected: 'a digit', index: 1, status: Fatal })
     })
   })
 
@@ -149,32 +144,28 @@ describe('Alternative and error recovery combinators', () => {
     })
     it('fails if its parser fails without calling the second parser', () => {
       fail(chainB(char('a'), () => char('b')), 'bb', {
-        expected: '"a"',
-        actual: '"b"',
+        expected: "'a'",
         index: 0,
-        status: Status.Error,
+        status: Error,
       })
     })
     it('fails non-fatally if the second fails after the first consumes', () => {
       fail(chainB(char('a'), () => char('b')), 'ac', {
-        expected: '"b"',
-        actual: '"c"',
+        expected: "'b'",
         index: 0,
-        status: Status.Error,
+        status: Error,
       })
     })
     it('still fails fatally if either parser fails fatally', () => {
       fail(chainB(seq([letter, digit]), () => letter), 'aaa', {
         expected: 'a digit',
-        actual: '"a"',
         index: 1,
-        status: Status.Fatal,
+        status: Fatal,
       })
       fail(chainB(letter, c => seq([char(c), char(c)])), 'aab', {
-        expected: '"a"',
-        actual: '"b"',
+        expected: "'a'",
         index: 2,
-        status: Status.Fatal,
+        status: Fatal,
       })
     })
   })
@@ -184,37 +175,26 @@ describe('Alternative and error recovery combinators', () => {
       pass(leftB(letter, digit), 'a1', 'a')
     })
     it('fails non-fatally if one parser fails and no input is consumed', () => {
-      fail(leftB(letter, digit), '1', {
-        expected: 'a letter',
-        actual: '"1"',
-        status: Status.Error,
-      })
-      fail(leftB(eof, char('a')), '', {
-        expected: '"a"',
-        actual: 'EOF',
-        status: Status.Error,
-      })
+      fail(leftB(letter, digit), '1', { expected: 'a letter', status: Error })
+      fail(leftB(eof, char('a')), '', { expected: "'a'", status: Error })
     })
     it('fails non-fatally on non-fatal errors after consumption', () => {
       fail(leftB(letter, digit), 'aa', {
         expected: 'a digit',
-        actual: '"a"',
         index: 0,
-        status: Status.Error,
+        status: Error,
       })
     })
     it('still fails fatally if either parser fails fatally', () => {
       fail(leftB(seq([letter, letter]), digit), 'a11', {
         expected: 'a letter',
-        actual: '"1"',
         index: 1,
-        status: Status.Fatal,
+        status: Fatal,
       })
       fail(leftB(letter, seq([letter, digit])), 'aab', {
         expected: 'a digit',
-        actual: '"b"',
         index: 2,
-        status: Status.Fatal,
+        status: Fatal,
       })
     })
   })
@@ -224,37 +204,26 @@ describe('Alternative and error recovery combinators', () => {
       pass(rightB(letter, digit), 'a1', '1')
     })
     it('fails non-fatally if one parser fails and no input is consumed', () => {
-      fail(rightB(letter, digit), '1', {
-        expected: 'a letter',
-        actual: '"1"',
-        status: Status.Error,
-      })
-      fail(rightB(eof, char('a')), '', {
-        expected: '"a"',
-        actual: 'EOF',
-        status: Status.Error,
-      })
+      fail(rightB(letter, digit), '1', { expected: 'a letter', status: Error })
+      fail(rightB(eof, char('a')), '', { expected: "'a'", status: Error })
     })
     it('fails non-fatally on non-fatal errors after consumption', () => {
       fail(rightB(letter, digit), 'aa', {
         expected: 'a digit',
-        actual: '"a"',
         index: 0,
-        status: Status.Error,
+        status: Error,
       })
     })
     it('still fails fatally if either parser fails fatally', () => {
       fail(rightB(seq([letter, letter]), digit), 'a11', {
         expected: 'a letter',
-        actual: '"1"',
         index: 1,
-        status: Status.Fatal,
+        status: Fatal,
       })
       fail(rightB(letter, seq([letter, digit])), 'aab', {
         expected: 'a digit',
-        actual: '"b"',
         index: 2,
-        status: Status.Fatal,
+        status: Fatal,
       })
     })
   })
@@ -264,37 +233,26 @@ describe('Alternative and error recovery combinators', () => {
       pass(bothB(letter, digit), 'a1', ['a', '1'])
     })
     it('fails non-fatally if one parser fails and no input is consumed', () => {
-      fail(bothB(letter, digit), '1', {
-        expected: 'a letter',
-        actual: '"1"',
-        status: Status.Error,
-      })
-      fail(bothB(eof, char('a')), '', {
-        expected: '"a"',
-        actual: 'EOF',
-        status: Status.Error,
-      })
+      fail(bothB(letter, digit), '1', { expected: 'a letter', status: Error })
+      fail(bothB(eof, char('a')), '', { expected: "'a'", status: Error })
     })
     it('fails non-fatally on non-fatal errors after consumption', () => {
       fail(bothB(letter, digit), 'aa', {
         expected: 'a digit',
-        actual: '"a"',
         index: 0,
-        status: Status.Error,
+        status: Error,
       })
     })
     it('still fails fatally if either parser fails fatally', () => {
       fail(bothB(seq([letter, letter]), digit), 'a11', {
         expected: 'a letter',
-        actual: '"1"',
         index: 1,
-        status: Status.Fatal,
+        status: Fatal,
       })
       fail(bothB(letter, seq([letter, digit])), 'aab', {
         expected: 'a digit',
-        actual: '"b"',
         index: 2,
-        status: Status.Fatal,
+        status: Fatal,
       })
     })
   })
@@ -308,25 +266,22 @@ describe('Alternative and error recovery combinators', () => {
     it('fails non-fatally if no input was consumed', () => {
       fail(countB(letter, 5), '12345', {
         expected: 'a letter',
-        actual: '"1"',
         index: 0,
-        status: Status.Error,
+        status: Error,
       })
     })
     it('fails fatally if the parser fails fatally', () => {
       fail(countB(seq([letter, letter]), 5), 'a1b2c3d4e5', {
         expected: 'a letter',
-        actual: '"1"',
         index: 1,
-        status: Status.Fatal,
+        status: Fatal,
       })
     })
     it('fails non-fatally on non-fatal errors if input was consumed', () => {
       fail(countB(letter, 5), 'abc123', {
         expected: 'a letter',
-        actual: '"1"',
         index: 0,
-        status: Status.Error,
+        status: Error,
       })
     })
   })
@@ -341,31 +296,27 @@ describe('Alternative and error recovery combinators', () => {
     it('fails if the content parser fails before the end', () => {
       fail(manyTillB(digit, letter), '.123abc', {
         expected: 'a digit or a letter',
-        actual: '"."',
         index: 0,
-        status: Status.Error,
+        status: Error,
       })
     })
     it('backtracks if input is consumed before content parser fails', () => {
       fail(manyTillB(digit, letter), '123.abc', {
         expected: 'a digit or a letter',
-        actual: '"."',
         index: 0,
-        status: Status.Error,
+        status: Error,
       })
     })
     it('fails fatally if either of its parsers fail fatally', () => {
       fail(manyTillB(digit, seq([letter, digit])), '123abc', {
         expected: 'a digit',
-        actual: '"b"',
         index: 4,
-        status: Status.Fatal,
+        status: Fatal,
       })
       fail(manyTillB(seq([letter, digit]), digit), 'a1b2cc3', {
         expected: 'a digit',
-        actual: '"c"',
         index: 5,
-        status: Status.Fatal,
+        status: Fatal,
       })
     })
   })

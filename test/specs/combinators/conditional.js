@@ -8,6 +8,7 @@ import {
   followedByL,
   lookAhead,
   notEmpty,
+  notEmptyL,
   notFollowedBy,
   notFollowedByL,
 } from 'kessel/combinators/conditional'
@@ -17,7 +18,9 @@ import { digit, letter } from 'kessel/parsers/char'
 import { string } from 'kessel/parsers/string'
 import { fail, pass } from 'test/helper'
 
-describe('Conditional and look-ahead combinators', () => {
+const { Error, Fatal } = Status
+
+describe.only('Conditional and look-ahead combinators', () => {
   describe('lookAhead', () => {
     const parser = lookAhead(seq([string('ab'), string('cd')]))
 
@@ -25,16 +28,16 @@ describe('Conditional and look-ahead combinators', () => {
       pass(parser, 'abcd', { result: ['ab', 'cd'], index: 0 })
     })
     it('fails with no consumption if its parser fails', () => {
-      fail(parser, 'abd', { expected: '"cd"', actual: '"d"', index: 0 })
+      fail(parser, 'abd', { expected: "'cd'", index: 0 })
     })
   })
 
   describe('notEmpty', () => {
     it('fails if its parser succeeds without consuming input', () => {
       fail(notEmpty(many(letter)), '123', {
-        expected: 'the parser to consume input',
+        expected: '',
         index: 0,
-        status: Status.Error,
+        status: Error,
       })
     })
     it('succeeds if its parser succeeds and consumed input', () => {
@@ -43,15 +46,38 @@ describe('Conditional and look-ahead combinators', () => {
     it('fails if its parser fails', () => {
       fail(notEmpty(letter), '123', {
         expected: 'a letter',
-        actual: '"1"',
         index: 0,
-        status: Status.Error,
+        status: Error,
       })
       fail(notEmpty(seq([letter, letter])), 'a1', {
         expected: 'a letter',
-        actual: '"1"',
         index: 1,
-        status: Status.Fatal,
+        status: Fatal,
+      })
+    })
+  })
+
+  describe('notEmptyL', () => {
+    it('fails if its parser succeeds without consuming input', () => {
+      fail(notEmptyL(many(letter), 'a letter'), '123', {
+        expected: 'a letter',
+        index: 0,
+        status: Error,
+      })
+    })
+    it('succeeds if its parser succeeds and consumed input', () => {
+      pass(notEmptyL(many(letter), 'a letter'), 'abc', ['a', 'b', 'c'])
+    })
+    it('fails if its parser fails', () => {
+      fail(notEmptyL(letter, 'at least one letter'), '123', {
+        expected: 'a letter',
+        index: 0,
+        status: Error,
+      })
+      fail(notEmptyL(seq([letter, letter]), 'a1 or something'), 'a1', {
+        expected: 'a letter',
+        index: 1,
+        status: Fatal,
       })
     })
   })
@@ -61,14 +87,8 @@ describe('Conditional and look-ahead combinators', () => {
       pass(followedBy(letter), 'abc', { result: null, index: 0 })
     })
     it('fails without changing state if its parser fails', () => {
-      fail(followedBy(letter), '123', {
-        index: 0,
-        status: Status.Error,
-      })
-      fail(followedBy(seq([letter, digit])), 'abc', {
-        index: 0,
-        status: Status.Error,
-      })
+      fail(followedBy(letter), '123', { index: 0, status: Error })
+      fail(followedBy(seq([letter, digit])), 'abc', { index: 0, status: Error })
     })
   })
 
@@ -80,19 +100,19 @@ describe('Conditional and look-ahead combinators', () => {
       fail(followedByL(letter, 'one single letter'), '123', {
         expected: 'one single letter',
         index: 0,
-        status: Status.Error,
+        status: Error,
       })
       fail(followedByL(seq([letter, digit]), 'a letter, then a digit'), 'abc', {
         expected: 'a letter, then a digit',
         index: 0,
-        status: Status.Error,
+        status: Error,
       })
     })
   })
 
   describe('notFollowedBy', () => {
     it('fails without changing state if its parser succeeds', () => {
-      fail(notFollowedBy(letter), 'abc', { index: 0, status: Status.Error })
+      fail(notFollowedBy(letter), 'abc', { index: 0, status: Error })
     })
     it('succeeds without changing state if its parser fails', () => {
       pass(notFollowedBy(letter), '123', { result: null, index: 0 })
@@ -107,7 +127,7 @@ describe('Conditional and look-ahead combinators', () => {
       fail(notFollowedByL(letter, 'something other than a letter'), 'abc', {
         expected: 'something other than a letter',
         index: 0,
-        status: Status.Error,
+        status: Error,
       })
     })
     it('succeeds without changing state if its parser fails', () => {

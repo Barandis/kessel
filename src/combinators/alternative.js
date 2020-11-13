@@ -4,8 +4,10 @@
 // https://opensource.org/licenses/MIT
 
 import { error, fatal, ok, makeParser, Status } from 'kessel/core'
-import { expectedError } from 'kessel/error'
+import { expected, merge } from 'kessel/error'
 import { dup, range } from 'kessel/util'
+
+const { Ok, Error, Fatal } = Status
 
 /** @typedef {import('kessel/core').Parser} Parser */
 
@@ -26,14 +28,14 @@ import { dup, range } from 'kessel/util'
  *     one succeeds.
  */
 export const alt = ps => makeParser(state => {
-  const errors = []
+  let errors = []
 
   for (const p of ps) {
-    const [tuple, [next, result]] = dup(p(state))
+    const [reply, [next, result]] = dup(p(state))
+    if (result.status === Ok) return reply
 
-    if (result.status === Status.Ok) return tuple
-    errors.push(...result.errors)
-    if (result.status === Status.Fatal) return fatal(next, errors)
+    errors = merge(errors, result.errors)
+    if (result.status === Fatal) return fatal(next, errors)
   }
   return error(state, errors)
 })
@@ -57,14 +59,12 @@ export const alt = ps => makeParser(state => {
  */
 export const altL = (ps, message) => makeParser(state => {
   for (const p of ps) {
-    const [tuple, [next, result]] = dup(p(state))
+    const [reply, [next, result]] = dup(p(state))
 
-    if (result.status === Status.Ok) return tuple
-    if (result.status === Status.Fatal) {
-      return fatal(next, [expectedError(message)])
-    }
+    if (result.status === Ok) return reply
+    if (result.status === Fatal) return fatal(next, expected(message))
   }
-  return error(state, [expectedError(message)])
+  return error(state, expected(message))
 })
 
 /**
@@ -80,9 +80,8 @@ export const altL = (ps, message) => makeParser(state => {
  *     if its contained parser succeeds.
  */
 export const optional = p => makeParser(state => {
-  const [tuple, [next, result]] = dup(p(state))
-  if (result.status === Status.Fatal) return tuple
-  return ok(next, null)
+  const [reply, [next, result]] = dup(p(state))
+  return result.status === Fatal ? reply : ok(next, null)
 })
 
 /**
@@ -101,9 +100,8 @@ export const optional = p => makeParser(state => {
  *     parser's successful result or the provided value.
  */
 export const orElse = (p, x) => makeParser(state => {
-  const [tuple, [next, result]] = dup(p(state))
-  if (result.status !== Status.Error) return tuple
-  return ok(next, x)
+  const [reply, [next, result]] = dup(p(state))
+  return result.status !== Error ? reply : ok(next, x)
 })
 
 /**
@@ -124,9 +122,8 @@ export const orElse = (p, x) => makeParser(state => {
  */
 export const back = p => makeParser(state => {
   const index = state.index
-  const [tuple, [next, result]] = dup(p(state))
-  if (result.status !== Status.Fatal) return tuple
-  return error(next, result.errors, index)
+  const [reply, [next, result]] = dup(p(state))
+  return result.status !== Fatal ? reply : error(next, result.errors, index)
 })
 
 /**
@@ -155,11 +152,11 @@ export const seqB = ps => makeParser(state => {
   let next = state
 
   for (const p of ps) {
-    const [tuple, [nextState, result]] = dup(p(next))
+    const [reply, [nextState, result]] = dup(p(next))
     next = nextState
 
-    if (result.status === Status.Fatal) return tuple
-    if (result.status === Status.Error) return error(next, result.errors, index)
+    if (result.status === Fatal) return reply
+    if (result.status === Error) return error(next, result.errors, index)
     if (result.value !== null) values.push(result.value)
   }
   return ok(next, values)
@@ -192,12 +189,11 @@ export const seqB = ps => makeParser(state => {
 export const chainB = (p, fn) => makeParser(state => {
   const index = state.index
 
-  const [tuple1, [next1, result1]] = dup(p(state))
-  if (result1.status !== Status.Ok) return tuple1
+  const [reply1, [next1, result1]] = dup(p(state))
+  if (result1.status !== Ok) return reply1
 
-  const [tuple2, [next2, result2]] = dup(fn(result1.value)(next1))
-  if (result2.status !== Status.Error) return tuple2
-  return error(next2, result2.errors, index)
+  const [reply2, [next2, result2]] = dup(fn(result1.value)(next1))
+  return result2.status !== Error ? reply2 : error(next2, result2.errors, index)
 })
 
 /**
@@ -222,15 +218,13 @@ export const chainB = (p, fn) => makeParser(state => {
 export const leftB = (p1, p2) => makeParser(state => {
   const index = state.index
 
-  const [tuple1, [next1, result1]] = dup(p1(state))
-  if (result1.status !== Status.Ok) return tuple1
+  const [reply1, [next1, result1]] = dup(p1(state))
+  if (result1.status !== Ok) return reply1
 
-  const [tuple2, [next2, result2]] = dup(p2(next1))
-  if (result2.status === Status.Fatal) return tuple2
-  if (result2.status === Status.Error) {
-    return error(next2, result2.errors, index)
-  }
-  return ok(next2, result1.value)
+  const [reply2, [next2, result2]] = dup(p2(next1))
+  return result2.status === Fatal ? reply2
+    : result2.status === Error ? error(next2, result2.errors, index)
+      : ok(next2, result1.value)
 })
 
 /**
@@ -255,12 +249,11 @@ export const leftB = (p1, p2) => makeParser(state => {
 export const rightB = (p1, p2) => makeParser(state => {
   const index = state.index
 
-  const [tuple1, [next1, result1]] = dup(p1(state))
-  if (result1.status !== Status.Ok) return tuple1
+  const [reply1, [next1, result1]] = dup(p1(state))
+  if (result1.status !== Status.Ok) return reply1
 
-  const [tuple2, [next2, result2]] = dup(p2(next1))
-  if (result2.status !== Status.Error) return tuple2
-  return error(next2, result2.errors, index)
+  const [reply2, [next2, result2]] = dup(p2(next1))
+  return result2.status === Error ? error(next2, result2.errors, index) : reply2
 })
 
 /**
@@ -285,15 +278,13 @@ export const rightB = (p1, p2) => makeParser(state => {
 export const bothB = (p1, p2) => makeParser(state => {
   const index = state.index
 
-  const [tuple1, [next1, result1]] = dup(p1(state))
-  if (result1.status !== Status.Ok) return tuple1
+  const [reply1, [next1, result1]] = dup(p1(state))
+  if (result1.status !== Ok) return reply1
 
-  const [tuple2, [next2, result2]] = dup(p2(next1))
-  if (result2.status === Status.Fatal) return tuple2
-  if (result2.status === Status.Ok) {
-    return ok(next2, [result1.value, result2.value])
-  }
-  return error(next2, result2.errors, index)
+  const [reply2, [next2, result2]] = dup(p2(next1))
+  return result2.status === Fatal ? reply2
+    : result2.status === Error ? error(next2, result2.errors, index)
+      : ok(next2, [result1.value, result2.value])
 })
 
 /**
@@ -317,10 +308,10 @@ export const countB = (p, n) => makeParser(state => {
   let next = state
 
   for (const _ of range(n)) {
-    const [tuple, [nextState, result]] = dup(p(next))
+    const [reply, [nextState, result]] = dup(p(next))
     next = nextState
-    if (result.status === Status.Fatal) return tuple
-    if (result.status === Status.Error) return error(next, result.errors, index)
+    if (result.status === Fatal) return reply
+    if (result.status === Error) return error(next, result.errors, index)
     values.push(result.value)
   }
   return ok(next, values)
@@ -355,16 +346,16 @@ export const manyTillB = (p, end) => makeParser(state => {
   let next = state
 
   while (true) {
-    const [tuple1, [next1, result1]] = dup(end(next))
+    const [reply1, [next1, result1]] = dup(end(next))
     next = next1
-    if (result1.status === Status.Fatal) return tuple1
-    if (result1.status === Status.Ok) break
+    if (result1.status === Fatal) return reply1
+    if (result1.status === Ok) break
 
-    const [tuple2, [next2, result2]] = dup(p(next))
+    const [reply2, [next2, result2]] = dup(p(next))
     next = next2
-    if (result2.status === Status.Fatal) return tuple2
-    if (result2.status === Status.Error) {
-      return error(next2, [...result2.errors, ...result1.errors], index)
+    if (result2.status === Fatal) return reply2
+    if (result2.status === Error) {
+      return error(next2, merge(result2.errors, result1.errors), index)
     }
     values.push(result2.value)
   }

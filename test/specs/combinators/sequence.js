@@ -25,18 +25,20 @@ import {
 } from 'kessel/combinators/sequence'
 import { Status } from 'kessel/core'
 import { any, char, digit, eof, letter } from 'kessel/parsers/char'
-import { space, spaceU } from 'kessel/parsers/regex'
+import { space } from 'kessel/parsers/regex'
 import { string } from 'kessel/parsers/string'
 import { error, fail, pass } from 'test/helper'
 
-describe('Sequence combinators', () => {
+const { Error, Fatal } = Status
+
+describe.only('Sequence combinators', () => {
   describe('seq', () => {
     const parser = seq([string('abc'), string('def'), string('ghi')])
 
     it('fails if any of its parsers fail', () => {
-      fail(parser, 'abd', { expected: '"abc"', actual: '"abd"', index: 0 })
-      fail(parser, 'abcdf', { expected: '"def"', actual: '"df"', index: 3 })
-      fail(parser, 'abcdefh', { expected: '"ghi"', actual: '"h"', index: 6 })
+      fail(parser, 'abd', { expected: "'abc'", index: 0 })
+      fail(parser, 'abcdf', { expected: "'def'", index: 3 })
+      fail(parser, 'abcdefh', { expected: "'ghi'", index: 6 })
     })
     it('succeeds if all of its parsers succeed', () => {
       pass(parser, 'abcdefghi', { result: ['abc', 'def', 'ghi'], index: 9 })
@@ -49,37 +51,29 @@ describe('Sequence combinators', () => {
   describe('block', () => {
     const parser = block(function *() {
       yield string('abc')
-      yield spaceU
+      yield space
       const c = yield any
-      yield spaceU
+      yield space
 
       return c
     })
 
     it('fails if any of its parsers fail', () => {
-      fail(parser, 'abd', {
-        expected: '"abc"',
-        actual: '"abd"',
-        index: 0,
-        status: Status.Error,
-      })
+      fail(parser, 'abd', { expected: "'abc'", index: 0, status: Error })
       fail(parser, 'abcd', {
-        expected: 'whitespace',
-        actual: '"d"',
+        expected: 'a whitespace character',
         index: 3,
-        status: Status.Fatal,
+        status: Fatal,
       })
       fail(parser, 'abc ', {
         expected: 'any character',
-        actual: 'EOF',
         index: 4,
-        status: Status.Fatal,
+        status: Fatal,
       })
       fail(parser, 'abc de', {
-        expected: 'whitespace',
-        actual: '"e"',
+        expected: 'a whitespace character',
         index: 5,
-        status: Status.Fatal,
+        status: Fatal,
       })
     })
     it('succeeds with its return value if all parsers succeed', () => {
@@ -101,10 +95,9 @@ describe('Sequence combinators', () => {
     })
     it('fails if its parser consumes while failing', () => {
       fail(many(seq([char('a'), char('b')])), 'ababac', {
-        expected: '"b"',
-        actual: '"c"',
+        expected: "'b'",
         index: 5,
-        status: Status.Fatal,
+        status: Fatal,
       })
     })
     it('does not add null to the results', () => {
@@ -114,8 +107,8 @@ describe('Sequence combinators', () => {
 
   describe('many1', () => {
     it('fails if its parser does not match at least once', () => {
-      fail(many1(digit), 'abc123', { expected: 'a digit', actual: '"a"' })
-      fail(many1(digit), '', { expected: 'a digit', actual: 'EOF' })
+      fail(many1(digit), 'abc123', 'a digit')
+      fail(many1(digit), '', 'a digit')
     })
     it('succeeds with all results until a non-match', () => {
       pass(many1(digit), '123abc', ['1', '2', '3'])
@@ -126,10 +119,9 @@ describe('Sequence combinators', () => {
     })
     it('fails if its parser consumes while failing', () => {
       fail(many1(seq([char('a'), char('b')])), 'ababac', {
-        expected: '"b"',
-        actual: '"c"',
+        expected: "'b'",
         index: 5,
-        status: Status.Fatal,
+        status: Fatal,
       })
     })
     it('does not add null to the results', () => {
@@ -143,15 +135,10 @@ describe('Sequence combinators', () => {
       pass(skip(many(letter)), 'abcdef123', { result: null, index: 6 })
     })
     it('propagates failures without modification', () => {
-      fail(skip(char('a')), '123', {
-        expected: '"a"',
-        actual: '"1"',
-        status: Status.Error,
-      })
+      fail(skip(char('a')), '123', { expected: "'a'", status: Error })
       fail(skip(seq([string('ab'), string('cd')])), 'abce', {
-        expected: '"cd"',
-        actual: '"ce"',
-        status: Status.Fatal,
+        expected: "'cd'",
+        status: Fatal,
       })
     })
   })
@@ -170,18 +157,17 @@ describe('Sequence combinators', () => {
     })
     it('fails if its parser consumes while failing', () => {
       fail(skipMany(seq([char('a'), char('b')])), 'ababac', {
-        expected: '"b"',
-        actual: '"c"',
+        expected: "'b'",
         index: 5,
-        status: Status.Fatal,
+        status: Fatal,
       })
     })
   })
 
   describe('skipMany1', () => {
     it('fails if its parser does not match at least once', () => {
-      fail(skipMany1(digit), 'abc123', { expected: 'a digit', actual: '"a"' })
-      fail(skipMany1(digit), '', { expected: 'a digit', actual: 'EOF' })
+      fail(skipMany1(digit), 'abc123', 'a digit')
+      fail(skipMany1(digit), '', 'a digit')
     })
     it('succeeds with all results until a non-match', () => {
       pass(skipMany1(digit), '123abc', { result: null, index: 3 })
@@ -192,10 +178,9 @@ describe('Sequence combinators', () => {
     })
     it('fails if its parser consumes while failing', () => {
       fail(skipMany1(seq([char('a'), char('b')])), 'ababac', {
-        expected: '"b"',
-        actual: '"c"',
+        expected: "'b'",
         index: 5,
-        status: Status.Fatal,
+        status: Fatal,
       })
     })
   })
@@ -221,23 +206,20 @@ describe('Sequence combinators', () => {
     it('fails if its content parser fails fatally', () => {
       fail(sepBy(seq([letter, letter]), char(',')), 'ab,a1', {
         expected: 'a letter',
-        actual: '"1"',
         index: 4,
-        status: Status.Fatal,
+        status: Fatal,
       })
       fail(sepBy(seq([letter, letter]), char(',')), 'a1', {
         expected: 'a letter',
-        actual: '"1"',
         index: 1,
-        status: Status.Fatal,
+        status: Fatal,
       })
     })
     it('fails if its separator parser fails fatally', () => {
       fail(sepBy(letter, seq([char('-'), char('-')])), 'a--b-c', {
-        expected: '"-"',
-        actual: '"c"',
+        expected: "'-'",
         index: 5,
-        status: Status.Fatal,
+        status: Fatal,
       })
     })
     it('throws if an infinite loop was detected', () => {
@@ -268,31 +250,27 @@ describe('Sequence combinators', () => {
     it('fails if there is no initial match', () => {
       fail(parser, '1', {
         expected: 'a letter',
-        actual: '"1"',
         index: 0,
-        status: Status.Error,
+        status: Error,
       })
     })
     it('fails if its content parser fails fatally', () => {
       fail(sepBy1(seq([letter, letter]), char(',')), 'ab,a1', {
         expected: 'a letter',
-        actual: '"1"',
         index: 4,
-        status: Status.Fatal,
+        status: Fatal,
       })
       fail(sepBy1(seq([letter, letter]), char(',')), 'a1', {
         expected: 'a letter',
-        actual: '"1"',
         index: 1,
-        status: Status.Fatal,
+        status: Fatal,
       })
     })
     it('fails if its separator parser fails fatally', () => {
       fail(sepBy1(letter, seq([char('-'), char('-')])), 'a--b-c', {
-        expected: '"-"',
-        actual: '"c"',
+        expected: "'-'",
         index: 5,
-        status: Status.Fatal,
+        status: Fatal,
       })
     })
     it('throws if an infinite loop was detected', () => {
@@ -326,23 +304,20 @@ describe('Sequence combinators', () => {
     it('fails if its content parser fails fatally', () => {
       fail(sepEndBy(seq([letter, letter]), char(',')), 'ab,a1', {
         expected: 'a letter',
-        actual: '"1"',
         index: 4,
-        status: Status.Fatal,
+        status: Fatal,
       })
       fail(sepEndBy(seq([letter, letter]), char(',')), 'a1', {
         expected: 'a letter',
-        actual: '"1"',
         index: 1,
-        status: Status.Fatal,
+        status: Fatal,
       })
     })
     it('fails if its separator parser fails fatally', () => {
       fail(sepEndBy(letter, seq([char('-'), char('-')])), 'a--b-c', {
-        expected: '"-"',
-        actual: '"c"',
+        expected: "'-'",
         index: 5,
-        status: Status.Fatal,
+        status: Fatal,
       })
     })
     it('throws if an infinite loop was detected', () => {
@@ -373,31 +348,27 @@ describe('Sequence combinators', () => {
     it('fails if there is no initial match', () => {
       fail(parser, '1', {
         expected: 'a letter',
-        actual: '"1"',
         index: 0,
-        status: Status.Error,
+        status: Error,
       })
     })
     it('fails if its content parser fails fatally', () => {
       fail(sepEndBy1(seq([letter, letter]), char(',')), 'ab,a1', {
         expected: 'a letter',
-        actual: '"1"',
         index: 4,
-        status: Status.Fatal,
+        status: Fatal,
       })
       fail(sepEndBy1(seq([letter, letter]), char(',')), 'a1', {
         expected: 'a letter',
-        actual: '"1"',
         index: 1,
-        status: Status.Fatal,
+        status: Fatal,
       })
     })
     it('fails if its separator parser fails fatally', () => {
       fail(sepEndBy1(letter, seq([char('-'), char('-')])), 'a--b-c', {
-        expected: '"-"',
-        actual: '"c"',
+        expected: "'-'",
         index: 5,
-        status: Status.Fatal,
+        status: Fatal,
       })
     })
     it('throws if an infinite loop was detected', () => {
@@ -419,25 +390,22 @@ describe('Sequence combinators', () => {
     it('fails non-fatally if no input was consumed', () => {
       fail(count(letter, 5), '12345', {
         expected: 'a letter',
-        actual: '"1"',
         index: 0,
-        status: Status.Error,
+        status: Error,
       })
     })
     it('fails fatally if the parser fails fatally', () => {
       fail(count(seq([letter, letter]), 5), 'a1b2c3d4e5', {
         expected: 'a letter',
-        actual: '"1"',
         index: 1,
-        status: Status.Fatal,
+        status: Fatal,
       })
     })
     it('fails fatally on non-fatal errors if input was consumed', () => {
       fail(count(letter, 5), 'abc123', {
         expected: 'a letter',
-        actual: '"1"',
         index: 3,
-        status: Status.Fatal,
+        status: Fatal,
       })
     })
   })
@@ -452,31 +420,27 @@ describe('Sequence combinators', () => {
     it('fails if the content parser fails before the end', () => {
       fail(manyTill(digit, letter), '.123abc', {
         expected: 'a digit or a letter',
-        actual: '"."',
         index: 0,
-        status: Status.Error,
+        status: Error,
       })
     })
     it('fails fatally if input is consumed before content parser fails', () => {
       fail(manyTill(digit, letter), '123.abc', {
         expected: 'a digit or a letter',
-        actual: '"."',
         index: 3,
-        status: Status.Fatal,
+        status: Fatal,
       })
     })
     it('fails fatally if either of its parsers fail fatally', () => {
       fail(manyTill(digit, seq([letter, digit])), '123abc', {
         expected: 'a digit',
-        actual: '"b"',
         index: 4,
-        status: Status.Fatal,
+        status: Fatal,
       })
       fail(manyTill(seq([letter, digit]), digit), 'a1b2cc3', {
         expected: 'a digit',
-        actual: '"c"',
         index: 5,
-        status: Status.Fatal,
+        status: Fatal,
       })
     })
     it('does not add null to the results', () => {
@@ -513,21 +477,18 @@ describe('Sequence combinators', () => {
     it('fails fatally if either parser fails fatally', () => {
       fail(chainl(seq([digit, digit]), op, 0), '1a', {
         expected: 'a digit',
-        actual: '"a"',
         index: 1,
-        status: Status.Fatal,
+        status: Fatal,
       })
       fail(chainl(seq([digit, digit]), op, 0), '12+1a', {
         expected: 'a digit',
-        actual: '"a"',
         index: 4,
-        status: Status.Fatal,
+        status: Fatal,
       })
       fail(chainl(p, seq([letter, letter]), 0), '23a1', {
         expected: 'a letter',
-        actual: '"1"',
         index: 3,
-        status: Status.Fatal,
+        status: Fatal,
       })
     })
   })
@@ -542,9 +503,8 @@ describe('Sequence combinators', () => {
     it('fails if there are no matches', () => {
       fail(chainl1(p, op), '', {
         expected: 'a digit',
-        actual: 'EOF',
         index: 0,
-        status: Status.Error,
+        status: Error,
       })
     })
     it('succeeds with the first match if op never matches', () => {
@@ -564,69 +524,63 @@ describe('Sequence combinators', () => {
     it('fails fatally if either parser fails fatally', () => {
       fail(chainl1(seq([digit, digit]), op), '1a', {
         expected: 'a digit',
-        actual: '"a"',
         index: 1,
-        status: Status.Fatal,
+        status: Fatal,
       })
       fail(chainl1(seq([digit, digit]), op), '12+1a', {
         expected: 'a digit',
-        actual: '"a"',
         index: 4,
-        status: Status.Fatal,
+        status: Fatal,
       })
       fail(chainl1(p, seq([letter, letter])), '23a1', {
         expected: 'a letter',
-        actual: '"1"',
         index: 3,
-        status: Status.Fatal,
+        status: Fatal,
       })
     })
   })
-})
 
-describe('chainr', () => {
-  const p = map(join(many1(digit)), x => parseInt(x))
-  const op = alt([
-    value(char('+'), (a, b) => a + b),
-    value(char('-'), (a, b) => a - b),
-  ])
+  describe('chainr', () => {
+    const p = map(join(many1(digit)), x => parseInt(x))
+    const op = alt([
+      value(char('+'), (a, b) => a + b),
+      value(char('-'), (a, b) => a - b),
+    ])
 
-  it('succeeds with a default value if there are no matches', () => {
-    pass(chainr(p, op, 0), '', { result: 0, index: 0 })
-  })
-  it('succeeds with the first match if op never matches', () => {
-    pass(chainr(p, op, 0), '23', { result: 23, index: 2 })
-  })
-  it('succeeds with one match of op', () => {
-    pass(chainr(p, op, 0), '23+17', { result: 40, index: 5 })
-    pass(chainr(p, op, 0), '23-17', { result: 6, index: 5 })
-  })
-  it('succeeds right-associatively with more than one match of op', () => {
-    // incorrect math, good testing
-    pass(chainr(p, op, 0), '23+17-42', { result: -2, index: 8 })
-    pass(chainr(p, op, 0), '23-17+42', { result: -36, index: 8 })
-  })
-  it('ignores the last op if there is no p match after', () => {
-    pass(chainr(p, op, 0), '23+17-', { result: 40, index: 5 })
-  })
-  it('fails fatally if either parser fails fatally', () => {
-    fail(chainr(seq([digit, digit]), op, 0), '1a', {
-      expected: 'a digit',
-      actual: '"a"',
-      index: 1,
-      status: Status.Fatal,
+    it('succeeds with a default value if there are no matches', () => {
+      pass(chainr(p, op, 0), '', { result: 0, index: 0 })
     })
-    fail(chainr(seq([digit, digit]), op, 0), '12+1a', {
-      expected: 'a digit',
-      actual: '"a"',
-      index: 4,
-      status: Status.Fatal,
+    it('succeeds with the first match if op never matches', () => {
+      pass(chainr(p, op, 0), '23', { result: 23, index: 2 })
     })
-    fail(chainr(p, seq([letter, letter]), 0), '23a1', {
-      expected: 'a letter',
-      actual: '"1"',
-      index: 3,
-      status: Status.Fatal,
+    it('succeeds with one match of op', () => {
+      pass(chainr(p, op, 0), '23+17', { result: 40, index: 5 })
+      pass(chainr(p, op, 0), '23-17', { result: 6, index: 5 })
+    })
+    it('succeeds right-associatively with more than one match of op', () => {
+      // incorrect math, good testing
+      pass(chainr(p, op, 0), '23+17-42', { result: -2, index: 8 })
+      pass(chainr(p, op, 0), '23-17+42', { result: -36, index: 8 })
+    })
+    it('ignores the last op if there is no p match after', () => {
+      pass(chainr(p, op, 0), '23+17-', { result: 40, index: 5 })
+    })
+    it('fails fatally if either parser fails fatally', () => {
+      fail(chainr(seq([digit, digit]), op, 0), '1a', {
+        expected: 'a digit',
+        index: 1,
+        status: Fatal,
+      })
+      fail(chainr(seq([digit, digit]), op, 0), '12+1a', {
+        expected: 'a digit',
+        index: 4,
+        status: Fatal,
+      })
+      fail(chainr(p, seq([letter, letter]), 0), '23a1', {
+        expected: 'a letter',
+        index: 3,
+        status: Fatal,
+      })
     })
   })
 
@@ -640,9 +594,8 @@ describe('chainr', () => {
     it('fails if there are no matches', () => {
       fail(chainr1(p, op), '', {
         expected: 'a digit',
-        actual: 'EOF',
         index: 0,
-        status: Status.Error,
+        status: Error,
       })
     })
     it('succeeds with the first match if op never matches', () => {
@@ -662,21 +615,18 @@ describe('chainr', () => {
     it('fails fatally if either parser fails fatally', () => {
       fail(chainr1(seq([digit, digit]), op), '1a', {
         expected: 'a digit',
-        actual: '"a"',
         index: 1,
-        status: Status.Fatal,
+        status: Fatal,
       })
       fail(chainr1(seq([digit, digit]), op), '12+1a', {
         expected: 'a digit',
-        actual: '"a"',
         index: 4,
-        status: Status.Fatal,
+        status: Fatal,
       })
       fail(chainr1(p, seq([letter, letter])), '23a1', {
         expected: 'a letter',
-        actual: '"1"',
         index: 3,
-        status: Status.Fatal,
+        status: Fatal,
       })
     })
   })

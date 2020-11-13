@@ -4,8 +4,10 @@
 // https://opensource.org/licenses/MIT
 
 import { error, ok, makeParser, Status } from 'kessel/core'
-import { expectedError } from 'kessel/error'
+import { expected } from 'kessel/error'
 import { dup } from 'kessel/util'
+
+const { Ok } = Status
 
 /** @typedef {import('kessel/core').Parser} Parser */
 
@@ -26,8 +28,7 @@ import { dup } from 'kessel/util'
 export const lookAhead = p => makeParser(state => {
   const index = state.index
   const [next, result] = p(state)
-  return result.status === Status.Ok
-    ? ok(next, result.value, index)
+  return result.status === Ok ? ok(next, result.value, index)
     : error(next, result.errors, index)
 })
 
@@ -40,15 +41,40 @@ export const lookAhead = p => makeParser(state => {
  * at least once. For instance, one could implement `many1(p)` with
  * `notEmpty(many(p))`.
  *
+ * This parser produces no error messages on failure. It should be used
+ * in conjunction with other parsers that take care of potential errors,
+ * or else `notEmptyL` should be used instead.
+ *
  * @param {Parser} p The parser to apply.
  * @returns {Parser} A parser which fails if `p` passes but doesn't
  *     consume any input, or otherwise passes the result through.
  */
 export const notEmpty = p => makeParser(state => {
   const index = state.index
-  const [tuple, [next, result]] = dup(p(state))
-  if (result.status !== Status.Ok || next.index !== index) return tuple
-  return error(next, [expectedError('the parser to consume input')])
+  const [reply, [next, result]] = dup(p(state))
+  return result.status !== Ok || next.index !== index ? reply : error(next)
+})
+
+/**
+ * Creates a parser that fails if the provided parser succeeds but does
+ * not consume input. If the parser succeeds any other way or fails,
+ * this parser transparently passes that result along.
+ *
+ * This effect is useful for turning a parser into one which must match
+ * at least once. For instance, one could implement `many1(p)` with
+ * `notEmpty(many(p))`.
+ *
+ * @param {Parser} p The parser to apply.
+ * @param {string} msg The expected error message to use if `p` succeeds
+ *     without consuming input.
+ * @returns {Parser} A parser which fails if `p` passes but doesn't
+ *     consume any input, or otherwise passes the result through.
+ */
+export const notEmptyL = (p, msg) => makeParser(state => {
+  const index = state.index
+  const [reply, [next, result]] = dup(p(state))
+  return result.status !== Ok || next.index !== index ? reply
+    : error(next, expected(msg))
 })
 
 /**
@@ -67,8 +93,8 @@ export const notEmpty = p => makeParser(state => {
 export const followedBy = p => makeParser(state => {
   const index = state.index
   const [next, result] = p(state)
-  if (result.status !== Status.Ok) return error(next, undefined, index)
-  return ok(next, null, index)
+  return result.status === Ok ? ok(next, null, index)
+    : error(next, undefined, index)
 })
 
 /**
@@ -85,10 +111,8 @@ export const followedBy = p => makeParser(state => {
 export const followedByL = (p, msg) => makeParser(state => {
   const index = state.index
   const [next, result] = p(state)
-  if (result.status !== Status.Ok) {
-    return error(next, [expectedError(msg)], index)
-  }
-  return ok(next, null, index)
+  return result.status === Ok ? ok(next, null, index)
+    : error(next, expected(msg), index)
 })
 
 /**
@@ -108,8 +132,8 @@ export const followedByL = (p, msg) => makeParser(state => {
 export const notFollowedBy = p => makeParser(state => {
   const index = state.index
   const [next, result] = p(state)
-  if (result.status === Status.Ok) return error(next, undefined, index)
-  return ok(next, null, index)
+  return result.status === Ok ? error(next, undefined, index)
+    : ok(next, null, index)
 })
 
 /**
@@ -127,8 +151,6 @@ export const notFollowedBy = p => makeParser(state => {
 export const notFollowedByL = (p, msg) => makeParser(state => {
   const index = state.index
   const [next, result] = p(state)
-  if (result.status === Status.Ok) {
-    return error(next, [expectedError(msg)], index)
-  }
-  return ok(next, null, index)
+  return result.status === Ok ? error(next, expected(msg), index)
+    : ok(next, null, index)
 })

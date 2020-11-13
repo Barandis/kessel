@@ -4,8 +4,10 @@
 // https://opensource.org/licenses/MIT
 
 import { error, makeParser, Status } from 'kessel/core'
-import { expectedError } from 'kessel/error'
+import { expected } from 'kessel/error'
 import { dup } from 'kessel/util'
+
+const { Error } = Status
 
 /** @typedef {import('kessel/core').Parser} Parser */
 
@@ -20,14 +22,12 @@ import { dup } from 'kessel/util'
  * automatically generated error messages are insufficient.
  *
  * @param {Parser} p The parser to be applied.
- * @param {string} message The new `Expected` error message if `p`
- *     fails.
+ * @param {string} msg The new `Expected` error message if `p` fails.
  * @returns {Parser} A parser that applies `p` and passes its results
  *     through except for changing its `Expected` error message upon
  *     failure.
  */
-export const label = (p, message) => makeParser(state => {
-  const [tuple, [next, result]] = dup(p(state))
-  if (result.status !== Status.Error) return tuple
-  return error(next, [expectedError(message)])
+export const label = (p, msg) => makeParser(state => {
+  const [reply, [next, result]] = dup(p(state))
+  return result.status === Error ? error(next, expected(msg)) : reply
 })
