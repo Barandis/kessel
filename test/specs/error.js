@@ -626,7 +626,7 @@ describe('Parse errors', () => {
       })
       it('formats errors using a custom formatting function', () => {
         const fn = (errors, index, view, tabSize, maxWidth) =>
-          `${errors[0].message}\n${index}\n${
+          `${errors[0].label}\n${index}\n${
             view.byteLength
           }\n${tabSize}\n${maxWidth}`
         const exp = 'a digit\n4\n14\n8\n72'

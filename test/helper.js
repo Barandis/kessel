@@ -25,7 +25,7 @@ import { commaSeparate } from 'kessel/util'
  *     to appear in the `errors` array.
  */
 const first = (errors, type) =>
-  errors.find(error => error.type === type)?.message
+  errors.find(error => error.type === type)?.label
 
 /**
  * Returns all of the message strings of errors of the provided type.
@@ -38,7 +38,7 @@ const first = (errors, type) =>
  */
 const all = (errors, type) => commaSeparate(errors
   .filter(error => error.type === type)
-  .map(error => error.message))
+  .map(error => error.label))
 
 /**
  * An object describing the state of the parser when tested and found

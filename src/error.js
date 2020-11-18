@@ -35,13 +35,13 @@ export const ErrorType = {
    * Error type representing a generic error message. Typically produced
    * by parsers such as `fail` and `failFatally`.
    */
-  Generic: Symbol('message'),
+  Generic: Symbol('generic'),
   /**
    * Error type representing an error within another error. This is
    * generally used for an error that caused backtracking, where the
    * parent error is reported after backtracking.
    */
-  Nested: Symbol('message'),
+  Nested: Symbol('nested'),
   /**
    * Error type representing a nested error with its own separate error
    * message. This is produced specifically by the `compound` parser.
@@ -55,50 +55,41 @@ export const ErrorType = {
 }
 
 /**
- * @typedef {(ParserError|ErrorMessage)[]} ErrorList
+ * A list of errors. This can consist of any error messages that apply
+ * to a particular index or nested/compound errors that point back to
+ * the same index but apply to a different one.
+ * @typedef {(NestedError|CompoundError|LocalError)[]} ErrorList
  */
 
 /**
- * @typedef {object} ParserError
+ * @typedef {object} NestedError
+ * @property {ErrorType} type
  * @property {State} state
- * @property {string} message
  * @property {ErrorList} errors
  */
 
 /**
- * @typedef {object} ErrorMessage
+ * @typedef {object} CompoundError
  * @property {ErrorType} type
- * @property {string} message
+ * @property {string} label
+ * @property {State} state
+ * @property {ErrorList} errors
  */
 
 /**
- * An error generated when a parser fails.
- *
- * @typedef {Object} ParseError
- * @property {ErrorType} type The type of the parse error.
- * @property {string} message The error message.
+ * @typedef {object} LocalError
+ * @property {ErrorType} type
+ * @property {string} label
  */
-
-/**
- * Creates a new `ErrorMessage`.
- *
- * @param {ErrorType} type The type of the parse error.
- * @param {string} message The error message.
- * @returns {ErrorMessage} A new `ErrorMessage` with the given type and
- *     message.
- */
-export function makeErrorMessage(type, message) {
-  return { type, message }
-}
 
 /**
  * Creates a new error list containing one expected error message.
  *
- * @param {string} message The message describing what was expected.
- * @returns {[ErrorMessage]} A new error message of the expected type.
+ * @param {string} label The message describing what was expected.
+ * @returns {[LocalError]} A new error message of the expected type.
  */
-export function expected(message) {
-  return [makeErrorMessage(ErrorType.Expected, message)]
+export function expected(label) {
+  return [{ type: ErrorType.Expected, label }]
 }
 
 /**
@@ -106,12 +97,12 @@ export function expected(message) {
  * error messages may have multiple unexpected errors, but only the
  * first will be displayed by the default formatter.
  *
- * @param {string} message The message describing what was found but was
+ * @param {string} label The message describing what was found but was
  *     not expected.
- * @returns {[ErrorMessage]} A new error message of the unexpected type.
+ * @returns {[LocalError]} A new error message of the unexpected type.
  */
-export function unexpected(message) {
-  return [makeErrorMessage(ErrorType.Unexpected, message)]
+export function unexpected(label) {
+  return [{ type: ErrorType.Unexpected, label }]
 }
 
 /**
@@ -119,22 +110,50 @@ export function unexpected(message) {
  * error message in an array of error messages, but only the first will
  * be displayed by the default formatter.
  *
- * @param {string} message The generic error's message.
+ * @param {string} label The generic error's message.
  * @returns {ErrorMessage} A new error message of the generic type.
  */
-export function generic(message) {
-  return [makeErrorMessage(ErrorType.Generic, message)]
+export function generic(label) {
+  return [{ type: ErrorType.Generic, label }]
 }
 
 /**
  * Creates an other error. These errors are not displayed by the default
  * formatter at all and are only useful for custom formatters.
  *
- * @param {string} message The other error's message.
+ * @param {string} label The other error's message.
  * @returns {ErrorMessage} A new parse error of the other type.
  */
-export function other(message) {
-  return [makeErrorMessage(ErrorType.Other, message)]
+export function other(label) {
+  return [{ type: ErrorType.Other, label }]
+}
+
+/**
+ * @param {State} state
+ * @param {ErrorList} errors
+ * @returns {NestedError}
+ */
+export function nested(state, errors) {
+  return errors.length === 1 && errors[0].type === ErrorType.Nested
+    ? errors
+    : [{ type: ErrorType.Nested, state, errors }]
+}
+
+/**
+ * @param {string} label
+ * @param {State} state
+ * @param {ErrorList} errors
+ * @returns {ParserError}
+ */
+export function compound(label, state, errors) {
+  return errors.length === 1 && errors[0].type === ErrorType.Nested
+    ? [{
+      type: ErrorType.Compound,
+      state: errors.state,
+      errors: errors.errors,
+      label,
+    }]
+    : [{ type: ErrorType.Compound, state, errors, label }]
 }
 
 /**
@@ -571,12 +590,12 @@ export function format(errors, index, view, tabSize, maxWidth) {
   const unexpected = errors.find(error => error.type === ErrorType.Unexpected)
   const expected = commaSeparate(
     errors.filter(error => error.type === ErrorType.Expected)
-      .map(error => error.message),
+      .map(error => error.label),
   )
 
-  const unexpMsg = unexpected ? `Unexpected ${unexpected.message}\n` : ''
+  const unexpMsg = unexpected ? `Unexpected ${unexpected.label}\n` : ''
   const expMsg = expected.length ? `Expected ${expected}\n` : ''
-  const msgMsg = message ? `${message.message}\n` : ''
+  const msgMsg = message ? `${message.label}\n` : ''
 
   return `${position}\n\n${display}\n${unexpMsg}${expMsg}${msgMsg}\n`
 }

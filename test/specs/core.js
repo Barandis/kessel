@@ -72,11 +72,11 @@ describe('Core functionality', () => {
         const [ustate2, uresult2] = error(state)
 
         expect(result.errors).to.deep.equal([
-          { type: ErrorType.Expected, message: "'123'" },
+          { type: ErrorType.Expected, label: "'123'" },
         ])
         expect(uresult1.errors).to.deep.equal([
-          { type: ErrorType.Expected, message: "'123'" },
-          { type: ErrorType.Unexpected, message: "'z'" },
+          { type: ErrorType.Expected, label: "'123'" },
+          { type: ErrorType.Unexpected, label: "'z'" },
         ])
         expect(uresult2.errors).to.deep.equal([])
         expect(state.index).to.equal(0)
@@ -100,11 +100,11 @@ describe('Core functionality', () => {
         const [ustate2, uresult2] = fatal(state)
 
         expect(result.errors).to.deep.equal([
-          { type: ErrorType.Expected, message: "'1'" },
+          { type: ErrorType.Expected, label: "'1'" },
         ])
         expect(uresult1.errors).to.deep.equal([
-          { type: ErrorType.Expected, message: "'1'" },
-          { type: ErrorType.Unexpected, message: "'z'" },
+          { type: ErrorType.Expected, label: "'1'" },
+          { type: ErrorType.Unexpected, label: "'z'" },
         ])
         expect(uresult2.errors).to.deep.equal([])
         expect(state.index).to.equal(1)
