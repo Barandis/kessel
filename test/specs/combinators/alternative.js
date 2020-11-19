@@ -12,10 +12,10 @@ import {
   choice,
   choiceL,
   countB,
+  fallback,
   leftB,
   manyTillB,
   optional,
-  orElse,
   rightB,
   seqB,
 } from 'kessel/combinators/alternative'
@@ -116,15 +116,15 @@ describe('Alternative and error recovery combinators', () => {
     })
   })
 
-  describe('orElse', () => {
+  describe('fallback', () => {
     it('succeeds with its parser\'s successful result', () => {
-      pass(orElse(char('a'), 'z'), 'abc', 'a')
+      pass(fallback(char('a'), 'z'), 'abc', 'a')
     })
     it('succeeds with its value if is parser fails', () => {
-      pass(orElse(char('b'), 'z'), 'abc', 'z')
+      pass(fallback(char('b'), 'z'), 'abc', 'z')
     })
     it('fails fatally if its parser does', () => {
-      fail(orElse(seq([string('ab'), string('cd')]), 'z'), 'abce', {
+      fail(fallback(seq([string('ab'), string('cd')]), 'z'), 'abce', {
         expected: "'cd'",
         status: Fatal,
       })

@@ -89,7 +89,7 @@ export const optional = p => makeParser(state => {
  * successful result or else (if that parser fails) the supplied value
  * `x`. This parser only fails if its contained parser fails fatally.
  *
- * `orElse(p, x)` is an optimized implementation of `alt([p,
+ * `fallback(p, x)` is an optimized implementation of `choice([p,
  * constant(x)])`.
  *
  * @param {Parser} p A parser whose result will be the created parser's
@@ -99,7 +99,7 @@ export const optional = p => makeParser(state => {
  * @returns {Parser} A parser which results in either its contained
  *     parser's successful result or the provided value.
  */
-export const orElse = (p, x) => makeParser(state => {
+export const fallback = (p, x) => makeParser(state => {
   const [reply, [next, result]] = dup(p(state))
   return result.status !== Error ? reply : ok(next, x)
 })

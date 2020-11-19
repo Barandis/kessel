@@ -61,10 +61,10 @@ export {
   choice,
   choiceL,
   countB,
+  fallback,
   leftB,
   manyTillB,
   optional,
-  orElse,
   rightB,
   seqB,
 } from './combinators/alternative'
