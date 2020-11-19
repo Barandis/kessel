@@ -91,7 +91,7 @@ export const ErrorType = {
 /**
  * A nested error that has its own label. This is simply for producing
  * nicer error messages; this error is typically only produced by the
- * `comp` parser.
+ * `backlabel` parser.
  *
  * @typedef {object} CompoundError
  * @property {ErrorType} type The error type. This will always be
@@ -517,11 +517,13 @@ export function getColNumber(colIndex, line) {
  *     another line containing a caret pointing at the designated
  *     column.
  */
-export function show(line, length, colno, maxWidth) {
+export function show(line, length, colno, maxWidth, indent = 0) {
+  const sp = ' '.repeat(indent)
+
   // First case: the line is shorter than maxWidth. Display the line
   // with the caret positioned below it.
   if (colno <= maxWidth && length <= maxWidth) {
-    return `${line}\n${' '.repeat(colno - 1)}^`
+    return `${sp}${line}\n${sp}${' '.repeat(colno - 1)}^`
   }
 
   // Second case: the line is longer than (maxWidth - 3) and the caret
@@ -529,7 +531,9 @@ export function show(line, length, colno, maxWidth) {
   // Display the first part of the line with `...` after it and position
   // the caret below it.
   if (colno <= maxWidth - 3) {
-    return `${line.substring(0, maxWidth - 3)}...\n${' '.repeat(colno - 1)}^`
+    return `${sp}${line.substring(0, maxWidth - 3)}...\n${sp}${
+      ' '.repeat(colno - 1)
+    }^`
   }
 
   // Third case: the line is longer than (maxWidth - 3) and the caret
@@ -540,7 +544,7 @@ export function show(line, length, colno, maxWidth) {
   if (colno >= length - maxWidth + 3) {
     const start = length - maxWidth + 3
     const newColno = colno - (length - maxWidth)
-    return `...${line.substring(start)}\n${' '.repeat(newColno - 1)}^`
+    return `${sp}...${line.substring(start)}\n${sp}${' '.repeat(newColno - 1)}^`
   }
 
   // Final case: the line is longer than maxWidth - 3 and the caret
@@ -550,11 +554,54 @@ export function show(line, length, colno, maxWidth) {
   // the caret below it.
   const start = colno - 1 - Math.ceil(maxWidth / 2) + 3
   const end = colno - 1 + Math.floor(maxWidth / 2) - 3
-  return `...${
+  return `${sp}...${
     line.substring(start, end)
-  }...\n${
+  }...\n${sp}${
     ' '.repeat(Math.ceil(maxWidth / 2))
   }^`
+}
+
+/**
+ * Formats a set of nested (or compound) error messages.
+ *
+ * @param {(NestedError[]|CompoundError[])} nesteds An array of either
+ *     nested or compound errors to format.
+ * @param {number} tabSize A number whose multiples determine where tab
+ *     stops lay.
+ * @param {number} maxWidth The maximum width of the line being
+ *     displayed. If the line is longer than this, it will be truncated
+ *     with ellipses added before and/or after as appropriate.
+ * @param {number} indent The number of spaces to indent the error
+ *     message.
+ * @returns {string} The formatted nested error message.
+ */
+function formatNested(nesteds, tabSize, maxWidth, indent) {
+  const sp = ' '.repeat(indent)
+  const nestedMsgs = nesteds.map(n => {
+    const { index, view } = n.state
+    const label = n.label
+      ? `\n${sp}${n.label} could not be parsed because:\n\n`
+      : `\n${sp}The parser backtracked after:\n\n`
+    return label + format(n.errors, index, view, tabSize, maxWidth, indent + 2)
+  })
+  return nestedMsgs.join('')
+}
+
+/**
+ * Ensures that a string ends with a certain number of newlines.
+ *
+ * @param {string} text The string that is supposed to have a certain
+ *     number of newlines at the end.
+ * @param {number} count The number of newlines.
+ * @returns {string} The same string, but with `count` newlines at the
+ *     end.
+ */
+function ensureNewlines(text, count) {
+  let result = text
+  while (result[result.length - 1] === '\n') {
+    result = result.substring(0, result.length - 1)
+  }
+  return result + '\n'.repeat(count)
 }
 
 /**
@@ -613,29 +660,52 @@ export function show(line, length, colno, maxWidth) {
  *                                     ^
  * Expected a digit
  * ```
+ *
+ * @param {ErrorList} errors The list of errors to be formatted.
+ * @param {number} index The index in the view where the error occurred.
+ * @param {DataView} view The data view containing the input text.
+ * @param {number} tabSize A number whose multiples determine where tab
+ *     stops lay.
+ * @param {number} maxWidth The maximum width of the line being
+ *     displayed. If the line is longer than this, it will be truncated
+ *     with ellipses added before and/or after as appropriate.
+ * @param {number} [indent=0] The number of spaces the message should be
+ *     indented. This should be 0 and increased only for nested errors.
+ * @returns {string} The formatted error message.
  */
-export function format(errors, index, view, tabSize, maxWidth) {
+export function format(errors, index, view, tabSize, maxWidth, indent = 0) {
   const { start, end, lineno } = getLineIndexes(index, view)
   const charIndex = getCharIndex(index, view, start)
+  const sp = ' '.repeat(indent)
 
   const rawLine = viewToString(start, end - start + 1, view)
   const { colIndex, line } = tabify(charIndex, rawLine, tabSize)
   const { colno, length } = getColNumber(colIndex, line)
 
-  const position = `Parse error at (line ${lineno}, column ${colno}):`
-  const display = show(line, length, colno, maxWidth)
-  const message = errors.find(error => error.type === ErrorType.Generic)
+  const position = `${sp}Parse error at (line ${lineno}, column ${colno}):`
+  const display = show(line, length, colno, maxWidth, indent)
+  const generic = errors.find(error => error.type === ErrorType.Generic)
   const unexpected = errors.find(error => error.type === ErrorType.Unexpected)
   const expected = commaSeparate(
     errors.filter(error => error.type === ErrorType.Expected)
       .map(error => error.label),
   )
 
-  const unexpMsg = unexpected ? `Unexpected ${unexpected.label}\n` : ''
-  const expMsg = expected.length ? `Expected ${expected}\n` : ''
-  const msgMsg = message ? `${message.label}\n` : ''
+  const nested = errors.filter(error => error.type === ErrorType.Nested)
+  const compound = errors.filter(error => error.type === ErrorType.Compound)
 
-  return `${position}\n\n${display}\n${unexpMsg}${expMsg}${msgMsg}\n`
+  const unexpMsg = unexpected ? `${sp}Unexpected ${unexpected.label}\n` : ''
+  const expMsg = expected.length ? `${sp}Expected ${expected}\n` : ''
+  const genericMsg = generic ? `${sp}${generic.label}\n` : ''
+
+  const nestedMsg = formatNested(nested, tabSize, maxWidth, indent)
+  const compoundMsg = formatNested(compound, tabSize, maxWidth, indent)
+
+  return ensureNewlines(
+    `${position}\n\n${display}\n${unexpMsg}${expMsg}${genericMsg}`
+      + `${compoundMsg}${nestedMsg}`,
+    2,
+  )
 }
 
 // #endregion

@@ -5,7 +5,8 @@
 
 import { expect } from 'chai'
 
-import { makeState, Status } from 'kessel/core'
+import { backlabel } from 'kessel/combinators/message'
+import { makeState, parse, Status } from 'kessel/core'
 import {
   expected,
   format,
@@ -22,6 +23,7 @@ import {
   tabify,
   unexpected,
 } from 'kessel/error'
+import { char, seq, seqB } from 'kessel/index'
 import { commaSeparate, stringToView } from 'kessel/util'
 
 describe('Parse errors', () => {
@@ -591,6 +593,37 @@ describe('Parse errors', () => {
           + '                                                    ^\n'
           + 'Expected a letter, a digit, or whitespace\n\n'
         expect(format(expecteds, 29, view, 8, 72)).to.equal(exp)
+      })
+      it('formats nested errors that come from backtracking', () => {
+        const parser = seqB([char('t'), char('e'), char('s'), char('t')])
+        const [state, result] = parse(parser, 'tesl')
+        const exp = 'Parse error at (line 1, column 1):\n\n'
+          + 'tesl\n'
+          + '^\n\n'
+          + 'The parser backtracked after:\n\n'
+          + '  Parse error at (line 1, column 4):\n\n'
+          + '  tesl\n'
+          + '     ^\n'
+          + '  Expected \'t\'\n\n'
+        const errorMsg = format(result.errors, state.index, state.view, 8, 72)
+        expect(errorMsg).to.equal(exp)
+      })
+      it('formats compound errors from backlabel', () => {
+        const parser = backlabel(
+          seq([char('t'), char('e'), char('s'), char('t')]),
+          "the word 'test'",
+        )
+        const [state, result] = parse(parser, 'tesl')
+        const exp = 'Parse error at (line 1, column 1):\n\n'
+          + 'tesl\n'
+          + '^\n\n'
+          + "the word 'test' could not be parsed because:\n\n"
+          + '  Parse error at (line 1, column 4):\n\n'
+          + '  tesl\n'
+          + '     ^\n'
+          + '  Expected \'t\'\n\n'
+        const errorMsg = format(result.errors, state.index, state.view, 8, 72)
+        expect(errorMsg).to.equal(exp)
       })
     })
 
