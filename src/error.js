@@ -62,24 +62,48 @@ export const ErrorType = {
  */
 
 /**
- * @typedef {object} NestedError
- * @property {ErrorType} type
- * @property {State} state
- * @property {ErrorList} errors
- */
-
-/**
- * @typedef {object} CompoundError
- * @property {ErrorType} type
- * @property {string} label
- * @property {State} state
- * @property {ErrorList} errors
- */
-
-/**
+ * An error that happens at the location referred to by the current
+ * state. The type is used to determine where the label should be
+ * positioned in the error message.
+ *
  * @typedef {object} LocalError
- * @property {ErrorType} type
- * @property {string} label
+ * @property {ErrorType} type The error type.
+ * @property {string} label The message associated with the error.
+ */
+
+/**
+ * An error that happens in a different location than the one referred
+ * to by the current state. The most typical reason for this happening
+ * is backtracking; the local error can track the current
+ * (post-backtrack) location while the nested error retains informtion
+ * from the error that caused the backtracking in the first place.
+ *
+ * @typedef {object} NestedError
+ * @property {ErrorType} type The error type. This will always be
+ *     `ErrorType.Nested`.
+ * @property {State} state The state at the time that the original error
+ *     occurred. This can (and probably will) be different from the
+ *     current state.
+ * @property {ErrorList} errors A list of errors that occurred at the
+ *     location derived from `state`.
+ */
+
+/**
+ * A nested error that has its own label. This is simply for producing
+ * nicer error messages; this error is typically only produced by the
+ * `comp` parser.
+ *
+ * @typedef {object} CompoundError
+ * @property {ErrorType} type The error type. This will always be
+ *     `ErrorType.Compound`.
+ * @property {string} label The message associated with this error. This
+ *     is typically used as a sort of header over the nested messages
+ *     under this compound error.
+ * @property {State} state The state at the time that the original error
+ *     occurred. This can (and probably will) be different from the
+ *     current state.
+ * @property {ErrorList} errors A list of errors that occurred at the
+ *     location derived from `state`.
  */
 
 /**
@@ -129,9 +153,16 @@ export function other(label) {
 }
 
 /**
- * @param {State} state
- * @param {ErrorList} errors
- * @returns {NestedError}
+ * Creates a nested error. This takes an error list and wraps it with
+ * state information. If the supplied error list is just a single nested
+ * error, that error is simply returned; a single nested error will not
+ * be nested in another nested error.
+ *
+ * @param {State} state The state at the point where the nested error
+ *     occurred.
+ * @param {ErrorList} errors The list of errors that occurred at the
+ *     position pointed to by the given state.
+ * @returns {NestedError} A new nested error.
  */
 export function nested(state, errors) {
   return errors.length === 1 && errors[0].type === ErrorType.Nested
@@ -140,10 +171,17 @@ export function nested(state, errors) {
 }
 
 /**
- * @param {string} label
- * @param {State} state
- * @param {ErrorList} errors
- * @returns {ParserError}
+ * Creates a new compound error. This wraps an error list just as a
+ * nested error does, except it also attaches a message to it. If the
+ * supplied error list is just a single nested error, its information is
+ * used to create a new compound error without any nested error.
+ *
+ * @param {string} label The message attached to the nested error.
+ * @param {State} state The state at the point where the compound error
+ *     occurred.
+ * @param {ErrorList} errors The list of errors that occurred at the
+ *     position pointed to by the given state.
+ * @returns {CompoundError} A new compound error.
  */
 export function compound(label, state, errors) {
   return errors.length === 1 && errors[0].type === ErrorType.Nested
