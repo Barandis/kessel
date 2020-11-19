@@ -162,7 +162,12 @@ export const seqB = ps => makeParser(state => {
     next = nextState
 
     if (result.status === Fatal) return reply
-    if (result.status === Error) return error(next, result.errors, index)
+    if (result.status === Error) {
+      const err = index === next.index
+        ? result.errors
+        : nested(next, result.errors)
+      return error(next, err, index)
+    }
     if (result.value !== null) values.push(result.value)
   }
   return ok(next, values)
@@ -199,7 +204,11 @@ export const chainB = (p, fn) => makeParser(state => {
   if (result1.status !== Ok) return reply1
 
   const [reply2, [next2, result2]] = dup(fn(result1.value)(next1))
-  return result2.status !== Error ? reply2 : error(next2, result2.errors, index)
+  if (result2.status !== Error) return reply2
+  const err = index === next2.index
+    ? result2.errors
+    : nested(next2, result2.errors)
+  return error(next2, err, index)
 })
 
 /**
@@ -228,9 +237,13 @@ export const leftB = (p1, p2) => makeParser(state => {
   if (result1.status !== Ok) return reply1
 
   const [reply2, [next2, result2]] = dup(p2(next1))
-  return result2.status === Fatal ? reply2
-    : result2.status === Error ? error(next2, result2.errors, index)
-      : ok(next2, result1.value)
+  if (result2.status === Fatal) return reply2
+  if (result2.status === Ok) return ok(next2, result1.value)
+
+  const err = index === next2.index
+    ? result2.errors
+    : nested(next2, result2.errors)
+  return error(next2, err, index)
 })
 
 /**
@@ -259,7 +272,12 @@ export const rightB = (p1, p2) => makeParser(state => {
   if (result1.status !== Status.Ok) return reply1
 
   const [reply2, [next2, result2]] = dup(p2(next1))
-  return result2.status === Error ? error(next2, result2.errors, index) : reply2
+  if (result2.status !== Error) return reply2
+
+  const err = index === next2.index
+    ? result2.errors
+    : nested(next2, result2.errors)
+  return error(next2, err, index)
 })
 
 /**
@@ -288,9 +306,13 @@ export const bothB = (p1, p2) => makeParser(state => {
   if (result1.status !== Ok) return reply1
 
   const [reply2, [next2, result2]] = dup(p2(next1))
-  return result2.status === Fatal ? reply2
-    : result2.status === Error ? error(next2, result2.errors, index)
-      : ok(next2, [result1.value, result2.value])
+  if (result2.status === Fatal) return reply2
+  if (result2.status === Ok) return ok(next2, [result1.value, result2.value])
+
+  const err = index === next2.index
+    ? result2.errors
+    : nested(next2, result2.errors)
+  return error(next2, err, index)
 })
 
 /**
@@ -317,7 +339,12 @@ export const countB = (p, n) => makeParser(state => {
     const [reply, [nextState, result]] = dup(p(next))
     next = nextState
     if (result.status === Fatal) return reply
-    if (result.status === Error) return error(next, result.errors, index)
+    if (result.status === Error) {
+      const err = index === next.index
+        ? result.errors
+        : nested(next, result.errors)
+      return error(next, err, index)
+    }
     values.push(result.value)
   }
   return ok(next, values)
@@ -361,7 +388,10 @@ export const manyTillB = (p, end) => makeParser(state => {
     next = next2
     if (result2.status === Fatal) return reply2
     if (result2.status === Error) {
-      return error(next2, merge(result2.errors, result1.errors), index)
+      const err = index === next2.index
+        ? merge(result2.errors, result1.errors)
+        : nested(next2, merge(result2.errors, result1.errors))
+      return error(next2, err, index)
     }
     values.push(result2.value)
   }
