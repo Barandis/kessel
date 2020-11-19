@@ -6,11 +6,11 @@
 import { expect } from 'chai'
 
 import {
-  altL,
   back,
   bothB,
   chainB,
   choice,
+  choiceL,
   countB,
   leftB,
   manyTillB,
@@ -48,8 +48,8 @@ describe('Alternative and error recovery combinators', () => {
     })
   })
 
-  describe('altL', () => {
-    const parser = altL([
+  describe('choiceL', () => {
+    const parser = choiceL([
       seq([char('a'), char('b')]),
       seq([char('c'), char('d')]),
       seq([char('e'), char('f')]),

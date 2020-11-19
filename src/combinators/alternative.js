@@ -47,7 +47,7 @@ export const choice = ps => makeParser(state => {
  * used as the expected message rather than constructing it out of the
  * expected messages of each failed parser.
  *
- * `altL(ps, message)` is an optimized version of `label(alt(ps),
+ * `choiceL(ps, message)` is an optimized version of `label(choice(ps),
  * message)`.
  *
  * @param {Parser[]} ps The parsers to apply to the input, one at a
@@ -57,7 +57,7 @@ export const choice = ps => makeParser(state => {
  * @returns {Parser} A parser that applies its contained parsers until
  *     one succeeds.
  */
-export const altL = (ps, message) => makeParser(state => {
+export const choiceL = (ps, message) => makeParser(state => {
   for (const p of ps) {
     const [reply, [next, result]] = dup(p(state))
 

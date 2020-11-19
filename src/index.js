@@ -55,11 +55,11 @@ export {
 // COMBINATORS
 
 export {
-  altL,
   back,
   bothB,
   chainB,
   choice,
+  choiceL,
   countB,
   leftB,
   manyTillB,
