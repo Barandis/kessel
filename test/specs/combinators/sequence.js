@@ -3,7 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { alt } from 'kessel/combinators/alternative'
+import { choice } from 'kessel/combinators/alternative'
 import { join, map, skip, value } from 'kessel/combinators/chaining'
 import {
   block,
@@ -101,7 +101,7 @@ describe('Sequence combinators', () => {
       })
     })
     it('does not add null to the results', () => {
-      pass(many(alt([any, eof])), 'abc', ['a', 'b', 'c'])
+      pass(many(choice([any, eof])), 'abc', ['a', 'b', 'c'])
     })
   })
 
@@ -125,7 +125,7 @@ describe('Sequence combinators', () => {
       })
     })
     it('does not add null to the results', () => {
-      pass(many1(alt([any, eof])), 'abc', ['a', 'b', 'c'])
+      pass(many1(choice([any, eof])), 'abc', ['a', 'b', 'c'])
     })
   })
 
@@ -445,14 +445,16 @@ describe('Sequence combinators', () => {
     })
     it('does not add null to the results', () => {
       pass(
-        manyTill(alt([letter, skip(space)]), digit), 'a b c 1', ['a', 'b', 'c'],
+        manyTill(
+          choice([letter, skip(space)]), digit,
+        ), 'a b c 1', ['a', 'b', 'c'],
       )
     })
   })
 
   describe('chainl', () => {
     const p = map(join(many1(digit)), x => parseInt(x))
-    const op = alt([
+    const op = choice([
       value(char('+'), (a, b) => a + b),
       value(char('-'), (a, b) => a - b),
     ])
@@ -495,7 +497,7 @@ describe('Sequence combinators', () => {
 
   describe('chainl1', () => {
     const p = map(join(many1(digit)), x => parseInt(x))
-    const op = alt([
+    const op = choice([
       value(char('+'), (a, b) => a + b),
       value(char('-'), (a, b) => a - b),
     ])
@@ -542,7 +544,7 @@ describe('Sequence combinators', () => {
 
   describe('chainr', () => {
     const p = map(join(many1(digit)), x => parseInt(x))
-    const op = alt([
+    const op = choice([
       value(char('+'), (a, b) => a + b),
       value(char('-'), (a, b) => a - b),
     ])
@@ -586,7 +588,7 @@ describe('Sequence combinators', () => {
 
   describe('chainr1', () => {
     const p = map(join(many1(digit)), x => parseInt(x))
-    const op = alt([
+    const op = choice([
       value(char('+'), (a, b) => a + b),
       value(char('-'), (a, b) => a - b),
     ])

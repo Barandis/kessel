@@ -6,11 +6,11 @@
 import { expect } from 'chai'
 
 import {
-  alt,
   altL,
   back,
   bothB,
   chainB,
+  choice,
   countB,
   leftB,
   manyTillB,
@@ -30,8 +30,8 @@ import { fail, pass } from 'test/helper'
 const { Error, Fatal } = Status
 
 describe('Alternative and error recovery combinators', () => {
-  describe('alt', () => {
-    const parser = alt([
+  describe('choice', () => {
+    const parser = choice([
       seq([char('a'), char('b')]),
       seq([char('c'), char('d')]),
       seq([char('e'), char('f')]),

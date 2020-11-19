@@ -27,7 +27,7 @@ const { Ok, Error, Fatal } = Status
  * @returns {Parser} A parser that applies its contained parsers until
  *     one succeeds.
  */
-export const alt = ps => makeParser(state => {
+export const choice = ps => makeParser(state => {
   let errors = []
 
   for (const p of ps) {
