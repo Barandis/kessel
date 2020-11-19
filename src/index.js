@@ -27,7 +27,7 @@ export {
   constant,
   fail,
   failFatally,
-  unexpected,
+  failUnexpected,
 } from './parsers/misc'
 export {
   alphaU,
@@ -89,6 +89,7 @@ export {
   notFollowedByL,
 } from './combinators/conditional'
 export {
+  backlabel,
   label,
 } from './combinators/message'
 export {
@@ -124,13 +125,13 @@ export {
 } from './core'
 export {
   ErrorType,
-  clear,
-  expectedError,
+  compound,
+  expected,
   formatErrors,
-  genericError,
+  generic,
   getPosition,
-  otherError,
-  overwrite,
-  push,
-  unexpectedError,
+  merge,
+  nested,
+  other,
+  unexpected,
 } from './error'
