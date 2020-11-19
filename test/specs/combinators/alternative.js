@@ -17,7 +17,7 @@ import {
   manyTillB,
   optional,
   rightB,
-  seqB,
+  sequenceB,
 } from 'kessel/combinators/alternative'
 import { lookAhead } from 'kessel/combinators/conditional'
 import { seq } from 'kessel/combinators/sequence'
@@ -131,8 +131,8 @@ describe('Alternative and error recovery combinators', () => {
     })
   })
 
-  describe('seqB', () => {
-    const parser = seqB([string('abc'), string('def'), string('ghi')])
+  describe('sequenceB', () => {
+    const parser = sequenceB([string('abc'), string('def'), string('ghi')])
 
     it('fails if any of its parsers fail', () => {
       const [state1, result1] = parse(parser, 'abd')
@@ -155,10 +155,13 @@ describe('Alternative and error recovery combinators', () => {
       pass(parser, 'abcdefghi', { result: ['abc', 'def', 'ghi'], index: 9 })
     })
     it('does not add null to results', () => {
-      pass(seqB([string('abc'), eof]), 'abc', { result: ['abc'], index: 3 })
+      pass(sequenceB([string('abc'), eof]), 'abc', {
+        result: ['abc'],
+        index: 3,
+      })
     })
     it('still fails fatally if any of its parsers does', () => {
-      const parser = seqB([seq([letter, digit]), letter, digit])
+      const parser = sequenceB([seq([letter, digit]), letter, digit])
       fail(parser, 'aaa1', { expected: 'a digit', index: 1, status: Fatal })
     })
   })

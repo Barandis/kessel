@@ -66,7 +66,7 @@ export {
   manyTillB,
   optional,
   rightB,
-  seqB,
+  sequenceB,
 } from './combinators/alternative'
 export {
   between,

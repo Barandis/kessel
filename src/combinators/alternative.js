@@ -144,15 +144,16 @@ export const backtrack = p => makeParser(state => {
  * fatal error from one of the contained parsers will still result in an
  * overall fatal error.
  *
- * Note that `seqB(ps)` is not the same as `back(seq(ps))`, as the
- * former will fail fatally if one of `ps` fails fatally, while the
- * latter will fail non-fatally in that case.
+ * Note that `sequenceB(ps)` is not the same as
+ * `backtrack(sequence(ps))`, as the former will fail fatally if one of
+ * `ps` fails fatally, while the latter will fail non-fatally in that
+ * case.
  *
  * @param {Parser[]} ps An array of parsers to be applied.
  * @returns {Parser} A parser that applies the supplied parsers one at a
  *     time, in order, and fails if any of those parsers fail.
  */
-export const seqB = ps => makeParser(state => {
+export const sequenceB = ps => makeParser(state => {
   const values = []
   const index = state.index
   let next = state

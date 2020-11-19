@@ -23,7 +23,7 @@ import {
   tabify,
   unexpected,
 } from 'kessel/error'
-import { char, seq, seqB } from 'kessel/index'
+import { char, seq, sequenceB } from 'kessel/index'
 import { commaSeparate, stringToView } from 'kessel/util'
 
 describe('Parse errors', () => {
@@ -595,7 +595,7 @@ describe('Parse errors', () => {
         expect(format(expecteds, 29, view, 8, 72)).to.equal(exp)
       })
       it('formats nested errors that come from backtracking', () => {
-        const parser = seqB([char('t'), char('e'), char('s'), char('t')])
+        const parser = sequenceB([char('t'), char('e'), char('s'), char('t')])
         const [state, result] = parse(parser, 'tesl')
         const exp = 'Parse error at (line 1, column 1):\n\n'
           + 'tesl\n'
