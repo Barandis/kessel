@@ -93,11 +93,11 @@ export {
   label,
 } from './combinators/message'
 export {
+  assocl,
+  assocl1,
+  assocr,
+  assocr1,
   block,
-  chainl,
-  chainl1,
-  chainr,
-  chainr1,
   count,
   many,
   many1,

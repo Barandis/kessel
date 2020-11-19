@@ -499,7 +499,7 @@ export const manyTill = (p, end) => makeParser(state => {
  *     applying the functions from `op` left associtively to the values
  *     that result from `p`.
  */
-export const chainl = (p, op, x) => makeParser(state => {
+export const assocl = (p, op, x) => makeParser(state => {
   const [reply, [nextState, result]] = dup(p(state))
   if (result.status === Fatal) return reply
   if (result.status === Error) return ok(nextState, x)
@@ -554,7 +554,7 @@ export const chainl = (p, op, x) => makeParser(state => {
  *     applying the functions from `op` left associtively to the values
  *     that result from `p`.
  */
-export const chainl1 = (p, op) => makeParser(state => {
+export const assocl1 = (p, op) => makeParser(state => {
   const [reply, [nextState, result]] = dup(p(state))
   if (result.status !== Ok) return reply
 
@@ -609,7 +609,7 @@ export const chainl1 = (p, op) => makeParser(state => {
  *     applying the functions from `op` right associtively to the values
  *     that result from `p`.
  */
-export const chainr = (p, op, x) => makeParser(state => {
+export const assocr = (p, op, x) => makeParser(state => {
   const [reply, [nextState, result]] = dup(p(state))
   if (result.status === Fatal) return reply
   if (result.status === Error) return ok(nextState, x)
@@ -664,7 +664,7 @@ export const chainr = (p, op, x) => makeParser(state => {
  *     applying the functions from `op` right associtively to the values
  *     that result from `p`.
  */
-export const chainr1 = (p, op) => makeParser(state => {
+export const assocr1 = (p, op) => makeParser(state => {
   const [reply, [nextState, result]] = dup(p(state))
   if (result.status !== Ok) return reply
 
