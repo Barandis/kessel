@@ -4,7 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import { error, fatal, ok, makeParser, Status } from 'kessel/core'
-import { expected, merge } from 'kessel/error'
+import { expected, merge, nested } from 'kessel/error'
 import { dup, range } from 'kessel/util'
 
 const { Ok, Error, Fatal } = Status
@@ -123,7 +123,13 @@ export const orElse = (p, x) => makeParser(state => {
 export const back = p => makeParser(state => {
   const index = state.index
   const [reply, [next, result]] = dup(p(state))
-  return result.status !== Fatal ? reply : error(next, result.errors, index)
+  if (result.status !== Ok) {
+    const err = index === next.index
+      ? result.errors
+      : nested(next, result.errors)
+    return error(next, err, index)
+  }
+  return reply
 })
 
 /**

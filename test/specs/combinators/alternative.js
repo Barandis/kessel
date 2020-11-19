@@ -21,6 +21,7 @@ import {
 } from 'kessel/combinators/alternative'
 import { seq } from 'kessel/combinators/sequence'
 import { parse, Status } from 'kessel/core'
+import { ErrorType } from 'kessel/error'
 import { any, char, digit, eof, letter } from 'kessel/parsers/char'
 import { string } from 'kessel/parsers/string'
 import { fail, pass } from 'test/helper'
@@ -100,6 +101,17 @@ describe('Alternative and error recovery combinators', () => {
       const parser = seq([string('te'), string('st')])
       fail(parser, 'tesl', { index: 2, status: Fatal })
       fail(back(parser), 'tesl', { index: 0, status: Error })
+    })
+    it('creates a nested error if it fails while consuming input', () => {
+      const parser = seq([string('te'), string('st')])
+      const [state, result] = parse(back(parser), 'tesl')
+      const error = result.errors[0]
+
+      expect(error.type).to.equal(ErrorType.Nested)
+      expect(state.index).to.equal(0)
+      expect(error.state.index).to.equal(2)
+      expect(error.errors[0].type).to.equal(ErrorType.Expected)
+      expect(error.errors[0].label).to.equal("'st'")
     })
   })
 

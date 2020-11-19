@@ -5,7 +5,7 @@
 
 import { stringToView } from './util'
 
-/** @typedef {import('./error.js').ParseError} ParseError */
+/** @typedef {import('./error.js').ErrorList} ErrorList */
 
 /**
  * Determines whether the input value is an instance of one of the types
@@ -59,8 +59,8 @@ export const Status = {
  * @property {Status} status The status of the last attempted parse of
  *     the input text.
  * @property {*} value The value of a successful parse.
- * @property {ParseError[]} errors A list of errors that occurred during
- *     an unsuccessful parse.
+ * @property {ErrorList} errors A list of errors that occurred
+ *     during an unsuccessful parse.
  */
 
 /**
