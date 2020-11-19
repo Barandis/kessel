@@ -106,7 +106,7 @@ export {
   sepBy1,
   sepEndBy,
   sepEndBy1,
-  seq,
+  sequence,
   skipMany,
   skipMany1,
 } from './combinators/sequence'

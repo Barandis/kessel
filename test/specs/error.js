@@ -5,7 +5,9 @@
 
 import { expect } from 'chai'
 
+import { sequenceB } from 'kessel/combinators/alternative'
 import { backLabel } from 'kessel/combinators/message'
+import { sequence } from 'kessel/combinators/sequence'
 import { makeState, parse, Status } from 'kessel/core'
 import {
   expected,
@@ -23,7 +25,7 @@ import {
   tabify,
   unexpected,
 } from 'kessel/error'
-import { char, seq, sequenceB } from 'kessel/index'
+import { char } from 'kessel/parsers/char'
 import { commaSeparate, stringToView } from 'kessel/util'
 
 describe('Parse errors', () => {
@@ -610,7 +612,7 @@ describe('Parse errors', () => {
       })
       it('formats compound errors from backlabel', () => {
         const parser = backLabel(
-          seq([char('t'), char('e'), char('s'), char('t')]),
+          sequence([char('t'), char('e'), char('s'), char('t')]),
           "the word 'test'",
         )
         const [state, result] = parse(parser, 'tesl')

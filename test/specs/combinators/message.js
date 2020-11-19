@@ -9,7 +9,7 @@ import { choice, backtrack } from 'kessel/combinators/alternative'
 import { right } from 'kessel/combinators/chaining'
 import { lookAhead } from 'kessel/combinators/conditional'
 import { label, backLabel } from 'kessel/combinators/message'
-import { seq } from 'kessel/combinators/sequence'
+import { sequence } from 'kessel/combinators/sequence'
 import { parse, Status } from 'kessel/core'
 import { char } from 'kessel/parsers/char'
 import { fail } from 'test/helper'
@@ -26,8 +26,8 @@ describe('Message combinators', () => {
       fail(label(char('a'), 'letter a'), 'bcd', 'letter a')
     })
     it('does not change the expected message on a fatal error', () => {
-      fail(seq([char('a'), char('b')]), 'a1', "'b'")
-      fail(label(seq([char('a'), char('b')]), 'letter b'), 'a1', "'b'")
+      fail(sequence([char('a'), char('b')]), 'a1', "'b'")
+      fail(label(sequence([char('a'), char('b')]), 'letter b'), 'a1', "'b'")
     })
     it('overwrites all of multiple expected messages', () => {
       const parser = choice([char('a'), char('b'), char('c')])
@@ -58,7 +58,7 @@ describe('Message combinators', () => {
     })
     it('adds a compound error if its parser fails while consuming', () => {
       const [state, result] = parse(
-        backLabel(seq([char('a'), char('b')]), 'test'), 'a1',
+        backLabel(sequence([char('a'), char('b')]), 'test'), 'a1',
       )
       const error = result.errors[0]
 

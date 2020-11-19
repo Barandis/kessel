@@ -31,7 +31,7 @@ function loopMessage(name) {
  * @returns {Parser} A parser that applies the supplied parsers one at a
  *     time, in order, and fails if any of those parsers fail.
  */
-export const seq = ps => makeParser(state => {
+export const sequence = ps => makeParser(state => {
   const values = []
   const index = state.index
   let next = state
