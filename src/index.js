@@ -55,7 +55,7 @@ export {
 // COMBINATORS
 
 export {
-  back,
+  backtrack,
   bothB,
   chainB,
   choice,

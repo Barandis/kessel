@@ -6,7 +6,7 @@
 import { expect } from 'chai'
 
 import {
-  back,
+  backtrack,
   bothB,
   chainB,
   choice,
@@ -80,32 +80,32 @@ describe('Alternative and error recovery combinators', () => {
         index: 1,
         status: Fatal,
       })
-      pass(optional(back(seq([char('a'), char('b')]))), 'acd', {
+      pass(optional(backtrack(seq([char('a'), char('b')]))), 'acd', {
         result: null,
         index: 0,
       })
     })
   })
 
-  describe('back', () => {
+  describe('backtrack', () => {
     it('does nothing if its parser succeeds', () => {
       const r1 = parse(char('a'), 'abc')
-      const r2 = parse(back(char('a')), 'abc')
+      const r2 = parse(backtrack(char('a')), 'abc')
       expect(r1).to.deep.equal(r2)
     })
     it('does nothing if its parser fails without consuming input', () => {
       const r1 = parse(char('a'), 'bcd')
-      const r2 = parse(back(char('a')), 'bcd')
+      const r2 = parse(backtrack(char('a')), 'bcd')
       expect(r1).to.deep.equal(r2)
     })
     it('resets the index if its parser fails with consuming input', () => {
       const parser = seq([string('te'), string('st')])
       fail(parser, 'tesl', { index: 2, status: Fatal })
-      fail(back(parser), 'tesl', { index: 0, status: Error })
+      fail(backtrack(parser), 'tesl', { index: 0, status: Error })
     })
     it('creates a nested error if it fails while consuming input', () => {
       const parser = seq([string('te'), string('st')])
-      const [state, result] = parse(back(parser), 'tesl')
+      const [state, result] = parse(backtrack(parser), 'tesl')
       const error = result.errors[0]
 
       expect(error.type).to.equal(ErrorType.Nested)

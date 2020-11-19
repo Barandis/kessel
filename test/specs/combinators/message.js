@@ -5,7 +5,7 @@
 
 import { expect } from 'chai'
 
-import { choice, back } from 'kessel/combinators/alternative'
+import { choice, backtrack } from 'kessel/combinators/alternative'
 import { right } from 'kessel/combinators/chaining'
 import { lookAhead } from 'kessel/combinators/conditional'
 import { label, backlabel } from 'kessel/combinators/message'
@@ -70,7 +70,7 @@ describe('Message combinators', () => {
     })
     it('collapses the nested error from backtracking', () => {
       const [state, result] = parse(
-        backlabel(back(right(char('a'), char('b'))), 'test'), 'a1',
+        backlabel(backtrack(right(char('a'), char('b'))), 'test'), 'a1',
       )
       const error = result.errors[0]
 

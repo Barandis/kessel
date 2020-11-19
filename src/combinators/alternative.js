@@ -120,7 +120,7 @@ export const fallback = (p, x) => makeParser(state => {
  * @returns {Parser} A parser that cannot fail fatally. If its contained
  *     parser fails fatally, this one will instead fail non-fatally.
  */
-export const back = p => makeParser(state => {
+export const backtrack = p => makeParser(state => {
   const index = state.index
   const [reply, [next, result]] = dup(p(state))
   if (result.status !== Ok) {
