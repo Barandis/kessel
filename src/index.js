@@ -89,7 +89,7 @@ export {
   notFollowedByL,
 } from './combinators/conditional'
 export {
-  backlabel,
+  backLabel,
   label,
 } from './combinators/message'
 export {

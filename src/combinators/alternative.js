@@ -185,9 +185,9 @@ export const sequenceB = ps => makeParser(state => {
  * parser consumed input. A fatal error from either parser will still
  * result in an overall fatal error.
  *
- * Note that `chainB(p, fn)` is not the same as `back(chain(p, fn))`, as
- * the former will fail fatally if one of its parsers fails fatally,
- * while the latter will fail non-fatally in that case.
+ * Note that `chainB(p, fn)` is not the same as `backtrack(chain(p,
+ * fn))`, as the former will fail fatally if one of its parsers fails
+ * fatally, while the latter will fail non-fatally in that case.
  *
  * @param {Parser} p The first parser to apply.
  * @param {function(*): Parser} fn A function that takes the result from
@@ -222,9 +222,9 @@ export const chainB = (p, fn) => makeParser(state => {
  * parser was applied, even if the first parser consumed input. A fatal
  * error from either parser will still result in an overall fatal error.
  *
- * Note that `leftB(p1, p2)` is not the same as `back(left(p1, p2))`, as
- * the former will fail fatally if one of its parsers fails fatally,
- * while the latter will fail non-fatally in that case.
+ * Note that `leftB(p1, p2)` is not the same as `backtrack(left(p1,
+ * p2))`, as the former will fail fatally if one of its parsers fails
+ * fatally, while the latter will fail non-fatally in that case.
  *
  * @param {Parser} p1 The first parser to apply.
  * @param {Parser} p2 The second parser to apply.
@@ -257,9 +257,9 @@ export const leftB = (p1, p2) => makeParser(state => {
  * parser was applied, even if the first parser consumed input. A fatal
  * error from either parser will still result in an overall fatal error.
  *
- * Note that `rightB(p1, p2)` is not the same as `back(right(p1, p2))`,
- * as the former will fail fatally if one of its parsers fails fatally,
- * while the latter will fail non-fatally in that case.
+ * Note that `rightB(p1, p2)` is not the same as `backtrack(right(p1,
+ * p2))`, as the former will fail fatally if one of its parsers fails
+ * fatally, while the latter will fail non-fatally in that case.
  *
  * @param {Parser} p1 The first parser to apply.
  * @param {Parser} p2 The second parser to apply.
@@ -291,9 +291,9 @@ export const rightB = (p1, p2) => makeParser(state => {
  * parser was applied, even if the first parser consumed input. A fatal
  * error from either parser will still result in an overall fatal error.
  *
- * Note that `bothB(p1, p2)` is not the same as `back(both(p1, p2))`, as
- * the former will fail fatally if one of its parsers fails fatally,
- * while the latter will fail non-fatally in that case.
+ * Note that `bothB(p1, p2)` is not the same as `backtrack(both(p1,
+ * p2))`, as the former will fail fatally if one of its parsers fails
+ * fatally, while the latter will fail non-fatally in that case.
  *
  * @param {Parser} p1 The first parser to apply.
  * @param {Parser} p2 The second parser to apply.

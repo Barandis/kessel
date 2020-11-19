@@ -61,7 +61,7 @@ export const label = (p, msg) => makeParser(state => {
  * @returns {Parser} A parser that applies `p` and changes the error
  *     as appropriate if `p` fails.
  */
-export const backlabel = (p, msg) => makeParser(state => {
+export const backLabel = (p, msg) => makeParser(state => {
   const index = state.index
   const [reply, [next, result]] = dup(p(state))
   if (result.status === Ok) {
