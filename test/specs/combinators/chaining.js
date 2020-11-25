@@ -7,12 +7,18 @@ import {
   between,
   both,
   chain,
+  fifth,
+  first,
+  fourth,
   join,
   left,
   map,
+  nth,
   pipe,
   right,
+  second,
   skip,
+  third,
   value,
 } from 'kessel/combinators/chaining'
 import { many, many1, sequence } from 'kessel/combinators/sequence'
@@ -224,6 +230,61 @@ describe('Chaining and piping combinators', () => {
         index: 2,
         status: Fatal,
       })
+    })
+  })
+
+  describe('nth', () => {
+    it('extracts the nth element of an array result', () => {
+      pass(nth(many(any), 2), '12345', '3')
+      pass(nth(sequence(char('"'), any, char('"')), 1), '"a"', 'a')
+    })
+    it('passes any parser failure through', () => {
+      fail(nth(many1(any), 2), '', 'any character')
+    })
+  })
+
+  describe('first', () => {
+    it('extracts the first element of an array result', () => {
+      pass(first(many(any)), '12345', '1')
+    })
+    it('passes any parser failure through', () => {
+      fail(first(many1(any)), '', 'any character')
+    })
+  })
+
+  describe('second', () => {
+    it('extracts the second element of an array result', () => {
+      pass(second(many(any)), '12345', '2')
+    })
+    it('passes any parser failure through', () => {
+      fail(second(many1(any)), '', 'any character')
+    })
+  })
+
+  describe('third', () => {
+    it('extracts the third element of an array result', () => {
+      pass(third(many(any)), '12345', '3')
+    })
+    it('passes any parser failure through', () => {
+      fail(third(many1(any)), '', 'any character')
+    })
+  })
+
+  describe('fourth', () => {
+    it('extracts the fourth element of an array result', () => {
+      pass(fourth(many(any)), '12345', '4')
+    })
+    it('passes any parser failure through', () => {
+      fail(fourth(many1(any)), '', 'any character')
+    })
+  })
+
+  describe('fifth', () => {
+    it('extracts the fifth element of an array result', () => {
+      pass(fifth(many(any)), '12345', '5')
+    })
+    it('passes any parser failure through', () => {
+      fail(fifth(many1(any)), '', 'any character')
     })
   })
 })

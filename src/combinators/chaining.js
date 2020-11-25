@@ -283,3 +283,100 @@ export const between = (pre, post, p) => makeParser(state => {
   return result3.status === Ok ? ok(next3, result2.value)
     : maybeFatal(next3.index !== index, next3, result3.errors)
 })
+
+/**
+ * Returns the nth element of the result of a parser that produces an
+ * array. If the parser fails, that failure will be passed through.
+ *
+ * `nth(p, n)` is an optimized implementation of `chain(p, x =>
+ * constant(x[n]))`.
+ *
+ * @param {Parser} p A parser that results in an array.
+ * @param {number} n The 0-based index of the result element to return.
+ * @returns {Parser} A parser whose result is the `n`th element of the
+ *     result of `p`.
+ */
+export const nth = (p, n) => makeParser(state => {
+  const [reply, [next, result]] = dup(p(state))
+  return result.status === Ok ? ok(next, result.value[n]) : reply
+})
+
+/**
+ * Returns the first element of a parser result that is an array. If the
+ * parser fails, that failure is passed through.
+ *
+ * `first(p)` is an optimized implementation of `chain(p, x =>
+ * constant(x[0]))`.
+ *
+ * @param {Parser} p A parser whose result is an array.
+ * @returns {Parser} A parser whose result is the first element of the
+ *     result of `p`.
+ */
+export const first = p => makeParser(state => {
+  const [reply, [next, result]] = dup(p(state))
+  return result.status === Ok ? ok(next, result.value[0]) : reply
+})
+
+/**
+ * Returns the second element of a parser result that is an array. If
+ * the parser fails, that failure is passed through.
+ *
+ * `second(p)` is an optimized implementation of `chain(p, x =>
+ * constant(x[1]))`.
+ *
+ * @param {Parser} p A parser whose result is an array.
+ * @returns {Parser} A parser whose result is the second element of the
+ *     result of `p`.
+ */
+export const second = p => makeParser(state => {
+  const [reply, [next, result]] = dup(p(state))
+  return result.status === Ok ? ok(next, result.value[1]) : reply
+})
+
+/**
+ * Returns the third element of a parser result that is an array. If the
+ * parser fails, that failure is passed through.
+ *
+ * `third(p)` is an optimized implementation of `chain(p, x =>
+ * constant(x[2]))`.
+ *
+ * @param {Parser} p A parser whose result is an array.
+ * @returns {Parser} A parser whose result is the third element of the
+ *     result of `p`.
+ */
+export const third = p => makeParser(state => {
+  const [reply, [next, result]] = dup(p(state))
+  return result.status === Ok ? ok(next, result.value[2]) : reply
+})
+
+/**
+ * Returns the fourth element of a parser result that is an array. If
+ * the parser fails, that failure is passed through.
+ *
+ * `fourth(p)` is an optimized implementation of `chain(p, x =>
+ * constant(x[3]))`.
+ *
+ * @param {Parser} p A parser whose result is an array.
+ * @returns {Parser} A parser whose result is the fourth element of the
+ *     result of `p`.
+ */
+export const fourth = p => makeParser(state => {
+  const [reply, [next, result]] = dup(p(state))
+  return result.status === Ok ? ok(next, result.value[3]) : reply
+})
+
+/**
+ * Returns the fifth element of a parser result that is an array. If the
+ * parser fails, that failure is passed through.
+ *
+ * `fifth(p)` is an optimized implementation of `chain(p, x =>
+ * constant(x[4]))`.
+ *
+ * @param {Parser} p A parser whose result is an array.
+ * @returns {Parser} A parser whose result is the fifth element of the
+ *     result of `p`.
+ */
+export const fifth = p => makeParser(state => {
+  const [reply, [next, result]] = dup(p(state))
+  return result.status === Ok ? ok(next, result.value[4]) : reply
+})

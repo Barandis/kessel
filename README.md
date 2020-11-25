@@ -37,18 +37,17 @@ To illustrate, here's a short parser definition for a CSV parser. This is a full
 
 ```javascript
 import { 
-  blockB, char, choice, join, label, many, newline, noneOf, run,
-  sepBy, sepEndBy, string, value,
+  char, choice, join, label, many, newline, noneOf, run, second, sepBy,
+  sepEndBy, sequenceB, string, value,
 } from 'kessel'
 
 const quotedChar = choice(noneOf('"'), value(string('""'), '"'))
 
-const quotedCell = blockB(function *() {
-  yield char('"')
-  const content = yield join(many(quotedChar))
-  yield label(char('"'), 'quote at end of cell')
-  return content
-})
+const quotedCell = second(sequenceB(
+  char('"'),
+  join(many(quotedChar)),
+  label(char('"'), 'quote at end of cell'),
+))
 
 const cell = choice(quotedCell, join(many(noneOf(',\n\r'))))
 const line = sepBy(cell, char(','))

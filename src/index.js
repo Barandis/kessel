@@ -72,12 +72,18 @@ export {
   between,
   both,
   chain,
+  fifth,
+  first,
+  fourth,
   join,
   left,
   map,
+  nth,
   pipe,
   right,
+  second,
   skip,
+  third,
   value,
 } from './combinators/chaining'
 export {
