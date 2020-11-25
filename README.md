@@ -57,6 +57,27 @@ const csv = sepEndBy(line, newline)
 const parseCsv = input => run(csv, input)
 ```
 
+Running this against CSV input will produce the following result (CSV input is from [Wikipedia's article on comma-separated values][4]):
+
+```javascript
+const text = `Year,Make,Model,Description,Price
+1997,Ford,E350,"ac, abs, moon",3000.00
+1999,Chevy,"Venture ""Extended Edition""","",4900.00
+1999,Chevy,"Venture ""Extended Edition, Very Large""",,5000.00
+1996,Jeep,Grand Cherokee,"MUST SELL! air, moon roof, loaded",4799.00`
+
+const result = parseCsv(text)
+
+// `result` is equal to the following:
+// [
+//   ['Year', 'Make', 'Model', 'Description', 'Price'],
+//   ['1997', 'Ford', 'E350', 'ac, abs, moon', '3000.00'],
+//   ['1999', 'Chevy', 'Venture "Extended Edition"', '', '4900.00'],
+//   ['1999', 'Chevy', 'Venture "Extended Edition, Very Large"', '', '5000.00'], 
+//   ['1996', 'Jeep', 'Grand Cherokee', 'MUST SELL! air, moon roof, loaded', '4799.00']
+// ]
+```
+
 ### Documentation
 
 Details for every function and parser in the API will be written after the long weekend.
@@ -64,3 +85,4 @@ Details for every function and parser in the API will be written after the long 
 [1]: https://hackage.haskell.org/package/parsec
 [2]: https://www.quanttec.com/fparsec/
 [3]: http://book.realworldhaskell.org/read/using-parsec.html
+[4]: https://en.wikipedia.org/wiki/Comma-separated_values#Example
