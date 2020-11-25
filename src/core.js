@@ -3,6 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+import { formatErrors } from './error'
 import { stringToView } from './util'
 
 /** @typedef {import('./error.js').ErrorList} ErrorList */
@@ -206,9 +207,9 @@ export function maybeFatal(test, state, errors = [], index = state.index) {
 }
 
 /**
- * Runs a parser against an input. This input can be a string, a typed
- * array, an array buffer, or a data view. The return value is the final
- * parser state returned by the parser after being run.
+ * Applies a parser to input. This input can be a string, a typed array,
+ * an array buffer, or a data view. The return value is the final parser
+ * state returned by the parser after being run.
  *
  * @param {Parser} parser The parser to be applied to the input. This
  *     can, as always, be a composition of an arbitrary number of
@@ -220,4 +221,70 @@ export function maybeFatal(test, state, errors = [], index = state.index) {
  */
 export function parse(parser, input) {
   return parser(makeState(input))
+}
+
+/**
+ * Determines whether an invocation of `parse` was successful.
+ *
+ * @param {[State, Result]} reply The state/result value returned by
+ *     `parse`.
+ * @returns {boolean} `true` if the parser succeeded or `false` if it
+ *     did not.
+ */
+export function succeeded(reply) {
+  return reply[1].status === Status.Ok
+}
+
+/**
+ * Extracts the result from the value returned by `parse`. If the parser
+ * did not succeed, this will return `null` instead.
+ *
+ * Note that `null` is a possible result from some individual parsers
+ * (`skip`, `lookAhead`, etc.). The proper way to tell if a parser
+ * succeeded in the first place is to use `succeeded`.
+ *
+ * @param {[State, Result]} reply The state/result value returned by
+ *     `parse`.
+ * @returns {*} The resulting value from the parse if it was successful,
+ *     or `null` if it was not.
+ */
+export function result(reply) {
+  return succeeded(reply) ? reply[1].value : null
+}
+
+/**
+ * Extracts the error message as a string from the value returned by
+ * an unsuccessful invocation of `parse`. If the parser was actually
+ * successful, this will return `null` instead.
+ *
+ * @param {[State, Result]} reply The state/result value returned by
+ *     `parse`.
+ * @returns {string} A formatted string detailing the circumstances of
+ *     the parser failure.
+ */
+export function failure(reply) {
+  return succeeded(reply) ? null : formatErrors(...reply)
+}
+
+/**
+ * Applies a parser to input. Returns the parsed value if the parser
+ * succeeds, or throws an exception with the parser's error message if
+ * it fails.
+ *
+ * @param {Parser} parser The parser to be applied to the input. This
+ *     can, as always, be a composition of an arbitrary number of
+ *     parsers and combinators.
+ * @param {(string|ArrayBuffer|TypedArray|DataView)} input The input
+ *     text.
+ * @returns {*} The result from the parser application, if the parser
+ *     succeeds.
+ * @throws {Error} If the parser fails. The error message will be a
+ *     detailed record of where the error occurred.
+ */
+export function run(parser, input) {
+  const [state, result] = parser(makeState(input))
+  if (result.status === Status.Ok) {
+    return result.value
+  }
+  throw new Error(formatErrors(state, result))
 }

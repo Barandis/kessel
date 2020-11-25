@@ -6,7 +6,18 @@
 import { expect } from 'chai'
 
 import { sequence } from 'kessel/combinators/sequence'
-import { error, fatal, maybeFatal, ok, parse, Status } from 'kessel/core'
+import {
+  error,
+  failure,
+  fatal,
+  maybeFatal,
+  ok,
+  parse,
+  result,
+  run,
+  Status,
+  succeeded,
+} from 'kessel/core'
 import { ErrorType, merge, unexpected } from 'kessel/error'
 import { char } from 'kessel/parsers/char'
 import { string } from 'kessel/parsers/string'
@@ -125,6 +136,34 @@ describe('Core functionality', () => {
       it('can set non-fatal state with a test', () => {
         const [_, result] = nonFatal
         expect(result.status).to.equal(Status.Error)
+      })
+    })
+  })
+
+  describe('evaluating parsers', () => {
+    it('evaluates successes', () => {
+      const reply = parse(char('a'), 'a')
+      expect(succeeded(reply)).to.be.true
+      expect(result(reply)).to.equal('a')
+      expect(failure(reply)).to.be.null
+    })
+    it('evaluates failures', () => {
+      const reply = parse(char('a'), 'b')
+      expect(succeeded(reply)).to.be.false
+      expect(result(reply)).to.be.null
+      expect(failure(reply)).to.equal(
+        "Parse error at (line 1, column 1):\n\nb\n^\nExpected 'a'\n\n",
+      )
+    })
+    describe('run', () => {
+      it('returns the parser value on success', () => {
+        const result = run(char('a'), 'a')
+        expect(result).to.equal('a')
+      })
+      it('throws an error on failure', () => {
+        const msg
+          = "Parse error at (line 1, column 1):\n\nb\n^\nExpected 'a'\n\n"
+        expect(() => run(char('a'), 'b')).to.throw(msg)
       })
     })
   })

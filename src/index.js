@@ -117,11 +117,15 @@ export {
 export {
   Status,
   error,
+  failure,
   fatal,
   makeParser,
   maybeFatal,
   ok,
   parse,
+  result,
+  run,
+  succeeded,
 } from './core'
 export {
   ErrorType,
