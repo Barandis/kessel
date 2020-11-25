@@ -56,6 +56,7 @@ export {
 
 export {
   backtrack,
+  blockB,
   bothB,
   chainB,
   choice,

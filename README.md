@@ -37,20 +37,20 @@ To illustrate, here's a short parser definition for a CSV parser. This is a full
 
 ```javascript
 import { 
-  backtrack, block, char, choice, join, label, many, newline, noneOf, run,
+  backtrack, blockB, char, choice, join, label, many, newline, noneOf, run,
   sepBy, sepEndBy, string, value,
 } from 'kessel'
 
 const quotedChar = choice([noneOf('"'), value(string('""'), '"')])
 
-const quotedCell = block(function *() {
+const quotedCell = blockB(function *() {
   yield char('"')
   const content = yield join(many(quotedChar))
   yield label(char('"'), 'quote at end of cell')
   return content
 })
 
-const cell = choice([backtrack(quotedCell), join(many(noneOf(',\n\r')))])
+const cell = choice([quotedCell, join(many(noneOf(',\n\r')))])
 const line = sepBy(cell, char(','))
 const csv = sepEndBy(line, newline)
 

@@ -7,6 +7,7 @@ import { expect } from 'chai'
 
 import {
   backtrack,
+  blockB,
   bothB,
   chainB,
   choice,
@@ -23,6 +24,7 @@ import { lookAhead } from 'kessel/combinators/conditional'
 import { sequence } from 'kessel/combinators/sequence'
 import { parse, Status } from 'kessel/core'
 import { ErrorType } from 'kessel/error'
+import { space } from 'kessel/index'
 import { any, char, digit, eof, letter } from 'kessel/parsers/char'
 import { string } from 'kessel/parsers/string'
 import { fail, pass } from 'test/helper'
@@ -367,6 +369,39 @@ describe('Alternative and error recovery combinators', () => {
         index: 5,
         status: Fatal,
       })
+    })
+  })
+
+  describe('blockB', () => {
+    const parser = blockB(function *() {
+      yield sequence([char('a'), char('b'), char('c')])
+      yield space
+      const c = yield any
+      yield space
+
+      return c
+    })
+
+    it('fails if any of its parsers fail', () => {
+      fail(parser, 'abd', { expected: "'c'", index: 2, status: Fatal })
+      fail(parser, 'abcd', {
+        expected: 'a whitespace character',
+        index: 0,
+        status: Error,
+      })
+      fail(parser, 'abc ', {
+        expected: 'any character',
+        index: 0,
+        status: Error,
+      })
+      fail(parser, 'abc de', {
+        expected: 'a whitespace character',
+        index: 0,
+        status: Error,
+      })
+    })
+    it('succeeds with its return value if all parsers succeed', () => {
+      pass(parser, 'abc d ', { result: 'd', index: 6 })
     })
   })
 })

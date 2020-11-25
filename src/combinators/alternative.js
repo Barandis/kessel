@@ -398,3 +398,47 @@ export const manyTillB = (p, end) => makeParser(state => {
   }
   return ok(next, values)
 })
+
+/**
+ * Creates a parser that executes a block of code in the form of a
+ * generator function. Inside that function, parsers that are `yield`ed
+ * will be executed and will evaluate to their results (which can then
+ * be assigned to variables, etc.).
+ *
+ * If any of these parsers fail, the `block` parser will also fail. If
+ * that failure is non-fatal, backtracking will reset the index to where
+ * it was at the beginning of the `block` parser application.
+ *
+ * If all parsers in the block succeed, `block` will succeed with the
+ * value that the generator function returned.
+ *
+ * Only parsers may be yielded in a block. Yielding anything else will
+ * cause undefined behavior.
+ *
+ * @param {function():*} genFn A generator function that takes no
+ *     arguments and returns whatever should be used as the returned
+ *     parser's result. This generator function can `yield` only
+ *     `Parser`s; yielding anything else will cause incorrect behavior
+ *     depending on what exactly is yielded.
+ * @returns {Parser} A parser that executes the generator function,
+ *     applies parsers as they are yielded, and results (if all parsers
+ *     succeed) in the return value of the generator.
+ */
+export const blockB = genFn => makeParser(state => {
+  const gen = genFn()
+  const index = state.index
+  let nextValue
+  let next = state
+
+  while (true) {
+    const { value, done } = gen.next(nextValue)
+    if (done) return ok(next, value)
+
+    const [reply, [nextState, result]] = dup(value(next))
+    next = nextState
+
+    if (result.status === Fatal) return reply
+    if (result.status === Error) return error(nextState, result.errors, index)
+    nextValue = result.value
+  }
+})
