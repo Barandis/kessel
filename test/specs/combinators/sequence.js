@@ -101,7 +101,7 @@ describe('Sequence combinators', () => {
       })
     })
     it('does not add null to the results', () => {
-      pass(many(choice([any, eof])), 'abc', ['a', 'b', 'c'])
+      pass(many(choice(any, eof)), 'abc', ['a', 'b', 'c'])
     })
   })
 
@@ -125,7 +125,7 @@ describe('Sequence combinators', () => {
       })
     })
     it('does not add null to the results', () => {
-      pass(many1(choice([any, eof])), 'abc', ['a', 'b', 'c'])
+      pass(many1(choice(any, eof)), 'abc', ['a', 'b', 'c'])
     })
   })
 
@@ -446,7 +446,7 @@ describe('Sequence combinators', () => {
     it('does not add null to the results', () => {
       pass(
         manyTill(
-          choice([letter, skip(space)]), digit,
+          choice(letter, skip(space)), digit,
         ), 'a b c 1', ['a', 'b', 'c'],
       )
     })
@@ -454,10 +454,10 @@ describe('Sequence combinators', () => {
 
   describe('assocl', () => {
     const p = map(join(many1(digit)), x => parseInt(x))
-    const op = choice([
+    const op = choice(
       value(char('+'), (a, b) => a + b),
       value(char('-'), (a, b) => a - b),
-    ])
+    )
 
     it('succeeds with a default value if there are no matches', () => {
       pass(assocl(p, op, 0), '', { result: 0, index: 0 })
@@ -497,10 +497,10 @@ describe('Sequence combinators', () => {
 
   describe('assocl1', () => {
     const p = map(join(many1(digit)), x => parseInt(x))
-    const op = choice([
+    const op = choice(
       value(char('+'), (a, b) => a + b),
       value(char('-'), (a, b) => a - b),
-    ])
+    )
 
     it('fails if there are no matches', () => {
       fail(assocl1(p, op), '', {
@@ -544,10 +544,10 @@ describe('Sequence combinators', () => {
 
   describe('assocr', () => {
     const p = map(join(many1(digit)), x => parseInt(x))
-    const op = choice([
+    const op = choice(
       value(char('+'), (a, b) => a + b),
       value(char('-'), (a, b) => a - b),
-    ])
+    )
 
     it('succeeds with a default value if there are no matches', () => {
       pass(assocr(p, op, 0), '', { result: 0, index: 0 })
@@ -588,10 +588,10 @@ describe('Sequence combinators', () => {
 
   describe('assocr1', () => {
     const p = map(join(many1(digit)), x => parseInt(x))
-    const op = choice([
+    const op = choice(
       value(char('+'), (a, b) => a + b),
       value(char('-'), (a, b) => a - b),
-    ])
+    )
 
     it('fails if there are no matches', () => {
       fail(assocr1(p, op), '', {

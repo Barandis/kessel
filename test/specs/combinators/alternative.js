@@ -11,7 +11,6 @@ import {
   bothB,
   chainB,
   choice,
-  choiceL,
   countB,
   fallback,
   leftB,
@@ -33,36 +32,17 @@ const { Error, Fatal } = Status
 
 describe('Alternative and error recovery combinators', () => {
   describe('choice', () => {
-    const parser = choice([
+    const parser = choice(
       sequence([char('a'), char('b')]),
       sequence([char('c'), char('d')]),
       sequence([char('e'), char('f')]),
-    ])
+    )
 
     it('fails with all expecteds if all parsers fail without consuming', () => {
       fail(parser, 'yz', "'a', 'c', or 'e'")
     })
     it('fails immediately if a failed parser consumes input', () => {
       fail(parser, 'ce', "'a' or 'd'")
-    })
-    it('succeeds if one parser succeeds first', () => {
-      pass(parser, 'cd', { result: ['c', 'd'] })
-    })
-  })
-
-  describe('choiceL', () => {
-    const parser = choiceL([
-      sequence([char('a'), char('b')]),
-      sequence([char('c'), char('d')]),
-      sequence([char('e'), char('f')]),
-    ],
-    '"ab", "cd", or "ef"')
-
-    it('fails with its message if all parsers fail without consuming', () => {
-      fail(parser, 'yz', '"ab", "cd", or "ef"')
-    })
-    it('fails immediately if a failed parser consumes input', () => {
-      fail(parser, 'ce', '"ab", "cd", or "ef"')
     })
     it('succeeds if one parser succeeds first', () => {
       pass(parser, 'cd', { result: ['c', 'd'] })

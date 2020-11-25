@@ -30,7 +30,7 @@ describe('Message combinators', () => {
       fail(label(sequence([char('a'), char('b')]), 'letter b'), 'a1', "'b'")
     })
     it('overwrites all of multiple expected messages', () => {
-      const parser = choice([char('a'), char('b'), char('c')])
+      const parser = choice(char('a'), char('b'), char('c'))
       fail(parser, 'def', "'a', 'b', or 'c'")
       fail(label(parser, 'a, b, or c'), 'def', 'a, b, or c')
     })

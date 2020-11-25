@@ -60,7 +60,6 @@ export {
   bothB,
   chainB,
   choice,
-  choiceL,
   countB,
   fallback,
   leftB,

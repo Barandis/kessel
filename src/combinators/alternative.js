@@ -4,7 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import { error, fatal, ok, makeParser, Status } from 'kessel/core'
-import { expected, merge, nested } from 'kessel/error'
+import { merge, nested } from 'kessel/error'
 import { dup, range } from 'kessel/util'
 
 const { Ok, Error, Fatal } = Status
@@ -22,12 +22,12 @@ const { Ok, Error, Fatal } = Status
  * On failure, all of the `Expected` errors from any of the contained
  * parsers will be merged into this parser's errors.
  *
- * @param {Parser[]} ps The parsers to apply to the input, one at a
+ * @param {...Parser} ps The parsers to apply to the input, one at a
  *     time, until one succeeds, one fails fatally, or all fail.
  * @returns {Parser} A parser that applies its contained parsers until
  *     one succeeds.
  */
-export const choice = ps => makeParser(state => {
+export const choice = (...ps) => makeParser(state => {
   let errors = []
 
   for (const p of ps) {
@@ -38,33 +38,6 @@ export const choice = ps => makeParser(state => {
     if (result.status === Fatal) return fatal(next, errors)
   }
   return error(state, errors)
-})
-
-/**
- * Creates a parser that implements alternatives, but with a failure
- * message included. The parsers are tried one at a time as with `alt`,
- * but if they all fail (or if any fail fatally), the last argument is
- * used as the expected message rather than constructing it out of the
- * expected messages of each failed parser.
- *
- * `choiceL(ps, message)` is an optimized version of `label(choice(ps),
- * message)`.
- *
- * @param {Parser[]} ps The parsers to apply to the input, one at a
- *     time, until one succeeds, one fails fatally, or all fail.
- * @param {string} message The message for the `Expected` error that
- *     will result from the parser failing.
- * @returns {Parser} A parser that applies its contained parsers until
- *     one succeeds.
- */
-export const choiceL = (ps, message) => makeParser(state => {
-  for (const p of ps) {
-    const [reply, [next, result]] = dup(p(state))
-
-    if (result.status === Ok) return reply
-    if (result.status === Fatal) return fatal(next, expected(message))
-  }
-  return error(state, expected(message))
 })
 
 /**
