@@ -78,6 +78,8 @@ const result = parseCsv(text)
 // ]
 ```
 
+This example exists as a test in the file `csv.js` in the `test/specs` directory.
+
 ### Documentation
 
 Details for every function and parser in the API will be written after the long weekend.
