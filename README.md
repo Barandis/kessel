@@ -37,7 +37,7 @@ To illustrate, here's a short parser definition for a CSV parser. This is a full
 
 ```javascript
 import { 
-  backtrack, blockB, char, choice, join, label, many, newline, noneOf, run,
+  blockB, char, choice, join, label, many, newline, noneOf, run,
   sepBy, sepEndBy, string, value,
 } from 'kessel'
 
