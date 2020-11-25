@@ -56,6 +56,12 @@ const csv = sepEndBy(line, newline)
 const parseCsv = input => run(csv, input)
 ```
 
+To demonstrate the composability of the parsers in this library, and to show that all of the intermediate variables (`quotedChar`, `quotedCell`, `cell`, `line`, and `csv`) are in fact parsers themselves, here's the same thing as a single line (please do not actually write code in this way):
+
+```javascript
+const parseCsv = input => run(sepEndBy(sepBy(choice(second(sequenceB(char('"'), join(many(choice(noneOf('"'), value(string('""'), '"')))), label(char('"'), 'quote at end of cell'))), join(many(noneOf(',\n\r')))), char(',')), newline), input)
+```
+
 Running this against CSV input will produce the following result (CSV input is from [Wikipedia's article on comma-separated values][4]):
 
 ```javascript

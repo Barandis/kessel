@@ -36,6 +36,14 @@ const csv = sepEndBy(line, newline)
 
 const parseCsv = input => run(csv, input)
 
+const parseCsv1 = input => run(sepEndBy(sepBy(choice(
+  second(sequenceB(
+    char('"'),
+    join(many(choice(noneOf('"'), value(string('""'), '"')))),
+    label(char('"'), 'quote at end of cell'),
+  )), join(many(noneOf(',\n\r'))),
+), char(',')), newline), input)
+
 describe('CSV parser', () => {
   it('successfully parses example CSV', () => {
     const text = `Year,Make,Model,Description,Price
@@ -55,5 +63,6 @@ describe('CSV parser', () => {
     ]
 
     expect(parseCsv(text)).to.deep.equal(expected)
+    expect(parseCsv1(text)).to.deep.equal(expected)
   })
 })
