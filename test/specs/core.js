@@ -98,13 +98,13 @@ describe('Core functionality', () => {
 
     describe('updated fatal failure parser state', () => {
       it('creates a new object', () => {
-        const [state, result] = parse(sequence([char('a'), char('1')]), 'abc')
+        const [state, result] = parse(sequence(char('a'), char('1')), 'abc')
         const [ustate, uresult] = fatal(state, result.errors)
         expect(state).to.not.equal(ustate)
         expect(result).to.deep.equal(uresult)
       })
       it('can update errors and/or index properties', () => {
-        const [state, result] = parse(sequence([char('a'), char('1')]), 'abc')
+        const [state, result] = parse(sequence(char('a'), char('1')), 'abc')
         const [ustate1, uresult1] = fatal(state, merge(
           result.errors, unexpected("'z'"),
         ), 17)

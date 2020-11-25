@@ -41,7 +41,7 @@ import {
   sepBy, sepEndBy, string, value,
 } from 'kessel'
 
-const quotedChar = choice([noneOf('"'), value(string('""'), '"')])
+const quotedChar = choice(noneOf('"'), value(string('""'), '"'))
 
 const quotedCell = blockB(function *() {
   yield char('"')
@@ -50,7 +50,7 @@ const quotedCell = blockB(function *() {
   return content
 })
 
-const cell = choice([quotedCell, join(many(noneOf(',\n\r')))])
+const cell = choice(quotedCell, join(many(noneOf(',\n\r'))))
 const line = sepBy(cell, char(','))
 const csv = sepEndBy(line, newline)
 

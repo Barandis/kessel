@@ -26,8 +26,8 @@ describe('Message combinators', () => {
       fail(label(char('a'), 'letter a'), 'bcd', 'letter a')
     })
     it('does not change the expected message on a fatal error', () => {
-      fail(sequence([char('a'), char('b')]), 'a1', "'b'")
-      fail(label(sequence([char('a'), char('b')]), 'letter b'), 'a1', "'b'")
+      fail(sequence(char('a'), char('b')), 'a1', "'b'")
+      fail(label(sequence(char('a'), char('b')), 'letter b'), 'a1', "'b'")
     })
     it('overwrites all of multiple expected messages', () => {
       const parser = choice(char('a'), char('b'), char('c'))
@@ -58,7 +58,7 @@ describe('Message combinators', () => {
     })
     it('adds a compound error if its parser fails while consuming', () => {
       const [state, result] = parse(
-        backLabel(sequence([char('a'), char('b')]), 'test'), 'a1',
+        backLabel(sequence(char('a'), char('b')), 'test'), 'a1',
       )
       const error = result.errors[0]
 

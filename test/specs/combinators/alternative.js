@@ -33,9 +33,9 @@ const { Error, Fatal } = Status
 describe('Alternative and error recovery combinators', () => {
   describe('choice', () => {
     const parser = choice(
-      sequence([char('a'), char('b')]),
-      sequence([char('c'), char('d')]),
-      sequence([char('e'), char('f')]),
+      sequence(char('a'), char('b')),
+      sequence(char('c'), char('d')),
+      sequence(char('e'), char('f')),
     )
 
     it('fails with all expecteds if all parsers fail without consuming', () => {
@@ -57,12 +57,12 @@ describe('Alternative and error recovery combinators', () => {
       pass(optional(char('a')), 'bcd', { result: null, index: 0 })
     })
     it('fails fatally if its parser fails fatally', () => {
-      fail(optional(sequence([char('a'), char('b')])), 'acd', {
+      fail(optional(sequence(char('a'), char('b'))), 'acd', {
         expected: "'b'",
         index: 1,
         status: Fatal,
       })
-      pass(optional(backtrack(sequence([char('a'), char('b')]))), 'acd', {
+      pass(optional(backtrack(sequence(char('a'), char('b')))), 'acd', {
         result: null,
         index: 0,
       })
@@ -81,12 +81,12 @@ describe('Alternative and error recovery combinators', () => {
       expect(r1).to.deep.equal(r2)
     })
     it('resets the index if its parser fails with consuming input', () => {
-      const parser = sequence([string('te'), string('st')])
+      const parser = sequence(string('te'), string('st'))
       fail(parser, 'tesl', { index: 2, status: Fatal })
       fail(backtrack(parser), 'tesl', { index: 0, status: Error })
     })
     it('creates a nested error if it fails while consuming input', () => {
-      const parser = sequence([string('te'), string('st')])
+      const parser = sequence(string('te'), string('st'))
       const [state, result] = parse(backtrack(parser), 'tesl')
       const error = result.errors[0]
 
@@ -106,7 +106,7 @@ describe('Alternative and error recovery combinators', () => {
       pass(fallback(char('b'), 'z'), 'abc', 'z')
     })
     it('fails fatally if its parser does', () => {
-      fail(fallback(sequence([string('ab'), string('cd')]), 'z'), 'abce', {
+      fail(fallback(sequence(string('ab'), string('cd')), 'z'), 'abce', {
         expected: "'cd'",
         status: Fatal,
       })
@@ -114,7 +114,7 @@ describe('Alternative and error recovery combinators', () => {
   })
 
   describe('sequenceB', () => {
-    const parser = sequenceB([string('abc'), string('def'), string('ghi')])
+    const parser = sequenceB(string('abc'), string('def'), string('ghi'))
 
     it('fails if any of its parsers fail', () => {
       const [state1, result1] = parse(parser, 'abd')
@@ -137,13 +137,13 @@ describe('Alternative and error recovery combinators', () => {
       pass(parser, 'abcdefghi', { result: ['abc', 'def', 'ghi'], index: 9 })
     })
     it('does not add null to results', () => {
-      pass(sequenceB([string('abc'), eof]), 'abc', {
+      pass(sequenceB(string('abc'), eof), 'abc', {
         result: ['abc'],
         index: 3,
       })
     })
     it('still fails fatally if any of its parsers does', () => {
-      const parser = sequenceB([sequence([letter, digit]), letter, digit])
+      const parser = sequenceB(sequence(letter, digit), letter, digit)
       fail(parser, 'aaa1', { expected: 'a digit', index: 1, status: Fatal })
     })
   })
@@ -177,12 +177,12 @@ describe('Alternative and error recovery combinators', () => {
       expect(err.errors[0].label).to.equal("'b'")
     })
     it('still fails fatally if either parser fails fatally', () => {
-      fail(chainB(sequence([letter, digit]), () => letter), 'aaa', {
+      fail(chainB(sequence(letter, digit), () => letter), 'aaa', {
         expected: 'a digit',
         index: 1,
         status: Fatal,
       })
-      fail(chainB(letter, c => sequence([char(c), char(c)])), 'aab', {
+      fail(chainB(letter, c => sequence(char(c), char(c))), 'aab', {
         expected: "'a'",
         index: 2,
         status: Fatal,
@@ -208,12 +208,12 @@ describe('Alternative and error recovery combinators', () => {
       expect(err.errors[0].label).to.equal('a digit')
     })
     it('still fails fatally if either parser fails fatally', () => {
-      fail(leftB(sequence([letter, letter]), digit), 'a11', {
+      fail(leftB(sequence(letter, letter), digit), 'a11', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
-      fail(leftB(letter, sequence([letter, digit])), 'aab', {
+      fail(leftB(letter, sequence(letter, digit)), 'aab', {
         expected: 'a digit',
         index: 2,
         status: Fatal,
@@ -239,12 +239,12 @@ describe('Alternative and error recovery combinators', () => {
       expect(err.errors[0].label).to.equal('a digit')
     })
     it('still fails fatally if either parser fails fatally', () => {
-      fail(rightB(sequence([letter, letter]), digit), 'a11', {
+      fail(rightB(sequence(letter, letter), digit), 'a11', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
-      fail(rightB(letter, sequence([letter, digit])), 'aab', {
+      fail(rightB(letter, sequence(letter, digit)), 'aab', {
         expected: 'a digit',
         index: 2,
         status: Fatal,
@@ -270,12 +270,12 @@ describe('Alternative and error recovery combinators', () => {
       expect(err.errors[0].label).to.equal('a digit')
     })
     it('still fails fatally if either parser fails fatally', () => {
-      fail(bothB(sequence([letter, letter]), digit), 'a11', {
+      fail(bothB(sequence(letter, letter), digit), 'a11', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
-      fail(bothB(letter, sequence([letter, digit])), 'aab', {
+      fail(bothB(letter, sequence(letter, digit)), 'aab', {
         expected: 'a digit',
         index: 2,
         status: Fatal,
@@ -297,7 +297,7 @@ describe('Alternative and error recovery combinators', () => {
       })
     })
     it('fails fatally if the parser fails fatally', () => {
-      fail(countB(sequence([letter, letter]), 5), 'a1b2c3d4e5', {
+      fail(countB(sequence(letter, letter), 5), 'a1b2c3d4e5', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
@@ -339,12 +339,12 @@ describe('Alternative and error recovery combinators', () => {
       expect(err.errors[1].label).to.equal('a letter')
     })
     it('fails fatally if either of its parsers fail fatally', () => {
-      fail(manyTillB(digit, sequence([letter, digit])), '123abc', {
+      fail(manyTillB(digit, sequence(letter, digit)), '123abc', {
         expected: 'a digit',
         index: 4,
         status: Fatal,
       })
-      fail(manyTillB(sequence([letter, digit]), digit), 'a1b2cc3', {
+      fail(manyTillB(sequence(letter, digit), digit), 'a1b2cc3', {
         expected: 'a digit',
         index: 5,
         status: Fatal,
@@ -354,7 +354,7 @@ describe('Alternative and error recovery combinators', () => {
 
   describe('blockB', () => {
     const parser = blockB(function *() {
-      yield sequence([char('a'), char('b'), char('c')])
+      yield sequence(char('a'), char('b'), char('c'))
       yield space
       const c = yield any
       yield space

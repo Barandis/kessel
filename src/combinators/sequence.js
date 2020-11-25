@@ -27,11 +27,11 @@ function loopMessage(name) {
  * parser succeeded and consumed input. Essentially, if the returned
  * parser consumes anything and then fails, it will fail fatally.
  *
- * @param {Parser[]} ps An array of parsers to be applied.
+ * @param {...Parser} ps The parsers to be applied.
  * @returns {Parser} A parser that applies the supplied parsers one at a
  *     time, in order, and fails if any of those parsers fail.
  */
-export const sequence = ps => makeParser(state => {
+export const sequence = (...ps) => makeParser(state => {
   const values = []
   const index = state.index
   let next = state

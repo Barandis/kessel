@@ -597,7 +597,7 @@ describe('Parse errors', () => {
         expect(format(expecteds, 29, view, 8, 72)).to.equal(exp)
       })
       it('formats nested errors that come from backtracking', () => {
-        const parser = sequenceB([char('t'), char('e'), char('s'), char('t')])
+        const parser = sequenceB(char('t'), char('e'), char('s'), char('t'))
         const [state, result] = parse(parser, 'tesl')
         const exp = 'Parse error at (line 1, column 1):\n\n'
           + 'tesl\n'
@@ -612,7 +612,7 @@ describe('Parse errors', () => {
       })
       it('formats compound errors from backlabel', () => {
         const parser = backLabel(
-          sequence([char('t'), char('e'), char('s'), char('t')]),
+          sequence(char('t'), char('e'), char('s'), char('t')),
           "the word 'test'",
         )
         const [state, result] = parse(parser, 'tesl')

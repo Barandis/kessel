@@ -47,14 +47,14 @@ describe('Chaining and piping combinators', () => {
   describe('map', () => {
     it('succeeds with the return value of its function', () => {
       pass(map(any, c => c.toUpperCase()), 'abc', 'A')
-      pass(map(sequence([letter, digit]), cs => cs.join('')), 'a1', 'a1')
+      pass(map(sequence(letter, digit), cs => cs.join('')), 'a1', 'a1')
     })
     it('propagates failed state if its parser fails', () => {
       fail(map(any, c => c.toUpperCase()), '', {
         expected: 'any character',
         status: Error,
       })
-      fail(map(sequence([letter, digit]), cs => cs.join('')), 'ab', {
+      fail(map(sequence(letter, digit), cs => cs.join('')), 'ab', {
         expected: 'a digit',
         status: Fatal,
         index: 1,
@@ -72,7 +72,7 @@ describe('Chaining and piping combinators', () => {
         expected: 'any character',
         status: Error,
       })
-      fail(join(sequence([letter, digit])), 'ab', {
+      fail(join(sequence(letter, digit)), 'ab', {
         expected: 'a digit',
         status: Fatal,
       })
@@ -110,7 +110,7 @@ describe('Chaining and piping combinators', () => {
       fail(left(eof, char('a')), '', { expected: "'a'", status: Error })
     })
     it('fails fatally if any input is consumed on failure', () => {
-      fail(left(sequence([letter, letter]), digit), 'a11', {
+      fail(left(sequence(letter, letter), digit), 'a11', {
         expected: 'a letter',
         index: 1,
         status: Status.Fatal,
@@ -132,7 +132,7 @@ describe('Chaining and piping combinators', () => {
       fail(right(eof, char('a')), '', { expected: "'a'", status: Error })
     })
     it('fails fatally if any input is consumed on failure', () => {
-      fail(right(sequence([letter, letter]), digit), 'a11', {
+      fail(right(sequence(letter, letter), digit), 'a11', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
@@ -160,7 +160,7 @@ describe('Chaining and piping combinators', () => {
       })
     })
     it('fails fatally if any input is consumed on failure', () => {
-      fail(both(sequence([letter, letter]), digit), 'a11', {
+      fail(both(sequence(letter, letter), digit), 'a11', {
         expected: 'a letter',
         index: 1,
         status: Status.Fatal,
@@ -219,7 +219,7 @@ describe('Chaining and piping combinators', () => {
         index: 4,
         status: Fatal,
       })
-      fail(between(char('('), char(')'), sequence([letter, letter])), '(a)', {
+      fail(between(char('('), char(')'), sequence(letter, letter)), '(a)', {
         expected: 'a letter',
         index: 2,
         status: Fatal,
