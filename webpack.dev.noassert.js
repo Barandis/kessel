@@ -14,11 +14,11 @@ module.exports = merge(common, {
   mode: 'development',
   devtool: 'inline-source-map',
   output: {
-    filename: 'kessel.js',
+    filename: 'kessel.noassert.js',
   },
   plugins: [
     new webpack.DefinePlugin({
-      'ASSERT': JSON.stringify(true),
+      'ASSERT': false,
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
     }),
   ],

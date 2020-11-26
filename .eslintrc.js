@@ -8,6 +8,9 @@ module.exports = {
     mocha: true,
     browser: true,
   },
+  globals: {
+    ASSERT: 'readonly',
+  },
   extends: ['eslint:recommended', 'plugin:import/errors'],
   parser: 'babel-eslint',
   parserOptions: {

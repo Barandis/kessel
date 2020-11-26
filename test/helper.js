@@ -151,7 +151,5 @@ export function fail(parser, test, error = {}) {
  * @param {string} message The expected message of the thrown exception.
  */
 export function error(parser, test, message) {
-  expect(() => {
-    parse(parser, test)
-  }).to.throw(message)
+  expect(() => parse(parser, test)).to.throw(message)
 }

@@ -20,5 +20,11 @@ module.exports = merge(common, {
   output: {
     filename: 'kessel.min.js',
   },
-  plugins: [new webpack.BannerPlugin({ banner, entryOnly: true })],
+  plugins: [
+    new webpack.BannerPlugin({ banner, entryOnly: true }),
+    new webpack.DefinePlugin({
+      'ASSERT': true,
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+    }),
+  ],
 })

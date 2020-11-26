@@ -20,10 +20,26 @@ import {
   satisfy,
   upper,
 } from 'kessel/parsers/char'
-import { fail, pass } from 'test/helper'
+import { error, fail, pass } from 'test/helper'
 
 describe('Character parsers', () => {
   describe('char', () => {
+    it('throws if something other than a single char is passed', () => {
+      error(char(0), '', '[char]: expected a one-character string; found 0')
+      error(char({}), '', '[char]: expected a one-character string; found {}')
+      error(
+        char('ab'), '', '[char]: expected a one-character string; found "ab"',
+      )
+      error(
+        char(() => {}),
+        '',
+        '[char]: expected a one-character string; found function',
+      )
+      error(
+        char(), '', '[char]: expected a one-character string; found undefined',
+      )
+    })
+
     context('1-byte characters', () => {
       const parser = char('O')
 
@@ -88,6 +104,21 @@ describe('Character parsers', () => {
   })
 
   describe('chari', () => {
+    it('throws if something other than a single char is passed', () => {
+      error(chari(0), '', '[chari]: expected a one-character string; found 0')
+      error(chari({}), '', '[chari]: expected a one-character string; found {}')
+      error(
+        chari('ab'), '', '[chari]: expected a one-character string; found "ab"',
+      )
+      /* eslint-disable prefer-arrow-callback */
+      error(
+        chari(function test() {}),
+        '',
+        '[chari]: expected a one-character string; found function test',
+      )
+      /* eslint-enable prefer-arrow-callback */
+    })
+
     context('1-byte characters', () => {
       const parser = chari('O')
 
@@ -154,13 +185,21 @@ describe('Character parsers', () => {
   describe('satisfy', () => {
     const fn = char => char === char.toUpperCase()
 
+    it('throws if a non-function is passed in', () => {
+      error(satisfy(0), '', '[satisfy]: expected a function; found 0')
+      error(satisfy({}), '', '[satisfy]: expected a function; found {}')
+      error(
+        satisfy(Symbol.for('test')),
+        '',
+        '[satisfy]: expected a function; found Symbol(test)',
+      )
+    })
     it('tests the next 1-byte character', () => {
       pass(satisfy(fn), 'Onomatopoeia', { result: 'O', index: 1 })
       fail(
         satisfy(fn), 'onomatopoeia', "a character that satisfies function 'fn'",
       )
     })
-
     it('tests the next 2-byte character', () => {
       pass(satisfy(fn), 'Звукоподражание', { result: 'З', index: 2 })
       fail(
@@ -169,15 +208,12 @@ describe('Character parsers', () => {
         "a character that satisfies function 'fn'",
       )
     })
-
     it('tests the next 3-byte character', () => {
       pass(satisfy(fn), 'คำเลียนเสียง', { result: 'ค', index: 3 })
     })
-
     it('tests the next 4-byte character', () => {
       pass(satisfy(fn), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂', index: 4 })
     })
-
     it('names an unnamed function <anonymous>', () => {
       fail(
         satisfy(char => char === char.toUpperCase()),
@@ -185,13 +221,24 @@ describe('Character parsers', () => {
         "a character that satisfies function '<anonymous>'",
       )
     })
-
     it('fails automatically at EOF', () => {
       fail(satisfy(fn), '', "a character that satisfies function 'fn'")
     })
   })
 
   describe('range', () => {
+    it('throws if the first argument is not a character', () => {
+      error(
+        range(0, '9'), '', '[range]: expected first argument to be a '
+          + 'one-character string; found 0',
+      )
+    })
+    it('throws if the second argument is not a character', () => {
+      error(
+        range('0', 9), '', '[range]: expected second argument to be a '
+          + 'one-character string; found 9',
+      )
+    })
     it('succeeds if the next character is between the supplied two', () => {
       pass(range('a', 'z'), 'abc', 'a')
       pass(range('а', 'я'), 'цчш', 'ц')
@@ -246,27 +293,51 @@ describe('Character parsers', () => {
   })
 
   describe('anyOf', () => {
+    it('throws if the argument is not a string or an array', () => {
+      error(
+        anyOf(0),
+        '',
+        '[anyOf]: expected a string or an array of characters; found 0',
+      )
+    })
+    it('throws if the argument is an array of non-character strings', () => {
+      error(
+        anyOf(['te', 'st']),
+        '',
+        '[anyOf]: expected a string or an array of characters; '
+          + 'found ["te","st"]',
+      )
+      error(
+        anyOf(['', 'a']),
+        '',
+        '[anyOf]: expected a string or an array of characters; found ["","a"]',
+      )
+    })
+    it('throws if the argument is an array of non-strings', () => {
+      error(
+        anyOf([0, 1, 2]),
+        '',
+        '[anyOf]: expected a string or an array of characters; found [0,1,2]',
+      )
+    })
     it('checks the next charater against 1-byte characters', () => {
       const parser = anyOf('Onoma')
       pass(parser, 'Onomatopoeia', { result: 'O', index: 1 })
       pass(parser, 'matriculate', { result: 'm', index: 1 })
       fail(parser, 'Matriculate', "any of 'O', 'n', 'o', 'm', or 'a'")
     })
-
     it('checks the next character against 2-byte characters', () => {
       const parser = anyOf('Звуко')
       pass(parser, 'Звукоподражание', { result: 'З', index: 2 })
       pass(parser, 'учитель', { result: 'у', index: 2 })
       fail(parser, 'Учитель', "any of 'З', 'в', 'у', 'к', or 'о'")
     })
-
     it('checks the next character against 3-byte characters', () => {
       const parser = anyOf('คำเลี')
       pass(parser, 'คำเลียนเสียง', { result: 'ค', index: 3 })
       pass(parser, 'ลียน', { result: 'ล', index: 3 })
       fail(parser, 'ยง', "any of 'ค', 'ำ', 'เ', 'ล', or 'ี'")
     })
-
     it('checks the next character against 4-byte characters', () => {
       const parser = anyOf('𝑂𝑛𝑜𝑚𝑎')
       pass(parser, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂', index: 4 })
@@ -276,27 +347,51 @@ describe('Character parsers', () => {
   })
 
   describe('noneOf', () => {
+    it('throws if the argument is not a string or an array', () => {
+      error(
+        noneOf(0),
+        '',
+        '[noneOf]: expected a string or an array of characters; found 0',
+      )
+    })
+    it('throws if the argument is an array of non-character strings', () => {
+      error(
+        noneOf(['te', 'st']),
+        '',
+        '[noneOf]: expected a string or an array of characters; '
+          + 'found ["te","st"]',
+      )
+      error(
+        noneOf(['', 'a']),
+        '',
+        '[noneOf]: expected a string or an array of characters; found ["","a"]',
+      )
+    })
+    it('throws if the argument is an array of non-strings', () => {
+      error(
+        noneOf([0, 1, 2]),
+        '',
+        '[noneOf]: expected a string or an array of characters; found [0,1,2]',
+      )
+    })
     it('checks the next charater against 1-byte characters', () => {
       const parser = noneOf('Onoma')
       fail(parser, 'Onomatopoeia', "none of 'O', 'n', 'o', 'm', or 'a'")
       fail(parser, 'matriculate', "none of 'O', 'n', 'o', 'm', or 'a'")
       pass(parser, 'Matriculate', { result: 'M', index: 1 })
     })
-
     it('checks the next character against 2-byte characters', () => {
       const parser = noneOf('Звуко')
       fail(parser, 'Звукоподражание', "none of 'З', 'в', 'у', 'к', or 'о'")
       fail(parser, 'учитель', "none of 'З', 'в', 'у', 'к', or 'о'")
       pass(parser, 'Учитель', { result: 'У', index: 2 })
     })
-
     it('checks the next character against 3-byte characters', () => {
       const parser = noneOf('คำเลี')
       fail(parser, 'คำเลียนเสียง', "none of 'ค', 'ำ', 'เ', 'ล', or 'ี'")
       fail(parser, 'ลียน', "none of 'ค', 'ำ', 'เ', 'ล', or 'ี'")
       pass(parser, 'ยง', { result: 'ย', index: 3 })
     })
-
     it('checks the next character against 4-byte characters', () => {
       const parser = noneOf('𝑂𝑛𝑜𝑚𝑎')
       fail(parser, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', "none of '𝑂', '𝑛', '𝑜', '𝑚', or '𝑎'")

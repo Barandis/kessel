@@ -3,6 +3,12 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+import {
+  assertChar,
+  assertFunction,
+  assertStringOrArray,
+  ordinalChar,
+} from 'kessel/assert'
 import { error, makeParser, ok, Status } from 'kessel/core'
 import { expecteds } from 'kessel/messages'
 import { dup, nextChar } from 'kessel/util'
@@ -47,6 +53,8 @@ const CharParser = fn => makeParser(state => {
  *     character in the input.
  */
 export const char = c => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) assertChar('char', c)
   const [reply, [next, result]] = dup(CharParser(next => c === next)(state))
   return result.status === Ok ? reply : error(next, expecteds.char(c))
 })
@@ -64,6 +72,8 @@ export const char = c => makeParser(state => {
  *     other-cased counterpart) is the next character in the input.
  */
 export const chari = c => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) assertChar('chari', c)
   const [reply, [next, result]] = dup(CharParser(
     read => c.toLowerCase() === read.toLowerCase(),
   )(state))
@@ -83,6 +93,8 @@ export const chari = c => makeParser(state => {
  *     on it when applied to input.
  */
 export const satisfy = fn => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) assertFunction('satisfy', fn)
   const [reply, [next, result]] = dup(CharParser(fn)(state))
   return result.status === Ok ? reply : error(next, expecteds.satisfy(fn))
 })
@@ -112,6 +124,11 @@ export const satisfy = fn => makeParser(state => {
  *     character is between `start` and `end` (inclusive).
  */
 export const range = (start, end) => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) {
+    assertChar('range', start, ordinalChar('first'))
+    assertChar('range', end, ordinalChar('second'))
+  }
   const fn = c => c >= start && c <= end
   const [reply, [next, result]] = dup(CharParser(fn)(state))
   return result.status === Ok ? reply : error(next, expecteds.range(start, end))
@@ -154,6 +171,8 @@ export const eof = makeParser(state => {
  *     one of the characters in `chars`.
  */
 export const anyOf = chars => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) assertStringOrArray('anyOf', chars)
   const { index, view } = state
   const { width, next } = nextChar(index, view)
   const arr = [...chars]
@@ -176,6 +195,8 @@ export const anyOf = chars => makeParser(state => {
  *     one of the characters in `chars`.
  */
 export const noneOf = chars => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) assertStringOrArray('noneOf', chars)
   const { index, view } = state
   const { width, next } = nextChar(index, view)
   const arr = [...chars]
