@@ -3,6 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+import { assertStringOrRegExp } from 'kessel/assert'
 import { error, makeParser, ok, Status } from 'kessel/core'
 import { expecteds } from 'kessel/messages'
 import { dup, stringToView, viewToString } from 'kessel/util'
@@ -87,6 +88,9 @@ const RegexParser = re => makeParser(state => {
  *     if a match is found.
  */
 export const regex = re => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) assertStringOrRegExp('regex', re)
+
   // First, convert to a regular expression if it's a string
   let regex = typeof re === 'string' ? new RegExp(re) : re
 

@@ -18,6 +18,8 @@ const fnFormatter = value =>
   `expected a function; found ${stringify(value)}`
 const strArrFormatter = value =>
   `expected a string or an array of characters; found ${stringify(value)}`
+const strRegFormtter = value =>
+  `expected a string or a regular expression; found ${stringify(value)}`
 
 export const ordinalChar = ord => value =>
   `expected ${ord} argument to be a one-character string; found ${
@@ -42,6 +44,13 @@ export function assertStringOrArray(name, value, formatter = strArrFormatter) {
     && value.every(c => typeof c === 'string' && charLength(c) === 1)
     || typeof value === 'string'
   )) {
+    throw new Error(`[${name}]: ${formatter(value)}`)
+  }
+}
+
+export function assertStringOrRegExp(name, value, formatter = strRegFormtter) {
+  const type = Object.prototype.toString.call(value)
+  if (typeof value !== 'string' && type !== '[object RegExp]') {
     throw new Error(`[${name}]: ${formatter(value)}`)
   }
 }

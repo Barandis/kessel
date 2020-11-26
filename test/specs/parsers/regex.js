@@ -18,10 +18,17 @@ import {
   spaces1U,
   upperU,
 } from 'kessel/parsers/regex'
-import { fail, pass } from 'test/helper'
+import { error, fail, pass } from 'test/helper'
 
 describe('Regular expression parsers', () => {
   describe('regex', () => {
+    it('throws if argument is not a string or regex', () => {
+      error(
+        regex(0),
+        '',
+        '[regex]: expected a string or a regular expression; found 0',
+      )
+    })
     it('accepts a string as input', () => {
       pass(regex('^\\w{3}'), 'Onomatopoeia', 'Ono')
     })
