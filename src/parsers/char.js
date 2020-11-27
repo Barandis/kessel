@@ -86,6 +86,12 @@ export const chari = c => makeParser(state => {
  * succeeds with that character as the result. If the function returns
  * `false`, this parser fails and consumes no input.
  *
+ * This parser cannot determine the cause for an error since it's not
+ * feasible to have it analyze the function to see what it expects to
+ * match, so no error message is provided on failure. Use
+ * `label(satisfy(fn), msg)` or the equivalent `satisfyL(fn, msg)` to
+ * add an appropriate error message.
+ *
  * @param {function(string):boolean} fn A function to which the next
  *     character is passed; if it returns `true`, the parser succeeds
  *     and if it returns `false` the parser fails.
@@ -95,8 +101,7 @@ export const chari = c => makeParser(state => {
 export const satisfy = fn => makeParser(state => {
   /* istanbul ignore else */
   if (ASSERT) assertFunction('satisfy', fn)
-  const [reply, [next, result]] = dup(CharParser(fn)(state))
-  return result.status === Ok ? reply : error(next, expecteds.satisfy(fn))
+  return CharParser(fn)(state)
 })
 
 /**

@@ -27,10 +27,6 @@ export const strings = {
   octal: 'an octal digit',
   range: (start, end) => `a character between '${start}' and '${end}'`,
   regex: re => `a string matching ${re}`,
-  satisfy: fn => {
-    const name = fn.name.length ? fn.name : '<anonymous>'
-    return `a character that satisfies function '${name}'`
-  },
   space: 'a whitespace character',
   spaces: 'zero or more whitespace characters',
   spaces1: 'one or more whitespace characters',
@@ -64,7 +60,6 @@ export const expecteds = {
   octal: expected(strings.octal),
   range: (start, end) => expected(strings.range(start, end)),
   regex: re => expected(strings.regex(re)),
-  satisfy: fn => expected(strings.satisfy(fn)),
   space: expected(strings.space),
   spaces: expected(strings.spaces),
   spaces1: expected(strings.spaces1),
