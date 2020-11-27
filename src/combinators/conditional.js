@@ -3,6 +3,12 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+import {
+  assertParser,
+  assertString,
+  ordinalParser,
+  ordinalString,
+} from 'kessel/assert'
 import { error, ok, makeParser, Status } from 'kessel/core'
 import { expected } from 'kessel/error'
 import { dup } from 'kessel/util'
@@ -26,6 +32,8 @@ const { Ok } = Status
  *     with it, but which consumes no input either way.
  */
 export const lookAhead = p => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) assertParser('lookAhead', p)
   const index = state.index
   const [next, result] = p(state)
   return result.status === Ok ? ok(next, result.value, index)
@@ -50,6 +58,8 @@ export const lookAhead = p => makeParser(state => {
  *     consume any input, or otherwise passes the result through.
  */
 export const notEmpty = p => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) assertParser('notEmpty', p)
   const index = state.index
   const [reply, [next, result]] = dup(p(state))
   return result.status !== Ok || next.index !== index ? reply : error(next)
@@ -64,6 +74,9 @@ export const notEmpty = p => makeParser(state => {
  * at least once. For instance, one could implement `many1(p)` with
  * `notEmpty(many(p))`.
  *
+ * `notEmptyL(p, msg)` is an optimized implementation of
+ * `label(notEmpty(p), msg)`.
+ *
  * @param {Parser} p The parser to apply.
  * @param {string} msg The expected error message to use if `p` succeeds
  *     without consuming input.
@@ -71,6 +84,11 @@ export const notEmpty = p => makeParser(state => {
  *     consume any input, or otherwise passes the result through.
  */
 export const notEmptyL = (p, msg) => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) {
+    assertParser('notEmptyL', p, ordinalParser('1st'))
+    assertString('notEmptyL', msg, ordinalString('2nd'))
+  }
   const index = state.index
   const [reply, [next, result]] = dup(p(state))
   return result.status !== Ok || next.index !== index ? reply
@@ -91,6 +109,8 @@ export const notEmptyL = (p, msg) => makeParser(state => {
  *     parser state, whether or not `p` succeeds.
  */
 export const followedBy = p => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) assertParser('followedBy', p)
   const index = state.index
   const [next, result] = p(state)
   return result.status === Ok ? ok(next, null, index)
@@ -103,12 +123,20 @@ export const followedBy = p => makeParser(state => {
  * `followedBy(p)` fails non-fatally, replacing any "expected" error
  * message with `msg` and removing any "unexpected" error message.
  *
+ * `followedByL(p, msg)` is an optimized implementation of
+ * `label(followedBy(p), msg)`.
+ *
  * @param {Parser} p The parser to apply.
  * @param {string} msg The expected error message to use if `p` fails.
  * @returns {Parser} A parser that applies `p` but does not change the
  *     parser state, whether or not `p` succeeds.
  */
 export const followedByL = (p, msg) => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) {
+    assertParser('followedByL', p, ordinalParser('1st'))
+    assertString('followedByL', msg, ordinalString('2nd'))
+  }
   const index = state.index
   const [next, result] = p(state)
   return result.status === Ok ? ok(next, null, index)
@@ -130,6 +158,8 @@ export const followedByL = (p, msg) => makeParser(state => {
  *     succeeds.
  */
 export const notFollowedBy = p => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) assertParser('notFollowedBy', p)
   const index = state.index
   const [next, result] = p(state)
   return result.status === Ok ? error(next, undefined, index)
@@ -142,6 +172,9 @@ export const notFollowedBy = p => makeParser(state => {
  * `notFollowedBy(p)` fails non-fatally, replacing any "expected" error
  * message with `msg` and removing any "unexpected" error message.
  *
+ * `notFollowedByL(p, msg)` is an optimized implementation of
+ * `label(notFollowedBy(p), msg)`.
+ *
  * @param {Parser} p The parser to apply.
  * @param {string} msg The expected error message to use if `p`
  *    succeeds.
@@ -149,6 +182,11 @@ export const notFollowedBy = p => makeParser(state => {
  *     parser state, whether or not `p` succeeds.
  */
 export const notFollowedByL = (p, msg) => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) {
+    assertParser('notFollowedByL', p, ordinalParser('1st'))
+    assertString('notFollowedByL', msg, ordinalString('2nd'))
+  }
   const index = state.index
   const [next, result] = p(state)
   return result.status === Ok ? error(next, expected(msg), index)
