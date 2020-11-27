@@ -10,7 +10,7 @@ import {
   failFatally,
   failUnexpected,
 } from 'kessel/parsers/misc'
-import { fail, pass } from 'test/helper'
+import { error, fail, pass } from 'test/helper'
 
 const { Error, Fatal } = Status
 
@@ -24,6 +24,9 @@ describe('Miscellaneous parsers', () => {
   })
 
   describe('fail', () => {
+    it('throws if its argument is not a string', () => {
+      error(pfail(0), '', '[fail]: expected a string; found 0')
+    })
     it('fails with the supplied generic message', () => {
       fail(pfail('test message'), '', {
         generic: 'test message',
@@ -34,6 +37,9 @@ describe('Miscellaneous parsers', () => {
   })
 
   describe('failFatally', () => {
+    it('throws if its argument is not a string', () => {
+      error(failFatally(0), '', '[failFatally]: expected a string; found 0')
+    })
     it('fails with the supplied generic message', () => {
       fail(failFatally('test message'), '', {
         generic: 'test message',
@@ -43,7 +49,12 @@ describe('Miscellaneous parsers', () => {
     })
   })
 
-  describe('unexpected', () => {
+  describe('failUnexpected', () => {
+    it('throws if its argument is not a string', () => {
+      error(
+        failUnexpected(0), '', '[failUnexpected]: expected a string; found 0',
+      )
+    })
     it('fails with the supplied unexpected message', () => {
       fail(failUnexpected('test message'), '', {
         unexpected: 'test message',

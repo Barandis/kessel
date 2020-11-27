@@ -3,6 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+import { assertString } from 'kessel/assert'
 import { error, fatal, makeParser, ok } from 'kessel/core'
 import { generic, unexpected } from 'kessel/error'
 
@@ -25,8 +26,11 @@ export const constant = x => makeParser(state => ok(state, x))
  * @returns {Parser} A parser that automatically fails with the supplied
  *     error message.
  */
-export const fail = message => makeParser(state =>
-  error(state, generic(message)))
+export const fail = message => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) assertString('fail', message)
+  return error(state, generic(message))
+})
 
 /**
  * Creates a parser that fails without consuming input, setting the
@@ -37,8 +41,11 @@ export const fail = message => makeParser(state =>
  * @returns {Parser} A parser that automatically fails fatally with the
  *     supplied error message.
  */
-export const failFatally = message => makeParser(state =>
-  fatal(state, generic(message)))
+export const failFatally = message => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) assertString('failFatally', message)
+  return fatal(state, generic(message))
+})
 
 /**
  * Creates a parser that fails without consuming input, setting the
@@ -49,5 +56,8 @@ export const failFatally = message => makeParser(state =>
  * @returns {Parser} A parser that automatically fails with the supplied
  *     error message.
  */
-export const failUnexpected = message => makeParser(state =>
-  error(state, unexpected(message)))
+export const failUnexpected = message => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) assertString('failUnexpected', message)
+  return error(state, unexpected(message))
+})

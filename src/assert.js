@@ -16,6 +16,8 @@ const charFormatter = value =>
   `expected a one-character string; found ${stringify(value)}`
 const fnFormatter = value =>
   `expected a function; found ${stringify(value)}`
+const strFormatter = value =>
+  `expected a string; found ${stringify(value)}`
 const strArrFormatter = value =>
   `expected a string or an array of characters; found ${stringify(value)}`
 const strRegFormtter = value =>
@@ -34,6 +36,12 @@ export function assertChar(name, value, formatter = charFormatter) {
 
 export function assertFunction(name, value, formatter = fnFormatter) {
   if (typeof value !== 'function') {
+    throw new Error(`[${name}]: ${formatter(value)}`)
+  }
+}
+
+export function assertString(name, value, formatter = strFormatter) {
+  if (typeof value !== 'string') {
     throw new Error(`[${name}]: ${formatter(value)}`)
   }
 }
