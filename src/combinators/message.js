@@ -3,6 +3,12 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+import {
+  assertParser,
+  assertString,
+  ordinalParser,
+  ordinalString,
+} from 'kessel/assert'
 import { fatal, makeParser, Status } from 'kessel/core'
 import { compound, ErrorType, expected } from 'kessel/error'
 import { dup } from 'kessel/util'
@@ -32,6 +38,11 @@ function pass(state, result, errors) {
  *     failure.
  */
 export const label = (p, msg) => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) {
+    assertParser('label', p, ordinalParser('1st'))
+    assertString('label', msg, ordinalString('2nd'))
+  }
   const index = state.index
   const [reply, [next, result]] = dup(p(state))
   return index === next.index ? pass(next, result, expected(msg)) : reply
@@ -62,6 +73,11 @@ export const label = (p, msg) => makeParser(state => {
  *     as appropriate if `p` fails.
  */
 export const backLabel = (p, msg) => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) {
+    assertParser('backLabel', p, ordinalParser('1st'))
+    assertString('backLabel', msg, ordinalString('2nd'))
+  }
   const index = state.index
   const [reply, [next, result]] = dup(p(state))
   if (result.status === Ok) {

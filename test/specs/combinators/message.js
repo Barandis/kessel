@@ -12,10 +12,24 @@ import { label, backLabel } from 'kessel/combinators/message'
 import { sequence } from 'kessel/combinators/sequence'
 import { parse, Status } from 'kessel/core'
 import { char } from 'kessel/parsers/char'
-import { fail } from 'test/helper'
+import { error, fail } from 'test/helper'
 
 describe('Message combinators', () => {
   describe('label', () => {
+    it('throws if its first argument is not a parser', () => {
+      error(
+        label(0, 'test'),
+        '',
+        '[label]: expected 1st argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a string', () => {
+      error(
+        label(char('a'), 0),
+        '',
+        '[label]: expected 2nd argument to be a string; found 0',
+      )
+    })
     it('does nothing if its parser succeeds', () => {
       const r1 = parse(char('a'), 'abc')
       const r2 = parse(label(char('a'), 'test'), 'abc')
@@ -37,11 +51,25 @@ describe('Message combinators', () => {
     it('adds an error message on success without consuming', () => {
       const [_, result] = parse(label(lookAhead(char('a')), 'test'), 'a')
       expect(result.status).to.equal(Status.Ok)
-      expect(result.errors.[0].label).to.equal('test')
+      expect(result.errors[0].label).to.equal('test')
     })
   })
 
   describe('backLabel', () => {
+    it('throws if its first argument is not a parser', () => {
+      error(
+        backLabel(0, 'test'),
+        '',
+        '[backLabel]: expected 1st argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a string', () => {
+      error(
+        backLabel(char('a'), 0),
+        '',
+        '[backLabel]: expected 2nd argument to be a string; found 0',
+      )
+    })
     it('does nothing if its parser succeeds', () => {
       const r1 = parse(char('a'), 'abc')
       const r2 = parse(backLabel(char('a'), 'test'), 'abc')
@@ -54,7 +82,7 @@ describe('Message combinators', () => {
     it('adds an error message on success without consuming', () => {
       const [_, result] = parse(backLabel(lookAhead(char('a')), 'test'), 'a')
       expect(result.status).to.equal(Status.Ok)
-      expect(result.errors.[0].label).to.equal('test')
+      expect(result.errors[0].label).to.equal('test')
     })
     it('adds a compound error if its parser fails while consuming', () => {
       const [state, result] = parse(
