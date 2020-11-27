@@ -24,12 +24,26 @@ import {
 import { many, many1, sequence } from 'kessel/combinators/sequence'
 import { Status } from 'kessel/core'
 import { any, char, digit, eof, letter, noneOf } from 'kessel/parsers/char'
-import { fail, pass } from 'test/helper'
+import { error, fail, pass } from 'test/helper'
 
 const { Error, Fatal } = Status
 
 describe('Chaining and piping combinators', () => {
   describe('chain', () => {
+    it('throws if its first argument is not a parser', () => {
+      error(
+        chain(0, x => x),
+        '',
+        '[chain]: expected 1st argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a function', () => {
+      error(
+        chain(any, 0),
+        '',
+        '[chain]: expected 2nd argument to be a function; found 0',
+      )
+    })
     it('passes successful result to function to get the next parser', () => {
       pass(chain(any, c => char(c)), 'aa', { result: 'a', index: 2 })
       fail(chain(any, c => char(c)), 'ab', "'a'")
@@ -51,6 +65,20 @@ describe('Chaining and piping combinators', () => {
   })
 
   describe('map', () => {
+    it('throws if its first argument is not a parser', () => {
+      error(
+        map(0, x => x),
+        '',
+        '[map]: expected 1st argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a function', () => {
+      error(
+        map(any, 0),
+        '',
+        '[map]: expected 2nd argument to be a function; found 0',
+      )
+    })
     it('succeeds with the return value of its function', () => {
       pass(map(any, c => c.toUpperCase()), 'abc', 'A')
       pass(map(sequence(letter, digit), cs => cs.join('')), 'a1', 'a1')
@@ -69,6 +97,9 @@ describe('Chaining and piping combinators', () => {
   })
 
   describe('join', () => {
+    it('throws if its argument is not a parser', () => {
+      error(join(0), '', '[join]: expected a parser; found 0')
+    })
     it('joins array elements together into a resulting string', () => {
       pass(join(many(any)), '123', '123')
       pass(join(map(many(any), x => x.map(c => parseInt(c)))), '123', '123')
@@ -86,6 +117,9 @@ describe('Chaining and piping combinators', () => {
   })
 
   describe('skip', () => {
+    it('throws if its argument is not a parser', () => {
+      error(skip(0), '', '[skip]: expected a parser; found 0')
+    })
     it('consumes input on success but does not result in a value', () => {
       pass(skip(many(letter)), 'abcdef123', { result: null, index: 6 })
     })
@@ -95,6 +129,11 @@ describe('Chaining and piping combinators', () => {
   })
 
   describe('value', () => {
+    it('throws if its first argument is not a parser', () => {
+      error(
+        value(0), '', '[value]: expected 1st argument to be a parser; found 0',
+      )
+    })
     it('returns its constant when its parser succeeds', () => {
       pass(value(letter, '!'), 'a', '!')
       pass(value(digit, 10), '1', { result: 10 })
@@ -105,6 +144,20 @@ describe('Chaining and piping combinators', () => {
   })
 
   describe('left', () => {
+    it('throws if its first argument is not a parser', () => {
+      error(
+        left(0, any),
+        '',
+        '[left]: expected 1st argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a parser', () => {
+      error(
+        left(any, 0),
+        '',
+        '[left]: expected 2nd argument to be a parser; found 0',
+      )
+    })
     it('returns the result of its left parser if both pass', () => {
       pass(left(letter, digit), 'a1', 'a')
     })
@@ -130,6 +183,20 @@ describe('Chaining and piping combinators', () => {
   })
 
   describe('right', () => {
+    it('throws if its first argument is not a parser', () => {
+      error(
+        right(0, any),
+        '',
+        '[right]: expected 1st argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a parser', () => {
+      error(
+        right(any, 0),
+        '',
+        '[right]: expected 2nd argument to be a parser; found 0',
+      )
+    })
     it('returns the result of its right parser if both pass', () => {
       pass(right(letter, digit), 'a1', '1')
     })
@@ -152,6 +219,20 @@ describe('Chaining and piping combinators', () => {
   })
 
   describe('both', () => {
+    it('throws if its first argument is not a parser', () => {
+      error(
+        both(0, any),
+        '',
+        '[both]: expected 1st argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a parser', () => {
+      error(
+        both(any, 0),
+        '',
+        '[both]: expected 2nd argument to be a parser; found 0',
+      )
+    })
     it('returns the result of both parsers if both pass', () => {
       pass(both(letter, digit), 'a1', ['a', '1'])
     })
@@ -180,25 +261,37 @@ describe('Chaining and piping combinators', () => {
   })
 
   describe('pipe', () => {
+    it('throws if its last argument is not a function', () => {
+      error(
+        pipe(any, any, 0),
+        '',
+        '[pipe]: expected 3rd argument to be a function; found 0',
+      )
+      error(
+        pipe(any, any, any, any),
+        '',
+        '[pipe]: expected 4th argument to be a function; found parser',
+      )
+    })
     it('passes parser results to a single function', () => {
-      pass(pipe([letter], a => a.toUpperCase()), 'a', 'A')
-      pass(pipe([letter, digit], (a, b) => b + a), 'a1', '1a')
-      pass(pipe([letter, digit, letter], (a, b, c) => c + b + a), 'a1b', 'b1a')
+      pass(pipe(letter, a => a.toUpperCase()), 'a', 'A')
+      pass(pipe(letter, digit, (a, b) => b + a), 'a1', '1a')
+      pass(pipe(letter, digit, letter, (a, b, c) => c + b + a), 'a1b', 'b1a')
     })
     it('fails non-fatally if no input is consumed on failure', () => {
-      fail(pipe([letter], a => a), '1', {
+      fail(pipe(letter, a => a), '1', {
         expected: 'a letter',
         index: 0,
         status: Error,
       })
-      fail(pipe([eof, letter], (a, b) => b + a), '', {
+      fail(pipe(eof, letter, (a, b) => b + a), '', {
         expected: 'a letter',
         index: 0,
         status: Error,
       })
     })
     it('fails fatally if input was consumed on failure', () => {
-      fail(pipe([letter, digit], (a, b) => b + a), 'aa', {
+      fail(pipe(letter, digit, (a, b) => b + a), 'aa', {
         expected: 'a digit',
         index: 1,
         status: Fatal,
@@ -209,6 +302,27 @@ describe('Chaining and piping combinators', () => {
   describe('between', () => {
     const parser = between(char('('), char(')'), many(noneOf(')')))
 
+    it('throws if its first argument is not a parser', () => {
+      error(
+        between(0, any, any),
+        '',
+        '[between]: expected 1st argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a parser', () => {
+      error(
+        between(any, 0, any),
+        '',
+        '[between]: expected 2nd argument to be a parser; found 0',
+      )
+    })
+    it('throws if its third argument is not a parser', () => {
+      error(
+        between(any, any, 0),
+        '',
+        '[between]: expected 3rd argument to be a parser; found 0',
+      )
+    })
     it('succeeds with the result of its content parser', () => {
       pass(parser, '(abc)', ['a', 'b', 'c'])
     })
@@ -234,6 +348,20 @@ describe('Chaining and piping combinators', () => {
   })
 
   describe('nth', () => {
+    it('throws if its first argument is not a parser', () => {
+      error(
+        nth(0, 1),
+        '',
+        '[nth]: expected 1st argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a number', () => {
+      error(
+        nth(many(any), '1'),
+        '',
+        '[nth]: expected 2nd argument to be a number; found "1"',
+      )
+    })
     it('extracts the nth element of an array result', () => {
       pass(nth(many(any), 2), '12345', '3')
       pass(nth(sequence(char('"'), any, char('"')), 1), '"a"', 'a')
@@ -244,6 +372,9 @@ describe('Chaining and piping combinators', () => {
   })
 
   describe('first', () => {
+    it('throws if its argument is not a parser', () => {
+      error(first(0), '', 'expected a parser; found 0')
+    })
     it('extracts the first element of an array result', () => {
       pass(first(many(any)), '12345', '1')
     })
@@ -253,6 +384,9 @@ describe('Chaining and piping combinators', () => {
   })
 
   describe('second', () => {
+    it('throws if its argument is not a parser', () => {
+      error(second(0), '', 'expected a parser; found 0')
+    })
     it('extracts the second element of an array result', () => {
       pass(second(many(any)), '12345', '2')
     })
@@ -262,6 +396,9 @@ describe('Chaining and piping combinators', () => {
   })
 
   describe('third', () => {
+    it('throws if its argument is not a parser', () => {
+      error(third(0), '', 'expected a parser; found 0')
+    })
     it('extracts the third element of an array result', () => {
       pass(third(many(any)), '12345', '3')
     })
@@ -271,6 +408,9 @@ describe('Chaining and piping combinators', () => {
   })
 
   describe('fourth', () => {
+    it('throws if its argument is not a parser', () => {
+      error(fourth(0), '', 'expected a parser; found 0')
+    })
     it('extracts the fourth element of an array result', () => {
       pass(fourth(many(any)), '12345', '4')
     })
@@ -280,6 +420,9 @@ describe('Chaining and piping combinators', () => {
   })
 
   describe('fifth', () => {
+    it('throws if its argument is not a parser', () => {
+      error(fifth(0), '', 'expected a parser; found 0')
+    })
     it('extracts the fifth element of an array result', () => {
       pass(fifth(many(any)), '12345', '5')
     })

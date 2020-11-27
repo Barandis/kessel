@@ -3,8 +3,16 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+import {
+  assertFunction,
+  assertNumber,
+  assertParser,
+  ordinalFunction,
+  ordinalNumber,
+  ordinalParser,
+} from 'kessel/assert'
 import { makeParser, maybeFatal, ok, Status } from 'kessel/core'
-import { dup } from 'kessel/util'
+import { dup, ordinal } from 'kessel/util'
 
 const { Ok } = Status
 
@@ -29,6 +37,11 @@ const { Ok } = Status
  *     return value as a second parser to apply the input to.
  */
 export const chain = (p, fn) => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) {
+    assertParser('chain', p, ordinalParser('1st'))
+    assertFunction('chain', fn, ordinalFunction('2nd'))
+  }
   const index = state.index
 
   const [reply1, [next1, result1]] = dup(p(state))
@@ -60,6 +73,11 @@ export const chain = (p, fn) => makeParser(state => {
  *     return value as its result.
  */
 export const map = (p, fn) => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) {
+    assertParser('map', p, ordinalParser('1st'))
+    assertFunction('map', fn, ordinalFunction('2nd'))
+  }
   const [reply, [next, result]] = dup(p(state))
   return result.status === Ok ? ok(next, fn(result.value)) : reply
 })
@@ -91,6 +109,8 @@ export const map = (p, fn) => makeParser(state => {
  *     array of strings.
  */
 export const join = p => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) assertParser('join', p)
   const [reply, [next, result]] = dup(p(state))
   return result.status === Ok ? ok(next, result.value.join('')) : reply
 })
@@ -108,6 +128,8 @@ export const join = p => makeParser(state => {
  *     parser does on success, but will produce no result.
  */
 export const skip = p => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) assertParser('skip', p)
   const [reply, [next, result]] = dup(p(state))
   return result.status === Ok ? ok(next, null) : reply
 })
@@ -126,6 +148,8 @@ export const skip = p => makeParser(state => {
  *     success.
  */
 export const value = (p, x) => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) assertParser('value', p, ordinalParser('1st'))
   const [tuple, [next, result]] = dup(p(state))
   return result.status === Ok ? ok(next, x) : tuple
 })
@@ -145,6 +169,11 @@ export const value = (p, x) => makeParser(state => {
  *     results in the value of the first.
  */
 export const left = (p1, p2) => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) {
+    assertParser('left', p1, ordinalParser('1st'))
+    assertParser('left', p2, ordinalParser('2nd'))
+  }
   const index = state.index
 
   const [reply1, [next1, result1]] = dup(p1(state))
@@ -170,6 +199,11 @@ export const left = (p1, p2) => makeParser(state => {
  *     results in the value of the second.
  */
 export const right = (p1, p2) => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) {
+    assertParser('right', p1, ordinalParser('1st'))
+    assertParser('right', p2, ordinalParser('2nd'))
+  }
   const index = state.index
 
   const [reply1, [next1, result1]] = dup(p1(state))
@@ -195,6 +229,11 @@ export const right = (p1, p2) => makeParser(state => {
  *     results in the values of both parsers in an array.
  */
 export const both = (p1, p2) => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) {
+    assertParser('both', p1, ordinalParser('1st'))
+    assertParser('both', p2, ordinalParser('2nd'))
+  }
   const index = state.index
 
   const [reply1, [next1, result1]] = dup(p1(state))
@@ -215,24 +254,33 @@ export const both = (p1, p2) => makeParser(state => {
  * This ensures that the same number of arguments are passed to `fn` no
  * matter the results from the parsers.
  *
- * `pipe([p1, p2], fn)` is an optimized implementation of `chain(p1, a
- * => chain(p2, b => constant(fn(a, b))))`, `pipe([p1, p2, p3], fn)` is
- * an optimized implementation of `chain(p1, a => chain(p2, b =>
- * chain(p3, c => constant(fn(a, b, c)))))`, and so on.
+ * `pipe(p1, p2, fn)` is an optimized implementation of `chain(p1, a =>
+ * chain(p2, b => constant(fn(a, b))))`, `pipe(p1, p2, p3, fn)` is an
+ * optimized implementation of `chain(p1, a => chain(p2, b => chain(p3,
+ * c => constant(fn(a, b, c)))))`, and so on.
  *
  * If the array has one element, the parser becomes equivalent to `map`
  * but less efficient.
  *
- * @param {Parser[]} ps An array of parsers to be applied one at a time,
- *     in order.
- * @param {function(...*):*} fn A function which will receive as
- *     parameters the results of each parser. Its return value will
- *     become the result of the created parser.
+ * @param {...(Parser|function(...*):*)} ps An array of parsers to be
+ *     applied one at a time, in order, followed by a function which
+ *     will receive as parameters the results of each parser. Its return
+ *     value will become the result of the created parser. A single
+ *     function must be present and it must be the last parameter; all
+ *     other parameters must be parsers.
  * @returns {Parser} A parser that will apply its parsers in sequence,
  *     feed the results to its function, and result in the function's
  *     return value.
  */
-export const pipe = (ps, fn) => makeParser(state => {
+export const pipe = (...ps) => makeParser(state => {
+  const fn = ps.pop()
+  /* istanbul ignore else */
+  if (ASSERT) {
+    for (const [i, p] of ps.entries()) {
+      assertParser('pipe', p, ordinalParser(ordinal(i + 1)))
+    }
+    assertFunction('pipe', fn, ordinalFunction(ordinal(ps.length + 1)))
+  }
   const index = state.index
   const values = []
   let next = state
@@ -269,6 +317,12 @@ export const pipe = (ps, fn) => makeParser(state => {
  *     order and then results in the result of its content parser.
  */
 export const between = (pre, post, p) => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) {
+    assertParser('between', pre, ordinalParser('1st'))
+    assertParser('between', post, ordinalParser('2nd'))
+    assertParser('between', p, ordinalParser('3rd'))
+  }
   const index = state.index
 
   const [reply1, [next1, result1]] = dup(pre(state))
@@ -297,6 +351,11 @@ export const between = (pre, post, p) => makeParser(state => {
  *     result of `p`.
  */
 export const nth = (p, n) => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) {
+    assertParser('nth', p, ordinalParser('1st'))
+    assertNumber('nth', n, ordinalNumber('2nd'))
+  }
   const [reply, [next, result]] = dup(p(state))
   return result.status === Ok ? ok(next, result.value[n]) : reply
 })
@@ -313,6 +372,8 @@ export const nth = (p, n) => makeParser(state => {
  *     result of `p`.
  */
 export const first = p => makeParser(state => {
+  /* istanbul ignore else */
+  assertParser('first', p)
   const [reply, [next, result]] = dup(p(state))
   return result.status === Ok ? ok(next, result.value[0]) : reply
 })
@@ -329,6 +390,8 @@ export const first = p => makeParser(state => {
  *     result of `p`.
  */
 export const second = p => makeParser(state => {
+  /* istanbul ignore else */
+  assertParser('second', p)
   const [reply, [next, result]] = dup(p(state))
   return result.status === Ok ? ok(next, result.value[1]) : reply
 })
@@ -345,6 +408,8 @@ export const second = p => makeParser(state => {
  *     result of `p`.
  */
 export const third = p => makeParser(state => {
+  /* istanbul ignore else */
+  assertParser('third', p)
   const [reply, [next, result]] = dup(p(state))
   return result.status === Ok ? ok(next, result.value[2]) : reply
 })
@@ -361,6 +426,8 @@ export const third = p => makeParser(state => {
  *     result of `p`.
  */
 export const fourth = p => makeParser(state => {
+  /* istanbul ignore else */
+  assertParser('fourth', p)
   const [reply, [next, result]] = dup(p(state))
   return result.status === Ok ? ok(next, result.value[3]) : reply
 })
@@ -377,6 +444,8 @@ export const fourth = p => makeParser(state => {
  *     result of `p`.
  */
 export const fifth = p => makeParser(state => {
+  /* istanbul ignore else */
+  assertParser('fifth', p)
   const [reply, [next, result]] = dup(p(state))
   return result.status === Ok ? ok(next, result.value[4]) : reply
 })

@@ -31,7 +31,7 @@ export function assertChar(name, value, formatter = charFormatter) {
 }
 
 export function assertFunction(name, value, formatter = fnFormatter) {
-  if (typeof value !== 'function') {
+  if (typeof value !== 'function' || makeParser.created(value)) {
     throw new Error(`[${name}]: ${formatter(value)}`)
   }
 }

@@ -44,13 +44,11 @@ describe('Alternative and error recovery combinators', () => {
         'abc',
         '[choice]: expected 2nd argument to be a parser; found 0',
       )
-      /* eslint-disable prefer-arrow-callback */
       error(
-        choice(any, letter, function test() { return letter }),
+        choice(any, letter, () => letter),
         'abc',
-        '[choice]: expected 3rd argument to be a parser; found function test',
+        '[choice]: expected 3rd argument to be a parser; found function',
       )
-      /* eslint-enable prefer-arrow-callback */
     })
     it('fails with all expecteds if all parsers fail without consuming', () => {
       fail(parser, 'yz', "'a', 'c', or 'e'")

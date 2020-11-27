@@ -110,13 +110,6 @@ describe('Character parsers', () => {
       error(
         chari('ab'), '', '[chari]: expected a one-character string; found "ab"',
       )
-      /* eslint-disable prefer-arrow-callback */
-      error(
-        chari(function test() {}),
-        '',
-        '[chari]: expected a one-character string; found function test',
-      )
-      /* eslint-enable prefer-arrow-callback */
     })
 
     context('1-byte characters', () => {

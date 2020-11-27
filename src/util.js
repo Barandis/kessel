@@ -4,6 +4,8 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+import { makeParser } from './core'
+
 /** @typedef {import('./core').State} State */
 /** @typedef {import('./core').Result} Result */
 
@@ -288,7 +290,9 @@ export function ordinal(n) {
  */
 export function stringify(value) {
   if (value === undefined) return 'undefined'
-  if (typeof value === 'function') return `function ${value.name}`
+  if (typeof value === 'function') {
+    return makeParser.created(value) ? 'parser' : 'function'
+  }
   if (typeof value === 'symbol') return `Symbol(${value.description})`
   return JSON.stringify(value)
 }
