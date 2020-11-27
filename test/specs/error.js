@@ -596,6 +596,13 @@ describe('Parse errors', () => {
           + 'Expected a letter, a digit, or whitespace\n\n'
         expect(format(expecteds, 29, view, 8, 72)).to.equal(exp)
       })
+      it('formats an unknown message if there are no errors', () => {
+        const exp = 'Parse error at (line 2, column 5):\n\n'
+                  + 'Звукоподражание\n'
+                  + '    ^\n'
+                  + 'Unknown error(s)\n\n'
+        expect(format([], 62, view, 8, 72)).to.equal(exp)
+      })
       it('formats nested errors that come from backtracking', () => {
         const parser = sequenceB(char('t'), char('e'), char('s'), char('t'))
         const [state, result] = parse(parser, 'tesl')

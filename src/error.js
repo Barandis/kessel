@@ -701,8 +701,10 @@ export function format(errors, index, view, tabSize, maxWidth, indent = 0) {
   const nestedMsg = formatNested(nested, tabSize, maxWidth, indent)
   const compoundMsg = formatNested(compound, tabSize, maxWidth, indent)
 
+  const unknownMsg = errors.length === 0 ? `${sp}Unknown error(s)\n` : ''
+
   return ensureNewlines(
-    `${position}\n\n${display}\n${unexpMsg}${expMsg}${genericMsg}`
+    `${position}\n\n${display}\n${unexpMsg}${expMsg}${genericMsg}${unknownMsg}`
       + `${compoundMsg}${nestedMsg}`,
     2,
   )
