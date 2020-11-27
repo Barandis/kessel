@@ -26,7 +26,7 @@ import { ErrorType } from 'kessel/error'
 import { space } from 'kessel/index'
 import { any, char, digit, eof, letter } from 'kessel/parsers/char'
 import { string } from 'kessel/parsers/string'
-import { fail, pass } from 'test/helper'
+import { error, fail, pass } from 'test/helper'
 
 const { Error, Fatal } = Status
 
@@ -38,6 +38,20 @@ describe('Alternative and error recovery combinators', () => {
       sequence(char('e'), char('f')),
     )
 
+    it('throws if any of its arguments are not parsers', () => {
+      error(
+        choice(any, 0),
+        'abc',
+        '[choice]: expected 2nd argument to be a parser; found 0',
+      )
+      /* eslint-disable prefer-arrow-callback */
+      error(
+        choice(any, letter, function test() { return letter }),
+        'abc',
+        '[choice]: expected 3rd argument to be a parser; found function test',
+      )
+      /* eslint-enable prefer-arrow-callback */
+    })
     it('fails with all expecteds if all parsers fail without consuming', () => {
       fail(parser, 'yz', "'a', 'c', or 'e'")
     })
@@ -50,6 +64,9 @@ describe('Alternative and error recovery combinators', () => {
   })
 
   describe('optional', () => {
+    it('throws if its argument is not a parser', () => {
+      error(optional(0), '', '[optional]: expected a parser; found 0')
+    })
     it('consumes input without a result on success', () => {
       pass(optional(char('a')), 'abc', { result: null, index: 1 })
     })
@@ -70,6 +87,9 @@ describe('Alternative and error recovery combinators', () => {
   })
 
   describe('backtrack', () => {
+    it('throws if its argument is not a parser', () => {
+      error(backtrack(0), '', '[backtrack]: expected a parser; found 0')
+    })
     it('does nothing if its parser succeeds', () => {
       const r1 = parse(char('a'), 'abc')
       const r2 = parse(backtrack(char('a')), 'abc')
@@ -99,6 +119,13 @@ describe('Alternative and error recovery combinators', () => {
   })
 
   describe('fallback', () => {
+    it('throws if its first argument is not a parser', () => {
+      error(
+        fallback(0),
+        '',
+        '[fallback]: expected 1st argument to be a parser; found 0',
+      )
+    })
     it('succeeds with its parser\'s successful result', () => {
       pass(fallback(char('a'), 'z'), 'abc', 'a')
     })
@@ -116,6 +143,18 @@ describe('Alternative and error recovery combinators', () => {
   describe('sequenceB', () => {
     const parser = sequenceB(string('abc'), string('def'), string('ghi'))
 
+    it('throws if any of its arguments is not a parser', () => {
+      error(
+        sequenceB(any, 0),
+        '',
+        '[sequenceB]: expected 2nd argument to be a parser; found 0',
+      )
+      error(
+        sequenceB(any, letter, digit, {}),
+        '',
+        '[sequenceB]: expected 4th argument to be a parser; found {}',
+      )
+    })
     it('fails if any of its parsers fail', () => {
       const [state1, result1] = parse(parser, 'abd')
       expect(state1.index).to.equal(0)
@@ -149,6 +188,20 @@ describe('Alternative and error recovery combinators', () => {
   })
 
   describe('chainB', () => {
+    it('throws if its first argument is not a parser', () => {
+      error(
+        chainB(0, x => x),
+        '',
+        '[chainB]: expected 1st argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a function', () => {
+      error(
+        chainB(any, 0),
+        '',
+        '[chainB]: expected 2nd argument to be a function; found 0',
+      )
+    })
     it('passes successful result to function to get the next parser', () => {
       pass(chainB(any, c => char(c)), 'aa', { result: 'a', index: 2 })
     })
@@ -191,6 +244,20 @@ describe('Alternative and error recovery combinators', () => {
   })
 
   describe('leftB', () => {
+    it('throws if its first argument is not a parser', () => {
+      error(
+        leftB(0, any),
+        '',
+        '[leftB]: expected 1st argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a parser', () => {
+      error(
+        leftB(any, 0),
+        '',
+        '[leftB]: expected 2nd argument to be a parser; found 0',
+      )
+    })
     it('returns the result of its left parser if both pass', () => {
       pass(leftB(letter, digit), 'a1', 'a')
     })
@@ -222,6 +289,20 @@ describe('Alternative and error recovery combinators', () => {
   })
 
   describe('rightB', () => {
+    it('throws if its first argument is not a parser', () => {
+      error(
+        rightB(0, any),
+        '',
+        '[rightB]: expected 1st argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a parser', () => {
+      error(
+        rightB(any, 0),
+        '',
+        '[rightB]: expected 2nd argument to be a parser; found 0',
+      )
+    })
     it('returns the result of its right parser if both pass', () => {
       pass(rightB(letter, digit), 'a1', '1')
     })
@@ -253,6 +334,20 @@ describe('Alternative and error recovery combinators', () => {
   })
 
   describe('bothB', () => {
+    it('throws if its first argument is not a parser', () => {
+      error(
+        bothB(0, any),
+        '',
+        '[bothB]: expected 1st argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a parser', () => {
+      error(
+        bothB(any, 0),
+        '',
+        '[bothB]: expected 2nd argument to be a parser; found 0',
+      )
+    })
     it('returns the result of its right parser if both pass', () => {
       pass(bothB(letter, digit), 'a1', ['a', '1'])
     })
@@ -284,6 +379,20 @@ describe('Alternative and error recovery combinators', () => {
   })
 
   describe('countB', () => {
+    it('throws if its first argument is not a parser', () => {
+      error(
+        countB(0, 5),
+        '',
+        '[countB]: expected 1st argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a number', () => {
+      error(
+        countB(any, '3'),
+        '',
+        '[countB]: expected 2nd argument to be a number; found "3"',
+      )
+    })
     it('applies one parser a number of times', () => {
       pass(countB(letter, 5), 'abcdef', ['a', 'b', 'c', 'd', 'e'])
       pass(countB(letter, 2), 'abcdef', ['a', 'b'])
@@ -315,6 +424,20 @@ describe('Alternative and error recovery combinators', () => {
   })
 
   describe('manyTillB', () => {
+    it('throws if its first argument is not a parser', () => {
+      error(
+        manyTillB(0, any),
+        '',
+        '[manyTillB]: expected 1st argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a parser', () => {
+      error(
+        manyTillB(any, 0),
+        '',
+        '[manyTillB]: expected 2nd argument to be a parser; found 0',
+      )
+    })
     it('succeeds with content parser results before the end', () => {
       pass(manyTillB(any, letter), '12./abc', ['1', '2', '.', '/'])
     })
@@ -362,6 +485,18 @@ describe('Alternative and error recovery combinators', () => {
       return c
     })
 
+    it('throws if it yields something other than a parser', () => {
+      error(
+        blockB(function *() { yield any; yield 0; return 0 }),
+        'abc',
+        '[blockB]: expected 2nd yield to be to a parser; found 0',
+      )
+      error(
+        blockB(function *() { yield any; yield any; yield x => x; return 0 }),
+        'abc',
+        '[blockB]: expected 3rd yield to be to a parser; found function',
+      )
+    })
     it('fails if any of its parsers fail', () => {
       fail(parser, 'abd', { expected: "'c'", index: 2, status: Fatal })
       fail(parser, 'abcd', {

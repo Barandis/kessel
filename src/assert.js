@@ -3,32 +3,26 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { charLength } from './util'
+import { makeParser } from './core'
+import { charLength, stringify } from './util'
 
-function stringify(value) {
-  if (value === undefined) return 'undefined'
-  if (typeof value === 'function') return `function ${value.name}`
-  if (typeof value === 'symbol') return `Symbol(${value.description})`
-  return JSON.stringify(value)
-}
+const formatter = type => value => `expected ${type}; found ${stringify(value)}`
 
-const charFormatter = value =>
-  `expected a one-character string; found ${stringify(value)}`
-const fnFormatter = value =>
-  `expected a function; found ${stringify(value)}`
-const strFormatter = value =>
-  `expected a string; found ${stringify(value)}`
-const strArrFormatter = value =>
-  `expected a string or an array of characters; found ${stringify(value)}`
-const strRegFormtter = value =>
-  `expected a string or a regular expression; found ${stringify(value)}`
-const numFormatter = value =>
-  `expected a number; found ${stringify(value)}`
+const charFormatter = formatter('a one-character string')
+const fnFormatter = formatter('a function')
+const strFormatter = formatter('a string')
+const strArrFormatter = formatter('a string or an array of characters')
+const strRegFormtter = formatter('a string or a regular expression')
+const numFormatter = formatter('a number')
+const parserFormatter = formatter('a parser')
 
-export const ordinalChar = ord => value =>
-  `expected ${ord} argument to be a one-character string; found ${
-    stringify(value)
-  }`
+export const ordFormatter = (type, ord) => value =>
+  `expected ${ord} argument to be ${type}; found ${stringify(value)}`
+
+export const ordinalChar = ord => ordFormatter('a one-character string', ord)
+export const ordinalFunction = ord => ordFormatter('a function', ord)
+export const ordinalNumber = ord => ordFormatter('a number', ord)
+export const ordinalParser = ord => ordFormatter('a parser', ord)
 
 export function assertChar(name, value, formatter = charFormatter) {
   if (typeof value !== 'string' || charLength(value) !== 1) {
@@ -67,6 +61,12 @@ export function assertStringOrRegExp(name, value, formatter = strRegFormtter) {
 
 export function assertNumber(name, value, formatter = numFormatter) {
   if (typeof value !== 'number') {
+    throw new Error(`[${name}]: ${formatter(value)}`)
+  }
+}
+
+export function assertParser(name, value, formatter = parserFormatter) {
+  if (typeof value !== 'function' || !makeParser.created(value)) {
     throw new Error(`[${name}]: ${formatter(value)}`)
   }
 }

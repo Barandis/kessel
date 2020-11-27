@@ -236,3 +236,70 @@ export function commaSeparate(messages) {
     }
   }
 }
+
+/**
+ * Augments a factory function to be able to determine whether it
+ * created an arbitrary object. The factory function is assigned an
+ * additional property (by default named `created`, can be changed by
+ * passing in the `prop` argument) which is a function that takes an
+ * object and returns `true` if the factory created it or `false` if it
+ * did not.
+ *
+ * @param {function} fn The factory function that will be augmented with
+ *     the new property.
+ * @param {string|symbol} [prop='created'] The property that will be
+ *     added to the factory function.
+ * @returns {function} The augmented factory function.
+ */
+export function track(fn, prop = 'created') {
+  const tracked = new WeakSet()
+
+  return Object.defineProperty(
+    (...args) => {
+      const created = fn(...args)
+      tracked.add(created)
+      return created
+    },
+    prop,
+    { value: tracked.has.bind(tracked) },
+  )
+}
+
+/**
+ * Converts a number to its string ordinal form (i.e., `1` becomes
+ * `'1st'`, `1729` becomes `'1729th'`, etc.)
+ *
+ * @param {number} n The number to convert into an ordinal.
+ * @returns {string} The same number in its ordinal form.
+ */
+export function ordinal(n) {
+  const suffixes = ['th', 'st', 'nd', 'rd']
+  const v = n % 100
+  return n + (suffixes[(v - 20) % 10] ?? suffixes[v] ?? suffixes[0])
+}
+
+/**
+ * Returns a reasonable string representation of a value. This will most
+ * often be the output from `JSON.stringify()`, though representations
+ * are also included for types that function doesn't support.
+ *
+ * @param {*} value The value to turn into a string.
+ * @returns {string} A reasonable string representation of the value.
+ */
+export function stringify(value) {
+  if (value === undefined) return 'undefined'
+  if (typeof value === 'function') return `function ${value.name}`
+  if (typeof value === 'symbol') return `Symbol(${value.description})`
+  return JSON.stringify(value)
+}
+
+/**
+ * Adds the appropriate indefinite article ('a' or 'an') to a word based
+ * on its first letter.
+ *
+ * @param {string} str The string to prepend an article to.
+ * @returns {string} The string with the prepended article.
+ */
+export function articlify(str) {
+  return 'aeiouAEIOU'.includes(str[0]) ? `an ${str}` : `a ${str}`
+}

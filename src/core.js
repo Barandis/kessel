@@ -4,7 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import { formatErrors } from './error'
-import { stringToView } from './util'
+import { stringToView, track } from './util'
 
 /** @typedef {import('./error.js').ErrorList} ErrorList */
 
@@ -119,23 +119,24 @@ export function makeState(input) {
  */
 
 /**
- * Creates a new `Parser`. This factory simply takes a parser
- * function and returns it; it's here in case something more needs to be
- * done in parser creation. This has happened in the past and very
- * likely will again happen in the future.
+ * Creates a new `Parser`. This factory simply takes a parser function
+ * and returns the same parser function; the purpose of the factory is
+ * to track parsers that it has created.
  *
- * While it is not currently so, there have been times when behavior of
- * functions produced by this factory differed from general functions.
- * Because of the possibility that this could return, it's suggested to
- * use this function to produce all parsers rather than producing them
- * by hand.
+ * If assertions are enabled, this will mean that any parser combinator
+ * will assert that the parser that is passed to it was created by this
+ * factory function. Any other will cause an exception to be thrown,
+ * even if it accepts the right kind of argument and returns the proper
+ * return value. If assertions are not enabled, this check will not be
+ * done.
+ *
+ * Every parser in this library is created with `makeParser`, so any of
+ * those or any parser composed from those will work automatically.
  *
  * @param {Parser} fn A parser function.
  * @returns {Parser} The same parser function.
  */
-export function makeParser(fn) {
-  return fn
-}
+export const makeParser = track(fn => fn)
 
 /**
  * Produces a new `Result` indicating that a parse succeeded, as well as
