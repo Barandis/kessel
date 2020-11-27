@@ -229,13 +229,13 @@ describe('Character parsers', () => {
   describe('range', () => {
     it('throws if the first argument is not a character', () => {
       error(
-        range(0, '9'), '', '[range]: expected first argument to be a '
+        range(0, '9'), '', '[range]: expected 1st argument to be a '
           + 'one-character string; found 0',
       )
     })
     it('throws if the second argument is not a character', () => {
       error(
-        range('0', 9), '', '[range]: expected second argument to be a '
+        range('0', 9), '', '[range]: expected 2nd argument to be a '
           + 'one-character string; found 9',
       )
     })

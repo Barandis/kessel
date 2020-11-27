@@ -126,8 +126,8 @@ export const satisfy = fn => makeParser(state => {
 export const range = (start, end) => makeParser(state => {
   /* istanbul ignore else */
   if (ASSERT) {
-    assertChar('range', start, ordinalChar('first'))
-    assertChar('range', end, ordinalChar('second'))
+    assertChar('range', start, ordinalChar('1st'))
+    assertChar('range', end, ordinalChar('2nd'))
   }
   const fn = c => c >= start && c <= end
   const [reply, [next, result]] = dup(CharParser(fn)(state))
