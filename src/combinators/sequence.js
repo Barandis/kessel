@@ -3,9 +3,15 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+import {
+  assertNumber,
+  assertParser,
+  ordinalNumber,
+  ordinalParser,
+} from 'kessel/assert'
 import { ok, makeParser, Status, maybeFatal } from 'kessel/core'
 import { merge } from 'kessel/error'
-import { dup, range } from 'kessel/util'
+import { dup, ordinal, range, stringify } from 'kessel/util'
 
 /** @typedef {import('kessel/core').Parser} Parser */
 
@@ -32,6 +38,12 @@ function loopMessage(name) {
  *     time, in order, and fails if any of those parsers fail.
  */
 export const sequence = (...ps) => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) {
+    for (const [i, p] of ps.entries()) {
+      assertParser('sequence', p, ordinalParser(ordinal(i + 1)))
+    }
+  }
   const values = []
   const index = state.index
   let next = state
@@ -76,11 +88,18 @@ export const block = genFn => makeParser(state => {
   const index = state.index
   let nextValue
   let next = state
+  let i = 0
 
   while (true) {
     const { value, done } = gen.next(nextValue)
     if (done) return ok(next, value)
 
+    /* istanbul ignore else */
+    if (ASSERT) {
+      assertParser('block', value, v => `expected ${
+        ordinal(i + 1)
+      } yield to be to a parser; found ${stringify(v)}`)
+    }
     const [nextState, result] = value(next)
     next = nextState
 
@@ -88,6 +107,7 @@ export const block = genFn => makeParser(state => {
       return maybeFatal(next.index !== index, next, result.errors)
     }
     nextValue = result.value
+    i++
   }
 })
 
@@ -104,6 +124,8 @@ export const block = genFn => makeParser(state => {
  *     successful results from the contained parser.
  */
 export const many = p => makeParser(state => {
+  /* istanbul ignore else */
+  assertParser('many', p)
   const values = []
   let next = state
 
@@ -133,6 +155,8 @@ export const many = p => makeParser(state => {
  *     successful results from the contained parser.
  */
 export const many1 = p => makeParser(state => {
+  /* istanbul ignore else */
+  assertParser('many1', p)
   const [tuple, [nextState, result]] = dup(p(state))
   if (result.status !== Ok) return tuple
 
@@ -162,6 +186,8 @@ export const many1 = p => makeParser(state => {
  *     repeatedly until it fails. Successful results are discarded.
  */
 export const skipMany = p => makeParser(state => {
+  /* istanbul ignore else */
+  assertParser('skipMany', p)
   let next = state
 
   while (true) {
@@ -187,6 +213,8 @@ export const skipMany = p => makeParser(state => {
  *     repeatedly until it fails. Successful results are discarded.
  */
 export const skipMany1 = p => makeParser(state => {
+  /* istanbul ignore else */
+  assertParser('skipMany1', p)
   const [reply, [nextState, result]] = dup(p(state))
   if (result.status !== Ok) return reply
 
@@ -225,6 +253,11 @@ export const skipMany1 = p => makeParser(state => {
  *     content parser results, discarding the separator parser results.
  */
 export const sepBy = (p, sep) => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) {
+    assertParser('sepBy', p, ordinalParser('1st'))
+    assertParser('sepBy', sep, ordinalParser('2nd'))
+  }
   let index = state.index
   const [reply, [nextState, result]] = dup(p(state))
   if (result.status === Fatal) return reply
@@ -275,6 +308,11 @@ export const sepBy = (p, sep) => makeParser(state => {
  *     content parser results, discarding the separator parser results.
  */
 export const sepBy1 = (p, sep) => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) {
+    assertParser('sepBy1', p, ordinalParser('1st'))
+    assertParser('sepBy1', sep, ordinalParser('2nd'))
+  }
   let index = state.index
   const [reply, [nextState, result]] = dup(p(state))
   if (result.status !== Ok) return reply
@@ -324,6 +362,11 @@ export const sepBy1 = (p, sep) => makeParser(state => {
  *     content parser results, discarding the separator parser results.
  */
 export const sepEndBy = (p, sep) => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) {
+    assertParser('sepEndBy', p, ordinalParser('1st'))
+    assertParser('sepEndBy', sep, ordinalParser('2nd'))
+  }
   let index = state.index
   const [reply, [nextState, result]] = dup(p(state))
   if (result.status === Fatal) return reply
@@ -375,6 +418,11 @@ export const sepEndBy = (p, sep) => makeParser(state => {
  *     content parser results, discarding the separator parser results.
  */
 export const sepEndBy1 = (p, sep) => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) {
+    assertParser('sepEndBy1', p, ordinalParser('1st'))
+    assertParser('sepEndBy1', sep, ordinalParser('2nd'))
+  }
   let index = state.index
   const [reply, [nextState, result]] = dup(p(state))
   if (result.status !== Ok) return reply
@@ -414,6 +462,11 @@ export const sepEndBy1 = (p, sep) => makeParser(state => {
  *     an array of all of the successful results of `p`.
  */
 export const count = (p, n) => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) {
+    assertParser('count', p, ordinalParser('1st'))
+    assertNumber('count', n, ordinalNumber('2nd'))
+  }
   const index = state.index
   const values = []
   let next = state
@@ -453,6 +506,11 @@ export const count = (p, n) => makeParser(state => {
  *     times until the end parser succeeds.
  */
 export const manyTill = (p, end) => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) {
+    assertParser('manyTill', p, ordinalParser('1st'))
+    assertParser('manyTill', end, ordinalParser('2nd'))
+  }
   const index = state.index
   const values = []
   let next = state
@@ -500,6 +558,11 @@ export const manyTill = (p, end) => makeParser(state => {
  *     that result from `p`.
  */
 export const assocl = (p, op, x) => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) {
+    assertParser('assocl', p, ordinalParser('1st'))
+    assertParser('assocl', op, ordinalParser('2nd'))
+  }
   const [reply, [nextState, result]] = dup(p(state))
   if (result.status === Fatal) return reply
   if (result.status === Error) return ok(nextState, x)
@@ -555,6 +618,11 @@ export const assocl = (p, op, x) => makeParser(state => {
  *     that result from `p`.
  */
 export const assocl1 = (p, op) => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) {
+    assertParser('assocl1', p, ordinalParser('1st'))
+    assertParser('assocl1', op, ordinalParser('2nd'))
+  }
   const [reply, [nextState, result]] = dup(p(state))
   if (result.status !== Ok) return reply
 
@@ -610,6 +678,11 @@ export const assocl1 = (p, op) => makeParser(state => {
  *     that result from `p`.
  */
 export const assocr = (p, op, x) => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) {
+    assertParser('assocr', p, ordinalParser('1st'))
+    assertParser('assocr', op, ordinalParser('2nd'))
+  }
   const [reply, [nextState, result]] = dup(p(state))
   if (result.status === Fatal) return reply
   if (result.status === Error) return ok(nextState, x)
@@ -665,6 +738,11 @@ export const assocr = (p, op, x) => makeParser(state => {
  *     that result from `p`.
  */
 export const assocr1 = (p, op) => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) {
+    assertParser('assocr1', p, ordinalParser('1st'))
+    assertParser('assocr1', op, ordinalParser('2nd'))
+  }
   const [reply, [nextState, result]] = dup(p(state))
   if (result.status !== Ok) return reply
 

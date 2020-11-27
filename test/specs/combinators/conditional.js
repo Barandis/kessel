@@ -71,7 +71,7 @@ describe('Conditional and look-ahead combinators', () => {
         '[notEmptyL]: expected 1st argument to be a parser; found 0',
       )
     })
-    it('throws if its second argument is not a parser', () => {
+    it('throws if its second argument is not a string', () => {
       error(
         notEmptyL(many(letter), 0),
         '',
@@ -126,7 +126,7 @@ describe('Conditional and look-ahead combinators', () => {
         '[followedByL]: expected 1st argument to be a parser; found 0',
       )
     })
-    it('throws if its second argument is not a parser', () => {
+    it('throws if its second argument is not a string', () => {
       error(
         followedByL(many(letter), 0),
         '',
@@ -175,7 +175,7 @@ describe('Conditional and look-ahead combinators', () => {
         '[notFollowedByL]: expected 1st argument to be a parser; found 0',
       )
     })
-    it('throws if its second argument is not a parser', () => {
+    it('throws if its second argument is not a string', () => {
       error(
         notFollowedByL(many(letter), 0),
         '',

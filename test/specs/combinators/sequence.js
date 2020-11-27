@@ -35,6 +35,18 @@ describe('Sequence combinators', () => {
   describe('sequence', () => {
     const parser = sequence(string('abc'), string('def'), string('ghi'))
 
+    it('throws if any of its arguments is not a parser', () => {
+      error(
+        sequence(any, 0),
+        '',
+        '[sequence]: expected 2nd argument to be a parser; found 0',
+      )
+      error(
+        sequence(any, letter, digit, {}),
+        '',
+        '[sequence]: expected 4th argument to be a parser; found {}',
+      )
+    })
     it('fails if any of its parsers fail', () => {
       fail(parser, 'abd', { expected: "'abc'", index: 0 })
       fail(parser, 'abcdf', { expected: "'def'", index: 3 })
@@ -58,6 +70,18 @@ describe('Sequence combinators', () => {
       return c
     })
 
+    it('throws if it yields something other than a parser', () => {
+      error(
+        block(function *() { yield any; yield 0; return 0 }),
+        'abc',
+        '[block]: expected 2nd yield to be to a parser; found 0',
+      )
+      error(
+        block(function *() { yield any; yield any; yield x => x; return 0 }),
+        'abc',
+        '[block]: expected 3rd yield to be to a parser; found function',
+      )
+    })
     it('fails if any of its parsers fail', () => {
       fail(parser, 'abd', { expected: "'abc'", index: 0, status: Error })
       fail(parser, 'abcd', {
@@ -82,6 +106,9 @@ describe('Sequence combinators', () => {
   })
 
   describe('many', () => {
+    it('throws if its argument is not a parser', () => {
+      error(many(0), '', '[many]: expected a parser; found 0')
+    })
     it('succeeds zero times with an empty array', () => {
       pass(many(digit), 'abc123', [])
       pass(many(digit), '', [])
@@ -106,6 +133,9 @@ describe('Sequence combinators', () => {
   })
 
   describe('many1', () => {
+    it('throws if its argument is not a parser', () => {
+      error(many1(0), '', '[many1]: expected a parser; found 0')
+    })
     it('fails if its parser does not match at least once', () => {
       fail(many1(digit), 'abc123', 'a digit')
       fail(many1(digit), '', 'a digit')
@@ -130,6 +160,9 @@ describe('Sequence combinators', () => {
   })
 
   describe('skip', () => {
+    it('throws if its argument is not a parser', () => {
+      error(skip(0), '', '[skip]: expected a parser; found 0')
+    })
     it('succeeds with no result if its parser succeeds', () => {
       pass(skip(char('a')), 'abc', { result: null, index: 1 })
       pass(skip(many(letter)), 'abcdef123', { result: null, index: 6 })
@@ -144,6 +177,9 @@ describe('Sequence combinators', () => {
   })
 
   describe('skipMany', () => {
+    it('throws if its argument is not a parser', () => {
+      error(skipMany(0), '', '[skipMany]: expected a parser; found 0')
+    })
     it('succeeds zero times without consuming input', () => {
       pass(skipMany(digit), 'abc123', { result: null, index: 0 })
       pass(skipMany(digit), '', { result: null, index: 0 })
@@ -165,6 +201,9 @@ describe('Sequence combinators', () => {
   })
 
   describe('skipMany1', () => {
+    it('throws if its argument is not a parser', () => {
+      error(skipMany1(0), '', '[skipMany1]: expected a parser; found 0')
+    })
     it('fails if its parser does not match at least once', () => {
       fail(skipMany1(digit), 'abc123', 'a digit')
       fail(skipMany1(digit), '', 'a digit')
@@ -188,6 +227,20 @@ describe('Sequence combinators', () => {
   describe('sepBy', () => {
     const parser = sepBy(letter, char(','))
 
+    it('throws if its first argument is not a parser', () => {
+      error(
+        sepBy(0, any),
+        '',
+        '[sepBy]: expected 1st argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a parser', () => {
+      error(
+        sepBy(any, 0),
+        '',
+        '[sepBy]: expected 2nd argument to be a parser; found 0',
+      )
+    })
     it('succeeds with multiple values with separators', () => {
       pass(parser, 'a,b,c', { result: ['a', 'b', 'c'], index: 5 })
     })
@@ -235,6 +288,20 @@ describe('Sequence combinators', () => {
   describe('sepBy1', () => {
     const parser = sepBy1(letter, char(','))
 
+    it('throws if its first argument is not a parser', () => {
+      error(
+        sepBy1(0, any),
+        '',
+        '[sepBy1]: expected 1st argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a parser', () => {
+      error(
+        sepBy1(any, 0),
+        '',
+        '[sepBy1]: expected 2nd argument to be a parser; found 0',
+      )
+    })
     it('succeeds with multiple values with separators', () => {
       pass(parser, 'a,b,c', { result: ['a', 'b', 'c'], index: 5 })
     })
@@ -286,6 +353,20 @@ describe('Sequence combinators', () => {
   describe('sepEndBy', () => {
     const parser = sepEndBy(letter, char(','))
 
+    it('throws if its first argument is not a parser', () => {
+      error(
+        sepEndBy1(0, any),
+        '',
+        '[sepEndBy1]: expected 1st argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a parser', () => {
+      error(
+        sepEndBy1(any, 0),
+        '',
+        '[sepEndBy1]: expected 2nd argument to be a parser; found 0',
+      )
+    })
     it('succeeds with multiple values with separators', () => {
       pass(parser, 'a,b,c', { result: ['a', 'b', 'c'], index: 5 })
     })
@@ -333,6 +414,20 @@ describe('Sequence combinators', () => {
   describe('sepEndBy1', () => {
     const parser = sepEndBy1(letter, char(','))
 
+    it('throws if its first argument is not a parser', () => {
+      error(
+        sepEndBy1(0, any),
+        '',
+        '[sepEndBy1]: expected 1st argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a parser', () => {
+      error(
+        sepEndBy1(any, 0),
+        '',
+        '[sepEndBy1]: expected 2nd argument to be a parser; found 0',
+      )
+    })
     it('succeeds with multiple values with separators', () => {
       pass(parser, 'a,b,c', { result: ['a', 'b', 'c'], index: 5 })
     })
@@ -382,6 +477,20 @@ describe('Sequence combinators', () => {
   })
 
   describe('count', () => {
+    it('throws if its first argument is not a parser', () => {
+      error(
+        count(0, 5),
+        '',
+        '[count]: expected 1st argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a number', () => {
+      error(
+        count(any, '3'),
+        '',
+        '[count]: expected 2nd argument to be a number; found "3"',
+      )
+    })
     it('applies one parser a number of times', () => {
       pass(count(letter, 5), 'abcdef', ['a', 'b', 'c', 'd', 'e'])
       pass(count(letter, 2), 'abcdef', ['a', 'b'])
@@ -411,6 +520,20 @@ describe('Sequence combinators', () => {
   })
 
   describe('manyTill', () => {
+    it('throws if its first argument is not a parser', () => {
+      error(
+        manyTill(0, any),
+        '',
+        '[manyTill]: expected 1st argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a parser', () => {
+      error(
+        manyTill(any, 0),
+        '',
+        '[manyTill]: expected 2nd argument to be a parser; found 0',
+      )
+    })
     it('succeeds with content parser results before the end', () => {
       pass(manyTill(any, letter), '12./abc', ['1', '2', '.', '/'])
     })
@@ -459,6 +582,20 @@ describe('Sequence combinators', () => {
       value(char('-'), (a, b) => a - b),
     )
 
+    it('throws if its first argument is not a parser', () => {
+      error(
+        assocl(0, any),
+        '',
+        '[assocl]: expected 1st argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a parser', () => {
+      error(
+        assocl(any, 0),
+        '',
+        '[assocl]: expected 2nd argument to be a parser; found 0',
+      )
+    })
     it('succeeds with a default value if there are no matches', () => {
       pass(assocl(p, op, 0), '', { result: 0, index: 0 })
     })
@@ -502,6 +639,20 @@ describe('Sequence combinators', () => {
       value(char('-'), (a, b) => a - b),
     )
 
+    it('throws if its first argument is not a parser', () => {
+      error(
+        assocl1(0, any),
+        '',
+        '[assocl1]: expected 1st argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a parser', () => {
+      error(
+        assocl1(any, 0),
+        '',
+        '[assocl1]: expected 2nd argument to be a parser; found 0',
+      )
+    })
     it('fails if there are no matches', () => {
       fail(assocl1(p, op), '', {
         expected: 'a digit',
@@ -549,6 +700,20 @@ describe('Sequence combinators', () => {
       value(char('-'), (a, b) => a - b),
     )
 
+    it('throws if its first argument is not a parser', () => {
+      error(
+        assocr(0, any),
+        '',
+        '[assocr]: expected 1st argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a parser', () => {
+      error(
+        assocr(any, 0),
+        '',
+        '[assocr]: expected 2nd argument to be a parser; found 0',
+      )
+    })
     it('succeeds with a default value if there are no matches', () => {
       pass(assocr(p, op, 0), '', { result: 0, index: 0 })
     })
@@ -593,6 +758,20 @@ describe('Sequence combinators', () => {
       value(char('-'), (a, b) => a - b),
     )
 
+    it('throws if its first argument is not a parser', () => {
+      error(
+        assocr1(0, any),
+        '',
+        '[assocr1]: expected 1st argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a parser', () => {
+      error(
+        assocr1(any, 0),
+        '',
+        '[assocr1]: expected 2nd argument to be a parser; found 0',
+      )
+    })
     it('fails if there are no matches', () => {
       fail(assocr1(p, op), '', {
         expected: 'a digit',
