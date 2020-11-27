@@ -23,6 +23,7 @@ export const ordinalChar = ord => ordFormatter('a one-character string', ord)
 export const ordinalFunction = ord => ordFormatter('a function', ord)
 export const ordinalNumber = ord => ordFormatter('a number', ord)
 export const ordinalParser = ord => ordFormatter('a parser', ord)
+export const ordinalString = ord => ordFormatter('a string', ord)
 
 export function assertChar(name, value, formatter = charFormatter) {
   if (typeof value !== 'string' || charLength(value) !== 1) {

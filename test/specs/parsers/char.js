@@ -18,6 +18,7 @@ import {
   octal,
   range,
   satisfy,
+  satisfyL,
   upper,
 } from 'kessel/parsers/char'
 import { error, fail, pass } from 'test/helper'
@@ -179,9 +180,13 @@ describe('Character parsers', () => {
     const fn = char => char === char.toUpperCase()
 
     it('throws if a non-function is passed in', () => {
-      error(satisfy(0), '', '')
-      error(satisfy({}), '', '')
-      error(satisfy(Symbol.for('test')), '', '')
+      error(satisfy(0), '', '[satisfy]: expected a function; found 0')
+      error(satisfy({}), '', '[satisfy]: expected a function; found {}')
+      error(
+        satisfy(Symbol.for('test')),
+        '',
+        '[satisfy]: expected a function; found Symbol(test)',
+      )
     })
     it('tests the next 1-byte character', () => {
       pass(satisfy(fn), 'Onomatopoeia', { result: 'O', index: 1 })
@@ -199,6 +204,53 @@ describe('Character parsers', () => {
     })
     it('fails automatically at EOF', () => {
       fail(satisfy(fn), '', '')
+    })
+  })
+
+  describe('satisfyL', () => {
+    const fn = char => char === char.toUpperCase()
+
+    it('throws if its first argument is not a function', () => {
+      error(
+        satisfyL(0, 'test'),
+        '',
+        '[satisfyL]: expected 1st argument to be a function; found 0',
+      )
+      error(
+        satisfyL({}, 'test'),
+        '',
+        '[satisfyL]: expected 1st argument to be a function; found {}',
+      )
+      error(
+        satisfyL(Symbol.for('test'), 'test'),
+        '',
+        '[satisfyL]: expected 1st argument to be a function; '
+          + 'found Symbol(test)',
+      )
+    })
+    it('throws if its second argument is not a string', () => {
+      error(
+        satisfyL(_ => true, 0),
+        '',
+        '[satisfyL]: expected 2nd argument to be a string; found 0',
+      )
+    })
+    it('tests the next 1-byte character', () => {
+      pass(satisfyL(fn, 'test'), 'Onomatopoeia', { result: 'O', index: 1 })
+      fail(satisfyL(fn, 'test'), 'onomatopoeia', 'test')
+    })
+    it('tests the next 2-byte character', () => {
+      pass(satisfyL(fn, 'test'), 'Звукоподражание', { result: 'З', index: 2 })
+      fail(satisfyL(fn, 'test'), 'звукоподражание', 'test')
+    })
+    it('tests the next 3-byte character', () => {
+      pass(satisfyL(fn, 'test'), 'คำเลียนเสียง', { result: 'ค', index: 3 })
+    })
+    it('tests the next 4-byte character', () => {
+      pass(satisfyL(fn, 'test'), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂', index: 4 })
+    })
+    it('fails automatically at EOF', () => {
+      fail(satisfyL(fn, 'test'), '', 'test')
     })
   })
 

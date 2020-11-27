@@ -6,10 +6,14 @@
 import {
   assertChar,
   assertFunction,
+  assertString,
   assertStringOrArray,
   ordinalChar,
+  ordinalFunction,
+  ordinalString,
 } from 'kessel/assert'
 import { error, makeParser, ok, Status } from 'kessel/core'
+import { expected } from 'kessel/error'
 import { expecteds } from 'kessel/messages'
 import { dup, nextChar } from 'kessel/util'
 
@@ -102,6 +106,33 @@ export const satisfy = fn => makeParser(state => {
   /* istanbul ignore else */
   if (ASSERT) assertFunction('satisfy', fn)
   return CharParser(fn)(state)
+})
+
+/**
+ * Creates a parser that reads a single character and passes it to the
+ * provided function. If the function returns `true`, this parser
+ * succeeds with that character as the result. If the function returns
+ * `false`, this parser fails and consumes no input and signals an error
+ * with the provided message.
+ *
+ * `satisfyL(fn, message)` is an optimized implementation of
+ * `label(satisfy(fn), message)`.
+ *
+ * @param {function(string):boolean} fn A function to which the next
+ *     character is passed; if it returns `true`, the parser succeeds
+ *     and if it returns `false` the parser fails.
+ * @param {string} message The error message to use if the parser fails.
+ * @returns {Parser} A parser that reads a character and executes `fn`
+ *     on it when applied to input.
+ */
+export const satisfyL = (fn, message) => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) {
+    assertFunction('satisfyL', fn, ordinalFunction('1st'))
+    assertString('satisfyL', message, ordinalString('2nd'))
+  }
+  const [reply, [next, result]] = dup(CharParser(fn)(state))
+  return result.status === Ok ? reply : error(next, expected(message))
 })
 
 /**
