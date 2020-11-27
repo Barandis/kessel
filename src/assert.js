@@ -22,6 +22,8 @@ const strArrFormatter = value =>
   `expected a string or an array of characters; found ${stringify(value)}`
 const strRegFormtter = value =>
   `expected a string or a regular expression; found ${stringify(value)}`
+const numFormatter = value =>
+  `expected a number; found ${stringify(value)}`
 
 export const ordinalChar = ord => value =>
   `expected ${ord} argument to be a one-character string; found ${
@@ -59,6 +61,12 @@ export function assertStringOrArray(name, value, formatter = strArrFormatter) {
 export function assertStringOrRegExp(name, value, formatter = strRegFormtter) {
   const type = Object.prototype.toString.call(value)
   if (typeof value !== 'string' && type !== '[object RegExp]') {
+    throw new Error(`[${name}]: ${formatter(value)}`)
+  }
+}
+
+export function assertNumber(name, value, formatter = numFormatter) {
+  if (typeof value !== 'number') {
     throw new Error(`[${name}]: ${formatter(value)}`)
   }
 }

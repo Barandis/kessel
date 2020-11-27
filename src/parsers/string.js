@@ -3,6 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+import { assertNumber, assertString } from 'kessel/assert'
 import { error, makeParser, ok, Status } from 'kessel/core'
 import { expecteds } from 'kessel/messages'
 import { charLength, dup, nextChars, viewToString } from 'kessel/util'
@@ -54,6 +55,8 @@ const StringParser = (length, fn) => makeParser(state => {
  *     matches the next characters in the input.
  */
 export const string = str => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) assertString('string', str)
   const [reply, [next, result]] = dup(StringParser(
     charLength(str), chars => str === chars,
   )(state))
@@ -77,6 +80,8 @@ export const string = str => makeParser(state => {
  *     case-insensitively matches the next characters in the input.
  */
 export const stringi = str => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) assertString('stringi', str)
   const [reply, [next, result]] = dup(StringParser(
     charLength(str), chars => str.toLowerCase() === chars.toLowerCase(),
   )(state))
@@ -103,6 +108,8 @@ export const all = makeParser(state => {
  *     them into a string for its result.
  */
 export const anyString = n => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) assertNumber('anyString', n)
   const [reply, [next, result]] = dup(StringParser(n, () => true)(state))
   return result.status === Ok ? reply : error(next, expecteds.anyString(n))
 })

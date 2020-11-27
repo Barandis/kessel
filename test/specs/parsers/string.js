@@ -4,10 +4,13 @@
 // https://opensource.org/licenses/MIT
 
 import { all, anyString, string, stringi } from 'kessel/parsers/string'
-import { fail, pass } from 'test/helper'
+import { error, fail, pass } from 'test/helper'
 
 describe('String parsers', () => {
   describe('string', () => {
+    it('throws if its argument is not a string', () => {
+      error(string(0), '', '[string]: expected a string; found 0')
+    })
     it('fails at the end of input', () => {
       fail(string('abc'), '', "'abc'")
     })
@@ -79,6 +82,9 @@ describe('String parsers', () => {
   })
 
   describe('stringi', () => {
+    it('throws if its argument is not a string', () => {
+      error(stringi(0), '', '[stringi]: expected a string; found 0')
+    })
     it('fails at the end of input', () => {
       fail(stringi('abc'), '', { expected: "'abc'", actual: 'EOF' })
     })
@@ -165,6 +171,9 @@ describe('String parsers', () => {
   })
 
   describe('anyString', () => {
+    it('throws if its argument is not a number', () => {
+      error(anyString('0'), '', '[anyString]: expected a number; found "0"')
+    })
     it('succeeds if there are more 1-byte characters than it reads', () => {
       pass(anyString(5), 'Onomatopoeia', { result: 'Onoma', index: 5 })
     })
