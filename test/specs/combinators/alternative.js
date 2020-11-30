@@ -6,16 +6,16 @@
 import { expect } from 'chai'
 
 import {
-  backtrack,
+  attempt,
   blockB,
   bothB,
   chainB,
   choice,
   countB,
-  fallback,
+  def,
   leftB,
   manyTillB,
-  optional,
+  opt,
   rightB,
   sequenceB,
 } from 'kessel/combinators/alternative'
@@ -61,51 +61,51 @@ describe('Alternative and error recovery combinators', () => {
     })
   })
 
-  describe('optional', () => {
+  describe('opt', () => {
     it('throws if its argument is not a parser', () => {
-      error(optional(0), '', '[optional]: expected a parser; found 0')
+      error(opt(0), '', '[opt]: expected a parser; found 0')
     })
     it('consumes input without a result on success', () => {
-      pass(optional(char('a')), 'abc', { result: null, index: 1 })
+      pass(opt(char('a')), 'abc', { result: null, index: 1 })
     })
     it('succeeds without consuming if its parser fails', () => {
-      pass(optional(char('a')), 'bcd', { result: null, index: 0 })
+      pass(opt(char('a')), 'bcd', { result: null, index: 0 })
     })
     it('fails fatally if its parser fails fatally', () => {
-      fail(optional(sequence(char('a'), char('b'))), 'acd', {
+      fail(opt(sequence(char('a'), char('b'))), 'acd', {
         expected: "'b'",
         index: 1,
         status: Fatal,
       })
-      pass(optional(backtrack(sequence(char('a'), char('b')))), 'acd', {
+      pass(opt(attempt(sequence(char('a'), char('b')))), 'acd', {
         result: null,
         index: 0,
       })
     })
   })
 
-  describe('backtrack', () => {
+  describe('attempt', () => {
     it('throws if its argument is not a parser', () => {
-      error(backtrack(0), '', '[backtrack]: expected a parser; found 0')
+      error(attempt(0), '', '[attempt]: expected a parser; found 0')
     })
     it('does nothing if its parser succeeds', () => {
       const r1 = parse(char('a'), 'abc')
-      const r2 = parse(backtrack(char('a')), 'abc')
+      const r2 = parse(attempt(char('a')), 'abc')
       expect(r1).to.deep.equal(r2)
     })
     it('does nothing if its parser fails without consuming input', () => {
       const r1 = parse(char('a'), 'bcd')
-      const r2 = parse(backtrack(char('a')), 'bcd')
+      const r2 = parse(attempt(char('a')), 'bcd')
       expect(r1).to.deep.equal(r2)
     })
     it('resets the index if its parser fails with consuming input', () => {
       const parser = sequence(string('te'), string('st'))
       fail(parser, 'tesl', { index: 2, status: Fatal })
-      fail(backtrack(parser), 'tesl', { index: 0, status: Error })
+      fail(attempt(parser), 'tesl', { index: 0, status: Error })
     })
     it('creates a nested error if it fails while consuming input', () => {
       const parser = sequence(string('te'), string('st'))
-      const [state, result] = parse(backtrack(parser), 'tesl')
+      const [state, result] = parse(attempt(parser), 'tesl')
       const error = result.errors[0]
 
       expect(error.type).to.equal(ErrorType.Nested)
@@ -116,22 +116,22 @@ describe('Alternative and error recovery combinators', () => {
     })
   })
 
-  describe('fallback', () => {
+  describe('def', () => {
     it('throws if its first argument is not a parser', () => {
       error(
-        fallback(0),
+        def(0),
         '',
-        '[fallback]: expected 1st argument to be a parser; found 0',
+        '[def]: expected 1st argument to be a parser; found 0',
       )
     })
     it('succeeds with its parser\'s successful result', () => {
-      pass(fallback(char('a'), 'z'), 'abc', 'a')
+      pass(def(char('a'), 'z'), 'abc', 'a')
     })
     it('succeeds with its value if is parser fails', () => {
-      pass(fallback(char('b'), 'z'), 'abc', 'z')
+      pass(def(char('b'), 'z'), 'abc', 'z')
     })
     it('fails fatally if its parser does', () => {
-      fail(fallback(sequence(string('ab'), string('cd')), 'z'), 'abce', {
+      fail(def(sequence(string('ab'), string('cd')), 'z'), 'abce', {
         expected: "'cd'",
         status: Fatal,
       })

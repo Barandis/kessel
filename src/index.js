@@ -56,16 +56,16 @@ export {
 // COMBINATORS
 
 export {
-  backtrack,
+  attempt,
   blockB,
   bothB,
   chainB,
   choice,
   countB,
-  fallback,
+  def,
   leftB,
   manyTillB,
-  optional,
+  opt,
   rightB,
   sequenceB,
 } from './combinators/alternative'

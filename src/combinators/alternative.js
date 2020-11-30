@@ -66,19 +66,20 @@ export const choice = (...ps) => makeParser(state => {
  *     contained parser fails fatally. This parser consumes text only
  *     if its contained parser succeeds.
  */
-export const optional = p => makeParser(state => {
+export const opt = p => makeParser(state => {
   /* istanbul ignore else */
-  if (ASSERT) assertParser('optional', p)
+  if (ASSERT) assertParser('opt', p)
   const [reply, [next, result]] = dup(p(state))
   return result.status === Fatal ? reply : ok(next, null)
 })
 
 /**
  * Creates a parser that succeeds either with the supplied parser's
- * successful result or else (if that parser fails) the supplied value
- * `x`. This parser only fails if its contained parser fails fatally.
+ * successful result or else (if that parser fails) the supplied default
+ * value `x`. This parser only fails if its contained parser fails
+ * fatally.
  *
- * `fallback(p, x)` is an optimized implementation of `choice([p,
+ * `def(p, x)` is an optimized implementation of `choice([p,
  * constant(x)])`.
  *
  * @param {Parser} p A parser whose result will be the created parser's
@@ -88,9 +89,9 @@ export const optional = p => makeParser(state => {
  * @returns {Parser} A parser which results in either its contained
  *     parser's successful result or the provided value.
  */
-export const fallback = (p, x) => makeParser(state => {
+export const def = (p, x) => makeParser(state => {
   /* istanbul ignore else */
-  if (ASSERT) assertParser('fallback', p, ordinalParser('1st'))
+  if (ASSERT) assertParser('def', p, ordinalParser('1st'))
   const [reply, [next, result]] = dup(p(state))
   return result.status !== Error ? reply : ok(next, x)
 })
@@ -111,9 +112,9 @@ export const fallback = (p, x) => makeParser(state => {
  * @returns {Parser} A parser that cannot fail fatally. If its contained
  *     parser fails fatally, this one will instead fail non-fatally.
  */
-export const backtrack = p => makeParser(state => {
+export const attempt = p => makeParser(state => {
   /* istanbul ignore else */
-  if (ASSERT) assertParser('backtrack', p)
+  if (ASSERT) assertParser('attempt', p)
   const index = state.index
   const [reply, [next, result]] = dup(p(state))
   if (result.status !== Ok) {
