@@ -249,7 +249,7 @@ export function succeeded(reply) {
  * @returns {*} The resulting value from the parse if it was successful,
  *     or `null` if it was not.
  */
-export function result(reply) {
+export function success(reply) {
   return succeeded(reply) ? reply[1].value : null
 }
 

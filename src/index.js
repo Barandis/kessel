@@ -130,9 +130,9 @@ export {
   maybeFatal,
   ok,
   parse,
-  result,
   run,
   succeeded,
+  success,
 } from './core'
 export {
   ErrorType,

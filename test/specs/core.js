@@ -13,7 +13,7 @@ import {
   maybeFatal,
   ok,
   parse,
-  result,
+  success,
   run,
   Status,
   succeeded,
@@ -144,13 +144,13 @@ describe('Core functionality', () => {
     it('evaluates successes', () => {
       const reply = parse(char('a'), 'a')
       expect(succeeded(reply)).to.be.true
-      expect(result(reply)).to.equal('a')
+      expect(success(reply)).to.equal('a')
       expect(failure(reply)).to.be.null
     })
     it('evaluates failures', () => {
       const reply = parse(char('a'), 'b')
       expect(succeeded(reply)).to.be.false
-      expect(result(reply)).to.be.null
+      expect(success(reply)).to.be.null
       expect(failure(reply)).to.equal(
         "Parse error at (line 1, column 1):\n\nb\n^\nExpected 'a'\n\n",
       )
