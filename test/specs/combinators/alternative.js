@@ -7,6 +7,7 @@ import { expect } from 'chai'
 
 import {
   attempt,
+  betweenB,
   blockB,
   bothB,
   chainB,
@@ -21,11 +22,11 @@ import {
   sequenceB,
 } from 'kessel/combinators/alternative'
 import { lookAhead } from 'kessel/combinators/conditional'
-import { sequence } from 'kessel/combinators/sequence'
+import { many, sequence } from 'kessel/combinators/sequence'
 import { parse, Status } from 'kessel/core'
 import { ErrorType } from 'kessel/error'
 import { space } from 'kessel/index'
-import { any, char, digit, eof, letter } from 'kessel/parsers/char'
+import { any, char, digit, eof, letter, noneOf } from 'kessel/parsers/char'
 import { string } from 'kessel/parsers/string'
 import { error, fail, pass } from 'test/helper'
 
@@ -554,6 +555,63 @@ describe('Alternative and error recovery combinators', () => {
         expected: 'a digit',
         index: 0,
         status: Error,
+      })
+    })
+    it('fails fatally if one of its parsers fails fatally', () => {
+      fail(
+        pipeB(letter, sequence(digit, digit), (a, [b1, b2]) => b1 + b2 + a),
+        'a1b',
+        { expected: 'a digit', index: 2, status: Fatal },
+      )
+    })
+  })
+
+  describe('betweenB', () => {
+    const parser = betweenB(char('('), char(')'), many(noneOf(')')))
+
+    it('throws if its first argument is not a parser', () => {
+      error(
+        betweenB(0, any, any),
+        '',
+        '[betweenB]: expected 1st argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a parser', () => {
+      error(
+        betweenB(any, 0, any),
+        '',
+        '[betweenB]: expected 2nd argument to be a parser; found 0',
+      )
+    })
+    it('throws if its third argument is not a parser', () => {
+      error(
+        betweenB(any, any, 0),
+        '',
+        '[betweenB]: expected 3rd argument to be a parser; found 0',
+      )
+    })
+    it('succeeds with the result of its content parser', () => {
+      pass(parser, '(abc)', ['a', 'b', 'c'])
+    })
+    it('fails non-fatally if no content is consumed', () => {
+      fail(parser, 'abc)', {
+        expected: "'('",
+        index: 0,
+        status: Error,
+      })
+    })
+    it('fails non-fatally if input is consumed on a non-fatal failure', () => {
+      fail(parser, '(abc', {
+        expected: "')'",
+        index: 0,
+        status: Error,
+      })
+    })
+    it('fails fatally if one of its parsers fails fatally', () => {
+      fail(betweenB(char('('), char(')'), sequence(letter, letter)), '(a)', {
+        expected: 'a letter',
+        index: 2,
+        status: Fatal,
       })
     })
   })

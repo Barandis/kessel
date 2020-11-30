@@ -530,3 +530,44 @@ export const pipeB = (...ps) => makeParser(state => {
   }
   return ok(next, fn(...values))
 })
+
+/**
+ * Creates a parser which applies its pre, content, and post parsers in
+ * order and results in the result of its content parser.
+ *
+ * Note that the content parser `p` is applied before the after parser
+ * `post`. This means that the content parser will have an opportunity
+ * to patch the "post" content before the post parser does, so take care
+ * that the parsers do not overlap in what they match.
+ *
+ * If any parser fails non-fatally, the `betweenB` parser will backtrack
+ * to where `pre` was applied and fail non-fatally.
+ *
+ * @param {Parser} pre The first parser to apply.
+ * @param {Parser} post The last parser to apply.
+ * @param {Parser} p The second parser to apply and whose result becomes
+ *     the result of the new parser.
+ * @returns {Parser} A parser which applies its parsers in the correct
+ *     order and then results in the result of its content parser.
+ */
+export const betweenB = (pre, post, p) => makeParser(state => {
+  /* istanbul ignore else */
+  if (ASSERT) {
+    assertParser('betweenB', pre, ordinalParser('1st'))
+    assertParser('betweenB', post, ordinalParser('2nd'))
+    assertParser('betweenB', p, ordinalParser('3rd'))
+  }
+  const index = state.index
+
+  const [reply1, [next1, result1]] = dup(pre(state))
+  if (result1.status !== Ok) return reply1
+
+  const [reply2, [next2, result2]] = dup(p(next1))
+  if (result2.status === Fatal) return reply2
+  if (result2.status === Error) return error(next2, result2.errors, index)
+
+  const [reply3, [next3, result3]] = dup(post(next2))
+  if (result3.status === Fatal) return reply3
+  if (result3.status === Error) return error(next3, result3.errors, index)
+  return ok(next3, result2.value)
+})

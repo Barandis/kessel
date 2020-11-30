@@ -57,6 +57,7 @@ export {
 
 export {
   attempt,
+  betweenB,
   blockB,
   bothB,
   chainB,
@@ -66,6 +67,7 @@ export {
   leftB,
   manyTillB,
   opt,
+  pipeB,
   rightB,
   sequenceB,
 } from './combinators/alternative'
