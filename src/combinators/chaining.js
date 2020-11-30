@@ -119,7 +119,13 @@ export const join = p => makeParser(state => {
   /* istanbul ignore else */
   if (ASSERT) assertParser('join', p)
   const [reply, [next, result]] = dup(p(state))
-  return result.status === Ok ? ok(next, result.value.join('')) : reply
+  if (result.status !== Ok) return reply
+
+  const v = result.value
+  if (ASSERT) {
+    assertArray('join', v, formatter('argument to return an array'))
+  }
+  return ok(next, v.join(''))
 })
 
 /**

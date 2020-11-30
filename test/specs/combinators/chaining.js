@@ -107,6 +107,13 @@ describe('Chaining and piping combinators', () => {
     it('throws if its argument is not a parser', () => {
       error(join(0), '', '[join]: expected a parser; found 0')
     })
+    it('throws if its argument does not return an array', () => {
+      error(
+        join(any),
+        'a',
+        '[join]: expected argument to return an array; found "a"',
+      )
+    })
     it('joins array elements together into a resulting string', () => {
       pass(join(many(any)), '123', '123')
       pass(join(map(many(any), x => x.map(c => parseInt(c)))), '123', '123')
