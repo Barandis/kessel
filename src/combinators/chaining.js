@@ -4,6 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import {
+  assertArray,
   assertFunction,
   assertNumber,
   assertParser,
@@ -363,7 +364,13 @@ export const nth = (p, n) => makeParser(state => {
     assertNumber('nth', n, ordinalNumber('2nd'))
   }
   const [reply, [next, result]] = dup(p(state))
-  return result.status === Ok ? ok(next, result.value[n]) : reply
+  if (result.status !== Ok) return reply
+
+  const v = result.value
+  if (ASSERT) {
+    assertArray('nth', v, formatter('1st argument to return an array'))
+  }
+  return ok(next, v[n])
 })
 
 /**
@@ -381,7 +388,13 @@ export const first = p => makeParser(state => {
   /* istanbul ignore else */
   assertParser('first', p)
   const [reply, [next, result]] = dup(p(state))
-  return result.status === Ok ? ok(next, result.value[0]) : reply
+  if (result.status !== Ok) return reply
+
+  const v = result.value
+  if (ASSERT) {
+    assertArray('first', v, formatter('argument to return an array'))
+  }
+  return ok(next, v[0])
 })
 
 /**
@@ -399,7 +412,13 @@ export const second = p => makeParser(state => {
   /* istanbul ignore else */
   assertParser('second', p)
   const [reply, [next, result]] = dup(p(state))
-  return result.status === Ok ? ok(next, result.value[1]) : reply
+  if (result.status !== Ok) return reply
+
+  const v = result.value
+  if (ASSERT) {
+    assertArray('second', v, formatter('argument to return an array'))
+  }
+  return ok(next, v[1])
 })
 
 /**
@@ -417,7 +436,13 @@ export const third = p => makeParser(state => {
   /* istanbul ignore else */
   assertParser('third', p)
   const [reply, [next, result]] = dup(p(state))
-  return result.status === Ok ? ok(next, result.value[2]) : reply
+  if (result.status !== Ok) return reply
+
+  const v = result.value
+  if (ASSERT) {
+    assertArray('third', v, formatter('argument to return an array'))
+  }
+  return ok(next, v[2])
 })
 
 /**
@@ -435,7 +460,13 @@ export const fourth = p => makeParser(state => {
   /* istanbul ignore else */
   assertParser('fourth', p)
   const [reply, [next, result]] = dup(p(state))
-  return result.status === Ok ? ok(next, result.value[3]) : reply
+  if (result.status !== Ok) return reply
+
+  const v = result.value
+  if (ASSERT) {
+    assertArray('fourth', v, formatter('argument to return an array'))
+  }
+  return ok(next, v[3])
 })
 
 /**
@@ -453,5 +484,11 @@ export const fifth = p => makeParser(state => {
   /* istanbul ignore else */
   assertParser('fifth', p)
   const [reply, [next, result]] = dup(p(state))
-  return result.status === Ok ? ok(next, result.value[4]) : reply
+  if (result.status !== Ok) return reply
+
+  const v = result.value
+  if (ASSERT) {
+    assertArray('fifth', v, formatter('argument to return an array'))
+  }
+  return ok(next, v[4])
 })

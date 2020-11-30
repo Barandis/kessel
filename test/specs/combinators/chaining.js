@@ -369,6 +369,13 @@ describe('Chaining and piping combinators', () => {
         '[nth]: expected 2nd argument to be a number; found "1"',
       )
     })
+    it('throws if its first argument does not return an array', () => {
+      error(
+        nth(any, 0),
+        'a',
+        '[nth]: expected 1st argument to return an array; found "a"',
+      )
+    })
     it('extracts the nth element of an array result', () => {
       pass(nth(many(any), 2), '12345', '3')
       pass(nth(sequence(char('"'), any, char('"')), 1), '"a"', 'a')
@@ -380,7 +387,14 @@ describe('Chaining and piping combinators', () => {
 
   describe('first', () => {
     it('throws if its argument is not a parser', () => {
-      error(first(0), '', 'expected a parser; found 0')
+      error(first(0), '', '[first]: expected a parser; found 0')
+    })
+    it('throws if its argument does not return an array', () => {
+      error(
+        first(any),
+        'a',
+        '[first]: expected argument to return an array; found "a"',
+      )
     })
     it('extracts the first element of an array result', () => {
       pass(first(many(any)), '12345', '1')
@@ -392,7 +406,14 @@ describe('Chaining and piping combinators', () => {
 
   describe('second', () => {
     it('throws if its argument is not a parser', () => {
-      error(second(0), '', 'expected a parser; found 0')
+      error(second(0), '', '[second]: expected a parser; found 0')
+    })
+    it('throws if its argument does not return an array', () => {
+      error(
+        second(any),
+        'a',
+        '[second]: expected argument to return an array; found "a"',
+      )
     })
     it('extracts the second element of an array result', () => {
       pass(second(many(any)), '12345', '2')
@@ -404,7 +425,14 @@ describe('Chaining and piping combinators', () => {
 
   describe('third', () => {
     it('throws if its argument is not a parser', () => {
-      error(third(0), '', 'expected a parser; found 0')
+      error(third(0), '', '[third]: expected a parser; found 0')
+    })
+    it('throws if its argument does not return an array', () => {
+      error(
+        third(any),
+        'a',
+        '[third]: expected argument to return an array; found "a"',
+      )
     })
     it('extracts the third element of an array result', () => {
       pass(third(many(any)), '12345', '3')
@@ -416,7 +444,14 @@ describe('Chaining and piping combinators', () => {
 
   describe('fourth', () => {
     it('throws if its argument is not a parser', () => {
-      error(fourth(0), '', 'expected a parser; found 0')
+      error(fourth(0), '', '[fourth]: expected a parser; found 0')
+    })
+    it('throws if its argument does not return an array', () => {
+      error(
+        fourth(any),
+        'a',
+        '[fourth]: expected argument to return an array; found "a"',
+      )
     })
     it('extracts the fourth element of an array result', () => {
       pass(fourth(many(any)), '12345', '4')
@@ -428,7 +463,14 @@ describe('Chaining and piping combinators', () => {
 
   describe('fifth', () => {
     it('throws if its argument is not a parser', () => {
-      error(fifth(0), '', 'expected a parser; found 0')
+      error(fifth(0), '', '[fifth]: expected a parser; found 0')
+    })
+    it('throws if its argument does not return an array', () => {
+      error(
+        fifth(any),
+        'a',
+        '[fifth]: expected argument to return an array; found "a"',
+      )
     })
     it('extracts the fifth element of an array result', () => {
       pass(fifth(many(any)), '12345', '5')

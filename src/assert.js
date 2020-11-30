@@ -12,6 +12,7 @@ export const formatter = type =>
 const charFormatter = formatter('a one-character string')
 const fnFormatter = formatter('a function')
 const strFormatter = formatter('a string')
+const arrFormatter = formatter('an array')
 const strArrFormatter = formatter('a string or an array of characters')
 const strRegFormtter = formatter('a string or a regular expression')
 const numFormatter = formatter('a number')
@@ -40,6 +41,12 @@ export function assertFunction(name, value, formatter = fnFormatter) {
 
 export function assertString(name, value, formatter = strFormatter) {
   if (typeof value !== 'string') {
+    throw new Error(`[${name}]: ${formatter(value)}`)
+  }
+}
+
+export function assertArray(name, value, formatter = arrFormatter) {
+  if (!Array.isArray(value)) {
     throw new Error(`[${name}]: ${formatter(value)}`)
   }
 }
