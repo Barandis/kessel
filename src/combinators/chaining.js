@@ -67,7 +67,7 @@ export const chain = (p, fn) => makeParser(state => {
  * failure of the returned parser.
  *
  * `map(p, fn)` is an optimized implementation of `chain(p, x =>
- * constant(fn(x)))`. This also makes it a more efficient version of
+ * always(fn(x)))`. This also makes it a more efficient version of
  * `pipe([p], fn)` (a single-parser `pipe`).
  *
  * @param {Parser} p The parser to apply to the input.
@@ -101,7 +101,7 @@ export const map = (p, fn) => makeParser(state => {
  * the same state.
  *
  * `join(p)` is an optimized implementation of `chain(p, x =>
- * constant(x.join('')))`.
+ * always(x.join('')))`.
  *
  * If the supplied parser does not result in an array, an exception will
  * be thrown because an attempt will be made to call `join` on the
@@ -127,7 +127,7 @@ export const join = p => makeParser(state => {
  * propagated without modification.
  *
  * `skip(p)` is an optimized implementation of `chain(p, () =>
- * constant(null))`,
+ * always(null))`,
  *
  * @param {Parser} p The parser whose result is to be discarded.
  * @returns {Parser} A parser that will consume input as its contained
@@ -145,7 +145,7 @@ export const skip = p => makeParser(state => {
  * result in the supplied value instead.
  *
  * `value(p, x)` is an optimized implemenation of `chain(p, () =>
- * constant(x))`.
+ * always(x))`.
  *
  * @param {Parser} p The parser to apply. Its result is ignored.
  * @param {*} x The value that the new parser will result in if `p`
@@ -227,7 +227,7 @@ export const right = (p1, p2) => makeParser(state => {
  * be fatal if any input had been consumed by either parser.
  *
  * `both(p1, p2)` is an optimized implementation of `chain(p1, a =>
- * chain(p2, b => constant([a, b])))`.
+ * chain(p2, b => always([a, b])))`.
  *
  * @param {Parser} p1 The first parser to apply.
  * @param {Parser} p2 The second parser to apply.
@@ -256,14 +256,14 @@ export const both = (p1, p2) => makeParser(state => {
  * parsers to apply. The return value of that function becomes the
  * parser's result.
  *
- * Note that, unlike `seq`, `null` parser results are *not* discarded.
- * This ensures that the same number of arguments are passed to `fn` no
- * matter the results from the parsers.
+ * Note that, unlike `sequence`, `null` parser results are *not*
+ * discarded. This ensures that the same number of arguments are passed
+ * to `fn` no matter the results from the parsers.
  *
  * `pipe(p1, p2, fn)` is an optimized implementation of `chain(p1, a =>
- * chain(p2, b => constant(fn(a, b))))`, `pipe(p1, p2, p3, fn)` is an
+ * chain(p2, b => always(fn(a, b))))`, `pipe(p1, p2, p3, fn)` is an
  * optimized implementation of `chain(p1, a => chain(p2, b => chain(p3,
- * c => constant(fn(a, b, c)))))`, and so on.
+ * c => always(fn(a, b, c)))))`, and so on.
  *
  * If the array has one element, the parser becomes equivalent to `map`
  * but less efficient.
@@ -349,7 +349,7 @@ export const between = (pre, post, p) => makeParser(state => {
  * array. If the parser fails, that failure will be passed through.
  *
  * `nth(p, n)` is an optimized implementation of `chain(p, x =>
- * constant(x[n]))`.
+ * always(x[n]))`.
  *
  * @param {Parser} p A parser that results in an array.
  * @param {number} n The 0-based index of the result element to return.
@@ -371,7 +371,7 @@ export const nth = (p, n) => makeParser(state => {
  * parser fails, that failure is passed through.
  *
  * `first(p)` is an optimized implementation of `chain(p, x =>
- * constant(x[0]))`.
+ * always(x[0]))`.
  *
  * @param {Parser} p A parser whose result is an array.
  * @returns {Parser} A parser whose result is the first element of the
@@ -389,7 +389,7 @@ export const first = p => makeParser(state => {
  * the parser fails, that failure is passed through.
  *
  * `second(p)` is an optimized implementation of `chain(p, x =>
- * constant(x[1]))`.
+ * always(x[1]))`.
  *
  * @param {Parser} p A parser whose result is an array.
  * @returns {Parser} A parser whose result is the second element of the
@@ -407,7 +407,7 @@ export const second = p => makeParser(state => {
  * parser fails, that failure is passed through.
  *
  * `third(p)` is an optimized implementation of `chain(p, x =>
- * constant(x[2]))`.
+ * always(x[2]))`.
  *
  * @param {Parser} p A parser whose result is an array.
  * @returns {Parser} A parser whose result is the third element of the
@@ -425,7 +425,7 @@ export const third = p => makeParser(state => {
  * the parser fails, that failure is passed through.
  *
  * `fourth(p)` is an optimized implementation of `chain(p, x =>
- * constant(x[3]))`.
+ * always(x[3]))`.
  *
  * @param {Parser} p A parser whose result is an array.
  * @returns {Parser} A parser whose result is the fourth element of the
@@ -443,7 +443,7 @@ export const fourth = p => makeParser(state => {
  * parser fails, that failure is passed through.
  *
  * `fifth(p)` is an optimized implementation of `chain(p, x =>
- * constant(x[4]))`.
+ * always(x[4]))`.
  *
  * @param {Parser} p A parser whose result is an array.
  * @returns {Parser} A parser whose result is the fifth element of the

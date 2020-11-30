@@ -16,6 +16,7 @@ import {
   leftB,
   manyTillB,
   opt,
+  pipeB,
   rightB,
   sequenceB,
 } from 'kessel/combinators/alternative'
@@ -515,6 +516,45 @@ describe('Alternative and error recovery combinators', () => {
     })
     it('succeeds with its return value if all parsers succeed', () => {
       pass(parser, 'abc d ', { result: 'd', index: 6 })
+    })
+  })
+
+  describe('pipeB', () => {
+    it('throws if its last argument is not a function', () => {
+      error(
+        pipeB(any, any, 0),
+        '',
+        '[pipeB]: expected 3rd argument to be a function; found 0',
+      )
+      error(
+        pipeB(any, any, any, any),
+        '',
+        '[pipeB]: expected 4th argument to be a function; found parser',
+      )
+    })
+    it('passes parser results to a single function', () => {
+      pass(pipeB(letter, a => a.toUpperCase()), 'a', 'A')
+      pass(pipeB(letter, digit, (a, b) => b + a), 'a1', '1a')
+      pass(pipeB(letter, digit, letter, (a, b, c) => c + b + a), 'a1b', 'b1a')
+    })
+    it('fails non-fatally if no input is consumed on failure', () => {
+      fail(pipeB(letter, a => a), '1', {
+        expected: 'a letter',
+        index: 0,
+        status: Error,
+      })
+      fail(pipeB(eof, letter, (a, b) => b + a), '', {
+        expected: 'a letter',
+        index: 0,
+        status: Error,
+      })
+    })
+    it('fails non-fatally if input was consumed on non-fatal failure', () => {
+      fail(pipeB(letter, digit, (a, b) => b + a), 'aa', {
+        expected: 'a digit',
+        index: 0,
+        status: Error,
+      })
     })
   })
 })

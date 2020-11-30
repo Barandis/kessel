@@ -480,3 +480,53 @@ export const blockB = genFn => makeParser(state => {
     i++
   }
 })
+
+/**
+ * Creates a parser that applies its parsers in sequence and passes
+ * those results to a function of the same arity as the number of
+ * parsers to apply. The return value of that function becomes the
+ * parser's result.
+ *
+ * Note that, unlike `sequence`, `null` parser results are *not*
+ * discarded. This ensures that the same number of arguments are passed
+ * to `fn` no matter the results from the parsers.
+ *
+ * If one of the parsers fails non-fatally, the overall parser will
+ * backtrack to where the first parser was applied and fail non-fatally.
+ *
+ * If the array has one element, the parser becomes equivalent to `map`
+ * but less efficient.
+ *
+ * @param {...(Parser|function(...*):*)} ps An array of parsers to be
+ *     applied one at a time, in order, followed by a function which
+ *     will receive as parameters the results of each parser. Its return
+ *     value will become the result of the created parser. A single
+ *     function must be present and it must be the last parameter; all
+ *     other parameters must be parsers.
+ * @returns {Parser} A parser that will apply its parsers in sequence,
+ *     feed the results to its function, and result in the function's
+ *     return value.
+ */
+export const pipeB = (...ps) => makeParser(state => {
+  const fn = ps.pop()
+  /* istanbul ignore else */
+  if (ASSERT) {
+    for (const [i, p] of ps.entries()) {
+      assertParser('pipeB', p, ordinalParser(ordinal(i + 1)))
+    }
+    assertFunction('pipeB', fn, ordinalFunction(ordinal(ps.length + 1)))
+  }
+  const index = state.index
+  const values = []
+  let next = state
+
+  for (const p of ps) {
+    const [reply, [nextState, result]] = dup(p(next))
+    next = nextState
+
+    if (result.status === Fatal) return reply
+    if (result.status === Error) return error(next, result.errors, index)
+    values.push(result.value)
+  }
+  return ok(next, fn(...values))
+})
