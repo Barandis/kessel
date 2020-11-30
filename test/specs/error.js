@@ -561,14 +561,16 @@ describe('Parse errors', () => {
         const exp = 'Parse error at (line 2, column 16):\n\n'
                   + 'Звукоподражание\n'
                   + '               ^\n'
-                  + 'Unexpected end of input\n\n'
+                  + 'Unexpected end of input\n'
+                  + 'Note: failure occurred at the end of input\n\n'
         expect(format(unexpecteds, 84, view, 8, 72)).to.equal(exp)
       })
       it('formats messages in a line 2 message', () => {
         const exp = 'Parse error at (line 2, column 16):\n\n'
                   + 'Звукоподражание\n'
                   + '               ^\n'
-                  + 'Test message\n\n'
+                  + 'Test message\n'
+                  + 'Note: failure occurred at the end of input\n\n'
         expect(format(generics, 84, view, 8, 72)).to.equal(exp)
       })
       it('formats all types of messages in a line 2 message', () => {
@@ -577,7 +579,8 @@ describe('Parse errors', () => {
                   + '               ^\n'
                   + 'Unexpected end of input\n'
                   + 'Expected a letter, a digit, or whitespace\n'
-                  + 'Test message\n\n'
+                  + 'Test message\n'
+                  + 'Note: failure occurred at the end of input\n\n'
         expect(format([
           ...expecteds, ...unexpecteds, ...generics, ...others,
         ], 84, view, 8, 72)).to.equal(exp)
