@@ -25,7 +25,7 @@ export {
   upper,
 } from './parsers/char'
 export {
-  constant,
+  always,
   fail,
   failFatally,
   failUnexpected,

@@ -16,7 +16,7 @@ import { generic, unexpected } from 'kessel/error'
  * @param {*} x The value that be the new parser's result.
  * @returns {Parser} A parser that always succeeds with `value`.
  */
-export const constant = x => makeParser(state => ok(state, x))
+export const always = x => makeParser(state => ok(state, x))
 
 /**
  * Creates a parser that fails without consuming input, setting the

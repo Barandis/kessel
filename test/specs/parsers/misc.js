@@ -5,7 +5,7 @@
 
 import { Status } from 'kessel/core'
 import {
-  constant,
+  always,
   fail as pfail,
   failFatally,
   failUnexpected,
@@ -15,11 +15,11 @@ import { error, fail, pass } from 'test/helper'
 const { Error, Fatal } = Status
 
 describe('Miscellaneous parsers', () => {
-  describe('constant', () => {
+  describe('always', () => {
     it('succeeds with the passed-in value', () => {
-      pass(constant('a'), '', 'a')
-      pass(constant(23), '', { result: 23, index: 0 })
-      pass(constant({ a: 1 }), '', { result: { a: 1 }, index: 0 })
+      pass(always('a'), '', 'a')
+      pass(always(23), '', { result: 23, index: 0 })
+      pass(always({ a: 1 }), '', { result: { a: 1 }, index: 0 })
     })
   })
 
