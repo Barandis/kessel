@@ -30,7 +30,7 @@ const { Ok } = Status
  *     the predicate function.
  */
 const StringParser = (length, fn) => makeParser(state => {
-  if (length === 0) return ok(state, '')
+  if (length < 1) return ok(state, '')
 
   const { index, view } = state
   if (index >= view.byteLength) return error(state)
