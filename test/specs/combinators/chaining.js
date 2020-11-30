@@ -44,6 +44,13 @@ describe('Chaining and piping combinators', () => {
         '[chain]: expected 2nd argument to be a function; found 0',
       )
     })
+    it('throws if its second argument does not return a parser', () => {
+      error(
+        chain(any, x => x),
+        'a',
+        '[chain]: expected the 2nd argument to return a parser; found "a"',
+      )
+    })
     it('passes successful result to function to get the next parser', () => {
       pass(chain(any, c => char(c)), 'aa', { result: 'a', index: 2 })
       fail(chain(any, c => char(c)), 'ab', "'a'")

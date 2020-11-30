@@ -6,7 +6,8 @@
 import { makeParser } from './core'
 import { charLength, stringify } from './util'
 
-const formatter = type => value => `expected ${type}; found ${stringify(value)}`
+export const formatter = type =>
+  value => `expected ${type}; found ${stringify(value)}`
 
 const charFormatter = formatter('a one-character string')
 const fnFormatter = formatter('a function')

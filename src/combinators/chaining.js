@@ -7,6 +7,7 @@ import {
   assertFunction,
   assertNumber,
   assertParser,
+  formatter,
   ordinalFunction,
   ordinalNumber,
   ordinalParser,
@@ -47,7 +48,12 @@ export const chain = (p, fn) => makeParser(state => {
   const [reply1, [next1, result1]] = dup(p(state))
   if (result1.status !== Ok) return reply1
 
-  const [reply2, [next2, result2]] = dup(fn(result1.value)(next1))
+  const p2 = fn(result1.value)
+  if (ASSERT) {
+    assertParser('chain', p2, formatter('the 2nd argument to return a parser'))
+  }
+
+  const [reply2, [next2, result2]] = dup(p2(next1))
   return result2.status === Ok ? reply2
     : maybeFatal(next2.index !== index, next2, result2.errors)
 })
