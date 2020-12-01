@@ -352,11 +352,11 @@ export const bothB = (p1, p2) => makeParser(state => {
  * @returns {Parser} A parser that applies `p` `n` times and results in
  *     an array of all of the successful results of `p`.
  */
-export const countB = (p, n) => makeParser(state => {
+export const repeatB = (p, n) => makeParser(state => {
   /* istanbul ignore else */
   if (ASSERT) {
-    assertParser('countB', p, ordinalParser('1st'))
-    assertNumber('countB', n, ordinalNumber('2nd'))
+    assertParser('repeatB', p, ordinalParser('1st'))
+    assertNumber('repeatB', n, ordinalNumber('2nd'))
   }
   const index = state.index
   const values = []

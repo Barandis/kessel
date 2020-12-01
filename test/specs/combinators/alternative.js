@@ -12,7 +12,7 @@ import {
   bothB,
   chainB,
   choice,
-  countB,
+  repeatB,
   def,
   leftB,
   manyTillB,
@@ -378,42 +378,42 @@ describe('Alternative and error recovery combinators', () => {
     })
   })
 
-  describe('countB', () => {
+  describe('repeatB', () => {
     it('throws if its first argument is not a parser', () => {
       error(
-        countB(0, 5),
+        repeatB(0, 5),
         '',
-        '[countB]: expected 1st argument to be a parser; found 0',
+        '[repeatB]: expected 1st argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a number', () => {
       error(
-        countB(any, '3'),
+        repeatB(any, '3'),
         '',
-        '[countB]: expected 2nd argument to be a number; found "3"',
+        '[repeatB]: expected 2nd argument to be a number; found "3"',
       )
     })
     it('applies one parser a number of times', () => {
-      pass(countB(letter, 5), 'abcdef', ['a', 'b', 'c', 'd', 'e'])
-      pass(countB(letter, 2), 'abcdef', ['a', 'b'])
-      pass(countB(letter, 0), 'abcdef', [])
+      pass(repeatB(letter, 5), 'abcdef', ['a', 'b', 'c', 'd', 'e'])
+      pass(repeatB(letter, 2), 'abcdef', ['a', 'b'])
+      pass(repeatB(letter, 0), 'abcdef', [])
     })
     it('fails non-fatally if no input was consumed', () => {
-      fail(countB(letter, 5), '12345', {
+      fail(repeatB(letter, 5), '12345', {
         expected: 'a letter',
         index: 0,
         status: Error,
       })
     })
     it('fails fatally if the parser fails fatally', () => {
-      fail(countB(sequence(letter, letter), 5), 'a1b2c3d4e5', {
+      fail(repeatB(sequence(letter, letter), 5), 'a1b2c3d4e5', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
     })
     it('fails non-fatally on non-fatal errors if input was consumed', () => {
-      const [state, result] = parse(countB(letter, 5), 'abc123')
+      const [state, result] = parse(repeatB(letter, 5), 'abc123')
       const err = result.errors[0]
 
       expect(state.index).to.equal(0)

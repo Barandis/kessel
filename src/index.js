@@ -62,12 +62,12 @@ export {
   bothB,
   chainB,
   choice,
-  countB,
   def,
   leftB,
   manyTillB,
   opt,
   pipeB,
+  repeatB,
   rightB,
   sequenceB,
 } from './combinators/alternative'
