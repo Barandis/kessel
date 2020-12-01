@@ -71,7 +71,7 @@ export const opt = p => makeParser(state => {
   /* istanbul ignore else */
   if (ASSERT) assertParser('opt', p)
   const [reply, [next, result]] = dup(p(state))
-  return result.status === Fatal ? reply : ok(next, null)
+  return result.status !== Error ? reply : ok(next, null)
 })
 
 /**

@@ -67,8 +67,8 @@ describe('Alternative and error recovery combinators', () => {
     it('throws if its argument is not a parser', () => {
       error(opt(0), '', '[opt]: expected a parser; found 0')
     })
-    it('consumes input without a result on success', () => {
-      pass(opt(char('a')), 'abc', { result: null, index: 1 })
+    it('consumes input and provides a result on success', () => {
+      pass(opt(char('a')), 'abc', { result: 'a', index: 1 })
     })
     it('succeeds without consuming if its parser fails', () => {
       pass(opt(char('a')), 'bcd', { result: null, index: 0 })
