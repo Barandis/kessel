@@ -133,6 +133,7 @@ export {
   ok,
   parse,
   run,
+  status,
   succeeded,
   success,
 } from './core'

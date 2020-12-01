@@ -225,6 +225,17 @@ export function parse(parser, input) {
 }
 
 /**
+ * Returns the status of the given reply.
+ *
+ * @param {[State, Result]} reply The state/result value returned by
+ *     `parse`.
+ * @returns {Status} The status of the given reply.
+ */
+export function status(reply) {
+  return reply[1].status
+}
+
+/**
  * Determines whether an invocation of `parse` was successful.
  *
  * @param {[State, Result]} reply The state/result value returned by

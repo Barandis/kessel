@@ -13,10 +13,11 @@ import {
   maybeFatal,
   ok,
   parse,
-  success,
   run,
   Status,
+  status,
   succeeded,
+  success,
 } from 'kessel/core'
 import { ErrorType, merge, unexpected } from 'kessel/error'
 import { char } from 'kessel/parsers/char'
@@ -144,12 +145,14 @@ describe('Core functionality', () => {
     it('evaluates successes', () => {
       const reply = parse(char('a'), 'a')
       expect(succeeded(reply)).to.be.true
+      expect(status(reply)).to.equal(Status.Ok)
       expect(success(reply)).to.equal('a')
       expect(failure(reply)).to.be.null
     })
     it('evaluates failures', () => {
       const reply = parse(char('a'), 'b')
       expect(succeeded(reply)).to.be.false
+      expect(status(reply)).to.equal(Status.Error)
       expect(success(reply)).to.be.null
       expect(failure(reply)).to.equal(
         "Parse error at (line 1, column 1):\n\nb\n^\nExpected 'a'\n\n",
