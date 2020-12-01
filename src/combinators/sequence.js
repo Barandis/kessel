@@ -463,11 +463,11 @@ export const sepEndBy1 = (p, sep) => makeParser(state => {
  * @returns {Parser} A parser that applies `p` `n` times and results in
  *     an array of all of the successful results of `p`.
  */
-export const count = (p, n) => makeParser(state => {
+export const repeat = (p, n) => makeParser(state => {
   /* istanbul ignore else */
   if (ASSERT) {
-    assertParser('count', p, ordinalParser('1st'))
-    assertNumber('count', n, ordinalNumber('2nd'))
+    assertParser('repeat', p, ordinalParser('1st'))
+    assertNumber('repeat', n, ordinalNumber('2nd'))
   }
   const index = state.index
   const values = []

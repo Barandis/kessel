@@ -11,10 +11,10 @@ import {
   assocr,
   assocr1,
   block,
-  count,
   many,
   many1,
   manyTill,
+  repeat,
   sepBy,
   sepBy1,
   sepEndBy,
@@ -484,42 +484,42 @@ describe('Sequence combinators', () => {
     })
   })
 
-  describe('count', () => {
+  describe('repeat', () => {
     it('throws if its first argument is not a parser', () => {
       error(
-        count(0, 5),
+        repeat(0, 5),
         '',
-        '[count]: expected 1st argument to be a parser; found 0',
+        '[repeat]: expected 1st argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a number', () => {
       error(
-        count(any, '3'),
+        repeat(any, '3'),
         '',
-        '[count]: expected 2nd argument to be a number; found "3"',
+        '[repeat]: expected 2nd argument to be a number; found "3"',
       )
     })
     it('applies one parser a number of times', () => {
-      pass(count(letter, 5), 'abcdef', ['a', 'b', 'c', 'd', 'e'])
-      pass(count(letter, 2), 'abcdef', ['a', 'b'])
-      pass(count(letter, 0), 'abcdef', [])
+      pass(repeat(letter, 5), 'abcdef', ['a', 'b', 'c', 'd', 'e'])
+      pass(repeat(letter, 2), 'abcdef', ['a', 'b'])
+      pass(repeat(letter, 0), 'abcdef', [])
     })
     it('fails non-fatally if no input was consumed', () => {
-      fail(count(letter, 5), '12345', {
+      fail(repeat(letter, 5), '12345', {
         expected: 'a letter',
         index: 0,
         status: Error,
       })
     })
     it('fails fatally if the parser fails fatally', () => {
-      fail(count(sequence(letter, letter), 5), 'a1b2c3d4e5', {
+      fail(repeat(sequence(letter, letter), 5), 'a1b2c3d4e5', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
     })
     it('fails fatally on non-fatal errors if input was consumed', () => {
-      fail(count(letter, 5), 'abc123', {
+      fail(repeat(letter, 5), 'abc123', {
         expected: 'a letter',
         index: 3,
         status: Fatal,
