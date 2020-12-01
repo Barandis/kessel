@@ -604,6 +604,13 @@ describe('Sequence combinators', () => {
         '[assocl]: expected 2nd argument to be a parser; found 0',
       )
     })
+    it('throws if its second argument does not return a function', () => {
+      error(
+        assocl(any, any, 0),
+        'abc',
+        '[assocl]: expected 1st op parser to return a function; found "b"',
+      )
+    })
     it('succeeds with a default value if there are no matches', () => {
       pass(assocl(p, op, 0), '', { result: 0, index: 0 })
     })
@@ -659,6 +666,13 @@ describe('Sequence combinators', () => {
         assocl1(any, 0),
         '',
         '[assocl1]: expected 2nd argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument does not return a function', () => {
+      error(
+        assocl1(any, any),
+        'abc',
+        '[assocl1]: expected 1st op parser to return a function; found "b"',
       )
     })
     it('fails if there are no matches', () => {
@@ -722,6 +736,13 @@ describe('Sequence combinators', () => {
         '[assocr]: expected 2nd argument to be a parser; found 0',
       )
     })
+    it('throws if its second argument does not return a function', () => {
+      error(
+        assocr(any, any, 0),
+        'abc',
+        '[assocr]: expected 1st op parser to return a function; found "b"',
+      )
+    })
     it('succeeds with a default value if there are no matches', () => {
       pass(assocr(p, op, 0), '', { result: 0, index: 0 })
     })
@@ -778,6 +799,13 @@ describe('Sequence combinators', () => {
         assocr1(any, 0),
         '',
         '[assocr1]: expected 2nd argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument does not return a function', () => {
+      error(
+        assocr1(any, any),
+        'abc',
+        '[assocr1]: expected 1st op parser to return a function; found "b"',
       )
     })
     it('fails if there are no matches', () => {

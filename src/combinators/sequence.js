@@ -4,6 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import {
+  assertFunction,
   assertGeneratorFunction,
   assertNumber,
   assertParser,
@@ -536,6 +537,12 @@ export const manyTill = (p, end) => makeParser(state => {
   return ok(next, values)
 })
 
+function opFormatter(ord) {
+  return value => `expected ${ord} op parser to return a function; found ${
+    stringify(value)
+  }`
+}
+
 /**
  * Creates a parser that parses zero or more applications of `p`
  * separated by `op`. It results in the value obtained by left
@@ -573,6 +580,7 @@ export const assocl = (p, op, x) => makeParser(state => {
   const ops = []
   let next = nextState
   let index = next.index
+  let i = 0
 
   while (true) {
     const [replyop, [nextop, resultop]] = dup(op(next))
@@ -585,9 +593,13 @@ export const assocl = (p, op, x) => makeParser(state => {
     if (resultp.status === Fatal) return replyp
     if (resultp.status === Error) break
 
+    if (ASSERT) {
+      assertFunction('assocl', resultop.value, opFormatter(ordinal(i + 1)))
+    }
     ops.push(resultop.value)
     values.push(resultp.value)
     index = next.index
+    i++
   }
 
   let value = values[0]
@@ -632,6 +644,7 @@ export const assocl1 = (p, op) => makeParser(state => {
   const ops = []
   let next = nextState
   let index = next.index
+  let i = 0
 
   while (true) {
     const [replyop, [nextop, resultop]] = dup(op(next))
@@ -644,9 +657,13 @@ export const assocl1 = (p, op) => makeParser(state => {
     if (resultp.status === Fatal) return replyp
     if (resultp.status === Error) break
 
+    if (ASSERT) {
+      assertFunction('assocl1', resultop.value, opFormatter(ordinal(i + 1)))
+    }
     ops.push(resultop.value)
     values.push(resultp.value)
     index = next.index
+    i++
   }
 
   let value = values[0]
@@ -693,6 +710,7 @@ export const assocr = (p, op, x) => makeParser(state => {
   const ops = []
   let next = nextState
   let index = next.index
+  let i = 0
 
   while (true) {
     const [replyop, [nextop, resultop]] = dup(op(next))
@@ -705,9 +723,13 @@ export const assocr = (p, op, x) => makeParser(state => {
     if (resultp.status === Fatal) return replyp
     if (resultp.status === Error) break
 
+    if (ASSERT) {
+      assertFunction('assocr', resultop.value, opFormatter(ordinal(i + 1)))
+    }
     ops.push(resultop.value)
     values.push(resultp.value)
     index = next.index
+    i++
   }
 
   let value = values[values.length - 1]
@@ -752,6 +774,7 @@ export const assocr1 = (p, op) => makeParser(state => {
   const ops = []
   let next = nextState
   let index = next.index
+  let i = 0
 
   while (true) {
     const [replyop, [nextop, resultop]] = dup(op(next))
@@ -764,9 +787,13 @@ export const assocr1 = (p, op) => makeParser(state => {
     if (resultp.status === Fatal) return replyp
     if (resultp.status === Error) break
 
+    if (ASSERT) {
+      assertFunction('assocr1', resultop.value, opFormatter(ordinal(i + 1)))
+    }
     ops.push(resultop.value)
     values.push(resultp.value)
     index = next.index
+    i++
   }
 
   let value = values[values.length - 1]
