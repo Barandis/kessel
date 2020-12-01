@@ -4,6 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import {
+  assertGeneratorFunction,
   assertNumber,
   assertParser,
   ordinalNumber,
@@ -84,6 +85,7 @@ export const sequence = (...ps) => makeParser(state => {
  *     succeed) in the return value of the generator.
  */
 export const block = genFn => makeParser(state => {
+  if (ASSERT) assertGeneratorFunction('block', genFn)
   const gen = genFn()
   const index = state.index
   let nextValue

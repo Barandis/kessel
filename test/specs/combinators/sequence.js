@@ -70,6 +70,14 @@ describe('Sequence combinators', () => {
       return c
     })
 
+    it('throws if its argument is not a generator function', () => {
+      error(block(0), '', '[block]: expected a generator function; found 0')
+      error(
+        block(() => {}),
+        '',
+        '[block]: expected a generator function; found function',
+      )
+    })
     it('throws if it yields something other than a parser', () => {
       error(
         block(function *() { yield any; yield 0; return 0 }),

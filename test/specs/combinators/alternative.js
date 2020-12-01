@@ -485,6 +485,14 @@ describe('Alternative and error recovery combinators', () => {
       return c
     })
 
+    it('throws if its argument is not a generator function', () => {
+      error(blockB(0), '', '[blockB]: expected a generator function; found 0')
+      error(
+        blockB(() => {}),
+        '',
+        '[blockB]: expected a generator function; found function',
+      )
+    })
     it('throws if it yields something other than a parser', () => {
       error(
         blockB(function *() { yield any; yield 0; return 0 }),

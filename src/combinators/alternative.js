@@ -5,6 +5,7 @@
 
 import {
   assertFunction,
+  assertGeneratorFunction,
   assertNumber,
   assertParser,
   ordinalFunction,
@@ -455,6 +456,7 @@ export const manyTillB = (p, end) => makeParser(state => {
  *     succeed) in the return value of the generator.
  */
 export const blockB = genFn => makeParser(state => {
+  if (ASSERT) assertGeneratorFunction('blockB', genFn)
   const gen = genFn()
   const index = state.index
   let nextValue
