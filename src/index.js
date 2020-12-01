@@ -21,7 +21,7 @@ export {
   octal,
   range,
   satisfy,
-  satisfyL,
+  satisfyM,
   upper,
 } from './parsers/char'
 export {
@@ -91,21 +91,22 @@ export {
 } from './combinators/chaining'
 export {
   followedBy,
-  followedByL,
+  followedByM,
   lookAhead,
   notEmpty,
+  notEmptyM,
   notFollowedBy,
-  notFollowedByL,
+  notFollowedByM,
 } from './combinators/conditional'
 export {
   backLabel,
   label,
 } from './combinators/message'
 export {
-  assocl,
-  assocl1,
-  assocr,
-  assocr1,
+  assoc1L,
+  assoc1R,
+  assocL,
+  assocR,
   block,
   many,
   many1,

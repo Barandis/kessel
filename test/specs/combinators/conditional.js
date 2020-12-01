@@ -5,12 +5,12 @@
 
 import {
   followedBy,
-  followedByL,
+  followedByM,
   lookAhead,
   notEmpty,
-  notEmptyL,
+  notEmptyM,
   notFollowedBy,
-  notFollowedByL,
+  notFollowedByM,
 } from 'kessel/combinators/conditional'
 import { many, sequence } from 'kessel/combinators/sequence'
 import { Status } from 'kessel/core'
@@ -63,38 +63,38 @@ describe('Conditional and look-ahead combinators', () => {
     })
   })
 
-  describe('notEmptyL', () => {
+  describe('notEmptyM', () => {
     it('throws if its first argument is not a parser', () => {
       error(
-        notEmptyL(0, 'test'),
+        notEmptyM(0, 'test'),
         '',
-        '[notEmptyL]: expected 1st argument to be a parser; found 0',
+        '[notEmptyM]: expected 1st argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a string', () => {
       error(
-        notEmptyL(many(letter), 0),
+        notEmptyM(many(letter), 0),
         '',
-        '[notEmptyL]: expected 2nd argument to be a string; found 0',
+        '[notEmptyM]: expected 2nd argument to be a string; found 0',
       )
     })
     it('fails if its parser succeeds without consuming input', () => {
-      fail(notEmptyL(many(letter), 'a letter'), '123', {
+      fail(notEmptyM(many(letter), 'a letter'), '123', {
         expected: 'a letter',
         index: 0,
         status: Error,
       })
     })
     it('succeeds if its parser succeeds and consumed input', () => {
-      pass(notEmptyL(many(letter), 'a letter'), 'abc', ['a', 'b', 'c'])
+      pass(notEmptyM(many(letter), 'a letter'), 'abc', ['a', 'b', 'c'])
     })
     it('fails if its parser fails', () => {
-      fail(notEmptyL(letter, 'at least one letter'), '123', {
+      fail(notEmptyM(letter, 'at least one letter'), '123', {
         expected: 'a letter',
         index: 0,
         status: Error,
       })
-      fail(notEmptyL(sequence(letter, letter), 'a1 or something'), 'a1', {
+      fail(notEmptyM(sequence(letter, letter), 'a1 or something'), 'a1', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
@@ -118,31 +118,31 @@ describe('Conditional and look-ahead combinators', () => {
     })
   })
 
-  describe('followedByL', () => {
+  describe('followedByM', () => {
     it('throws if its first argument is not a parser', () => {
       error(
-        followedByL(0, 'test'),
+        followedByM(0, 'test'),
         '',
-        '[followedByL]: expected 1st argument to be a parser; found 0',
+        '[followedByM]: expected 1st argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a string', () => {
       error(
-        followedByL(many(letter), 0),
+        followedByM(many(letter), 0),
         '',
-        '[followedByL]: expected 2nd argument to be a string; found 0',
+        '[followedByM]: expected 2nd argument to be a string; found 0',
       )
     })
     it('succeeds without changing state if its parser succeeds', () => {
-      pass(followedByL(letter, 'test'), 'abc', { result: null, index: 0 })
+      pass(followedByM(letter, 'test'), 'abc', { result: null, index: 0 })
     })
     it('fails without changing state if its parser fails', () => {
-      fail(followedByL(letter, 'one single letter'), '123', {
+      fail(followedByM(letter, 'one single letter'), '123', {
         expected: 'one single letter',
         index: 0,
         status: Error,
       })
-      fail(followedByL(
+      fail(followedByM(
         sequence(letter, digit), 'a letter, then a digit',
       ), 'abc', {
         expected: 'a letter, then a digit',
@@ -167,31 +167,31 @@ describe('Conditional and look-ahead combinators', () => {
     })
   })
 
-  describe('notFollowedByL', () => {
+  describe('notFollowedByM', () => {
     it('throws if its first argument is not a parser', () => {
       error(
-        notFollowedByL(0, 'test'),
+        notFollowedByM(0, 'test'),
         '',
-        '[notFollowedByL]: expected 1st argument to be a parser; found 0',
+        '[notFollowedByM]: expected 1st argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a string', () => {
       error(
-        notFollowedByL(many(letter), 0),
+        notFollowedByM(many(letter), 0),
         '',
-        '[notFollowedByL]: expected 2nd argument to be a string; found 0',
+        '[notFollowedByM]: expected 2nd argument to be a string; found 0',
       )
     })
     it('fails without changing state if its parser succeeds', () => {
-      fail(notFollowedByL(letter, 'something other than a letter'), 'abc', {
+      fail(notFollowedByM(letter, 'something other than a letter'), 'abc', {
         expected: 'something other than a letter',
         index: 0,
         status: Error,
       })
     })
     it('succeeds without changing state if its parser fails', () => {
-      pass(notFollowedByL(letter, 'test'), '123', { result: null, index: 0 })
-      pass(notFollowedByL(sequence(letter, digit), 'test'), 'abc', {
+      pass(notFollowedByM(letter, 'test'), '123', { result: null, index: 0 })
+      pass(notFollowedByM(sequence(letter, digit), 'test'), 'abc', {
         result: null, index: 0,
       })
     })

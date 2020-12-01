@@ -566,11 +566,11 @@ function opFormatter(ord) {
  *     applying the functions from `op` left associtively to the values
  *     that result from `p`.
  */
-export const assocl = (p, op, x) => makeParser(state => {
+export const assocL = (p, op, x) => makeParser(state => {
   /* istanbul ignore else */
   if (ASSERT) {
-    assertParser('assocl', p, ordinalParser('1st'))
-    assertParser('assocl', op, ordinalParser('2nd'))
+    assertParser('assocL', p, ordinalParser('1st'))
+    assertParser('assocL', op, ordinalParser('2nd'))
   }
   const [reply, [nextState, result]] = dup(p(state))
   if (result.status === Fatal) return reply
@@ -594,7 +594,7 @@ export const assocl = (p, op, x) => makeParser(state => {
     if (resultp.status === Error) break
 
     if (ASSERT) {
-      assertFunction('assocl', resultop.value, opFormatter(ordinal(i + 1)))
+      assertFunction('assocL', resultop.value, opFormatter(ordinal(i + 1)))
     }
     ops.push(resultop.value)
     values.push(resultp.value)
@@ -631,11 +631,11 @@ export const assocl = (p, op, x) => makeParser(state => {
  *     applying the functions from `op` left associtively to the values
  *     that result from `p`.
  */
-export const assocl1 = (p, op) => makeParser(state => {
+export const assoc1L = (p, op) => makeParser(state => {
   /* istanbul ignore else */
   if (ASSERT) {
-    assertParser('assocl1', p, ordinalParser('1st'))
-    assertParser('assocl1', op, ordinalParser('2nd'))
+    assertParser('assoc1L', p, ordinalParser('1st'))
+    assertParser('assoc1L', op, ordinalParser('2nd'))
   }
   const [reply, [nextState, result]] = dup(p(state))
   if (result.status !== Ok) return reply
@@ -658,7 +658,7 @@ export const assocl1 = (p, op) => makeParser(state => {
     if (resultp.status === Error) break
 
     if (ASSERT) {
-      assertFunction('assocl1', resultop.value, opFormatter(ordinal(i + 1)))
+      assertFunction('assoc1L', resultop.value, opFormatter(ordinal(i + 1)))
     }
     ops.push(resultop.value)
     values.push(resultp.value)
@@ -696,11 +696,11 @@ export const assocl1 = (p, op) => makeParser(state => {
  *     applying the functions from `op` right associtively to the values
  *     that result from `p`.
  */
-export const assocr = (p, op, x) => makeParser(state => {
+export const assocR = (p, op, x) => makeParser(state => {
   /* istanbul ignore else */
   if (ASSERT) {
-    assertParser('assocr', p, ordinalParser('1st'))
-    assertParser('assocr', op, ordinalParser('2nd'))
+    assertParser('assocR', p, ordinalParser('1st'))
+    assertParser('assocR', op, ordinalParser('2nd'))
   }
   const [reply, [nextState, result]] = dup(p(state))
   if (result.status === Fatal) return reply
@@ -724,7 +724,7 @@ export const assocr = (p, op, x) => makeParser(state => {
     if (resultp.status === Error) break
 
     if (ASSERT) {
-      assertFunction('assocr', resultop.value, opFormatter(ordinal(i + 1)))
+      assertFunction('assocR', resultop.value, opFormatter(ordinal(i + 1)))
     }
     ops.push(resultop.value)
     values.push(resultp.value)
@@ -761,11 +761,11 @@ export const assocr = (p, op, x) => makeParser(state => {
  *     applying the functions from `op` right associtively to the values
  *     that result from `p`.
  */
-export const assocr1 = (p, op) => makeParser(state => {
+export const assoc1R = (p, op) => makeParser(state => {
   /* istanbul ignore else */
   if (ASSERT) {
-    assertParser('assocr1', p, ordinalParser('1st'))
-    assertParser('assocr1', op, ordinalParser('2nd'))
+    assertParser('assoc1R', p, ordinalParser('1st'))
+    assertParser('assoc1R', op, ordinalParser('2nd'))
   }
   const [reply, [nextState, result]] = dup(p(state))
   if (result.status !== Ok) return reply
@@ -788,7 +788,7 @@ export const assocr1 = (p, op) => makeParser(state => {
     if (resultp.status === Error) break
 
     if (ASSERT) {
-      assertFunction('assocr1', resultop.value, opFormatter(ordinal(i + 1)))
+      assertFunction('assoc1R', resultop.value, opFormatter(ordinal(i + 1)))
     }
     ops.push(resultop.value)
     values.push(resultp.value)

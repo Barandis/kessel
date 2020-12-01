@@ -74,7 +74,7 @@ export const notEmpty = p => makeParser(state => {
  * at least once. For instance, one could implement `many1(p)` with
  * `notEmpty(many(p))`.
  *
- * `notEmptyL(p, msg)` is an optimized implementation of
+ * `notEmptyM(p, msg)` is an optimized implementation of
  * `label(notEmpty(p), msg)`.
  *
  * @param {Parser} p The parser to apply.
@@ -83,11 +83,11 @@ export const notEmpty = p => makeParser(state => {
  * @returns {Parser} A parser which fails if `p` passes but doesn't
  *     consume any input, or otherwise passes the result through.
  */
-export const notEmptyL = (p, msg) => makeParser(state => {
+export const notEmptyM = (p, msg) => makeParser(state => {
   /* istanbul ignore else */
   if (ASSERT) {
-    assertParser('notEmptyL', p, ordinalParser('1st'))
-    assertString('notEmptyL', msg, ordinalString('2nd'))
+    assertParser('notEmptyM', p, ordinalParser('1st'))
+    assertString('notEmptyM', msg, ordinalString('2nd'))
   }
   const index = state.index
   const [reply, [next, result]] = dup(p(state))
@@ -123,7 +123,7 @@ export const followedBy = p => makeParser(state => {
  * `followedBy(p)` fails non-fatally, replacing any "expected" error
  * message with `msg` and removing any "unexpected" error message.
  *
- * `followedByL(p, msg)` is an optimized implementation of
+ * `followedByM(p, msg)` is an optimized implementation of
  * `label(followedBy(p), msg)`.
  *
  * @param {Parser} p The parser to apply.
@@ -131,11 +131,11 @@ export const followedBy = p => makeParser(state => {
  * @returns {Parser} A parser that applies `p` but does not change the
  *     parser state, whether or not `p` succeeds.
  */
-export const followedByL = (p, msg) => makeParser(state => {
+export const followedByM = (p, msg) => makeParser(state => {
   /* istanbul ignore else */
   if (ASSERT) {
-    assertParser('followedByL', p, ordinalParser('1st'))
-    assertString('followedByL', msg, ordinalString('2nd'))
+    assertParser('followedByM', p, ordinalParser('1st'))
+    assertString('followedByM', msg, ordinalString('2nd'))
   }
   const index = state.index
   const [next, result] = p(state)
@@ -172,7 +172,7 @@ export const notFollowedBy = p => makeParser(state => {
  * `notFollowedBy(p)` fails non-fatally, replacing any "expected" error
  * message with `msg` and removing any "unexpected" error message.
  *
- * `notFollowedByL(p, msg)` is an optimized implementation of
+ * `notFollowedByM(p, msg)` is an optimized implementation of
  * `label(notFollowedBy(p), msg)`.
  *
  * @param {Parser} p The parser to apply.
@@ -181,11 +181,11 @@ export const notFollowedBy = p => makeParser(state => {
  * @returns {Parser} A parser that applies `p` but does not change the
  *     parser state, whether or not `p` succeeds.
  */
-export const notFollowedByL = (p, msg) => makeParser(state => {
+export const notFollowedByM = (p, msg) => makeParser(state => {
   /* istanbul ignore else */
   if (ASSERT) {
-    assertParser('notFollowedByL', p, ordinalParser('1st'))
-    assertString('notFollowedByL', msg, ordinalString('2nd'))
+    assertParser('notFollowedByM', p, ordinalParser('1st'))
+    assertString('notFollowedByM', msg, ordinalString('2nd'))
   }
   const index = state.index
   const [next, result] = p(state)

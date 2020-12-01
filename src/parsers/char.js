@@ -115,7 +115,7 @@ export const satisfy = fn => makeParser(state => {
  * `false`, this parser fails and consumes no input and signals an error
  * with the provided message.
  *
- * `satisfyL(fn, message)` is an optimized implementation of
+ * `satisfyM(fn, message)` is an optimized implementation of
  * `label(satisfy(fn), message)`.
  *
  * @param {function(string):boolean} fn A function to which the next
@@ -125,11 +125,11 @@ export const satisfy = fn => makeParser(state => {
  * @returns {Parser} A parser that reads a character and executes `fn`
  *     on it when applied to input.
  */
-export const satisfyL = (fn, message) => makeParser(state => {
+export const satisfyM = (fn, message) => makeParser(state => {
   /* istanbul ignore else */
   if (ASSERT) {
-    assertFunction('satisfyL', fn, ordinalFunction('1st'))
-    assertString('satisfyL', message, ordinalString('2nd'))
+    assertFunction('satisfyM', fn, ordinalFunction('1st'))
+    assertString('satisfyM', message, ordinalString('2nd'))
   }
   const [reply, [next, result]] = dup(CharParser(fn)(state))
   return result.status === Ok ? reply : error(next, expected(message))

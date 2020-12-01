@@ -6,10 +6,10 @@
 import { choice } from 'kessel/combinators/alternative'
 import { join, map, skip, value } from 'kessel/combinators/chaining'
 import {
-  assocl,
-  assocl1,
-  assocr,
-  assocr1,
+  assocL,
+  assoc1L,
+  assocR,
+  assoc1R,
   block,
   many,
   many1,
@@ -583,7 +583,7 @@ describe('Sequence combinators', () => {
     })
   })
 
-  describe('assocl', () => {
+  describe('assocL', () => {
     const p = map(join(many1(digit)), x => parseInt(x))
     const op = choice(
       value(char('+'), (a, b) => a + b),
@@ -592,54 +592,54 @@ describe('Sequence combinators', () => {
 
     it('throws if its first argument is not a parser', () => {
       error(
-        assocl(0, any),
+        assocL(0, any),
         '',
-        '[assocl]: expected 1st argument to be a parser; found 0',
+        '[assocL]: expected 1st argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       error(
-        assocl(any, 0),
+        assocL(any, 0),
         '',
-        '[assocl]: expected 2nd argument to be a parser; found 0',
+        '[assocL]: expected 2nd argument to be a parser; found 0',
       )
     })
     it('throws if its second argument does not return a function', () => {
       error(
-        assocl(any, any, 0),
+        assocL(any, any, 0),
         'abc',
-        '[assocl]: expected 1st op parser to return a function; found "b"',
+        '[assocL]: expected 1st op parser to return a function; found "b"',
       )
     })
     it('succeeds with a default value if there are no matches', () => {
-      pass(assocl(p, op, 0), '', { result: 0, index: 0 })
+      pass(assocL(p, op, 0), '', { result: 0, index: 0 })
     })
     it('succeeds with the first match if op never matches', () => {
-      pass(assocl(p, op, 0), '23', { result: 23, index: 2 })
+      pass(assocL(p, op, 0), '23', { result: 23, index: 2 })
     })
     it('succeeds with one match of op', () => {
-      pass(assocl(p, op, 0), '23+17', { result: 40, index: 5 })
-      pass(assocl(p, op, 0), '23-17', { result: 6, index: 5 })
+      pass(assocL(p, op, 0), '23+17', { result: 40, index: 5 })
+      pass(assocL(p, op, 0), '23-17', { result: 6, index: 5 })
     })
     it('succeeds left-associatively with more than one match of op', () => {
-      pass(assocl(p, op, 0), '23+17-42', { result: -2, index: 8 })
-      pass(assocl(p, op, 0), '23-17+42', { result: 48, index: 8 })
+      pass(assocL(p, op, 0), '23+17-42', { result: -2, index: 8 })
+      pass(assocL(p, op, 0), '23-17+42', { result: 48, index: 8 })
     })
     it('ignores the last op if there is no p match after', () => {
-      pass(assocl(p, op, 0), '23+17-', { result: 40, index: 5 })
+      pass(assocL(p, op, 0), '23+17-', { result: 40, index: 5 })
     })
     it('fails fatally if either parser fails fatally', () => {
-      fail(assocl(sequence(digit, digit), op, 0), '1a', {
+      fail(assocL(sequence(digit, digit), op, 0), '1a', {
         expected: 'a digit',
         index: 1,
         status: Fatal,
       })
-      fail(assocl(sequence(digit, digit), op, 0), '12+1a', {
+      fail(assocL(sequence(digit, digit), op, 0), '12+1a', {
         expected: 'a digit',
         index: 4,
         status: Fatal,
       })
-      fail(assocl(p, sequence(letter, letter), 0), '23a1', {
+      fail(assocL(p, sequence(letter, letter), 0), '23a1', {
         expected: 'a letter',
         index: 3,
         status: Fatal,
@@ -647,7 +647,7 @@ describe('Sequence combinators', () => {
     })
   })
 
-  describe('assocl1', () => {
+  describe('assoc1L', () => {
     const p = map(join(many1(digit)), x => parseInt(x))
     const op = choice(
       value(char('+'), (a, b) => a + b),
@@ -656,58 +656,58 @@ describe('Sequence combinators', () => {
 
     it('throws if its first argument is not a parser', () => {
       error(
-        assocl1(0, any),
+        assoc1L(0, any),
         '',
-        '[assocl1]: expected 1st argument to be a parser; found 0',
+        '[assoc1L]: expected 1st argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       error(
-        assocl1(any, 0),
+        assoc1L(any, 0),
         '',
-        '[assocl1]: expected 2nd argument to be a parser; found 0',
+        '[assoc1L]: expected 2nd argument to be a parser; found 0',
       )
     })
     it('throws if its second argument does not return a function', () => {
       error(
-        assocl1(any, any),
+        assoc1L(any, any),
         'abc',
-        '[assocl1]: expected 1st op parser to return a function; found "b"',
+        '[assoc1L]: expected 1st op parser to return a function; found "b"',
       )
     })
     it('fails if there are no matches', () => {
-      fail(assocl1(p, op), '', {
+      fail(assoc1L(p, op), '', {
         expected: 'a digit',
         index: 0,
         status: Error,
       })
     })
     it('succeeds with the first match if op never matches', () => {
-      pass(assocl1(p, op), '23', { result: 23, index: 2 })
+      pass(assoc1L(p, op), '23', { result: 23, index: 2 })
     })
     it('succeeds with one match of op', () => {
-      pass(assocl1(p, op), '23+17', { result: 40, index: 5 })
-      pass(assocl1(p, op), '23-17', { result: 6, index: 5 })
+      pass(assoc1L(p, op), '23+17', { result: 40, index: 5 })
+      pass(assoc1L(p, op), '23-17', { result: 6, index: 5 })
     })
     it('succeeds left-associatively with more than one match of op', () => {
-      pass(assocl1(p, op), '23+17-42', { result: -2, index: 8 })
-      pass(assocl1(p, op), '23-17+42', { result: 48, index: 8 })
+      pass(assoc1L(p, op), '23+17-42', { result: -2, index: 8 })
+      pass(assoc1L(p, op), '23-17+42', { result: 48, index: 8 })
     })
     it('ignores the last op if there is no p match after', () => {
-      pass(assocl1(p, op), '23+17-', { result: 40, index: 5 })
+      pass(assoc1L(p, op), '23+17-', { result: 40, index: 5 })
     })
     it('fails fatally if either parser fails fatally', () => {
-      fail(assocl1(sequence(digit, digit), op), '1a', {
+      fail(assoc1L(sequence(digit, digit), op), '1a', {
         expected: 'a digit',
         index: 1,
         status: Fatal,
       })
-      fail(assocl1(sequence(digit, digit), op), '12+1a', {
+      fail(assoc1L(sequence(digit, digit), op), '12+1a', {
         expected: 'a digit',
         index: 4,
         status: Fatal,
       })
-      fail(assocl1(p, sequence(letter, letter)), '23a1', {
+      fail(assoc1L(p, sequence(letter, letter)), '23a1', {
         expected: 'a letter',
         index: 3,
         status: Fatal,
@@ -715,7 +715,7 @@ describe('Sequence combinators', () => {
     })
   })
 
-  describe('assocr', () => {
+  describe('assocR', () => {
     const p = map(join(many1(digit)), x => parseInt(x))
     const op = choice(
       value(char('+'), (a, b) => a + b),
@@ -724,55 +724,55 @@ describe('Sequence combinators', () => {
 
     it('throws if its first argument is not a parser', () => {
       error(
-        assocr(0, any),
+        assocR(0, any),
         '',
-        '[assocr]: expected 1st argument to be a parser; found 0',
+        '[assocR]: expected 1st argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       error(
-        assocr(any, 0),
+        assocR(any, 0),
         '',
-        '[assocr]: expected 2nd argument to be a parser; found 0',
+        '[assocR]: expected 2nd argument to be a parser; found 0',
       )
     })
     it('throws if its second argument does not return a function', () => {
       error(
-        assocr(any, any, 0),
+        assocR(any, any, 0),
         'abc',
-        '[assocr]: expected 1st op parser to return a function; found "b"',
+        '[assocR]: expected 1st op parser to return a function; found "b"',
       )
     })
     it('succeeds with a default value if there are no matches', () => {
-      pass(assocr(p, op, 0), '', { result: 0, index: 0 })
+      pass(assocR(p, op, 0), '', { result: 0, index: 0 })
     })
     it('succeeds with the first match if op never matches', () => {
-      pass(assocr(p, op, 0), '23', { result: 23, index: 2 })
+      pass(assocR(p, op, 0), '23', { result: 23, index: 2 })
     })
     it('succeeds with one match of op', () => {
-      pass(assocr(p, op, 0), '23+17', { result: 40, index: 5 })
-      pass(assocr(p, op, 0), '23-17', { result: 6, index: 5 })
+      pass(assocR(p, op, 0), '23+17', { result: 40, index: 5 })
+      pass(assocR(p, op, 0), '23-17', { result: 6, index: 5 })
     })
     it('succeeds right-associatively with more than one match of op', () => {
       // incorrect math, good testing
-      pass(assocr(p, op, 0), '23+17-42', { result: -2, index: 8 })
-      pass(assocr(p, op, 0), '23-17+42', { result: -36, index: 8 })
+      pass(assocR(p, op, 0), '23+17-42', { result: -2, index: 8 })
+      pass(assocR(p, op, 0), '23-17+42', { result: -36, index: 8 })
     })
     it('ignores the last op if there is no p match after', () => {
-      pass(assocr(p, op, 0), '23+17-', { result: 40, index: 5 })
+      pass(assocR(p, op, 0), '23+17-', { result: 40, index: 5 })
     })
     it('fails fatally if either parser fails fatally', () => {
-      fail(assocr(sequence(digit, digit), op, 0), '1a', {
+      fail(assocR(sequence(digit, digit), op, 0), '1a', {
         expected: 'a digit',
         index: 1,
         status: Fatal,
       })
-      fail(assocr(sequence(digit, digit), op, 0), '12+1a', {
+      fail(assocR(sequence(digit, digit), op, 0), '12+1a', {
         expected: 'a digit',
         index: 4,
         status: Fatal,
       })
-      fail(assocr(p, sequence(letter, letter), 0), '23a1', {
+      fail(assocR(p, sequence(letter, letter), 0), '23a1', {
         expected: 'a letter',
         index: 3,
         status: Fatal,
@@ -780,7 +780,7 @@ describe('Sequence combinators', () => {
     })
   })
 
-  describe('assocr1', () => {
+  describe('assoc1R', () => {
     const p = map(join(many1(digit)), x => parseInt(x))
     const op = choice(
       value(char('+'), (a, b) => a + b),
@@ -789,58 +789,58 @@ describe('Sequence combinators', () => {
 
     it('throws if its first argument is not a parser', () => {
       error(
-        assocr1(0, any),
+        assoc1R(0, any),
         '',
-        '[assocr1]: expected 1st argument to be a parser; found 0',
+        '[assoc1R]: expected 1st argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       error(
-        assocr1(any, 0),
+        assoc1R(any, 0),
         '',
-        '[assocr1]: expected 2nd argument to be a parser; found 0',
+        '[assoc1R]: expected 2nd argument to be a parser; found 0',
       )
     })
     it('throws if its second argument does not return a function', () => {
       error(
-        assocr1(any, any),
+        assoc1R(any, any),
         'abc',
-        '[assocr1]: expected 1st op parser to return a function; found "b"',
+        '[assoc1R]: expected 1st op parser to return a function; found "b"',
       )
     })
     it('fails if there are no matches', () => {
-      fail(assocr1(p, op), '', {
+      fail(assoc1R(p, op), '', {
         expected: 'a digit',
         index: 0,
         status: Error,
       })
     })
     it('succeeds with the first match if op never matches', () => {
-      pass(assocr1(p, op), '23', { result: 23, index: 2 })
+      pass(assoc1R(p, op), '23', { result: 23, index: 2 })
     })
     it('succeeds with one match of op', () => {
-      pass(assocr1(p, op), '23+17', { result: 40, index: 5 })
-      pass(assocr1(p, op), '23-17', { result: 6, index: 5 })
+      pass(assoc1R(p, op), '23+17', { result: 40, index: 5 })
+      pass(assoc1R(p, op), '23-17', { result: 6, index: 5 })
     })
     it('succeeds left-associatively with more than one match of op', () => {
-      pass(assocr1(p, op), '23+17-42', { result: -2, index: 8 })
-      pass(assocr1(p, op), '23-17+42', { result: -36, index: 8 })
+      pass(assoc1R(p, op), '23+17-42', { result: -2, index: 8 })
+      pass(assoc1R(p, op), '23-17+42', { result: -36, index: 8 })
     })
     it('ignores the last op if there is no p match after', () => {
-      pass(assocr1(p, op), '23+17-', { result: 40, index: 5 })
+      pass(assoc1R(p, op), '23+17-', { result: 40, index: 5 })
     })
     it('fails fatally if either parser fails fatally', () => {
-      fail(assocr1(sequence(digit, digit), op), '1a', {
+      fail(assoc1R(sequence(digit, digit), op), '1a', {
         expected: 'a digit',
         index: 1,
         status: Fatal,
       })
-      fail(assocr1(sequence(digit, digit), op), '12+1a', {
+      fail(assoc1R(sequence(digit, digit), op), '12+1a', {
         expected: 'a digit',
         index: 4,
         status: Fatal,
       })
-      fail(assocr1(p, sequence(letter, letter)), '23a1', {
+      fail(assoc1R(p, sequence(letter, letter)), '23a1', {
         expected: 'a letter',
         index: 3,
         status: Fatal,
