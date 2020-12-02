@@ -178,6 +178,11 @@ describe('Sequence combinators', () => {
         ['a', 'c'],
       )
     })
+    it('succeeds with a single null result', () => {
+      pass(
+        many1(map(letter, x => x === 'a' ? null : x)), 'a', [],
+      )
+    })
   })
 
   describe('skip', () => {
