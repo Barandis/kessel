@@ -85,7 +85,7 @@ export const stringI = str => Parser(ctx => {
   const [reply, [next, result]] = dup(StringParser(
     charLength(str), chars => str.toLowerCase() === chars.toLowerCase(),
   )(ctx))
-  return result.status === Ok ? reply : error(next, expecteds.stringi(str))
+  return result.status === Ok ? reply : error(next, expecteds.stringI(str))
 })
 
 /**
