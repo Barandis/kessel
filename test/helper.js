@@ -12,7 +12,7 @@ import { commaSeparate } from 'kessel/util'
 /**
  * @typedef {import('kessel/error').ParseError} ParseError
  * @typedef {import('kessel/core').Parser} Parser
- * @typedef {import('kessel/core').State} State
+ * @typedef {import('kessel/core').Context} Context
  */
 
 /**

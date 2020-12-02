@@ -12,7 +12,7 @@ import {
   ordinalNumber,
   ordinalParser,
 } from 'kessel/assert'
-import { error, fatal, ok, makeParser, Status } from 'kessel/core'
+import { error, fatal, ok, Parser, Status } from 'kessel/core'
 import { merge, nested } from 'kessel/error'
 import { dup, ordinal, range, stringify } from 'kessel/util'
 
@@ -24,8 +24,8 @@ const { Ok, Error, Fatal } = Status
  * Creates a parser that implements alternatives. Each of the supplied
  * parsers is applied one at a time, in order. When the first parser
  * succeeds, or the first parser fails while consuming input, execution
- * is stopped and the state from that last parser is passed through. The
- * same happens if all parsers are applied without any of them
+ * is stopped and the context from that last parser is passed through.
+ * The same happens if all parsers are applied without any of them
  * succeeding.
  *
  * On failure, all of the `Expected` errors from any of the contained
@@ -36,7 +36,7 @@ const { Ok, Error, Fatal } = Status
  * @returns {Parser} A parser that applies its contained parsers until
  *     one succeeds.
  */
-export const choice = (...ps) => makeParser(state => {
+export const choice = (...ps) => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) {
     for (const [i, p] of ps.entries()) {
@@ -46,13 +46,13 @@ export const choice = (...ps) => makeParser(state => {
   let errors = []
 
   for (const p of ps) {
-    const [reply, [next, result]] = dup(p(state))
+    const [reply, [next, result]] = dup(p(ctx))
     if (result.status === Ok) return reply
 
     errors = merge(errors, result.errors)
     if (result.status === Fatal) return fatal(next, errors)
   }
-  return error(state, errors)
+  return error(ctx, errors)
 })
 
 /**
@@ -67,10 +67,10 @@ export const choice = (...ps) => makeParser(state => {
  *     contained parser fails fatally. This parser consumes text only
  *     if its contained parser succeeds.
  */
-export const opt = p => makeParser(state => {
+export const opt = p => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) assertParser('opt', p)
-  const [reply, [next, result]] = dup(p(state))
+  const [reply, [next, result]] = dup(p(ctx))
   return result.status !== Error ? reply : ok(next, null)
 })
 
@@ -90,19 +90,19 @@ export const opt = p => makeParser(state => {
  * @returns {Parser} A parser which results in either its contained
  *     parser's successful result or the provided value.
  */
-export const def = (p, x) => makeParser(state => {
+export const def = (p, x) => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) assertParser('def', p, ordinalParser('1st'))
-  const [reply, [next, result]] = dup(p(state))
+  const [reply, [next, result]] = dup(p(ctx))
   return result.status !== Error ? reply : ok(next, x)
 })
 
 /**
  * Creates a parser that transforms a fatal failure into a non-fatal
  * failure. It applies the supplied parser; if that parser fails
- * fatally, the state is set back to what it was *before* that parser is
- * applied and the fatal failure is returned as a non-fatal failure. If
- * the parser has any other result, it is passed through without
+ * fatally, the context is set back to what it was *before* that parser
+ * is applied and the fatal failure is returned as a non-fatal failure.
+ * If the parser has any other result, it is passed through without
  * modification.
  *
  * This parser allows the user to cause a non-backtracking parser to
@@ -113,11 +113,11 @@ export const def = (p, x) => makeParser(state => {
  * @returns {Parser} A parser that cannot fail fatally. If its contained
  *     parser fails fatally, this one will instead fail non-fatally.
  */
-export const attempt = p => makeParser(state => {
+export const attempt = p => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) assertParser('attempt', p)
-  const index = state.index
-  const [reply, [next, result]] = dup(p(state))
+  const index = ctx.index
+  const [reply, [next, result]] = dup(p(ctx))
   if (result.status !== Ok) {
     const err = index === next.index
       ? result.errors
@@ -134,10 +134,10 @@ export const attempt = p => makeParser(state => {
  * becomes the returned parser's result.
  *
  * If one of the parsers fails non-fatally, the entire parser will also
- * fail non-fatally, reverting the state to what it was before the first
- * parser was applied, even if previous parsers have consumed input. A
- * fatal error from one of the contained parsers will still result in an
- * overall fatal error.
+ * fail non-fatally, reverting the context to what it was before the
+ * first parser was applied, even if previous parsers have consumed
+ * input. A fatal error from one of the contained parsers will still
+ * result in an overall fatal error.
  *
  * Note that `sequenceB(ps)` is not the same as
  * `backtrack(sequence(ps))`, as the former will fail fatally if one of
@@ -148,7 +148,7 @@ export const attempt = p => makeParser(state => {
  * @returns {Parser} A parser that applies the supplied parsers one at a
  *     time, in order, and fails if any of those parsers fail.
  */
-export const sequenceB = (...ps) => makeParser(state => {
+export const sequenceB = (...ps) => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) {
     for (const [i, p] of ps.entries()) {
@@ -156,12 +156,12 @@ export const sequenceB = (...ps) => makeParser(state => {
     }
   }
   const values = []
-  const index = state.index
-  let next = state
+  const index = ctx.index
+  let next = ctx
 
   for (const p of ps) {
-    const [reply, [nextState, result]] = dup(p(next))
-    next = nextState
+    const [reply, [nextCtx, result]] = dup(p(next))
+    next = nextCtx
 
     if (result.status === Fatal) return reply
     if (result.status === Error) {
@@ -176,13 +176,13 @@ export const sequenceB = (...ps) => makeParser(state => {
 })
 
 /**
- * Creates a parser that chains the state after applying its contained
+ * Creates a parser that chains the context after applying its contained
  * parser to another parser returned by the supplied function. The
- * parser returns that resulting state.
+ * parser returns that resulting context.
  *
  * If the second parser (the one provided by `fn`) fails non-fatally,
- * the entire parser will also fail non-fatally, reverting the state to
- * what it was before the first parser was applied, even if the first
+ * the entire parser will also fail non-fatally, reverting the context
+ * to what it was before the first parser was applied, even if the first
  * parser consumed input. A fatal error from either parser will still
  * result in an overall fatal error.
  *
@@ -199,15 +199,15 @@ export const sequenceB = (...ps) => makeParser(state => {
  *     pass the result to the supplied function, and use that function's
  *     return value as a second parser to apply the input to.
  */
-export const chainB = (p, fn) => makeParser(state => {
+export const chainB = (p, fn) => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) {
     assertParser('chainB', p, ordinalParser('1st'))
     assertFunction('chainB', fn, ordinalFunction('2nd'))
   }
-  const index = state.index
+  const index = ctx.index
 
-  const [reply1, [next1, result1]] = dup(p(state))
+  const [reply1, [next1, result1]] = dup(p(ctx))
   if (result1.status !== Ok) return reply1
 
   const [reply2, [next2, result2]] = dup(fn(result1.value)(next1))
@@ -224,7 +224,7 @@ export const chainB = (p, fn) => makeParser(state => {
  * fail, this parser will also fail.
  *
  * If `p2` fails non-fatally, the entire parser will also fail
- * non-fatally, reverting the state to what it was before the first
+ * non-fatally, reverting the context to what it was before the first
  * parser was applied, even if the first parser consumed input. A fatal
  * error from either parser will still result in an overall fatal error.
  *
@@ -237,15 +237,15 @@ export const chainB = (p, fn) => makeParser(state => {
  * @returns {Parser} A parser that applies both contained parsers and
  *     results in the value of the first.
  */
-export const leftB = (p1, p2) => makeParser(state => {
+export const leftB = (p1, p2) => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) {
     assertParser('leftB', p1, ordinalParser('1st'))
     assertParser('leftB', p2, ordinalParser('2nd'))
   }
-  const index = state.index
+  const index = ctx.index
 
-  const [reply1, [next1, result1]] = dup(p1(state))
+  const [reply1, [next1, result1]] = dup(p1(ctx))
   if (result1.status !== Ok) return reply1
 
   const [reply2, [next2, result2]] = dup(p2(next1))
@@ -264,7 +264,7 @@ export const leftB = (p1, p2) => makeParser(state => {
  * fail, this parser will also fail.
  *
  * If `p2` fails non-fatally, the entire parser will also fail
- * non-fatally, reverting the state to what it was before the first
+ * non-fatally, reverting the context to what it was before the first
  * parser was applied, even if the first parser consumed input. A fatal
  * error from either parser will still result in an overall fatal error.
  *
@@ -277,15 +277,15 @@ export const leftB = (p1, p2) => makeParser(state => {
  * @returns {Parser} A parser that applies both contained parsers and
  *     results in the value of the second.
  */
-export const rightB = (p1, p2) => makeParser(state => {
+export const rightB = (p1, p2) => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) {
     assertParser('rightB', p1, ordinalParser('1st'))
     assertParser('rightB', p2, ordinalParser('2nd'))
   }
-  const index = state.index
+  const index = ctx.index
 
-  const [reply1, [next1, result1]] = dup(p1(state))
+  const [reply1, [next1, result1]] = dup(p1(ctx))
   if (result1.status !== Status.Ok) return reply1
 
   const [reply2, [next2, result2]] = dup(p2(next1))
@@ -303,7 +303,7 @@ export const rightB = (p1, p2) => makeParser(state => {
  * `p1` or `p2` fail, this parser will also fail.
  *
  * If `p2` fails non-fatally, the entire parser will also fail
- * non-fatally, reverting the state to what it was before the first
+ * non-fatally, reverting the context to what it was before the first
  * parser was applied, even if the first parser consumed input. A fatal
  * error from either parser will still result in an overall fatal error.
  *
@@ -316,15 +316,15 @@ export const rightB = (p1, p2) => makeParser(state => {
  * @returns {Parser} A parser that applies both contained parsers and
  *     results in the values of both parsers in an array.
  */
-export const bothB = (p1, p2) => makeParser(state => {
+export const bothB = (p1, p2) => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) {
     assertParser('bothB', p1, ordinalParser('1st'))
     assertParser('bothB', p2, ordinalParser('2nd'))
   }
-  const index = state.index
+  const index = ctx.index
 
-  const [reply1, [next1, result1]] = dup(p1(state))
+  const [reply1, [next1, result1]] = dup(p1(ctx))
   if (result1.status !== Ok) return reply1
 
   const [reply2, [next2, result2]] = dup(p2(next1))
@@ -352,19 +352,19 @@ export const bothB = (p1, p2) => makeParser(state => {
  * @returns {Parser} A parser that applies `p` `n` times and results in
  *     an array of all of the successful results of `p`.
  */
-export const repeatB = (p, n) => makeParser(state => {
+export const repeatB = (p, n) => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) {
     assertParser('repeatB', p, ordinalParser('1st'))
     assertNumber('repeatB', n, ordinalNumber('2nd'))
   }
-  const index = state.index
+  const index = ctx.index
   const values = []
-  let next = state
+  let next = ctx
 
   for (const _ of range(n)) {
-    const [reply, [nextState, result]] = dup(p(next))
-    next = nextState
+    const [reply, [nextCtx, result]] = dup(p(next))
+    next = nextCtx
     if (result.status === Fatal) return reply
     if (result.status === Error) {
       const err = index === next.index
@@ -400,15 +400,15 @@ export const repeatB = (p, n) => makeParser(state => {
  * @returns {Parser} A parser which will apply the content zero or more
  *     times until the end parser succeeds.
  */
-export const manyTillB = (p, end) => makeParser(state => {
+export const manyTillB = (p, end) => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) {
     assertParser('manyTillB', p, ordinalParser('1st'))
     assertParser('manyTillB', end, ordinalParser('2nd'))
   }
-  const index = state.index
+  const index = ctx.index
   const values = []
-  let next = state
+  let next = ctx
 
   while (true) {
     const [reply1, [next1, result1]] = dup(end(next))
@@ -455,12 +455,12 @@ export const manyTillB = (p, end) => makeParser(state => {
  *     applies parsers as they are yielded, and results (if all parsers
  *     succeed) in the return value of the generator.
  */
-export const blockB = genFn => makeParser(state => {
+export const blockB = genFn => Parser(ctx => {
   if (ASSERT) assertGeneratorFunction('blockB', genFn)
   const gen = genFn()
-  const index = state.index
+  const index = ctx.index
   let nextValue
-  let next = state
+  let next = ctx
   let i = 0
 
   while (true) {
@@ -473,11 +473,11 @@ export const blockB = genFn => makeParser(state => {
         ordinal(i + 1)
       } yield to be to a parser; found ${stringify(v)}`)
     }
-    const [reply, [nextState, result]] = dup(value(next))
-    next = nextState
+    const [reply, [nextCtx, result]] = dup(value(next))
+    next = nextCtx
 
     if (result.status === Fatal) return reply
-    if (result.status === Error) return error(nextState, result.errors, index)
+    if (result.status === Error) return error(nextCtx, result.errors, index)
     nextValue = result.value
     i++
   }
@@ -509,7 +509,7 @@ export const blockB = genFn => makeParser(state => {
  *     feed the results to its function, and result in the function's
  *     return value.
  */
-export const pipeB = (...ps) => makeParser(state => {
+export const pipeB = (...ps) => Parser(ctx => {
   const fn = ps.pop()
   /* istanbul ignore else */
   if (ASSERT) {
@@ -518,13 +518,13 @@ export const pipeB = (...ps) => makeParser(state => {
     }
     assertFunction('pipeB', fn, ordinalFunction(ordinal(ps.length + 1)))
   }
-  const index = state.index
+  const index = ctx.index
   const values = []
-  let next = state
+  let next = ctx
 
   for (const p of ps) {
-    const [reply, [nextState, result]] = dup(p(next))
-    next = nextState
+    const [reply, [nextCtx, result]] = dup(p(next))
+    next = nextCtx
 
     if (result.status === Fatal) return reply
     if (result.status === Error) return error(next, result.errors, index)
@@ -552,16 +552,16 @@ export const pipeB = (...ps) => makeParser(state => {
  * @returns {Parser} A parser which applies its parsers in the correct
  *     order and then results in the result of its content parser.
  */
-export const betweenB = (pre, post, p) => makeParser(state => {
+export const betweenB = (pre, post, p) => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) {
     assertParser('betweenB', pre, ordinalParser('1st'))
     assertParser('betweenB', post, ordinalParser('2nd'))
     assertParser('betweenB', p, ordinalParser('3rd'))
   }
-  const index = state.index
+  const index = ctx.index
 
-  const [reply1, [next1, result1]] = dup(pre(state))
+  const [reply1, [next1, result1]] = dup(pre(ctx))
   if (result1.status !== Ok) return reply1
 
   const [reply2, [next2, result2]] = dup(p(next1))

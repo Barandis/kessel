@@ -11,7 +11,7 @@ export {
   any,
   anyOf,
   char,
-  chari,
+  charI,
   digit,
   eof,
   hex,
@@ -49,7 +49,7 @@ export {
   all,
   anyString,
   string,
-  stringi,
+  stringI,
 } from './parsers/string'
 
 ///////////////////////////////////////////////////////////////////////
@@ -125,11 +125,11 @@ export {
 // PARSER TOOLS AND UTILITIES
 
 export {
+  Parser,
   Status,
   error,
   failure,
   fatal,
-  makeParser,
   maybeFatal,
   ok,
   parse,

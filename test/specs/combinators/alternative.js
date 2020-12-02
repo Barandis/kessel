@@ -107,12 +107,12 @@ describe('Alternative and error recovery combinators', () => {
     })
     it('creates a nested error if it fails while consuming input', () => {
       const parser = sequence(string('te'), string('st'))
-      const [state, result] = parse(attempt(parser), 'tesl')
+      const [ctx, result] = parse(attempt(parser), 'tesl')
       const error = result.errors[0]
 
       expect(error.type).to.equal(ErrorType.Nested)
-      expect(state.index).to.equal(0)
-      expect(error.state.index).to.equal(2)
+      expect(ctx.index).to.equal(0)
+      expect(error.ctx.index).to.equal(2)
       expect(error.errors[0].type).to.equal(ErrorType.Expected)
       expect(error.errors[0].label).to.equal("'st'")
     })
@@ -156,20 +156,20 @@ describe('Alternative and error recovery combinators', () => {
       )
     })
     it('fails if any of its parsers fail', () => {
-      const [state1, result1] = parse(parser, 'abd')
-      expect(state1.index).to.equal(0)
+      const [ctx1, result1] = parse(parser, 'abd')
+      expect(ctx1.index).to.equal(0)
       expect(result1.errors[0].label).to.equal("'abc'")
 
-      const [state2, result2] = parse(parser, 'abcdf')
+      const [ctx2, result2] = parse(parser, 'abcdf')
       const err2 = result2.errors[0]
-      expect(state2.index).to.equal(0)
-      expect(err2.state.index).to.equal(3)
+      expect(ctx2.index).to.equal(0)
+      expect(err2.ctx.index).to.equal(3)
       expect(err2.errors[0].label).to.equal("'def'")
 
-      const [state3, result3] = parse(parser, 'abcdefh')
+      const [ctx3, result3] = parse(parser, 'abcdefh')
       const err3 = result3.errors[0]
-      expect(state3.index).to.equal(0)
-      expect(err3.state.index).to.equal(6)
+      expect(ctx3.index).to.equal(0)
+      expect(err3.ctx.index).to.equal(6)
       expect(err3.errors[0].label).to.equal("'ghi'")
     })
     it('succeeds if all of its parsers succeed', () => {
@@ -221,12 +221,12 @@ describe('Alternative and error recovery combinators', () => {
     })
     it('fails non-fatally if the second fails after the first consumes', () => {
       const parser = chainB(char('a'), () => char('b'))
-      const [state, result] = parse(parser, 'ac')
+      const [ctx, result] = parse(parser, 'ac')
       const err = result.errors[0]
 
-      expect(state.index).to.equal(0)
+      expect(ctx.index).to.equal(0)
       expect(result.status).to.equal(Error)
-      expect(err.state.index).to.equal(1)
+      expect(err.ctx.index).to.equal(1)
       expect(err.errors[0].label).to.equal("'b'")
     })
     it('still fails fatally if either parser fails fatally', () => {
@@ -266,12 +266,12 @@ describe('Alternative and error recovery combinators', () => {
       fail(leftB(eof, char('a')), '', { expected: "'a'", status: Error })
     })
     it('fails non-fatally on non-fatal errors after consumption', () => {
-      const [state, result] = parse(leftB(letter, digit), 'aa')
+      const [ctx, result] = parse(leftB(letter, digit), 'aa')
       const err = result.errors[0]
 
-      expect(state.index).to.equal(0)
+      expect(ctx.index).to.equal(0)
       expect(result.status).to.equal(Error)
-      expect(err.state.index).to.equal(1)
+      expect(err.ctx.index).to.equal(1)
       expect(err.errors[0].label).to.equal('a digit')
     })
     it('still fails fatally if either parser fails fatally', () => {
@@ -311,12 +311,12 @@ describe('Alternative and error recovery combinators', () => {
       fail(rightB(eof, char('a')), '', { expected: "'a'", status: Error })
     })
     it('fails non-fatally on non-fatal errors after consumption', () => {
-      const [state, result] = parse(rightB(letter, digit), 'aa')
+      const [ctx, result] = parse(rightB(letter, digit), 'aa')
       const err = result.errors[0]
 
-      expect(state.index).to.equal(0)
+      expect(ctx.index).to.equal(0)
       expect(result.status).to.equal(Error)
-      expect(err.state.index).to.equal(1)
+      expect(err.ctx.index).to.equal(1)
       expect(err.errors[0].label).to.equal('a digit')
     })
     it('still fails fatally if either parser fails fatally', () => {
@@ -356,12 +356,12 @@ describe('Alternative and error recovery combinators', () => {
       fail(bothB(eof, char('a')), '', { expected: "'a'", status: Error })
     })
     it('fails non-fatally on non-fatal errors after consumption', () => {
-      const [state, result] = parse(bothB(letter, digit), 'aa')
+      const [ctx, result] = parse(bothB(letter, digit), 'aa')
       const err = result.errors[0]
 
-      expect(state.index).to.equal(0)
+      expect(ctx.index).to.equal(0)
       expect(result.status).to.equal(Error)
-      expect(err.state.index).to.equal(1)
+      expect(err.ctx.index).to.equal(1)
       expect(err.errors[0].label).to.equal('a digit')
     })
     it('still fails fatally if either parser fails fatally', () => {
@@ -413,12 +413,12 @@ describe('Alternative and error recovery combinators', () => {
       })
     })
     it('fails non-fatally on non-fatal errors if input was consumed', () => {
-      const [state, result] = parse(repeatB(letter, 5), 'abc123')
+      const [ctx, result] = parse(repeatB(letter, 5), 'abc123')
       const err = result.errors[0]
 
-      expect(state.index).to.equal(0)
+      expect(ctx.index).to.equal(0)
       expect(result.status).to.equal(Error)
-      expect(err.state.index).to.equal(3)
+      expect(err.ctx.index).to.equal(3)
       expect(err.errors[0].label).to.equal('a letter')
     })
   })
@@ -452,12 +452,12 @@ describe('Alternative and error recovery combinators', () => {
       })
     })
     it('backtracks if input is consumed before content parser fails', () => {
-      const [state, result] = parse(manyTillB(digit, letter), '123.abc')
+      const [ctx, result] = parse(manyTillB(digit, letter), '123.abc')
       const err = result.errors[0]
 
-      expect(state.index).to.equal(0)
+      expect(ctx.index).to.equal(0)
       expect(result.status).to.equal(Error)
-      expect(err.state.index).to.equal(3)
+      expect(err.ctx.index).to.equal(3)
       expect(err.errors[0].label).to.equal('a digit')
       expect(err.errors[1].label).to.equal('a letter')
     })

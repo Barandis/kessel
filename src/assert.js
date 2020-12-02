@@ -3,7 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { makeParser } from './core'
+import { Parser } from './core'
 import { charLength, stringify } from './util'
 
 export const formatter = type =>
@@ -39,7 +39,7 @@ export function assertChar(name, value, formatter = charFormatter) {
 }
 
 export function assertFunction(name, value, formatter = fnFormatter) {
-  if (typeof value !== 'function' || makeParser.created(value)) {
+  if (typeof value !== 'function' || Parser.created(value)) {
     failAssert(name, value, formatter)
   }
 }
@@ -80,7 +80,7 @@ export function assertNumber(name, value, formatter = numFormatter) {
 }
 
 export function assertParser(name, value, formatter = parserFormatter) {
-  if (typeof value !== 'function' || !makeParser.created(value)) {
+  if (typeof value !== 'function' || !Parser.created(value)) {
     failAssert(name, value, formatter)
   }
 }

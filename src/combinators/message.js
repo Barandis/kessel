@@ -9,7 +9,7 @@ import {
   ordinalParser,
   ordinalString,
 } from 'kessel/assert'
-import { fatal, makeParser, Status } from 'kessel/core'
+import { fatal, Parser, Status } from 'kessel/core'
 import { compound, ErrorType, expected } from 'kessel/error'
 import { dup } from 'kessel/util'
 
@@ -18,8 +18,8 @@ const { Nested } = ErrorType
 
 /** @typedef {import('kessel/core').Parser} Parser */
 
-function pass(state, result, errors) {
-  return [{ ...state }, { ...result, errors }]
+function pass(ctx, result, errors) {
+  return [{ ...ctx }, { ...result, errors }]
 }
 
 /**
@@ -37,14 +37,14 @@ function pass(state, result, errors) {
  *     through except for changing its `Expected` error message upon
  *     failure.
  */
-export const label = (p, msg) => makeParser(state => {
+export const label = (p, msg) => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) {
     assertParser('label', p, ordinalParser('1st'))
     assertString('label', msg, ordinalString('2nd'))
   }
-  const index = state.index
-  const [reply, [next, result]] = dup(p(state))
+  const index = ctx.index
+  const [reply, [next, result]] = dup(p(ctx))
   return index === next.index ? pass(next, result, expected(msg)) : reply
 })
 
@@ -57,7 +57,7 @@ export const label = (p, msg) => makeParser(state => {
  * If the original parser fails, what happens depends on whether that
  * failure consumed input. If it did not, the supplied message
  * overwrites the original error message just as with `label`. If it
- * *did* consume input, the state is reset to the state before the
+ * *did* consume input, the context is reset to the context before the
  * parser was applied, the error is set to a compound error using the
  * supplied message (with the nested error being the original error that
  * came from the failure point), and a fatal error is returned.
@@ -72,23 +72,23 @@ export const label = (p, msg) => makeParser(state => {
  * @returns {Parser} A parser that applies `p` and changes the error
  *     as appropriate if `p` fails.
  */
-export const backLabel = (p, msg) => makeParser(state => {
+export const backLabel = (p, msg) => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) {
     assertParser('backLabel', p, ordinalParser('1st'))
     assertString('backLabel', msg, ordinalString('2nd'))
   }
-  const index = state.index
-  const [reply, [next, result]] = dup(p(state))
+  const index = ctx.index
+  const [reply, [next, result]] = dup(p(ctx))
   if (result.status === Ok) {
     return index === next.index
       ? pass(next, result, expected(msg)) : reply
   } else if (index === next.index) {
     if (result.errors.length === 1 && result.errors[0].type === Nested) {
-      const { state, errors } = result.errors[0]
-      return pass(next, result, compound(msg, state, errors))
+      const { ctx, errors } = result.errors[0]
+      return pass(next, result, compound(msg, ctx, errors))
     }
     return pass(next, result, expected(msg))
   }
-  return fatal(state, compound(msg, next, result.errors))
+  return fatal(ctx, compound(msg, next, result.errors))
 })

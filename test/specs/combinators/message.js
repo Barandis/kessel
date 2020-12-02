@@ -85,26 +85,26 @@ describe('Message combinators', () => {
       expect(result.errors[0].label).to.equal('test')
     })
     it('adds a compound error if its parser fails while consuming', () => {
-      const [state, result] = parse(
+      const [ctx, result] = parse(
         backLabel(sequence(char('a'), char('b')), 'test'), 'a1',
       )
       const error = result.errors[0]
 
       expect(result.status).to.equal(Status.Fatal)
-      expect(state.index).to.equal(0)
-      expect(error.state.index).to.equal(1)
+      expect(ctx.index).to.equal(0)
+      expect(error.ctx.index).to.equal(1)
       expect(error.label).to.equal('test')
       expect(error.errors[0].label).to.equal("'b'")
     })
     it('collapses the nested error from backtracking', () => {
-      const [state, result] = parse(
+      const [ctx, result] = parse(
         backLabel(attempt(right(char('a'), char('b'))), 'test'), 'a1',
       )
       const error = result.errors[0]
 
       expect(result.status).to.equal(Status.Error)
-      expect(state.index).to.equal(0)
-      expect(error.state.index).to.equal(1)
+      expect(ctx.index).to.equal(0)
+      expect(error.ctx.index).to.equal(1)
       expect(error.label).to.equal('test')
       expect(error.errors[0].label).to.equal("'b'")
     })

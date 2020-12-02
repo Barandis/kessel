@@ -4,10 +4,11 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { makeParser } from './core'
+import { Parser } from './core'
 
-/** @typedef {import('./core').State} State */
+/** @typedef {import('./core').Context} Context */
 /** @typedef {import('./core').Result} Result */
+/** @typedef {import('./core').Reply} Reply */
 
 /**
  * Translates a UCS-2 string into a Uint8Array of UTF-8 bytes.
@@ -202,12 +203,12 @@ export function quote(str) {
  *
  * ### Example
  * ```
- * const [whole, [state, value]] = dup(parse(parser, input))
+ * const [whole, [ctx, value]] = dup(parse(parser, input))
  * ```
  *
- * @param {[State, Result]} value Any value.
- * @returns {[[State, Result], [State, Result]]} An array containing two
- *     copies of the value.
+ * @param {Reply} value Any value.
+ * @returns {[Reply, Reply]} An array containing two copies of the
+ *     value.
  */
 export function dup(value) {
   return [value, value]
@@ -291,7 +292,7 @@ export function ordinal(n) {
 export function stringify(value) {
   if (value === undefined) return 'undefined'
   if (typeof value === 'function') {
-    return makeParser.created(value) ? 'parser' : 'function'
+    return Parser.created(value) ? 'parser' : 'function'
   }
   if (typeof value === 'symbol') return `Symbol(${value.description})`
   return JSON.stringify(value)

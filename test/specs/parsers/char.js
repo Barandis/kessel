@@ -8,7 +8,7 @@ import {
   any,
   anyOf,
   char,
-  chari,
+  charI,
   digit,
   eof,
   hex,
@@ -104,17 +104,17 @@ describe('Character parsers', () => {
     })
   })
 
-  describe('chari', () => {
+  describe('charI', () => {
     it('throws if something other than a single char is passed', () => {
-      error(chari(0), '', '[chari]: expected a one-character string; found 0')
-      error(chari({}), '', '[chari]: expected a one-character string; found {}')
+      error(charI(0), '', '[charI]: expected a one-character string; found 0')
+      error(charI({}), '', '[charI]: expected a one-character string; found {}')
       error(
-        chari('ab'), '', '[chari]: expected a one-character string; found "ab"',
+        charI('ab'), '', '[charI]: expected a one-character string; found "ab"',
       )
     })
 
     context('1-byte characters', () => {
-      const parser = chari('O')
+      const parser = charI('O')
 
       it('succeeds if the next character matches', () => {
         pass(parser, 'Onomatopoeia', 'O')
@@ -131,7 +131,7 @@ describe('Character parsers', () => {
     })
 
     context('2-byte characters', () => {
-      const parser = chari('З')
+      const parser = charI('З')
 
       it('succeeds if the next character matches', () => {
         pass(parser, 'Звукоподражание', 'З')
@@ -148,7 +148,7 @@ describe('Character parsers', () => {
     })
 
     context('3-byte characters', () => {
-      const parser = chari('ค')
+      const parser = charI('ค')
 
       it('succeeds if the next character matches', () => {
         pass(parser, 'คำเลียนเสียง', 'ค')
@@ -162,7 +162,7 @@ describe('Character parsers', () => {
     })
 
     context('4-byte characters', () => {
-      const parser = chari('𝑂')
+      const parser = charI('𝑂')
 
       it('succeeds if the next character matches', () => {
         pass(parser, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', '𝑂')

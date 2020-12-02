@@ -4,7 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import { assertStringOrRegExp } from 'kessel/assert'
-import { error, makeParser, ok, Status } from 'kessel/core'
+import { error, ok, Parser, Status } from 'kessel/core'
 import { expecteds } from 'kessel/messages'
 import { dup, stringToView, viewToString } from 'kessel/util'
 
@@ -56,14 +56,14 @@ const reUnewline = /^(?:\r\n|[\r\n\u0085\u2028\u2029])/u
  *     expression against the input at its current position and succeeds
  *     if a match is found.
  */
-const RegexParser = re => makeParser(state => {
-  const { index, view } = state
+const RegexParser = re => Parser(ctx => {
+  const { index, view } = ctx
   const rest = viewToString(index, view.byteLength - index, view)
 
   const match = rest.match(re)
   return match
-    ? ok(state, match[0], index + stringToView(match[0]).byteLength)
-    : error(state)
+    ? ok(ctx, match[0], index + stringToView(match[0]).byteLength)
+    : error(ctx)
 })
 
 /**
@@ -87,7 +87,7 @@ const RegexParser = re => makeParser(state => {
  *     expression against the input at its current position and succeeds
  *     if a match is found.
  */
-export const regex = re => makeParser(state => {
+export const regex = re => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) assertStringOrRegExp('regex', re)
 
@@ -102,7 +102,7 @@ export const regex = re => makeParser(state => {
     regex = new RegExp(newSource, flags)
   }
 
-  const [reply, [next, result]] = dup(RegexParser(regex)(state))
+  const [reply, [next, result]] = dup(RegexParser(regex)(ctx))
   return result.status === Ok ? reply : error(next, expecteds.regex(regex))
 })
 
@@ -111,8 +111,8 @@ export const regex = re => makeParser(state => {
  * it is a letter. A letter for this purpose is any character with the
  * Unicode `Alphabetic` property.
  */
-export const letterU = makeParser(state => {
-  const [reply, [next, result]] = dup(RegexParser(reLetter)(state))
+export const letterU = Parser(ctx => {
+  const [reply, [next, result]] = dup(RegexParser(reLetter)(ctx))
   return result.status === Ok ? reply : error(next, expecteds.letterU)
 })
 
@@ -121,8 +121,8 @@ export const letterU = makeParser(state => {
  * it is alphanumeric. A character is alphanumeric if it has either the
  * Unicode `Alphabetic` property or the Unicode `Number` property.
  */
-export const alphaU = makeParser(state => {
-  const [reply, [next, result]] = dup(RegexParser(reAlpha)(state))
+export const alphaU = Parser(ctx => {
+  const [reply, [next, result]] = dup(RegexParser(reAlpha)(ctx))
   return result.status === Ok ? reply : error(next, expecteds.alphaU)
 })
 
@@ -132,8 +132,8 @@ export const alphaU = makeParser(state => {
  * uppercase if it has the Unicode `Uppercase` property and is titlecase
  * if it has the Unicode `Letter, Titlecase` property.
  */
-export const upperU = makeParser(state => {
-  const [reply, [next, result]] = dup(RegexParser(reUpper)(state))
+export const upperU = Parser(ctx => {
+  const [reply, [next, result]] = dup(RegexParser(reUpper)(ctx))
   return result.status === Ok ? reply : error(next, expecteds.upperU)
 })
 
@@ -142,8 +142,8 @@ export const upperU = makeParser(state => {
  * it is a lowercase letter. A character is lowercase if it has the
  * Unicode `Lowercase` property.
  */
-export const lowerU = makeParser(state => {
-  const [reply, [next, result]] = dup(RegexParser(reLower)(state))
+export const lowerU = Parser(ctx => {
+  const [reply, [next, result]] = dup(RegexParser(reLower)(ctx))
   return result.status === Ok ? reply : error(next, expecteds.lowerU)
 })
 
@@ -153,8 +153,8 @@ export const lowerU = makeParser(state => {
  * recognizes are space, tab, and any conventional newline (`\r`, `\n`,
  * or `\r\n`).
  */
-export const space = makeParser(state => {
-  const [reply, [next, result]] = dup(RegexParser(reSpace)(state))
+export const space = Parser(ctx => {
+  const [reply, [next, result]] = dup(RegexParser(reSpace)(ctx))
   return result.status === Ok ? reply : error(next, expecteds.space)
 })
 
@@ -166,8 +166,8 @@ export const space = makeParser(state => {
  * This parser will also recognize the two-character combination `\r\n`
  * as a single instance of whitespace.
  */
-export const spaceU = makeParser(state => {
-  const [reply, [next, result]] = dup(RegexParser(reUspace)(state))
+export const spaceU = Parser(ctx => {
+  const [reply, [next, result]] = dup(RegexParser(reUspace)(ctx))
   return result.status === Ok ? reply : error(next, expecteds.spaceU)
 })
 
@@ -178,8 +178,8 @@ export const spaceU = makeParser(state => {
  * though it will not move the index in that case. This parser skips the
  * whitespace and does not produde a result.
  */
-export const spaces = makeParser(state => {
-  const [next, _] = RegexParser(reSpaces)(state)
+export const spaces = Parser(ctx => {
+  const [next, _] = RegexParser(reSpaces)(ctx)
   return ok(next, null)
 })
 
@@ -190,8 +190,8 @@ export const spaces = makeParser(state => {
  * index in that case. This parser skips the whitespace and does not
  * produde a result.
  */
-export const spacesU = makeParser(state => {
-  const [next, _] = RegexParser(reUspaces)(state)
+export const spacesU = Parser(ctx => {
+  const [next, _] = RegexParser(reUspaces)(ctx)
   return ok(next, null)
 })
 
@@ -201,8 +201,8 @@ export const spacesU = makeParser(state => {
  * only fail if there is not at least one whitespace character read. On
  * success, it skips the whitespace and does not produde a result.
  */
-export const spaces1 = makeParser(state => {
-  const [next, result] = RegexParser(reSpaces1)(state)
+export const spaces1 = Parser(ctx => {
+  const [next, result] = RegexParser(reSpaces1)(ctx)
   return result.status === Ok ? ok(next, null) : error(next, expecteds.spaces1)
 })
 
@@ -212,8 +212,8 @@ export const spaces1 = makeParser(state => {
  * not at least one whitespace character read. On success, it skips the
  * whitespace and does not produde a result.
  */
-export const spaces1U = makeParser(state => {
-  const [next, result] = RegexParser(reUspaces1)(state)
+export const spaces1U = Parser(ctx => {
+  const [next, result] = RegexParser(reUspaces1)(ctx)
   return result.status === Ok ? ok(next, null) : error(next, expecteds.spaces1U)
 })
 
@@ -231,8 +231,8 @@ export const spaces1U = makeParser(state => {
  * No characters will be consumed on failure, even in the case of
  * `\r\n`.
  */
-export const newline = makeParser(state => {
-  const [reply, [next, result]] = dup(RegexParser(reNewline)(state))
+export const newline = Parser(ctx => {
+  const [reply, [next, result]] = dup(RegexParser(reNewline)(ctx))
   return result.status === Ok ? reply : error(next, expecteds.newline)
 })
 
@@ -255,7 +255,7 @@ export const newline = makeParser(state => {
  * No characters will be consumed on failure, even in the case of
  * `\r\n`.
  */
-export const newlineU = makeParser(state => {
-  const [reply, [next, result]] = dup(RegexParser(reUnewline)(state))
+export const newlineU = Parser(ctx => {
+  const [reply, [next, result]] = dup(RegexParser(reUnewline)(ctx))
   return result.status === Ok ? reply : error(next, expecteds.newlineU)
 })

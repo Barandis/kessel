@@ -11,7 +11,7 @@ import {
   ordinalNumber,
   ordinalParser,
 } from 'kessel/assert'
-import { ok, makeParser, Status, maybeFatal } from 'kessel/core'
+import { ok, Parser, Status, maybeFatal } from 'kessel/core'
 import { merge } from 'kessel/error'
 import { dup, ordinal, range, stringify } from 'kessel/util'
 
@@ -39,7 +39,7 @@ function loopMessage(name) {
  * @returns {Parser} A parser that applies the supplied parsers one at a
  *     time, in order, and fails if any of those parsers fail.
  */
-export const sequence = (...ps) => makeParser(state => {
+export const sequence = (...ps) => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) {
     for (const [i, p] of ps.entries()) {
@@ -47,12 +47,12 @@ export const sequence = (...ps) => makeParser(state => {
     }
   }
   const values = []
-  const index = state.index
-  let next = state
+  const index = ctx.index
+  let next = ctx
 
   for (const p of ps) {
-    const [nextState, result] = p(next)
-    next = nextState
+    const [nextCtx, result] = p(next)
+    next = nextCtx
 
     if (result.status !== Ok) {
       return maybeFatal(next.index !== index, next, result.errors)
@@ -85,12 +85,12 @@ export const sequence = (...ps) => makeParser(state => {
  *     applies parsers as they are yielded, and results (if all parsers
  *     succeed) in the return value of the generator.
  */
-export const block = genFn => makeParser(state => {
+export const block = genFn => Parser(ctx => {
   if (ASSERT) assertGeneratorFunction('block', genFn)
   const gen = genFn()
-  const index = state.index
+  const index = ctx.index
   let nextValue
-  let next = state
+  let next = ctx
   let i = 0
 
   while (true) {
@@ -103,8 +103,8 @@ export const block = genFn => makeParser(state => {
         ordinal(i + 1)
       } yield to be to a parser; found ${stringify(v)}`)
     }
-    const [nextState, result] = value(next)
-    next = nextState
+    const [nextCtx, result] = value(next)
+    next = nextCtx
 
     if (result.status !== Ok) {
       return maybeFatal(next.index !== index, next, result.errors)
@@ -126,15 +126,15 @@ export const block = genFn => makeParser(state => {
  *     repeatedly until it fails. Its result will be an array of the
  *     successful results from the contained parser.
  */
-export const many = p => makeParser(state => {
+export const many = p => Parser(ctx => {
   /* istanbul ignore else */
   assertParser('many', p)
   const values = []
-  let next = state
+  let next = ctx
 
   while (true) {
-    const [reply, [nextState, result]] = dup(p(next))
-    next = nextState
+    const [reply, [nextCtx, result]] = dup(p(next))
+    next = nextCtx
 
     if (result.status === Fatal) return reply
     if (result.status === Error) break
@@ -157,18 +157,18 @@ export const many = p => makeParser(state => {
  *     repeatedly until it fails. Its result will be an array of the
  *     successful results from the contained parser.
  */
-export const many1 = p => makeParser(state => {
+export const many1 = p => Parser(ctx => {
   /* istanbul ignore else */
   assertParser('many1', p)
-  const [tuple, [nextState, result]] = dup(p(state))
+  const [tuple, [nextCtx, result]] = dup(p(ctx))
   if (result.status !== Ok) return tuple
 
-  let next = nextState
+  let next = nextCtx
   const values = [result.value]
 
   while (true) {
-    const [reply, [nextState, result]] = dup(p(next))
-    next = nextState
+    const [reply, [nextCtx, result]] = dup(p(next))
+    next = nextCtx
 
     if (result.status === Fatal) return reply
     if (result.status === Error) break
@@ -188,14 +188,14 @@ export const many1 = p => makeParser(state => {
  * @returns {Parser} A parser that applies the supplied parser
  *     repeatedly until it fails. Successful results are discarded.
  */
-export const skipMany = p => makeParser(state => {
+export const skipMany = p => Parser(ctx => {
   /* istanbul ignore else */
   assertParser('skipMany', p)
-  let next = state
+  let next = ctx
 
   while (true) {
-    const [reply, [nextState, result]] = dup(p(next))
-    next = nextState
+    const [reply, [nextCtx, result]] = dup(p(next))
+    next = nextCtx
 
     if (result.status === Fatal) return reply
     if (result.status === Error) break
@@ -215,17 +215,17 @@ export const skipMany = p => makeParser(state => {
  * @returns {Parser} A parser that applies the supplied parser
  *     repeatedly until it fails. Successful results are discarded.
  */
-export const skipMany1 = p => makeParser(state => {
+export const skipMany1 = p => Parser(ctx => {
   /* istanbul ignore else */
   assertParser('skipMany1', p)
-  const [reply, [nextState, result]] = dup(p(state))
+  const [reply, [nextCtx, result]] = dup(p(ctx))
   if (result.status !== Ok) return reply
 
-  let next = nextState
+  let next = nextCtx
 
   while (true) {
-    const [reply, [nextState, result]] = dup(p(next))
-    next = nextState
+    const [reply, [nextCtx, result]] = dup(p(next))
+    next = nextCtx
 
     if (result.status === Fatal) return reply
     if (result.status === Error) break
@@ -255,30 +255,30 @@ export const skipMany1 = p => makeParser(state => {
  * @returns {Parser} A parser that results in an array of all of the
  *     content parser results, discarding the separator parser results.
  */
-export const sepBy = (p, sep) => makeParser(state => {
+export const sepBy = (p, sep) => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) {
     assertParser('sepBy', p, ordinalParser('1st'))
     assertParser('sepBy', sep, ordinalParser('2nd'))
   }
-  let index = state.index
-  const [reply, [nextState, result]] = dup(p(state))
+  let index = ctx.index
+  const [reply, [nextCtx, result]] = dup(p(ctx))
   if (result.status === Fatal) return reply
-  if (result.status === Error) return ok(nextState, [])
+  if (result.status === Error) return ok(nextCtx, [])
 
   const values = [result.value]
-  let next = nextState
+  let next = nextCtx
 
   while (true) {
     index = next.index
 
-    const [reply1, [nextState1, result1]] = dup(sep(next))
-    next = nextState1
+    const [reply1, [nextCtx1, result1]] = dup(sep(next))
+    next = nextCtx1
     if (result1.status === Fatal) return reply1
     if (result1.status === Error) break
 
-    const [reply2, [nextState2, result2]] = dup(p(next))
-    next = nextState2
+    const [reply2, [nextCtx2, result2]] = dup(p(next))
+    next = nextCtx2
     if (result2.status === Fatal) return reply2
     if (result2.status === Error) break
 
@@ -310,29 +310,29 @@ export const sepBy = (p, sep) => makeParser(state => {
  * @returns {Parser} A parser that results in an array of all of the
  *     content parser results, discarding the separator parser results.
  */
-export const sepBy1 = (p, sep) => makeParser(state => {
+export const sepBy1 = (p, sep) => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) {
     assertParser('sepBy1', p, ordinalParser('1st'))
     assertParser('sepBy1', sep, ordinalParser('2nd'))
   }
-  let index = state.index
-  const [reply, [nextState, result]] = dup(p(state))
+  let index = ctx.index
+  const [reply, [nextCtx, result]] = dup(p(ctx))
   if (result.status !== Ok) return reply
 
   const values = [result.value]
-  let next = nextState
+  let next = nextCtx
 
   while (true) {
     index = next.index
 
-    const [reply1, [nextState1, result1]] = dup(sep(next))
-    next = nextState1
+    const [reply1, [nextCtx1, result1]] = dup(sep(next))
+    next = nextCtx1
     if (result1.status === Fatal) return reply1
     if (result1.status === Error) break
 
-    const [reply2, [nextState2, result2]] = dup(p(next))
-    next = nextState2
+    const [reply2, [nextCtx2, result2]] = dup(p(next))
+    next = nextCtx2
     if (result2.status === Fatal) return reply2
     if (result2.status === Error) break
 
@@ -364,30 +364,30 @@ export const sepBy1 = (p, sep) => makeParser(state => {
  * @returns {Parser} A parser that results in an array of all of the
  *     content parser results, discarding the separator parser results.
  */
-export const sepEndBy = (p, sep) => makeParser(state => {
+export const sepEndBy = (p, sep) => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) {
     assertParser('sepEndBy', p, ordinalParser('1st'))
     assertParser('sepEndBy', sep, ordinalParser('2nd'))
   }
-  let index = state.index
-  const [reply, [nextState, result]] = dup(p(state))
+  let index = ctx.index
+  const [reply, [nextCtx, result]] = dup(p(ctx))
   if (result.status === Fatal) return reply
-  if (result.status === Error) return ok(nextState, [])
+  if (result.status === Error) return ok(nextCtx, [])
 
   const values = [result.value]
-  let next = nextState
+  let next = nextCtx
 
   while (true) {
     index = next.index
 
-    const [reply1, [nextState1, result1]] = dup(sep(next))
-    next = nextState1
+    const [reply1, [nextCtx1, result1]] = dup(sep(next))
+    next = nextCtx1
     if (result1.status === Fatal) return reply1
     if (result1.status === Error) break
 
-    const [reply2, [nextState2, result2]] = dup(p(next))
-    next = nextState2
+    const [reply2, [nextCtx2, result2]] = dup(p(next))
+    next = nextCtx2
     if (result2.status === Fatal) return reply2
     if (result2.status === Error) break
 
@@ -420,29 +420,29 @@ export const sepEndBy = (p, sep) => makeParser(state => {
  * @returns {Parser} A parser that results in an array of all of the
  *     content parser results, discarding the separator parser results.
  */
-export const sepEndBy1 = (p, sep) => makeParser(state => {
+export const sepEndBy1 = (p, sep) => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) {
     assertParser('sepEndBy1', p, ordinalParser('1st'))
     assertParser('sepEndBy1', sep, ordinalParser('2nd'))
   }
-  let index = state.index
-  const [reply, [nextState, result]] = dup(p(state))
+  let index = ctx.index
+  const [reply, [nextCtx, result]] = dup(p(ctx))
   if (result.status !== Ok) return reply
 
   const values = [result.value]
-  let next = nextState
+  let next = nextCtx
 
   while (true) {
     index = next.index
 
-    const [reply1, [nextState1, result1]] = dup(sep(next))
-    next = nextState1
+    const [reply1, [nextCtx1, result1]] = dup(sep(next))
+    next = nextCtx1
     if (result1.status === Fatal) return reply1
     if (result1.status === Error) break
 
-    const [reply2, [nextState2, result2]] = dup(p(next))
-    next = nextState2
+    const [reply2, [nextCtx2, result2]] = dup(p(next))
+    next = nextCtx2
     if (result2.status === Fatal) return reply2
     if (result2.status === Error) break
 
@@ -464,19 +464,19 @@ export const sepEndBy1 = (p, sep) => makeParser(state => {
  * @returns {Parser} A parser that applies `p` `n` times and results in
  *     an array of all of the successful results of `p`.
  */
-export const repeat = (p, n) => makeParser(state => {
+export const repeat = (p, n) => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) {
     assertParser('repeat', p, ordinalParser('1st'))
     assertNumber('repeat', n, ordinalNumber('2nd'))
   }
-  const index = state.index
+  const index = ctx.index
   const values = []
-  let next = state
+  let next = ctx
 
   for (const _ of range(n)) {
-    const [nextState, result] = p(next)
-    next = nextState
+    const [nextCtx, result] = p(next)
+    next = nextCtx
     if (result.status !== Ok) {
       return maybeFatal(next.index !== index, next, result.errors)
     }
@@ -508,15 +508,15 @@ export const repeat = (p, n) => makeParser(state => {
  * @returns {Parser} A parser which will apply the content zero or more
  *     times until the end parser succeeds.
  */
-export const manyTill = (p, end) => makeParser(state => {
+export const manyTill = (p, end) => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) {
     assertParser('manyTill', p, ordinalParser('1st'))
     assertParser('manyTill', end, ordinalParser('2nd'))
   }
-  const index = state.index
+  const index = ctx.index
   const values = []
-  let next = state
+  let next = ctx
 
   while (true) {
     const [reply1, [next1, result1]] = dup(end(next))
@@ -566,19 +566,19 @@ function opFormatter(ord) {
  *     applying the functions from `op` left associtively to the values
  *     that result from `p`.
  */
-export const assocL = (p, op, x) => makeParser(state => {
+export const assocL = (p, op, x) => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) {
     assertParser('assocL', p, ordinalParser('1st'))
     assertParser('assocL', op, ordinalParser('2nd'))
   }
-  const [reply, [nextState, result]] = dup(p(state))
+  const [reply, [nextCtx, result]] = dup(p(ctx))
   if (result.status === Fatal) return reply
-  if (result.status === Error) return ok(nextState, x)
+  if (result.status === Error) return ok(nextCtx, x)
 
   const values = [result.value]
   const ops = []
-  let next = nextState
+  let next = nextCtx
   let index = next.index
   let i = 0
 
@@ -631,18 +631,18 @@ export const assocL = (p, op, x) => makeParser(state => {
  *     applying the functions from `op` left associtively to the values
  *     that result from `p`.
  */
-export const assoc1L = (p, op) => makeParser(state => {
+export const assoc1L = (p, op) => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) {
     assertParser('assoc1L', p, ordinalParser('1st'))
     assertParser('assoc1L', op, ordinalParser('2nd'))
   }
-  const [reply, [nextState, result]] = dup(p(state))
+  const [reply, [nextCtx, result]] = dup(p(ctx))
   if (result.status !== Ok) return reply
 
   const values = [result.value]
   const ops = []
-  let next = nextState
+  let next = nextCtx
   let index = next.index
   let i = 0
 
@@ -696,19 +696,19 @@ export const assoc1L = (p, op) => makeParser(state => {
  *     applying the functions from `op` right associtively to the values
  *     that result from `p`.
  */
-export const assocR = (p, op, x) => makeParser(state => {
+export const assocR = (p, op, x) => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) {
     assertParser('assocR', p, ordinalParser('1st'))
     assertParser('assocR', op, ordinalParser('2nd'))
   }
-  const [reply, [nextState, result]] = dup(p(state))
+  const [reply, [nextCtx, result]] = dup(p(ctx))
   if (result.status === Fatal) return reply
-  if (result.status === Error) return ok(nextState, x)
+  if (result.status === Error) return ok(nextCtx, x)
 
   const values = [result.value]
   const ops = []
-  let next = nextState
+  let next = nextCtx
   let index = next.index
   let i = 0
 
@@ -761,18 +761,18 @@ export const assocR = (p, op, x) => makeParser(state => {
  *     applying the functions from `op` right associtively to the values
  *     that result from `p`.
  */
-export const assoc1R = (p, op) => makeParser(state => {
+export const assoc1R = (p, op) => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) {
     assertParser('assoc1R', p, ordinalParser('1st'))
     assertParser('assoc1R', op, ordinalParser('2nd'))
   }
-  const [reply, [nextState, result]] = dup(p(state))
+  const [reply, [nextCtx, result]] = dup(p(ctx))
   if (result.status !== Ok) return reply
 
   const values = [result.value]
   const ops = []
-  let next = nextState
+  let next = nextCtx
   let index = next.index
   let i = 0
 

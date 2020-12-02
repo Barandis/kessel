@@ -4,7 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import { assertString } from 'kessel/assert'
-import { error, fatal, makeParser, ok } from 'kessel/core'
+import { error, fatal, ok, Parser } from 'kessel/core'
 import { generic, unexpected } from 'kessel/error'
 
 /** @typedef {import('kessel/core').Parser} Parser */
@@ -16,20 +16,20 @@ import { generic, unexpected } from 'kessel/error'
  * @param {*} x The value that be the new parser's result.
  * @returns {Parser} A parser that always succeeds with `value`.
  */
-export const always = x => makeParser(state => ok(state, x))
+export const always = x => Parser(ctx => ok(ctx, x))
 
 /**
  * Creates a parser that fails without consuming input, setting the
  * generic error message to whatever is passed in.
  *
- * @param {string} message The message used to create the generic error.
+ * @param {string} msg The message used to create the generic error.
  * @returns {Parser} A parser that automatically fails with the supplied
  *     error message.
  */
-export const fail = message => makeParser(state => {
+export const fail = msg => Parser(ctx => {
   /* istanbul ignore else */
-  if (ASSERT) assertString('fail', message)
-  return error(state, generic(message))
+  if (ASSERT) assertString('fail', msg)
+  return error(ctx, generic(msg))
 })
 
 /**
@@ -37,27 +37,27 @@ export const fail = message => makeParser(state => {
  * generic error message to whatever is passed in. This signifies a
  * fatal error, one that cannot be recovered from without backtracking.
  *
- * @param {string} message The message used to create the generic error.
+ * @param {string} msg The message used to create the generic error.
  * @returns {Parser} A parser that automatically fails fatally with the
  *     supplied error message.
  */
-export const failFatally = message => makeParser(state => {
+export const failFatally = msg => Parser(ctx => {
   /* istanbul ignore else */
-  if (ASSERT) assertString('failFatally', message)
-  return fatal(state, generic(message))
+  if (ASSERT) assertString('failFatally', msg)
+  return fatal(ctx, generic(msg))
 })
 
 /**
  * Creates a parser that fails without consuming input, setting the
  * unexpected error message to whatever is passed in.
  *
- * @param {string} message The message used to create the unexpected
+ * @param {string} msg The message used to create the unexpected
  *     error.
  * @returns {Parser} A parser that automatically fails with the supplied
  *     error message.
  */
-export const failUnexpected = message => makeParser(state => {
+export const failUnexpected = msg => Parser(ctx => {
   /* istanbul ignore else */
-  if (ASSERT) assertString('failUnexpected', message)
-  return error(state, unexpected(message))
+  if (ASSERT) assertString('failUnexpected', msg)
+  return error(ctx, unexpected(msg))
 })

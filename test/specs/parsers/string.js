@@ -3,7 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { all, anyString, string, stringi } from 'kessel/parsers/string'
+import { all, anyString, string, stringI } from 'kessel/parsers/string'
 import { error, fail, pass } from 'test/helper'
 
 describe('String parsers', () => {
@@ -81,16 +81,16 @@ describe('String parsers', () => {
     })
   })
 
-  describe('stringi', () => {
+  describe('stringI', () => {
     it('throws if its argument is not a string', () => {
-      error(stringi(0), '', '[stringi]: expected a string; found 0')
+      error(stringI(0), '', '[stringI]: expected a string; found 0')
     })
     it('fails at the end of input', () => {
-      fail(stringi('abc'), '', { expected: "'abc'", actual: 'EOF' })
+      fail(stringI('abc'), '', { expected: "'abc'", actual: 'EOF' })
     })
 
     context('1-byte characters', () => {
-      const parser = stringi('Onoma')
+      const parser = stringI('Onoma')
 
       it('succeeds if the same number of characters is matched', () => {
         pass(parser, 'Onomatopoeia', { result: 'Onoma', index: 5 })
@@ -107,7 +107,7 @@ describe('String parsers', () => {
     })
 
     context('2-byte characters', () => {
-      const parser = stringi('Звуко')
+      const parser = stringI('Звуко')
 
       it('succeeds if the same number of characters is matched', () => {
         pass(parser, 'Звукоподражание', { result: 'Звуко', index: 10 })
@@ -124,7 +124,7 @@ describe('String parsers', () => {
     })
 
     context('3-byte characters', () => {
-      const parser = stringi('คำเลี')
+      const parser = stringI('คำเลี')
 
       it('succeeds if the same number of characters is matched', () => {
         pass(parser, 'คำเลียนเสียง', { result: 'คำเลี', index: 15 })
@@ -138,7 +138,7 @@ describe('String parsers', () => {
     })
 
     context('4-byte characters', () => {
-      const parser = stringi('𝑂𝑛𝑜𝑚𝑎')
+      const parser = stringI('𝑂𝑛𝑜𝑚𝑎')
 
       it('succeeds if the same number of characters is matched', () => {
         pass(parser, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂𝑛𝑜𝑚𝑎', index: 20 })

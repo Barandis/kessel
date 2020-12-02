@@ -10,7 +10,7 @@ import {
   viewToString,
 } from './util'
 
-/** @typedef {import('./core.js').State} State */
+/** @typedef {import('./core.js').Context} Context */
 /** @typedef {import('./core.js').Result} Result */
 
 const tab = /\t/gu
@@ -63,7 +63,7 @@ export const ErrorType = {
 
 /**
  * An error that happens at the location referred to by the current
- * state. The type is used to determine where the label should be
+ * context. The type is used to determine where the label should be
  * positioned in the error message.
  *
  * @typedef {object} LocalError
@@ -73,7 +73,7 @@ export const ErrorType = {
 
 /**
  * An error that happens in a different location than the one referred
- * to by the current state. The most typical reason for this happening
+ * to by the current context. The most typical reason for this happening
  * is backtracking; the local error can track the current
  * (post-backtrack) location while the nested error retains informtion
  * from the error that caused the backtracking in the first place.
@@ -81,11 +81,11 @@ export const ErrorType = {
  * @typedef {object} NestedError
  * @property {ErrorType} type The error type. This will always be
  *     `ErrorType.Nested`.
- * @property {State} state The state at the time that the original error
- *     occurred. This can (and probably will) be different from the
- *     current state.
+ * @property {Context} ctx The context at the time that the original
+ *     error occurred. This can (and probably will) be different from
+ *     the current context.
  * @property {ErrorList} errors A list of errors that occurred at the
- *     location derived from `state`.
+ *     location derived from `ctx`.
  */
 
 /**
@@ -99,11 +99,11 @@ export const ErrorType = {
  * @property {string} label The message associated with this error. This
  *     is typically used as a sort of header over the nested messages
  *     under this compound error.
- * @property {State} state The state at the time that the original error
- *     occurred. This can (and probably will) be different from the
- *     current state.
+ * @property {Context} ctx The context at the time that the original
+ *     error occurred. This can (and probably will) be different from
+ *     the current context.
  * @property {ErrorList} errors A list of errors that occurred at the
- *     location derived from `state`.
+ *     location derived from `ctx`.
  */
 
 /**
@@ -154,20 +154,20 @@ export function other(label) {
 
 /**
  * Creates a nested error. This takes an error list and wraps it with
- * state information. If the supplied error list is just a single nested
- * error, that error is simply returned; a single nested error will not
- * be nested in another nested error.
+ * context information. If the supplied error list is just a single
+ * nested error, that error is simply returned; a single nested error
+ * will not be nested in another nested error.
  *
- * @param {State} state The state at the point where the nested error
+ * @param {Context} ctx The context at the point where the nested error
  *     occurred.
  * @param {ErrorList} errors The list of errors that occurred at the
- *     position pointed to by the given state.
+ *     position pointed to by the given context.
  * @returns {NestedError} A new nested error.
  */
-export function nested(state, errors) {
+export function nested(ctx, errors) {
   return errors.length === 1 && errors[0].type === ErrorType.Nested
     ? errors
-    : [{ type: ErrorType.Nested, state, errors }]
+    : [{ type: ErrorType.Nested, ctx, errors }]
 }
 
 /**
@@ -177,21 +177,21 @@ export function nested(state, errors) {
  * used to create a new compound error without any nested error.
  *
  * @param {string} label The message attached to the nested error.
- * @param {State} state The state at the point where the compound error
- *     occurred.
+ * @param {Context} ctx The context at the point where the compound
+ *     error occurred.
  * @param {ErrorList} errors The list of errors that occurred at the
- *     position pointed to by the given state.
+ *     position pointed to by the given context.
  * @returns {CompoundError} A new compound error.
  */
-export function compound(label, state, errors) {
+export function compound(label, ctx, errors) {
   return errors.length === 1 && errors[0].type === ErrorType.Nested
     ? [{
       type: ErrorType.Compound,
-      state: errors.state,
+      ctx: errors.ctx,
       errors: errors.errors,
       label,
     }]
-    : [{ type: ErrorType.Compound, state, errors, label }]
+    : [{ type: ErrorType.Compound, ctx, errors, label }]
 }
 
 /**
@@ -578,7 +578,7 @@ export function show(line, length, colno, maxWidth, indent = 0) {
 function formatNested(nesteds, tabSize, maxWidth, indent) {
   const sp = ' '.repeat(indent)
   const nestedMsgs = nesteds.map(n => {
-    const { index, view } = n.state
+    const { index, view } = n.ctx
     const label = n.label
       ? `\n${sp}${n.label} could not be parsed because:\n\n`
       : `\n${sp}The parser backtracked after:\n\n`
@@ -715,14 +715,14 @@ export function format(errors, index, view, tabSize, maxWidth, indent = 0) {
 // #endregion
 
 /**
- * Accepts a parser state and produces an error message from it.
+ * Accepts a parser context and produces an error message from it.
  *
  * A default formatter is provided but an alternate one can be passed
  * in. The same goes for tab size (used to expand tabs in parsed text;
  * defaults to 8) and max width (for the error message itself; defaults
  * to 72).
  *
- * @param {State} state The parser's state when the error happened.
+ * @param {Context} ctx The parser's context when the error happened.
  * @param {Result} result The result produced when the error happened.
  * @param {number} [tabSize=8] A number whose multiples define where
  *     tabs stop.
@@ -733,19 +733,19 @@ export function format(errors, index, view, tabSize, maxWidth, indent = 0) {
  *     actual formatting is delegated.
  */
 export function formatErrors(
-  state, result, tabSize = 8, maxWidth = 72, formatter = format,
+  ctx, result, tabSize = 8, maxWidth = 72, formatter = format,
 ) {
-  const { index, view } = state
+  const { index, view } = ctx
   return formatter(result.errors, index, view, tabSize, maxWidth)
 }
 
 /**
- * Returns the position of the next byte of the supplied state. The
+ * Returns the position of the next byte of the supplied context. The
  * position is an object with `line` and `column` properties that are
- * the 1-based line and column numbers of the byte at the state's index
- * within the state's data view.
+ * the 1-based line and column numbers of the byte at the context's
+ * index within the context's data view.
  *
- * @param {State} state The state whose current position is being
+ * @param {Context} ctx The context whose current position is being
  *     calculated.
  * @param {number} [tabSize=8] A number whose multiples define where
  *     tabs stop. The current position's column number is adjusted based
@@ -753,8 +753,8 @@ export function formatErrors(
  * @returns {Position} A two-property object with `line` and `column`
  *     properties.
  */
-export function getPosition(state, tabSize = 8) {
-  const { index, view } = state
+export function getPosition(ctx, tabSize = 8) {
+  const { index, view } = ctx
   const { start, end, lineno } = getLineIndexes(index, view)
   const charIndex = getCharIndex(index, view, start)
 

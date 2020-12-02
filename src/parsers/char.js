@@ -12,7 +12,7 @@ import {
   ordinalFunction,
   ordinalString,
 } from 'kessel/assert'
-import { error, makeParser, ok, Status } from 'kessel/core'
+import { error, ok, Parser, Status } from 'kessel/core'
 import { expected } from 'kessel/error'
 import { expecteds } from 'kessel/messages'
 import { dup, nextChar } from 'kessel/util'
@@ -37,12 +37,12 @@ const { Ok } = Status
  * @returns {Parser} A parser that reads a character and executes `fn`
  *     on it when applied to input.
  */
-const CharParser = fn => makeParser(state => {
-  const { index, view } = state
-  if (index >= view.byteLength) return error(state)
+const CharParser = fn => Parser(ctx => {
+  const { index, view } = ctx
+  if (index >= view.byteLength) return error(ctx)
 
   const { width, next } = nextChar(index, view)
-  return fn(next) ? ok(state, next, index + width) : error(state)
+  return fn(next) ? ok(ctx, next, index + width) : error(ctx)
 })
 
 /**
@@ -56,10 +56,10 @@ const CharParser = fn => makeParser(state => {
  * @returns {Parser} A parser that will succeed if `c` is the next
  *     character in the input.
  */
-export const char = c => makeParser(state => {
+export const char = c => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) assertChar('char', c)
-  const [reply, [next, result]] = dup(CharParser(next => c === next)(state))
+  const [reply, [next, result]] = dup(CharParser(ch => c === ch)(ctx))
   return result.status === Ok ? reply : error(next, expecteds.char(c))
 })
 
@@ -75,12 +75,12 @@ export const char = c => makeParser(state => {
  * @returns {Parser} A parser that will succeed if `c` (or its
  *     other-cased counterpart) is the next character in the input.
  */
-export const chari = c => makeParser(state => {
+export const charI = c => Parser(ctx => {
   /* istanbul ignore else */
-  if (ASSERT) assertChar('chari', c)
+  if (ASSERT) assertChar('charI', c)
   const [reply, [next, result]] = dup(CharParser(
-    read => c.toLowerCase() === read.toLowerCase(),
-  )(state))
+    ch => c.toLowerCase() === ch.toLowerCase(),
+  )(ctx))
   return result.status === Ok ? reply : error(next, expecteds.chari(c))
 })
 
@@ -102,10 +102,10 @@ export const chari = c => makeParser(state => {
  * @returns {Parser} A parser that reads a character and executes `fn`
  *     on it when applied to input.
  */
-export const satisfy = fn => makeParser(state => {
+export const satisfy = fn => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) assertFunction('satisfy', fn)
-  return CharParser(fn)(state)
+  return CharParser(fn)(ctx)
 })
 
 /**
@@ -125,13 +125,13 @@ export const satisfy = fn => makeParser(state => {
  * @returns {Parser} A parser that reads a character and executes `fn`
  *     on it when applied to input.
  */
-export const satisfyM = (fn, message) => makeParser(state => {
+export const satisfyM = (fn, message) => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) {
     assertFunction('satisfyM', fn, ordinalFunction('1st'))
     assertString('satisfyM', message, ordinalString('2nd'))
   }
-  const [reply, [next, result]] = dup(CharParser(fn)(state))
+  const [reply, [next, result]] = dup(CharParser(fn)(ctx))
   return result.status === Ok ? reply : error(next, expected(message))
 })
 
@@ -159,14 +159,14 @@ export const satisfyM = (fn, message) => makeParser(state => {
  * @returns {Parser} A parser that will succeed if the next input
  *     character is between `start` and `end` (inclusive).
  */
-export const range = (start, end) => makeParser(state => {
+export const range = (start, end) => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) {
     assertChar('range', start, ordinalChar('1st'))
     assertChar('range', end, ordinalChar('2nd'))
   }
   const fn = c => c >= start && c <= end
-  const [reply, [next, result]] = dup(CharParser(fn)(state))
+  const [reply, [next, result]] = dup(CharParser(fn)(ctx))
   return result.status === Ok ? reply : error(next, expecteds.range(start, end))
 })
 
@@ -174,12 +174,12 @@ export const range = (start, end) => makeParser(state => {
  * A parser that reads a single input character and then succeeds with
  * that character. Fails only if there is no input left to read.
  */
-export const any = makeParser(state => {
-  const { index, view } = state
-  if (index >= view.byteLength) return error(state, expecteds.any)
+export const any = Parser(ctx => {
+  const { index, view } = ctx
+  if (index >= view.byteLength) return error(ctx, expecteds.any)
 
   const { width, next } = nextChar(index, view)
-  return ok(state, next, index + width)
+  return ok(ctx, next, index + width)
 })
 
 /**
@@ -187,10 +187,9 @@ export const any = makeParser(state => {
  * not exist (i.e., if the index is already at the end of the input).
  * Consumes nothing on either success or failure.
  */
-export const eof = makeParser(state => {
-  const { index, view } = state
-  return index >= view.byteLength
-    ? ok(state, null) : error(state, expecteds.eof)
+export const eof = Parser(ctx => {
+  const { index, view } = ctx
+  return index >= view.byteLength ? ok(ctx, null) : error(ctx, expecteds.eof)
 })
 
 /**
@@ -206,15 +205,15 @@ export const eof = makeParser(state => {
  * @returns {Parser} A parser that succeeds if the next character is
  *     one of the characters in `chars`.
  */
-export const anyOf = chars => makeParser(state => {
+export const anyOf = chars => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) assertStringOrArray('anyOf', chars)
-  const { index, view } = state
+  const { index, view } = ctx
   const { width, next } = nextChar(index, view)
   const arr = [...chars]
 
   return arr.includes(next)
-    ? ok(state, next, index + width) : error(state, expecteds.anyOf(arr))
+    ? ok(ctx, next, index + width) : error(ctx, expecteds.anyOf(arr))
 })
 
 /**
@@ -230,15 +229,15 @@ export const anyOf = chars => makeParser(state => {
  * @returns {Parser} A parser that succeeds if the next character is not
  *     one of the characters in `chars`.
  */
-export const noneOf = chars => makeParser(state => {
+export const noneOf = chars => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) assertStringOrArray('noneOf', chars)
-  const { index, view } = state
+  const { index, view } = ctx
   const { width, next } = nextChar(index, view)
   const arr = [...chars]
 
   return arr.includes(next)
-    ? error(state, expecteds.noneOf(arr)) : ok(state, next, index + width)
+    ? error(ctx, expecteds.noneOf(arr)) : ok(ctx, next, index + width)
 })
 
 /**
@@ -247,9 +246,9 @@ export const noneOf = chars => makeParser(state => {
  * that, use `regex(/\p{Nd}/)`. This parser succeeds only for the
  * literal characters `0-9`.
  */
-export const digit = makeParser(state => {
+export const digit = Parser(ctx => {
   const fn = c => c >= '0' && c <= '9'
-  const [reply, [next, result]] = dup(CharParser(fn)(state))
+  const [reply, [next, result]] = dup(CharParser(fn)(ctx))
   return result.status === Ok ? reply : error(next, expecteds.digit)
 })
 
@@ -257,11 +256,11 @@ export const digit = makeParser(state => {
  * A parser that reads a character and succeeds with that character if
  * it is a hexadecimal digit. This parser is not case sensitive.
  */
-export const hex = makeParser(state => {
+export const hex = Parser(ctx => {
   const fn = c => c >= '0' && c <= '9'
     || c >= 'a' && c <= 'f'
     || c >= 'A' && c <= 'F'
-  const [reply, [next, result]] = dup(CharParser(fn)(state))
+  const [reply, [next, result]] = dup(CharParser(fn)(ctx))
   return result.status === Ok ? reply : error(next, expecteds.hex)
 })
 
@@ -269,9 +268,9 @@ export const hex = makeParser(state => {
  * A parser that reads a character and succeeds with that character if
  * it is an octal digit.
  */
-export const octal = makeParser(state => {
+export const octal = Parser(ctx => {
   const fn = c => c >= '0' && c <= '7'
-  const [reply, [next, result]] = dup(CharParser(fn)(state))
+  const [reply, [next, result]] = dup(CharParser(fn)(ctx))
   return result.status === Ok ? reply : error(next, expecteds.octal)
 })
 
@@ -280,9 +279,9 @@ export const octal = makeParser(state => {
  * it is a letter. This parser is only for ASCII characters; `uletter`
  * is a Unicode letter parser.
  */
-export const letter = makeParser(state => {
+export const letter = Parser(ctx => {
   const fn = c => c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z'
-  const [reply, [next, result]] = dup(CharParser(fn)(state))
+  const [reply, [next, result]] = dup(CharParser(fn)(ctx))
   return result.status === Ok ? reply : error(next, expecteds.letter)
 })
 
@@ -291,11 +290,11 @@ export const letter = makeParser(state => {
  * it is an alphanumeric character. This parser is only for ASCII
  * characters; `ualpha` is a Unicode alphanumeric parser.
  */
-export const alpha = makeParser(state => {
+export const alpha = Parser(ctx => {
   const fn = c => c >= 'a' && c <= 'z'
     || c >= 'A' && c <= 'Z'
     || c >= '0' && c <= '9'
-  const [reply, [next, result]] = dup(CharParser(fn)(state))
+  const [reply, [next, result]] = dup(CharParser(fn)(ctx))
   return result.status === Ok ? reply : error(next, expecteds.alpha)
 })
 
@@ -304,9 +303,9 @@ export const alpha = makeParser(state => {
  * it is an uppercase letter. This parser is only for ASCII characters;
  * `uupper` is a Unicode uppercase letter parser.
  */
-export const upper = makeParser(state => {
+export const upper = Parser(ctx => {
   const fn = c => c >= 'A' && c <= 'Z'
-  const [reply, [next, result]] = dup(CharParser(fn)(state))
+  const [reply, [next, result]] = dup(CharParser(fn)(ctx))
   return result.status === Ok ? reply : error(next, expecteds.upper)
 })
 
@@ -315,8 +314,8 @@ export const upper = makeParser(state => {
  * it is a lowercase letter. This parser is only for ASCII characters;
  * `ulower` is a Unicode letter parser.
  */
-export const lower = makeParser(state => {
+export const lower = Parser(ctx => {
   const fn = c => c >= 'a' && c <= 'z'
-  const [reply, [next, result]] = dup(CharParser(fn)(state))
+  const [reply, [next, result]] = dup(CharParser(fn)(ctx))
   return result.status === Ok ? reply : error(next, expecteds.lower)
 })

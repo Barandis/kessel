@@ -41,10 +41,10 @@ export const Status = {
 }
 
 /**
- * The current state of a parser. This object contains the input text
- * and a pointer to the current location within it.
+ * The context of a parser. This object contains the input text and a
+ * pointer to the current location within it.
  *
- * @typedef {object} State
+ * @typedef {object} Context
  * @property {DataView} view The data view containing the input text.
  * @property {number} index The index within the data view where the
  *     next parsing operation will take place (or where the last one
@@ -65,6 +65,12 @@ export const Status = {
  */
 
 /**
+ * The object that is returned from a parser application, including the
+ * context and the result.
+ * @typedef {[Context, Result]} Reply
+ */
+
+/**
  * @typedef {(
  *   Uint8Array|Uint8ClampedArray|Uint16Array|Uint32Array|Int8Array|
  *   Int16Array|Int32Array|Float32Array|Float64Array
@@ -72,16 +78,16 @@ export const Status = {
  */
 
 /**
- * Creates a new, empty parser state. This is not exported because a new
- * state is only created before parsing, in the `parse` function. Any
- * further states are derived from the initial state using {@link ok},
+ * Creates a new, empty parser context. This is not exported because a
+ * new context is only created before parsing, in the `parse` function.
+ * Any further contexts are derived from the context using {@link ok},
  * {@link error}, or {@link fatal}.
  *
  * @param {(string|ArrayBuffer|TypedArray|DataView)} input The input
  *     text.
- * @returns {State} An empty parser state object.
+ * @returns {Context} An empty parser context.
  */
-export function makeState(input) {
+export function Context(input) {
   const message = 'Parser input must be a string, a typed array, an array '
     + `buffer, or a data view; parser input was ${typeof input}`
 
@@ -109,13 +115,13 @@ export function makeState(input) {
 
 /**
  * A parsing function. This is simply a function that takes a parser
- * state, updates it somehow (generally by reading a character), and
- * returns the updated state.
+ * context, updates it somehow (generally by reading a character), and
+ * returns the updated context.
  *
  * @callback Parser
- * @param {State} state The state before the parser is run.
- * @returns {[State, Result]} The updated state after the parser is
- *     applied and the result of that parser application.
+ * @param {Context} ctx The context before the parser is run.
+ * @returns {Reply} The updated context after the parser is applied and
+ *     the result of that parser application.
  */
 
 /**
@@ -136,53 +142,53 @@ export function makeState(input) {
  * @param {Parser} fn A parser function.
  * @returns {Parser} The same parser function.
  */
-export const makeParser = track(fn => fn)
+export const Parser = track(fn => fn)
 
 /**
  * Produces a new `Result` indicating that a parse succeeded, as well as
- * a `State` potentially with an updated `index`.
+ * a `Context` potentially with an updated `index`.
  *
- * @param {State} state The state prior to the parser being applied.
+ * @param {Context} ctx The context prior to the parser being applied.
  * @param {*} [value=null] The new result of the parser application.
- * @param {number} [index=state.index] The updated index after the
- *     parser was applied.
- * @returns {[State, Result]} A new object representing the state and
- *     result after the latest parser succeeded.
+ * @param {number} [index=ctx.index] The updated index after the parser
+ *     was applied.
+ * @returns {Reply} A new object representing the context and result
+ *     after the latest parser succeeded.
  */
-export function ok(state, value = null, index = state.index) {
-  return [{ ...state, index }, { status: Status.Ok, value }]
+export function ok(ctx, value = null, index = ctx.index) {
+  return [{ ...ctx, index }, { status: Status.Ok, value }]
 }
 
 /**
  * Produces a new `Result` indicating that a parse failed without
- * consuming input, as well as a copy of `State`.
+ * consuming input, as well as a copy of `Context`.
  *
- * @param {State} state The state prior to the parser being applied.
- * @param {ParseError[]} [errors=[]] The errors associated
- *     with the state after the latest parser was applied.
- * @param {number} [index=state.index] The updated index after the
- *     latest parser was applied.
- * @returns {[State, Result]} A new object representing the state and
- *     result after the latest parser failed.
+ * @param {Context} ctx The context prior to the parser being applied.
+ * @param {ParseError[]} [errors=[]] The errors associated with the
+ *     context after the latest parser was applied.
+ * @param {number} [index=ctx.index] The updated index after the latest
+ *     parser was applied.
+ * @returns {Reply} A new object representing the context and result
+ *     after the latest parser failed.
  */
-export function error(state, errors = [], index = state.index) {
-  return [{ ...state, index }, { status: Status.Error, errors }]
+export function error(ctx, errors = [], index = ctx.index) {
+  return [{ ...ctx, index }, { status: Status.Error, errors }]
 }
 
 /**
  * Produces a new `Result` indicating that a parse failed while
- * consuming input, as well as a new `State` with an updated `index`.
+ * consuming input, as well as a new `Context` with an updated `index`.
  *
- * @param {State} state The state prior to the parser being applied.
- * @param {ParseError[]} [errors=[] The errors associated
- *     with the state after the latest parser was applied.
- * @param {number} [index=state.index] The updated index after the
- *     latest parser was applied.
- * @returns {[State, Result]} A new object representing the state and
- *     result after the latest parser failed.
+ * @param {Context} ctx The context prior to the parser being applied.
+ * @param {ParseError[]} [errors=[] The errors associated with the
+ *     context after the latest parser was applied.
+ * @param {number} [index=ctx.index] The updated index after the latest
+ *     parser was applied.
+ * @returns {Reply} A new object representing the context and result
+ *     after the latest parser failed.
  */
-export function fatal(state, errors = [], index = state.index) {
-  return [{ ...state, index }, { status: Status.Fatal, errors }]
+export function fatal(ctx, errors = [], index = ctx.index) {
+  return [{ ...ctx, index }, { status: Status.Fatal, errors }]
 }
 
 /**
@@ -192,17 +198,17 @@ export function fatal(state, errors = [], index = state.index) {
  *
  * @param {boolean} test Used to determine whether the produced result
  *     represents a fatal error (`true`) or not (`false`).
- * @param {State} state The state prior to the parser being applied.
- * @param {ParseError[]} [errors=[] The errors associated
- *     with the state after the latest parser was applied.
- * @param {number} [index=state.index] The updated index after the
- *     latest parser was applied.
- * @returns {[State, Result]} A new object representing the state and
- *     result after the latest parser failed.
+ * @param {Context} ctx The context prior to the parser being applied.
+ * @param {ParseError[]} [errors=[] The errors associated with the
+ *     context after the latest parser was applied.
+ * @param {number} [index=ctx.index] The updated index after the latest
+ *     parser was applied.
+ * @returns {Reply} A new object representing the context and result
+ *     after the latest parser failed.
  */
-export function maybeFatal(test, state, errors = [], index = state.index) {
+export function maybeFatal(test, ctx, errors = [], index = ctx.index) {
   return [
-    { ...state, index },
+    { ...ctx, index },
     { status: test ? Status.Fatal : Status.Error, errors },
   ]
 }
@@ -210,25 +216,24 @@ export function maybeFatal(test, state, errors = [], index = state.index) {
 /**
  * Applies a parser to input. This input can be a string, a typed array,
  * an array buffer, or a data view. The return value is the final parser
- * state returned by the parser after being run.
+ * context returned by the parser after being run.
  *
  * @param {Parser} parser The parser to be applied to the input. This
  *     can, as always, be a composition of an arbitrary number of
  *     parsers and combinators.
  * @param {(string|ArrayBuffer|TypedArray|DataView)} input The input
  *     text.
- * @returns {[State, Result]} The final state after all parsers have
- *     been applied and the result of the final parser application.
+ * @returns {Reply} The final context after all parsers have been
+ *     applied and the result of the final parser application.
  */
 export function parse(parser, input) {
-  return parser(makeState(input))
+  return parser(Context(input))
 }
 
 /**
  * Returns the status of the given reply.
  *
- * @param {[State, Result]} reply The state/result value returned by
- *     `parse`.
+ * @param {Reply} reply The context/result value returned by `parse`.
  * @returns {Status} The status of the given reply.
  */
 export function status(reply) {
@@ -238,8 +243,7 @@ export function status(reply) {
 /**
  * Determines whether an invocation of `parse` was successful.
  *
- * @param {[State, Result]} reply The state/result value returned by
- *     `parse`.
+ * @param {Reply} reply The context/result value returned by `parse`.
  * @returns {boolean} `true` if the parser succeeded or `false` if it
  *     did not.
  */
@@ -255,8 +259,7 @@ export function succeeded(reply) {
  * (`skip`, `lookAhead`, etc.). The proper way to tell if a parser
  * succeeded in the first place is to use `succeeded`.
  *
- * @param {[State, Result]} reply The state/result value returned by
- *     `parse`.
+ * @param {Reply} reply The context/result value returned by `parse`.
  * @returns {*} The resulting value from the parse if it was successful,
  *     or `null` if it was not.
  */
@@ -265,12 +268,11 @@ export function success(reply) {
 }
 
 /**
- * Extracts the error message as a string from the value returned by
- * an unsuccessful invocation of `parse`. If the parser was actually
+ * Extracts the error message as a string from the value returned by an
+ * unsuccessful invocation of `parse`. If the parser was actually
  * successful, this will return `null` instead.
  *
- * @param {[State, Result]} reply The state/result value returned by
- *     `parse`.
+ * @param {Reply} reply The context/result value returned by `parse`.
  * @returns {string} A formatted string detailing the circumstances of
  *     the parser failure.
  */
@@ -294,9 +296,9 @@ export function failure(reply) {
  *     detailed record of where the error occurred.
  */
 export function run(parser, input) {
-  const [state, result] = parser(makeState(input))
+  const [ctx, result] = parser(Context(input))
   if (result.status === Status.Ok) {
     return result.value
   }
-  throw new Error(formatErrors(state, result))
+  throw new Error(formatErrors(ctx, result))
 }

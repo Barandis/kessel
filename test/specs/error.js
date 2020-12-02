@@ -8,7 +8,7 @@ import { expect } from 'chai'
 import { sequenceB } from 'kessel/combinators/alternative'
 import { backLabel } from 'kessel/combinators/message'
 import { sequence } from 'kessel/combinators/sequence'
-import { makeState, parse, Status } from 'kessel/core'
+import { Context, parse, Status } from 'kessel/core'
 import {
   expected,
   format,
@@ -641,7 +641,7 @@ describe('Parse errors', () => {
 
     describe('formatErrors', () => {
       const input = '\t\tOnomatopoeia'
-      const state = makeState(input)
+      const state = Context(input)
       state.index = 4
       const result = {
         errors: expected('a digit'),

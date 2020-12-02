@@ -4,7 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import { assertNumber, assertString } from 'kessel/assert'
-import { error, makeParser, ok, Status } from 'kessel/core'
+import { error, ok, Parser, Status } from 'kessel/core'
 import { expecteds } from 'kessel/messages'
 import { charLength, dup, nextChars, viewToString } from 'kessel/util'
 
@@ -29,15 +29,15 @@ const { Ok } = Status
  * @returns {Parser} A parser that succeeds if the read string passes
  *     the predicate function.
  */
-const StringParser = (length, fn) => makeParser(state => {
-  if (length < 1) return ok(state, '')
+const StringParser = (length, fn) => Parser(ctx => {
+  if (length < 1) return ok(ctx, '')
 
-  const { index, view } = state
-  if (index >= view.byteLength) return error(state)
+  const { index, view } = ctx
+  if (index >= view.byteLength) return error(ctx)
 
   const { width, next } = nextChars(index, view, length)
   return charLength(next) !== length || !fn(next)
-    ? error(state) : ok(state, next, index + width)
+    ? error(ctx) : ok(ctx, next, index + width)
 })
 
 /**
@@ -54,12 +54,12 @@ const StringParser = (length, fn) => makeParser(state => {
  * @returns {Parser} A parser that will succeed if the supplied string
  *     matches the next characters in the input.
  */
-export const string = str => makeParser(state => {
+export const string = str => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) assertString('string', str)
   const [reply, [next, result]] = dup(StringParser(
     charLength(str), chars => str === chars,
-  )(state))
+  )(ctx))
   return result.status === Ok ? reply : error(next, expecteds.string(str))
 })
 
@@ -79,12 +79,12 @@ export const string = str => makeParser(state => {
  * @returns {Parser} A parser that will succeed if the supplied string
  *     case-insensitively matches the next characters in the input.
  */
-export const stringi = str => makeParser(state => {
+export const stringI = str => Parser(ctx => {
   /* istanbul ignore else */
-  if (ASSERT) assertString('stringi', str)
+  if (ASSERT) assertString('stringI', str)
   const [reply, [next, result]] = dup(StringParser(
     charLength(str), chars => str.toLowerCase() === chars.toLowerCase(),
-  )(state))
+  )(ctx))
   return result.status === Ok ? reply : error(next, expecteds.stringi(str))
 })
 
@@ -92,10 +92,10 @@ export const stringi = str => makeParser(state => {
  * A parser that reads the remainder of the input text and results in
  * that text. Succeeds if already at EOF, resulting in an empty string.
  */
-export const all = makeParser(state => {
-  const { index, view } = state
+export const all = Parser(ctx => {
+  const { index, view } = ctx
   const width = view.byteLength - index
-  return ok(state, viewToString(index, width, view), index + width)
+  return ok(ctx, viewToString(index, width, view), index + width)
 })
 
 /**
@@ -107,9 +107,9 @@ export const all = makeParser(state => {
  * @returns {Parser} A parser that reads that many characters and joins
  *     them into a string for its result.
  */
-export const anyString = n => makeParser(state => {
+export const anyString = n => Parser(ctx => {
   /* istanbul ignore else */
   if (ASSERT) assertNumber('anyString', n)
-  const [reply, [next, result]] = dup(StringParser(n, () => true)(state))
+  const [reply, [next, result]] = dup(StringParser(n, () => true)(ctx))
   return result.status === Ok ? reply : error(next, expecteds.anyString(n))
 })
