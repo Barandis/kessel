@@ -42,8 +42,8 @@ export const label = (p, msg) => Parser(ctx => {
   ASSERT && assertString('label', msg, ordinalString('2nd'))
 
   const index = ctx.index
-  const [reply, [next, result]] = dup(p(ctx))
-  return index === next.index ? pass(next, result, expected(msg)) : reply
+  const [reply, [context, result]] = dup(p(ctx))
+  return index === context.index ? pass(context, result, expected(msg)) : reply
 })
 
 /**
@@ -75,16 +75,16 @@ export const backLabel = (p, msg) => Parser(ctx => {
   ASSERT && assertString('backLabel', msg, ordinalString('2nd'))
 
   const index = ctx.index
-  const [reply, [next, result]] = dup(p(ctx))
+  const [reply, [context, result]] = dup(p(ctx))
   if (result.status === Ok) {
-    return index === next.index
-      ? pass(next, result, expected(msg)) : reply
-  } else if (index === next.index) {
+    return index === context.index
+      ? pass(context, result, expected(msg)) : reply
+  } else if (index === context.index) {
     if (result.errors.length === 1 && result.errors[0].type === Nested) {
       const { ctx, errors } = result.errors[0]
-      return pass(next, result, compound(msg, ctx, errors))
+      return pass(context, result, compound(msg, ctx, errors))
     }
-    return pass(next, result, expected(msg))
+    return pass(context, result, expected(msg))
   }
-  return fatal(ctx, compound(msg, next, result.errors))
+  return fatal(ctx, compound(msg, context, result.errors))
 })

@@ -35,9 +35,9 @@ export const lookAhead = p => Parser(ctx => {
   ASSERT && assertParser('lookAhead', p)
 
   const index = ctx.index
-  const [next, result] = p(ctx)
-  return result.status === Ok ? ok(next, result.value, index)
-    : error(next, result.errors, index)
+  const [context, result] = p(ctx)
+  return result.status === Ok ? ok(context, result.value, index)
+    : error(context, result.errors, index)
 })
 
 /**
@@ -61,8 +61,9 @@ export const notEmpty = p => Parser(ctx => {
   ASSERT && assertParser('notEmpty', p)
 
   const index = ctx.index
-  const [reply, [next, result]] = dup(p(ctx))
-  return result.status !== Ok || next.index !== index ? reply : error(next)
+  const [reply, [context, result]] = dup(p(ctx))
+  return result.status !== Ok || context.index !== index ? reply
+    : error(context)
 })
 
 /**
@@ -88,9 +89,9 @@ export const notEmptyM = (p, msg) => Parser(ctx => {
   ASSERT && assertString('notEmptyM', msg, ordinalString('2nd'))
 
   const index = ctx.index
-  const [reply, [next, result]] = dup(p(ctx))
-  return result.status !== Ok || next.index !== index ? reply
-    : error(next, expected(msg))
+  const [reply, [context, result]] = dup(p(ctx))
+  return result.status !== Ok || context.index !== index ? reply
+    : error(context, expected(msg))
 })
 
 /**
@@ -110,9 +111,9 @@ export const followedBy = p => Parser(ctx => {
   ASSERT && assertParser('followedBy', p)
 
   const index = ctx.index
-  const [next, result] = p(ctx)
-  return result.status === Ok ? ok(next, null, index)
-    : error(next, undefined, index)
+  const [context, result] = p(ctx)
+  return result.status === Ok ? ok(context, null, index)
+    : error(context, undefined, index)
 })
 
 /**
@@ -134,9 +135,9 @@ export const followedByM = (p, msg) => Parser(ctx => {
   ASSERT && assertString('followedByM', msg, ordinalString('2nd'))
 
   const index = ctx.index
-  const [next, result] = p(ctx)
-  return result.status === Ok ? ok(next, null, index)
-    : error(next, expected(msg), index)
+  const [context, result] = p(ctx)
+  return result.status === Ok ? ok(context, null, index)
+    : error(context, expected(msg), index)
 })
 
 /**
@@ -157,9 +158,9 @@ export const notFollowedBy = p => Parser(ctx => {
   ASSERT && assertParser('notFollowedBy', p)
 
   const index = ctx.index
-  const [next, result] = p(ctx)
-  return result.status === Ok ? error(next, undefined, index)
-    : ok(next, null, index)
+  const [context, result] = p(ctx)
+  return result.status === Ok ? error(context, undefined, index)
+    : ok(context, null, index)
 })
 
 /**
@@ -182,7 +183,7 @@ export const notFollowedByM = (p, msg) => Parser(ctx => {
   ASSERT && assertString('notFollowedByM', msg, ordinalString('2nd'))
 
   const index = ctx.index
-  const [next, result] = p(ctx)
-  return result.status === Ok ? error(next, expected(msg), index)
-    : ok(next, null, index)
+  const [context, result] = p(ctx)
+  return result.status === Ok ? error(context, expected(msg), index)
+    : ok(context, null, index)
 })

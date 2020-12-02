@@ -45,7 +45,7 @@ export const chain = (p, fn) => Parser(ctx => {
 
   const index = ctx.index
 
-  const [reply1, [next1, result1]] = dup(p(ctx))
+  const [reply1, [context1, result1]] = dup(p(ctx))
   if (result1.status !== Ok) return reply1
 
   const p2 = fn(result1.value)
@@ -53,9 +53,9 @@ export const chain = (p, fn) => Parser(ctx => {
     'chain', p2, formatter('the 2nd argument to return a parser'),
   )
 
-  const [reply2, [next2, result2]] = dup(p2(next1))
+  const [reply2, [context2, result2]] = dup(p2(context1))
   return result2.status === Ok ? reply2
-    : maybeFatal(next2.index !== index, next2, result2.errors)
+    : maybeFatal(context2.index !== index, context2, result2.errors)
 })
 
 /**
@@ -82,8 +82,8 @@ export const map = (p, fn) => Parser(ctx => {
   ASSERT && assertParser('map', p, ordinalParser('1st'))
   ASSERT && assertFunction('map', fn, ordinalFunction('2nd'))
 
-  const [reply, [next, result]] = dup(p(ctx))
-  return result.status === Ok ? ok(next, fn(result.value)) : reply
+  const [reply, [context, result]] = dup(p(ctx))
+  return result.status === Ok ? ok(context, fn(result.value)) : reply
 })
 
 /**
@@ -115,13 +115,13 @@ export const map = (p, fn) => Parser(ctx => {
 export const join = p => Parser(ctx => {
   ASSERT && assertParser('join', p)
 
-  const [reply, [next, result]] = dup(p(ctx))
+  const [reply, [context, result]] = dup(p(ctx))
   if (result.status !== Ok) return reply
 
   const v = result.value
   ASSERT && assertArray('join', v, formatter('argument to return an array'))
 
-  return ok(next, v.join(''))
+  return ok(context, v.join(''))
 })
 
 /**
@@ -139,8 +139,8 @@ export const join = p => Parser(ctx => {
 export const skip = p => Parser(ctx => {
   ASSERT && assertParser('skip', p)
 
-  const [reply, [next, result]] = dup(p(ctx))
-  return result.status === Ok ? ok(next, null) : reply
+  const [reply, [context, result]] = dup(p(ctx))
+  return result.status === Ok ? ok(context, null) : reply
 })
 
 /**
@@ -159,8 +159,8 @@ export const skip = p => Parser(ctx => {
 export const value = (p, x) => Parser(ctx => {
   ASSERT && assertParser('value', p, ordinalParser('1st'))
 
-  const [tuple, [next, result]] = dup(p(ctx))
-  return result.status === Ok ? ok(next, x) : tuple
+  const [tuple, [context, result]] = dup(p(ctx))
+  return result.status === Ok ? ok(context, x) : tuple
 })
 
 /**
@@ -183,12 +183,12 @@ export const left = (p1, p2) => Parser(ctx => {
 
   const index = ctx.index
 
-  const [reply1, [next1, result1]] = dup(p1(ctx))
+  const [reply1, [context1, result1]] = dup(p1(ctx))
   if (result1.status !== Ok) return reply1
 
-  const [next2, result2] = p2(next1)
-  return result2.status === Ok ? ok(next2, result1.value)
-    : maybeFatal(next2.index !== index, next2, result2.errors)
+  const [context2, result2] = p2(context1)
+  return result2.status === Ok ? ok(context2, result1.value)
+    : maybeFatal(context2.index !== index, context2, result2.errors)
 })
 
 /**
@@ -211,12 +211,12 @@ export const right = (p1, p2) => Parser(ctx => {
 
   const index = ctx.index
 
-  const [reply1, [next1, result1]] = dup(p1(ctx))
+  const [reply1, [context1, result1]] = dup(p1(ctx))
   if (result1.status !== Status.Ok) return reply1
 
-  const [reply2, [next2, result2]] = dup(p2(next1))
+  const [reply2, [context2, result2]] = dup(p2(context1))
   return result2.status === Ok ? reply2
-    : maybeFatal(next2.index !== index, next2, result2.errors)
+    : maybeFatal(context2.index !== index, context2, result2.errors)
 })
 
 /**
@@ -239,12 +239,12 @@ export const both = (p1, p2) => Parser(ctx => {
 
   const index = ctx.index
 
-  const [reply1, [next1, result1]] = dup(p1(ctx))
+  const [reply1, [context1, result1]] = dup(p1(ctx))
   if (result1.status !== Ok) return reply1
 
-  const [next2, result2] = p2(next1)
-  return result2.status === Ok ? ok(next2, [result1.value, result2.value])
-    : maybeFatal(next2.index !== index, next2, result2.errors)
+  const [context2, result2] = p2(context1)
+  return result2.status === Ok ? ok(context2, [result1.value, result2.value])
+    : maybeFatal(context2.index !== index, context2, result2.errors)
 })
 
 /**
@@ -283,18 +283,18 @@ export const pipe = (...ps) => Parser(ctx => {
 
   const index = ctx.index
   const values = []
-  let next = ctx
+  let context = ctx
 
   for (const p of ps) {
-    const [nextCtx, result] = p(next)
-    next = nextCtx
+    const [next, result] = p(context)
+    context = next
 
     if (result.status !== Ok) {
-      return maybeFatal(next.index !== index, next, result.errors)
+      return maybeFatal(context.index !== index, context, result.errors)
     }
     values.push(result.value)
   }
-  return ok(next, fn(...values))
+  return ok(context, fn(...values))
 })
 
 /**
@@ -323,17 +323,17 @@ export const between = (pre, post, p) => Parser(ctx => {
 
   const index = ctx.index
 
-  const [reply1, [next1, result1]] = dup(pre(ctx))
+  const [reply1, [context1, result1]] = dup(pre(ctx))
   if (result1.status !== Ok) return reply1
 
-  const [next2, result2] = p(next1)
+  const [context2, result2] = p(context1)
   if (result2.status !== Ok) {
-    return maybeFatal(next2.index !== index, next2, result2.errors)
+    return maybeFatal(context2.index !== index, context2, result2.errors)
   }
 
-  const [next3, result3] = post(next2)
-  return result3.status === Ok ? ok(next3, result2.value)
-    : maybeFatal(next3.index !== index, next3, result3.errors)
+  const [context3, result3] = post(context2)
+  return result3.status === Ok ? ok(context3, result2.value)
+    : maybeFatal(context3.index !== index, context3, result3.errors)
 })
 
 /**
@@ -352,13 +352,13 @@ export const nth = (p, n) => Parser(ctx => {
   ASSERT && assertParser('nth', p, ordinalParser('1st'))
   ASSERT && assertNumber('nth', n, ordinalNumber('2nd'))
 
-  const [reply, [next, result]] = dup(p(ctx))
+  const [reply, [context, result]] = dup(p(ctx))
   if (result.status !== Ok) return reply
 
   const v = result.value
   ASSERT && assertArray('nth', v, formatter('1st argument to return an array'))
 
-  return ok(next, v[n])
+  return ok(context, v[n])
 })
 
 /**
@@ -375,13 +375,13 @@ export const nth = (p, n) => Parser(ctx => {
 export const first = p => Parser(ctx => {
   ASSERT && assertParser('first', p)
 
-  const [reply, [next, result]] = dup(p(ctx))
+  const [reply, [context, result]] = dup(p(ctx))
   if (result.status !== Ok) return reply
 
   const v = result.value
   ASSERT && assertArray('first', v, formatter('argument to return an array'))
 
-  return ok(next, v[0])
+  return ok(context, v[0])
 })
 
 /**
@@ -398,13 +398,13 @@ export const first = p => Parser(ctx => {
 export const second = p => Parser(ctx => {
   ASSERT && assertParser('second', p)
 
-  const [reply, [next, result]] = dup(p(ctx))
+  const [reply, [context, result]] = dup(p(ctx))
   if (result.status !== Ok) return reply
 
   const v = result.value
   ASSERT && assertArray('second', v, formatter('argument to return an array'))
 
-  return ok(next, v[1])
+  return ok(context, v[1])
 })
 
 /**
@@ -421,13 +421,13 @@ export const second = p => Parser(ctx => {
 export const third = p => Parser(ctx => {
   ASSERT && assertParser('third', p)
 
-  const [reply, [next, result]] = dup(p(ctx))
+  const [reply, [context, result]] = dup(p(ctx))
   if (result.status !== Ok) return reply
 
   const v = result.value
   ASSERT && assertArray('third', v, formatter('argument to return an array'))
 
-  return ok(next, v[2])
+  return ok(context, v[2])
 })
 
 /**
@@ -444,13 +444,13 @@ export const third = p => Parser(ctx => {
 export const fourth = p => Parser(ctx => {
   ASSERT && assertParser('fourth', p)
 
-  const [reply, [next, result]] = dup(p(ctx))
+  const [reply, [context, result]] = dup(p(ctx))
   if (result.status !== Ok) return reply
 
   const v = result.value
   ASSERT && assertArray('fourth', v, formatter('argument to return an array'))
 
-  return ok(next, v[3])
+  return ok(context, v[3])
 })
 
 /**
@@ -467,11 +467,11 @@ export const fourth = p => Parser(ctx => {
 export const fifth = p => Parser(ctx => {
   ASSERT && assertParser('fifth', p)
 
-  const [reply, [next, result]] = dup(p(ctx))
+  const [reply, [context, result]] = dup(p(ctx))
   if (result.status !== Ok) return reply
 
   const v = result.value
   ASSERT && assertArray('fifth', v, formatter('argument to return an array'))
 
-  return ok(next, v[4])
+  return ok(context, v[4])
 })

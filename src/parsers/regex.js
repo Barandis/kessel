@@ -101,8 +101,8 @@ export const regex = re => Parser(ctx => {
     regex = new RegExp(newSource, flags)
   }
 
-  const [reply, [next, result]] = dup(RegexParser(regex)(ctx))
-  return result.status === Ok ? reply : error(next, expecteds.regex(regex))
+  const [reply, [context, result]] = dup(RegexParser(regex)(ctx))
+  return result.status === Ok ? reply : error(context, expecteds.regex(regex))
 })
 
 /**
@@ -111,8 +111,8 @@ export const regex = re => Parser(ctx => {
  * Unicode `Alphabetic` property.
  */
 export const letterU = Parser(ctx => {
-  const [reply, [next, result]] = dup(RegexParser(reLetter)(ctx))
-  return result.status === Ok ? reply : error(next, expecteds.letterU)
+  const [reply, [context, result]] = dup(RegexParser(reLetter)(ctx))
+  return result.status === Ok ? reply : error(context, expecteds.letterU)
 })
 
 /**
@@ -121,8 +121,8 @@ export const letterU = Parser(ctx => {
  * Unicode `Alphabetic` property or the Unicode `Number` property.
  */
 export const alphaU = Parser(ctx => {
-  const [reply, [next, result]] = dup(RegexParser(reAlpha)(ctx))
-  return result.status === Ok ? reply : error(next, expecteds.alphaU)
+  const [reply, [context, result]] = dup(RegexParser(reAlpha)(ctx))
+  return result.status === Ok ? reply : error(context, expecteds.alphaU)
 })
 
 /**
@@ -132,8 +132,8 @@ export const alphaU = Parser(ctx => {
  * if it has the Unicode `Letter, Titlecase` property.
  */
 export const upperU = Parser(ctx => {
-  const [reply, [next, result]] = dup(RegexParser(reUpper)(ctx))
-  return result.status === Ok ? reply : error(next, expecteds.upperU)
+  const [reply, [context, result]] = dup(RegexParser(reUpper)(ctx))
+  return result.status === Ok ? reply : error(context, expecteds.upperU)
 })
 
 /**
@@ -142,8 +142,8 @@ export const upperU = Parser(ctx => {
  * Unicode `Lowercase` property.
  */
 export const lowerU = Parser(ctx => {
-  const [reply, [next, result]] = dup(RegexParser(reLower)(ctx))
-  return result.status === Ok ? reply : error(next, expecteds.lowerU)
+  const [reply, [context, result]] = dup(RegexParser(reLower)(ctx))
+  return result.status === Ok ? reply : error(context, expecteds.lowerU)
 })
 
 /**
@@ -153,8 +153,8 @@ export const lowerU = Parser(ctx => {
  * or `\r\n`).
  */
 export const space = Parser(ctx => {
-  const [reply, [next, result]] = dup(RegexParser(reSpace)(ctx))
-  return result.status === Ok ? reply : error(next, expecteds.space)
+  const [reply, [context, result]] = dup(RegexParser(reSpace)(ctx))
+  return result.status === Ok ? reply : error(context, expecteds.space)
 })
 
 /**
@@ -166,8 +166,8 @@ export const space = Parser(ctx => {
  * as a single instance of whitespace.
  */
 export const spaceU = Parser(ctx => {
-  const [reply, [next, result]] = dup(RegexParser(reUspace)(ctx))
-  return result.status === Ok ? reply : error(next, expecteds.spaceU)
+  const [reply, [context, result]] = dup(RegexParser(reUspace)(ctx))
+  return result.status === Ok ? reply : error(context, expecteds.spaceU)
 })
 
 /**
@@ -201,8 +201,9 @@ export const spacesU = Parser(ctx => {
  * success, it skips the whitespace and does not produde a result.
  */
 export const spaces1 = Parser(ctx => {
-  const [next, result] = RegexParser(reSpaces1)(ctx)
-  return result.status === Ok ? ok(next, null) : error(next, expecteds.spaces1)
+  const [context, result] = RegexParser(reSpaces1)(ctx)
+  return result.status === Ok ? ok(context, null)
+    : error(context, expecteds.spaces1)
 })
 
 /**
@@ -212,8 +213,9 @@ export const spaces1 = Parser(ctx => {
  * whitespace and does not produde a result.
  */
 export const spaces1U = Parser(ctx => {
-  const [next, result] = RegexParser(reUspaces1)(ctx)
-  return result.status === Ok ? ok(next, null) : error(next, expecteds.spaces1U)
+  const [context, result] = RegexParser(reUspaces1)(ctx)
+  return result.status === Ok ? ok(context, null)
+    : error(context, expecteds.spaces1U)
 })
 
 /**
@@ -231,8 +233,8 @@ export const spaces1U = Parser(ctx => {
  * `\r\n`.
  */
 export const newline = Parser(ctx => {
-  const [reply, [next, result]] = dup(RegexParser(reNewline)(ctx))
-  return result.status === Ok ? reply : error(next, expecteds.newline)
+  const [reply, [context, result]] = dup(RegexParser(reNewline)(ctx))
+  return result.status === Ok ? reply : error(context, expecteds.newline)
 })
 
 /**
@@ -255,6 +257,6 @@ export const newline = Parser(ctx => {
  * `\r\n`.
  */
 export const newlineU = Parser(ctx => {
-  const [reply, [next, result]] = dup(RegexParser(reUnewline)(ctx))
-  return result.status === Ok ? reply : error(next, expecteds.newlineU)
+  const [reply, [context, result]] = dup(RegexParser(reUnewline)(ctx))
+  return result.status === Ok ? reply : error(context, expecteds.newlineU)
 })

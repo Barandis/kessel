@@ -43,11 +43,11 @@ export const choice = (...ps) => Parser(ctx => {
   let errors = []
 
   for (const p of ps) {
-    const [reply, [next, result]] = dup(p(ctx))
+    const [reply, [context, result]] = dup(p(ctx))
     if (result.status === Ok) return reply
 
     errors = merge(errors, result.errors)
-    if (result.status === Fatal) return fatal(next, errors)
+    if (result.status === Fatal) return fatal(context, errors)
   }
   return error(ctx, errors)
 })
@@ -67,8 +67,8 @@ export const choice = (...ps) => Parser(ctx => {
 export const opt = p => Parser(ctx => {
   ASSERT && assertParser('opt', p)
 
-  const [reply, [next, result]] = dup(p(ctx))
-  return result.status !== Error ? reply : ok(next, null)
+  const [reply, [context, result]] = dup(p(ctx))
+  return result.status !== Error ? reply : ok(context, null)
 })
 
 /**
@@ -90,8 +90,8 @@ export const opt = p => Parser(ctx => {
 export const def = (p, x) => Parser(ctx => {
   ASSERT && assertParser('def', p, ordinalParser('1st'))
 
-  const [reply, [next, result]] = dup(p(ctx))
-  return result.status !== Error ? reply : ok(next, x)
+  const [reply, [context, result]] = dup(p(ctx))
+  return result.status !== Error ? reply : ok(context, x)
 })
 
 /**
@@ -114,12 +114,12 @@ export const attempt = p => Parser(ctx => {
   ASSERT && assertParser('attempt', p)
 
   const index = ctx.index
-  const [reply, [next, result]] = dup(p(ctx))
+  const [reply, [context, result]] = dup(p(ctx))
   if (result.status !== Ok) {
-    const err = index === next.index
+    const err = index === context.index
       ? result.errors
-      : nested(next, result.errors)
-    return error(next, err, index)
+      : nested(context, result.errors)
+    return error(context, err, index)
   }
   return reply
 })
@@ -150,22 +150,22 @@ export const sequenceB = (...ps) => Parser(ctx => {
 
   const values = []
   const index = ctx.index
-  let next = ctx
+  let context = ctx
 
   for (const p of ps) {
-    const [reply, [nextCtx, result]] = dup(p(next))
-    next = nextCtx
+    const [reply, [next, result]] = dup(p(context))
+    context = next
 
     if (result.status === Fatal) return reply
     if (result.status === Error) {
-      const err = index === next.index
+      const err = index === context.index
         ? result.errors
-        : nested(next, result.errors)
-      return error(next, err, index)
+        : nested(context, result.errors)
+      return error(context, err, index)
     }
     if (result.value !== null) values.push(result.value)
   }
-  return ok(next, values)
+  return ok(context, values)
 })
 
 /**
@@ -198,15 +198,15 @@ export const chainB = (p, fn) => Parser(ctx => {
 
   const index = ctx.index
 
-  const [reply1, [next1, result1]] = dup(p(ctx))
+  const [reply1, [context1, result1]] = dup(p(ctx))
   if (result1.status !== Ok) return reply1
 
-  const [reply2, [next2, result2]] = dup(fn(result1.value)(next1))
+  const [reply2, [context2, result2]] = dup(fn(result1.value)(context1))
   if (result2.status !== Error) return reply2
-  const err = index === next2.index
+  const err = index === context2.index
     ? result2.errors
-    : nested(next2, result2.errors)
-  return error(next2, err, index)
+    : nested(context2, result2.errors)
+  return error(context2, err, index)
 })
 
 /**
@@ -234,17 +234,17 @@ export const leftB = (p1, p2) => Parser(ctx => {
 
   const index = ctx.index
 
-  const [reply1, [next1, result1]] = dup(p1(ctx))
+  const [reply1, [context1, result1]] = dup(p1(ctx))
   if (result1.status !== Ok) return reply1
 
-  const [reply2, [next2, result2]] = dup(p2(next1))
+  const [reply2, [context2, result2]] = dup(p2(context1))
   if (result2.status === Fatal) return reply2
-  if (result2.status === Ok) return ok(next2, result1.value)
+  if (result2.status === Ok) return ok(context2, result1.value)
 
-  const err = index === next2.index
+  const err = index === context2.index
     ? result2.errors
-    : nested(next2, result2.errors)
-  return error(next2, err, index)
+    : nested(context2, result2.errors)
+  return error(context2, err, index)
 })
 
 /**
@@ -272,16 +272,16 @@ export const rightB = (p1, p2) => Parser(ctx => {
 
   const index = ctx.index
 
-  const [reply1, [next1, result1]] = dup(p1(ctx))
+  const [reply1, [context1, result1]] = dup(p1(ctx))
   if (result1.status !== Status.Ok) return reply1
 
-  const [reply2, [next2, result2]] = dup(p2(next1))
+  const [reply2, [context2, result2]] = dup(p2(context1))
   if (result2.status !== Error) return reply2
 
-  const err = index === next2.index
+  const err = index === context2.index
     ? result2.errors
-    : nested(next2, result2.errors)
-  return error(next2, err, index)
+    : nested(context2, result2.errors)
+  return error(context2, err, index)
 })
 
 /**
@@ -309,17 +309,17 @@ export const bothB = (p1, p2) => Parser(ctx => {
 
   const index = ctx.index
 
-  const [reply1, [next1, result1]] = dup(p1(ctx))
+  const [reply1, [context1, result1]] = dup(p1(ctx))
   if (result1.status !== Ok) return reply1
 
-  const [reply2, [next2, result2]] = dup(p2(next1))
+  const [reply2, [context2, result2]] = dup(p2(context1))
   if (result2.status === Fatal) return reply2
-  if (result2.status === Ok) return ok(next2, [result1.value, result2.value])
+  if (result2.status === Ok) return ok(context2, [result1.value, result2.value])
 
-  const err = index === next2.index
+  const err = index === context2.index
     ? result2.errors
-    : nested(next2, result2.errors)
-  return error(next2, err, index)
+    : nested(context2, result2.errors)
+  return error(context2, err, index)
 })
 
 /**
@@ -343,21 +343,21 @@ export const repeatB = (p, n) => Parser(ctx => {
 
   const index = ctx.index
   const values = []
-  let next = ctx
+  let context = ctx
 
   for (const _ of range(n)) {
-    const [reply, [nextCtx, result]] = dup(p(next))
-    next = nextCtx
+    const [reply, [next, result]] = dup(p(context))
+    context = next
     if (result.status === Fatal) return reply
     if (result.status === Error) {
-      const err = index === next.index
+      const err = index === context.index
         ? result.errors
-        : nested(next, result.errors)
-      return error(next, err, index)
+        : nested(context, result.errors)
+      return error(context, err, index)
     }
     values.push(result.value)
   }
-  return ok(next, values)
+  return ok(context, values)
 })
 
 /**
@@ -389,26 +389,26 @@ export const manyTillB = (p, end) => Parser(ctx => {
 
   const index = ctx.index
   const values = []
-  let next = ctx
+  let context = ctx
 
   while (true) {
-    const [reply1, [next1, result1]] = dup(end(next))
-    next = next1
+    const [reply1, [context1, result1]] = dup(end(context))
+    context = context1
     if (result1.status === Fatal) return reply1
     if (result1.status === Ok) break
 
-    const [reply2, [next2, result2]] = dup(p(next))
-    next = next2
+    const [reply2, [context2, result2]] = dup(p(context))
+    context = context2
     if (result2.status === Fatal) return reply2
     if (result2.status === Error) {
-      const err = index === next2.index
+      const err = index === context2.index
         ? merge(result2.errors, result1.errors)
-        : nested(next2, merge(result2.errors, result1.errors))
-      return error(next2, err, index)
+        : nested(context2, merge(result2.errors, result1.errors))
+      return error(context2, err, index)
     }
     values.push(result2.value)
   }
-  return ok(next, values)
+  return ok(context, values)
 })
 
 /**
@@ -442,22 +442,22 @@ export const blockB = genFn => Parser(ctx => {
   const gen = genFn()
   const index = ctx.index
   let nextValue
-  let next = ctx
+  let context = ctx
   let i = 0
 
   while (true) {
     const { value, done } = gen.next(nextValue)
-    if (done) return ok(next, value)
+    if (done) return ok(context, value)
 
     ASSERT && assertParser('blockB', value, v => `expected ${
       ordinal(i + 1)
     } yield to be to a parser; found ${stringify(v)}`)
 
-    const [reply, [nextCtx, result]] = dup(value(next))
-    next = nextCtx
+    const [reply, [next, result]] = dup(value(context))
+    context = next
 
     if (result.status === Fatal) return reply
-    if (result.status === Error) return error(nextCtx, result.errors, index)
+    if (result.status === Error) return error(next, result.errors, index)
     nextValue = result.value
     i++
   }
@@ -497,17 +497,17 @@ export const pipeB = (...ps) => Parser(ctx => {
 
   const index = ctx.index
   const values = []
-  let next = ctx
+  let context = ctx
 
   for (const p of ps) {
-    const [reply, [nextCtx, result]] = dup(p(next))
-    next = nextCtx
+    const [reply, [next, result]] = dup(p(context))
+    context = next
 
     if (result.status === Fatal) return reply
-    if (result.status === Error) return error(next, result.errors, index)
+    if (result.status === Error) return error(context, result.errors, index)
     values.push(result.value)
   }
-  return ok(next, fn(...values))
+  return ok(context, fn(...values))
 })
 
 /**
@@ -536,15 +536,15 @@ export const betweenB = (pre, post, p) => Parser(ctx => {
 
   const index = ctx.index
 
-  const [reply1, [next1, result1]] = dup(pre(ctx))
+  const [reply1, [context1, result1]] = dup(pre(ctx))
   if (result1.status !== Ok) return reply1
 
-  const [reply2, [next2, result2]] = dup(p(next1))
+  const [reply2, [context2, result2]] = dup(p(context1))
   if (result2.status === Fatal) return reply2
-  if (result2.status === Error) return error(next2, result2.errors, index)
+  if (result2.status === Error) return error(context2, result2.errors, index)
 
-  const [reply3, [next3, result3]] = dup(post(next2))
+  const [reply3, [context3, result3]] = dup(post(context2))
   if (result3.status === Fatal) return reply3
-  if (result3.status === Error) return error(next3, result3.errors, index)
-  return ok(next3, result2.value)
+  if (result3.status === Error) return error(context3, result3.errors, index)
+  return ok(context3, result2.value)
 })

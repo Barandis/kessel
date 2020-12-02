@@ -45,18 +45,18 @@ export const sequence = (...ps) => Parser(ctx => {
 
   const values = []
   const index = ctx.index
-  let next = ctx
+  let context = ctx
 
   for (const p of ps) {
-    const [nextCtx, result] = p(next)
-    next = nextCtx
+    const [next, result] = p(context)
+    context = next
 
     if (result.status !== Ok) {
-      return maybeFatal(next.index !== index, next, result.errors)
+      return maybeFatal(context.index !== index, context, result.errors)
     }
     if (result.value !== null) values.push(result.value)
   }
-  return ok(next, values)
+  return ok(context, values)
 })
 
 /**
@@ -88,22 +88,22 @@ export const block = genFn => Parser(ctx => {
   const gen = genFn()
   const index = ctx.index
   let nextValue
-  let next = ctx
+  let context = ctx
   let i = 0
 
   while (true) {
     const { value, done } = gen.next(nextValue)
-    if (done) return ok(next, value)
+    if (done) return ok(context, value)
 
     ASSERT && assertParser('block', value, v => `expected ${
       ordinal(i + 1)
     } yield to be to a parser; found ${stringify(v)}`)
 
-    const [nextCtx, result] = value(next)
-    next = nextCtx
+    const [next, result] = value(context)
+    context = next
 
     if (result.status !== Ok) {
-      return maybeFatal(next.index !== index, next, result.errors)
+      return maybeFatal(context.index !== index, context, result.errors)
     }
     nextValue = result.value
     i++
@@ -123,21 +123,21 @@ export const block = genFn => Parser(ctx => {
  *     successful results from the contained parser.
  */
 export const many = p => Parser(ctx => {
-  /* istanbul ignore else */
-  assertParser('many', p)
+  ASSERT && assertParser('many', p)
+
   const values = []
-  let next = ctx
+  let context = ctx
 
   while (true) {
-    const [reply, [nextCtx, result]] = dup(p(next))
-    next = nextCtx
+    const [reply, [next, result]] = dup(p(context))
+    context = next
 
     if (result.status === Fatal) return reply
     if (result.status === Error) break
     if (result.value !== null) values.push(result.value)
-    if (next.index >= next.view.byteLength) break
+    if (context.index >= context.view.byteLength) break
   }
-  return ok(next, values)
+  return ok(context, values)
 })
 
 /**
@@ -154,24 +154,24 @@ export const many = p => Parser(ctx => {
  *     successful results from the contained parser.
  */
 export const many1 = p => Parser(ctx => {
-  /* istanbul ignore else */
-  assertParser('many1', p)
-  const [tuple, [nextCtx, result]] = dup(p(ctx))
-  if (result.status !== Ok) return tuple
+  ASSERT && assertParser('many1', p)
 
-  let next = nextCtx
+  const [reply, [next, result]] = dup(p(ctx))
+  if (result.status !== Ok) return reply
+
+  let context = next
   const values = [result.value]
 
   while (true) {
-    const [reply, [nextCtx, result]] = dup(p(next))
-    next = nextCtx
+    const [reply, [next, result]] = dup(p(context))
+    context = next
 
     if (result.status === Fatal) return reply
     if (result.status === Error) break
     if (result.value !== null) values.push(result.value)
-    if (next.index >= next.view.byteLength) break
+    if (context.index >= context.view.byteLength) break
   }
-  return ok(next, values)
+  return ok(context, values)
 })
 
 /**
@@ -185,19 +185,19 @@ export const many1 = p => Parser(ctx => {
  *     repeatedly until it fails. Successful results are discarded.
  */
 export const skipMany = p => Parser(ctx => {
-  /* istanbul ignore else */
-  assertParser('skipMany', p)
-  let next = ctx
+  ASSERT && assertParser('skipMany', p)
+
+  let context = ctx
 
   while (true) {
-    const [reply, [nextCtx, result]] = dup(p(next))
-    next = nextCtx
+    const [reply, [next, result]] = dup(p(context))
+    context = next
 
     if (result.status === Fatal) return reply
     if (result.status === Error) break
-    if (next.index >= next.view.byteLength) break
+    if (context.index >= context.view.byteLength) break
   }
-  return ok(next, null)
+  return ok(context, null)
 })
 
 /**
@@ -212,22 +212,22 @@ export const skipMany = p => Parser(ctx => {
  *     repeatedly until it fails. Successful results are discarded.
  */
 export const skipMany1 = p => Parser(ctx => {
-  /* istanbul ignore else */
-  assertParser('skipMany1', p)
-  const [reply, [nextCtx, result]] = dup(p(ctx))
+  ASSERT && assertParser('skipMany1', p)
+
+  const [reply, [next, result]] = dup(p(ctx))
   if (result.status !== Ok) return reply
 
-  let next = nextCtx
+  let context = next
 
   while (true) {
-    const [reply, [nextCtx, result]] = dup(p(next))
-    next = nextCtx
+    const [reply, [next, result]] = dup(p(context))
+    context = next
 
     if (result.status === Fatal) return reply
     if (result.status === Error) break
-    if (next.index >= next.view.byteLength) break
+    if (context.index >= context.view.byteLength) break
   }
-  return ok(next, null)
+  return ok(context, null)
 })
 
 /**
@@ -256,30 +256,30 @@ export const sepBy = (p, sep) => Parser(ctx => {
   ASSERT && assertParser('sepBy', sep, ordinalParser('2nd'))
 
   let index = ctx.index
-  const [reply, [nextCtx, result]] = dup(p(ctx))
+  const [reply, [next, result]] = dup(p(ctx))
   if (result.status === Fatal) return reply
-  if (result.status === Error) return ok(nextCtx, [])
+  if (result.status === Error) return ok(next, [])
 
   const values = [result.value]
-  let next = nextCtx
+  let context = next
 
   while (true) {
-    index = next.index
+    index = context.index
 
-    const [reply1, [nextCtx1, result1]] = dup(sep(next))
-    next = nextCtx1
+    const [reply1, [context1, result1]] = dup(sep(context))
+    context = context1
     if (result1.status === Fatal) return reply1
     if (result1.status === Error) break
 
-    const [reply2, [nextCtx2, result2]] = dup(p(next))
-    next = nextCtx2
+    const [reply2, [context2, result2]] = dup(p(context))
+    context = context2
     if (result2.status === Fatal) return reply2
     if (result2.status === Error) break
 
-    if (next.index === index) throw new TypeError(loopMessage('sepBy'))
+    if (context.index === index) throw new TypeError(loopMessage('sepBy'))
     values.push(result2.value)
   }
-  return ok(next, values, index)
+  return ok(context, values, index)
 })
 
 /**
@@ -309,29 +309,29 @@ export const sepBy1 = (p, sep) => Parser(ctx => {
   ASSERT && assertParser('sepBy1', sep, ordinalParser('2nd'))
 
   let index = ctx.index
-  const [reply, [nextCtx, result]] = dup(p(ctx))
+  const [reply, [next, result]] = dup(p(ctx))
   if (result.status !== Ok) return reply
 
   const values = [result.value]
-  let next = nextCtx
+  let context = next
 
   while (true) {
-    index = next.index
+    index = context.index
 
-    const [reply1, [nextCtx1, result1]] = dup(sep(next))
-    next = nextCtx1
+    const [reply1, [context1, result1]] = dup(sep(context))
+    context = context1
     if (result1.status === Fatal) return reply1
     if (result1.status === Error) break
 
-    const [reply2, [nextCtx2, result2]] = dup(p(next))
-    next = nextCtx2
+    const [reply2, [context2, result2]] = dup(p(context))
+    context = context2
     if (result2.status === Fatal) return reply2
     if (result2.status === Error) break
 
-    if (next.index === index) throw new TypeError(loopMessage('sepBy1'))
+    if (context.index === index) throw new TypeError(loopMessage('sepBy1'))
     values.push(result2.value)
   }
-  return ok(next, values, index)
+  return ok(context, values, index)
 })
 
 /**
@@ -361,30 +361,30 @@ export const sepEndBy = (p, sep) => Parser(ctx => {
   ASSERT && assertParser('sepEndBy', sep, ordinalParser('2nd'))
 
   let index = ctx.index
-  const [reply, [nextCtx, result]] = dup(p(ctx))
+  const [reply, [next, result]] = dup(p(ctx))
   if (result.status === Fatal) return reply
-  if (result.status === Error) return ok(nextCtx, [])
+  if (result.status === Error) return ok(next, [])
 
   const values = [result.value]
-  let next = nextCtx
+  let context = next
 
   while (true) {
-    index = next.index
+    index = context.index
 
-    const [reply1, [nextCtx1, result1]] = dup(sep(next))
-    next = nextCtx1
+    const [reply1, [context1, result1]] = dup(sep(context))
+    context = context1
     if (result1.status === Fatal) return reply1
     if (result1.status === Error) break
 
-    const [reply2, [nextCtx2, result2]] = dup(p(next))
-    next = nextCtx2
+    const [reply2, [context2, result2]] = dup(p(context))
+    context = context2
     if (result2.status === Fatal) return reply2
     if (result2.status === Error) break
 
-    if (next.index === index) throw new TypeError(loopMessage('sepEndBy'))
+    if (context.index === index) throw new TypeError(loopMessage('sepEndBy'))
     values.push(result2.value)
   }
-  const [sepNext, _] = sep({ ...next, index })
+  const [sepNext, _] = sep({ ...context, index })
   return ok(sepNext, values)
 })
 
@@ -415,29 +415,29 @@ export const sepEndBy1 = (p, sep) => Parser(ctx => {
   ASSERT && assertParser('sepEndBy1', sep, ordinalParser('2nd'))
 
   let index = ctx.index
-  const [reply, [nextCtx, result]] = dup(p(ctx))
+  const [reply, [next, result]] = dup(p(ctx))
   if (result.status !== Ok) return reply
 
   const values = [result.value]
-  let next = nextCtx
+  let context = next
 
   while (true) {
-    index = next.index
+    index = context.index
 
-    const [reply1, [nextCtx1, result1]] = dup(sep(next))
-    next = nextCtx1
+    const [reply1, [context1, result1]] = dup(sep(context))
+    context = context1
     if (result1.status === Fatal) return reply1
     if (result1.status === Error) break
 
-    const [reply2, [nextCtx2, result2]] = dup(p(next))
-    next = nextCtx2
+    const [reply2, [context2, result2]] = dup(p(context))
+    context = context2
     if (result2.status === Fatal) return reply2
     if (result2.status === Error) break
 
-    if (next.index === index) throw new TypeError(loopMessage('sepEndBy1'))
+    if (context.index === index) throw new TypeError(loopMessage('sepEndBy1'))
     values.push(result2.value)
   }
-  const [sepNext, _] = sep({ ...next, index })
+  const [sepNext, _] = sep({ ...context, index })
   return ok(sepNext, values)
 })
 
@@ -458,17 +458,17 @@ export const repeat = (p, n) => Parser(ctx => {
 
   const index = ctx.index
   const values = []
-  let next = ctx
+  let context = ctx
 
   for (const _ of range(n)) {
-    const [nextCtx, result] = p(next)
-    next = nextCtx
+    const [next, result] = p(context)
+    context = next
     if (result.status !== Ok) {
-      return maybeFatal(next.index !== index, next, result.errors)
+      return maybeFatal(context.index !== index, context, result.errors)
     }
     values.push(result.value)
   }
-  return ok(next, values)
+  return ok(context, values)
 })
 
 /**
@@ -500,25 +500,25 @@ export const manyTill = (p, end) => Parser(ctx => {
 
   const index = ctx.index
   const values = []
-  let next = ctx
+  let context = ctx
 
   while (true) {
-    const [reply1, [next1, result1]] = dup(end(next))
-    next = next1
+    const [reply1, [context1, result1]] = dup(end(context))
+    context = context1
     if (result1.status === Fatal) return reply1
     if (result1.status === Ok) break
 
-    const [reply2, [next2, result2]] = dup(p(next))
-    next = next2
+    const [reply2, [context2, result2]] = dup(p(context))
+    context = context2
     if (result2.status === Fatal) return reply2
     if (result2.status === Error) {
       return maybeFatal(
-        next.index !== index, next, merge(result2.errors, result1.errors),
+        context.index !== index, context, merge(result2.errors, result1.errors),
       )
     }
     if (result2.value !== null) values.push(result2.value)
   }
-  return ok(next, values)
+  return ok(context, values)
 })
 
 function opFormatter(ord) {
@@ -554,24 +554,24 @@ export const assocL = (p, op, x) => Parser(ctx => {
   ASSERT && assertParser('assocL', p, ordinalParser('1st'))
   ASSERT && assertParser('assocL', op, ordinalParser('2nd'))
 
-  const [reply, [nextCtx, result]] = dup(p(ctx))
+  const [reply, [next, result]] = dup(p(ctx))
   if (result.status === Fatal) return reply
-  if (result.status === Error) return ok(nextCtx, x)
+  if (result.status === Error) return ok(next, x)
 
   const values = [result.value]
   const ops = []
-  let next = nextCtx
-  let index = next.index
+  let context = next
+  let index = context.index
   let i = 0
 
   while (true) {
-    const [replyop, [nextop, resultop]] = dup(op(next))
-    next = nextop
+    const [replyop, [contextop, resultop]] = dup(op(context))
+    context = contextop
     if (resultop.status === Fatal) return replyop
     if (resultop.status === Error) break
 
-    const [replyp, [nextp, resultp]] = dup(p(next))
-    next = nextp
+    const [replyp, [contextp, resultp]] = dup(p(context))
+    context = contextp
     if (resultp.status === Fatal) return replyp
     if (resultp.status === Error) break
 
@@ -581,7 +581,7 @@ export const assocL = (p, op, x) => Parser(ctx => {
 
     ops.push(resultop.value)
     values.push(resultp.value)
-    index = next.index
+    index = context.index
     i++
   }
 
@@ -589,7 +589,7 @@ export const assocL = (p, op, x) => Parser(ctx => {
   for (const i of range(ops.length)) {
     value = ops[i](value, values[i + 1])
   }
-  return ok(next, value, index)
+  return ok(context, value, index)
 })
 
 /**
@@ -618,23 +618,23 @@ export const assoc1L = (p, op) => Parser(ctx => {
   ASSERT && assertParser('assoc1L', p, ordinalParser('1st'))
   ASSERT && assertParser('assoc1L', op, ordinalParser('2nd'))
 
-  const [reply, [nextCtx, result]] = dup(p(ctx))
+  const [reply, [next, result]] = dup(p(ctx))
   if (result.status !== Ok) return reply
 
   const values = [result.value]
   const ops = []
-  let next = nextCtx
-  let index = next.index
+  let context = next
+  let index = context.index
   let i = 0
 
   while (true) {
-    const [replyop, [nextop, resultop]] = dup(op(next))
-    next = nextop
+    const [replyop, [contextop, resultop]] = dup(op(context))
+    context = contextop
     if (resultop.status === Fatal) return replyop
     if (resultop.status === Error) break
 
-    const [replyp, [nextp, resultp]] = dup(p(next))
-    next = nextp
+    const [replyp, [contextp, resultp]] = dup(p(context))
+    context = contextp
     if (resultp.status === Fatal) return replyp
     if (resultp.status === Error) break
 
@@ -644,7 +644,7 @@ export const assoc1L = (p, op) => Parser(ctx => {
 
     ops.push(resultop.value)
     values.push(resultp.value)
-    index = next.index
+    index = context.index
     i++
   }
 
@@ -652,7 +652,7 @@ export const assoc1L = (p, op) => Parser(ctx => {
   for (const i of range(ops.length)) {
     value = ops[i](value, values[i + 1])
   }
-  return ok(next, value, index)
+  return ok(context, value, index)
 })
 
 /**
@@ -682,24 +682,24 @@ export const assocR = (p, op, x) => Parser(ctx => {
   ASSERT && assertParser('assocR', p, ordinalParser('1st'))
   ASSERT && assertParser('assocR', op, ordinalParser('2nd'))
 
-  const [reply, [nextCtx, result]] = dup(p(ctx))
+  const [reply, [next, result]] = dup(p(ctx))
   if (result.status === Fatal) return reply
-  if (result.status === Error) return ok(nextCtx, x)
+  if (result.status === Error) return ok(next, x)
 
   const values = [result.value]
   const ops = []
-  let next = nextCtx
-  let index = next.index
+  let context = next
+  let index = context.index
   let i = 0
 
   while (true) {
-    const [replyop, [nextop, resultop]] = dup(op(next))
-    next = nextop
+    const [replyop, [contextop, resultop]] = dup(op(context))
+    context = contextop
     if (resultop.status === Fatal) return replyop
     if (resultop.status === Error) break
 
-    const [replyp, [nextp, resultp]] = dup(p(next))
-    next = nextp
+    const [replyp, [contextp, resultp]] = dup(p(context))
+    context = contextp
     if (resultp.status === Fatal) return replyp
     if (resultp.status === Error) break
 
@@ -709,7 +709,7 @@ export const assocR = (p, op, x) => Parser(ctx => {
 
     ops.push(resultop.value)
     values.push(resultp.value)
-    index = next.index
+    index = context.index
     i++
   }
 
@@ -717,7 +717,7 @@ export const assocR = (p, op, x) => Parser(ctx => {
   for (const i of range(ops.length - 1, -1)) {
     value = ops[i](values[i], value)
   }
-  return ok(next, value, index)
+  return ok(context, value, index)
 })
 
 /**
@@ -746,23 +746,23 @@ export const assoc1R = (p, op) => Parser(ctx => {
   ASSERT && assertParser('assoc1R', p, ordinalParser('1st'))
   ASSERT && assertParser('assoc1R', op, ordinalParser('2nd'))
 
-  const [reply, [nextCtx, result]] = dup(p(ctx))
+  const [reply, [next, result]] = dup(p(ctx))
   if (result.status !== Ok) return reply
 
   const values = [result.value]
   const ops = []
-  let next = nextCtx
-  let index = next.index
+  let context = next
+  let index = context.index
   let i = 0
 
   while (true) {
-    const [replyop, [nextop, resultop]] = dup(op(next))
-    next = nextop
+    const [replyop, [contextop, resultop]] = dup(op(context))
+    context = contextop
     if (resultop.status === Fatal) return replyop
     if (resultop.status === Error) break
 
-    const [replyp, [nextp, resultp]] = dup(p(next))
-    next = nextp
+    const [replyp, [contextp, resultp]] = dup(p(context))
+    context = contextp
     if (resultp.status === Fatal) return replyp
     if (resultp.status === Error) break
 
@@ -772,7 +772,7 @@ export const assoc1R = (p, op) => Parser(ctx => {
 
     ops.push(resultop.value)
     values.push(resultp.value)
-    index = next.index
+    index = context.index
     i++
   }
 
@@ -780,5 +780,5 @@ export const assoc1R = (p, op) => Parser(ctx => {
   for (const i of range(ops.length - 1, -1)) {
     value = ops[i](values[i], value)
   }
-  return ok(next, value, index)
+  return ok(context, value, index)
 })
