@@ -8,9 +8,9 @@ import {
   assertFunction,
   assertString,
   assertStringOrArray,
-  ordinalChar,
-  ordinalFunction,
-  ordinalString,
+  ordCharFormatter,
+  ordFnFormatter,
+  ordStrFormatter,
 } from 'kessel/assert'
 import { error, ok, Parser, Status } from 'kessel/core'
 import { expected } from 'kessel/error'
@@ -125,8 +125,8 @@ export const satisfy = fn => Parser(ctx => {
  *     on it when applied to input.
  */
 export const satisfyM = (fn, message) => Parser(ctx => {
-  ASSERT && assertFunction('satisfyM', fn, ordinalFunction('1st'))
-  ASSERT && assertString('satisfyM', message, ordinalString('2nd'))
+  ASSERT && assertFunction('satisfyM', fn, ordFnFormatter('1st'))
+  ASSERT && assertString('satisfyM', message, ordStrFormatter('2nd'))
 
   const [reply, [context, result]] = dup(CharParser(fn)(ctx))
   return result.status === Ok ? reply : error(context, expected(message))
@@ -157,8 +157,8 @@ export const satisfyM = (fn, message) => Parser(ctx => {
  *     character is between `start` and `end` (inclusive).
  */
 export const range = (start, end) => Parser(ctx => {
-  ASSERT && assertChar('range', start, ordinalChar('1st'))
-  ASSERT && assertChar('range', end, ordinalChar('2nd'))
+  ASSERT && assertChar('range', start, ordCharFormatter('1st'))
+  ASSERT && assertChar('range', end, ordCharFormatter('2nd'))
 
   const fn = c => c >= start && c <= end
   const [reply, [context, result]] = dup(CharParser(fn)(ctx))

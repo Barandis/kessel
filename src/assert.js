@@ -17,16 +17,17 @@ const arrFormatter = formatter('an array')
 const strArrFormatter = formatter('a string or an array of characters')
 const strRegFormtter = formatter('a string or a regular expression')
 const numFormatter = formatter('a number')
-const parserFormatter = formatter('a parser')
+const parFormatter = formatter('a parser')
 
 export const ordFormatter = (type, ord) => value =>
   `expected ${ord} argument to be ${type}; found ${stringify(value)}`
 
-export const ordinalChar = ord => ordFormatter('a one-character string', ord)
-export const ordinalFunction = ord => ordFormatter('a function', ord)
-export const ordinalNumber = ord => ordFormatter('a number', ord)
-export const ordinalParser = ord => ordFormatter('a parser', ord)
-export const ordinalString = ord => ordFormatter('a string', ord)
+export const ordCharFormatter = ord =>
+  ordFormatter('a one-character string', ord)
+export const ordFnFormatter = ord => ordFormatter('a function', ord)
+export const ordNumFormatter = ord => ordFormatter('a number', ord)
+export const ordParFormatter = ord => ordFormatter('a parser', ord)
+export const ordStrFormatter = ord => ordFormatter('a string', ord)
 
 function failAssert(name, value, formatter) {
   throw new Error(`[${name}]: ${formatter(value)}`)
@@ -79,7 +80,7 @@ export function assertNumber(name, value, formatter = numFormatter) {
   if (typeof value !== 'number') failAssert(name, value, formatter)
 }
 
-export function assertParser(name, value, formatter = parserFormatter) {
+export function assertParser(name, value, formatter = parFormatter) {
   if (typeof value !== 'function' || !Parser.created(value)) {
     failAssert(name, value, formatter)
   }
@@ -87,6 +88,6 @@ export function assertParser(name, value, formatter = parserFormatter) {
 
 export function assertParsers(name, values) {
   for (const [i, value] of values.entries()) {
-    assertParser(name, value, ordinalParser(ordinal(i + 1)))
+    assertParser(name, value, ordParFormatter(ordinal(i + 1)))
   }
 }

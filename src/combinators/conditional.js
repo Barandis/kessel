@@ -6,8 +6,8 @@
 import {
   assertParser,
   assertString,
-  ordinalParser,
-  ordinalString,
+  ordParFormatter,
+  ordStrFormatter,
 } from 'kessel/assert'
 import { error, ok, Parser, Status } from 'kessel/core'
 import { expected } from 'kessel/error'
@@ -85,8 +85,8 @@ export const notEmpty = p => Parser(ctx => {
  *     consume any input, or otherwise passes the result through.
  */
 export const notEmptyM = (p, msg) => Parser(ctx => {
-  ASSERT && assertParser('notEmptyM', p, ordinalParser('1st'))
-  ASSERT && assertString('notEmptyM', msg, ordinalString('2nd'))
+  ASSERT && assertParser('notEmptyM', p, ordParFormatter('1st'))
+  ASSERT && assertString('notEmptyM', msg, ordStrFormatter('2nd'))
 
   const index = ctx.index
   const [reply, [context, result]] = dup(p(ctx))
@@ -131,8 +131,8 @@ export const followedBy = p => Parser(ctx => {
  *     parser context, whether or not `p` succeeds.
  */
 export const followedByM = (p, msg) => Parser(ctx => {
-  ASSERT && assertParser('followedByM', p, ordinalParser('1st'))
-  ASSERT && assertString('followedByM', msg, ordinalString('2nd'))
+  ASSERT && assertParser('followedByM', p, ordParFormatter('1st'))
+  ASSERT && assertString('followedByM', msg, ordStrFormatter('2nd'))
 
   const index = ctx.index
   const [context, result] = p(ctx)
@@ -179,8 +179,8 @@ export const notFollowedBy = p => Parser(ctx => {
  *     parser context, whether or not `p` succeeds.
  */
 export const notFollowedByM = (p, msg) => Parser(ctx => {
-  ASSERT && assertParser('notFollowedByM', p, ordinalParser('1st'))
-  ASSERT && assertString('notFollowedByM', msg, ordinalString('2nd'))
+  ASSERT && assertParser('notFollowedByM', p, ordParFormatter('1st'))
+  ASSERT && assertString('notFollowedByM', msg, ordStrFormatter('2nd'))
 
   const index = ctx.index
   const [context, result] = p(ctx)

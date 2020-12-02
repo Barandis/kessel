@@ -9,9 +9,9 @@ import {
   assertNumber,
   assertParser,
   assertParsers,
-  ordinalFunction,
-  ordinalNumber,
-  ordinalParser,
+  ordFnFormatter,
+  ordNumFormatter,
+  ordParFormatter,
 } from 'kessel/assert'
 import { error, fatal, ok, Parser, Status } from 'kessel/core'
 import { merge, nested } from 'kessel/error'
@@ -88,7 +88,7 @@ export const opt = p => Parser(ctx => {
  *     parser's successful result or the provided value.
  */
 export const def = (p, x) => Parser(ctx => {
-  ASSERT && assertParser('def', p, ordinalParser('1st'))
+  ASSERT && assertParser('def', p, ordParFormatter('1st'))
 
   const [reply, [context, result]] = dup(p(ctx))
   return result.status !== Error ? reply : ok(context, x)
@@ -193,8 +193,8 @@ export const sequenceB = (...ps) => Parser(ctx => {
  *     return value as a second parser to apply the input to.
  */
 export const chainB = (p, fn) => Parser(ctx => {
-  ASSERT && assertParser('chainB', p, ordinalParser('1st'))
-  ASSERT && assertFunction('chainB', fn, ordinalFunction('2nd'))
+  ASSERT && assertParser('chainB', p, ordParFormatter('1st'))
+  ASSERT && assertFunction('chainB', fn, ordFnFormatter('2nd'))
 
   const index = ctx.index
 
@@ -229,8 +229,8 @@ export const chainB = (p, fn) => Parser(ctx => {
  *     results in the value of the first.
  */
 export const leftB = (p1, p2) => Parser(ctx => {
-  ASSERT && assertParser('leftB', p1, ordinalParser('1st'))
-  ASSERT && assertParser('leftB', p2, ordinalParser('2nd'))
+  ASSERT && assertParser('leftB', p1, ordParFormatter('1st'))
+  ASSERT && assertParser('leftB', p2, ordParFormatter('2nd'))
 
   const index = ctx.index
 
@@ -267,8 +267,8 @@ export const leftB = (p1, p2) => Parser(ctx => {
  *     results in the value of the second.
  */
 export const rightB = (p1, p2) => Parser(ctx => {
-  ASSERT && assertParser('rightB', p1, ordinalParser('1st'))
-  ASSERT && assertParser('rightB', p2, ordinalParser('2nd'))
+  ASSERT && assertParser('rightB', p1, ordParFormatter('1st'))
+  ASSERT && assertParser('rightB', p2, ordParFormatter('2nd'))
 
   const index = ctx.index
 
@@ -304,8 +304,8 @@ export const rightB = (p1, p2) => Parser(ctx => {
  *     results in the values of both parsers in an array.
  */
 export const bothB = (p1, p2) => Parser(ctx => {
-  ASSERT && assertParser('bothB', p1, ordinalParser('1st'))
-  ASSERT && assertParser('bothB', p2, ordinalParser('2nd'))
+  ASSERT && assertParser('bothB', p1, ordParFormatter('1st'))
+  ASSERT && assertParser('bothB', p2, ordParFormatter('2nd'))
 
   const index = ctx.index
 
@@ -338,8 +338,8 @@ export const bothB = (p1, p2) => Parser(ctx => {
  *     an array of all of the successful results of `p`.
  */
 export const repeatB = (p, n) => Parser(ctx => {
-  ASSERT && assertParser('repeatB', p, ordinalParser('1st'))
-  ASSERT && assertNumber('repeatB', n, ordinalNumber('2nd'))
+  ASSERT && assertParser('repeatB', p, ordParFormatter('1st'))
+  ASSERT && assertNumber('repeatB', n, ordNumFormatter('2nd'))
 
   const index = ctx.index
   const values = []
@@ -384,8 +384,8 @@ export const repeatB = (p, n) => Parser(ctx => {
  *     times until the end parser succeeds.
  */
 export const manyTillB = (p, end) => Parser(ctx => {
-  ASSERT && assertParser('manyTillB', p, ordinalParser('1st'))
-  ASSERT && assertParser('manyTillB', end, ordinalParser('2nd'))
+  ASSERT && assertParser('manyTillB', p, ordParFormatter('1st'))
+  ASSERT && assertParser('manyTillB', end, ordParFormatter('2nd'))
 
   const index = ctx.index
   const values = []
@@ -493,7 +493,7 @@ export const pipeB = (...ps) => Parser(ctx => {
   const fn = ps.pop()
 
   ASSERT && assertParsers('pipeB', ps)
-  ASSERT && assertFunction('pipeB', fn, ordinalFunction(ordinal(ps.length + 1)))
+  ASSERT && assertFunction('pipeB', fn, ordFnFormatter(ordinal(ps.length + 1)))
 
   const index = ctx.index
   const values = []
@@ -530,9 +530,9 @@ export const pipeB = (...ps) => Parser(ctx => {
  *     order and then results in the result of its content parser.
  */
 export const betweenB = (pre, post, p) => Parser(ctx => {
-  ASSERT && assertParser('betweenB', pre, ordinalParser('1st'))
-  ASSERT && assertParser('betweenB', post, ordinalParser('2nd'))
-  ASSERT && assertParser('betweenB', p, ordinalParser('3rd'))
+  ASSERT && assertParser('betweenB', pre, ordParFormatter('1st'))
+  ASSERT && assertParser('betweenB', post, ordParFormatter('2nd'))
+  ASSERT && assertParser('betweenB', p, ordParFormatter('3rd'))
 
   const index = ctx.index
 

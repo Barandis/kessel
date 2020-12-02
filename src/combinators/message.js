@@ -6,8 +6,8 @@
 import {
   assertParser,
   assertString,
-  ordinalParser,
-  ordinalString,
+  ordParFormatter,
+  ordStrFormatter,
 } from 'kessel/assert'
 import { fatal, Parser, Status } from 'kessel/core'
 import { compound, ErrorType, expected } from 'kessel/error'
@@ -38,8 +38,8 @@ function pass(ctx, result, errors) {
  *     failure.
  */
 export const label = (p, msg) => Parser(ctx => {
-  ASSERT && assertParser('label', p, ordinalParser('1st'))
-  ASSERT && assertString('label', msg, ordinalString('2nd'))
+  ASSERT && assertParser('label', p, ordParFormatter('1st'))
+  ASSERT && assertString('label', msg, ordStrFormatter('2nd'))
 
   const index = ctx.index
   const [reply, [context, result]] = dup(p(ctx))
@@ -71,8 +71,8 @@ export const label = (p, msg) => Parser(ctx => {
  *     as appropriate if `p` fails.
  */
 export const backLabel = (p, msg) => Parser(ctx => {
-  ASSERT && assertParser('backLabel', p, ordinalParser('1st'))
-  ASSERT && assertString('backLabel', msg, ordinalString('2nd'))
+  ASSERT && assertParser('backLabel', p, ordParFormatter('1st'))
+  ASSERT && assertString('backLabel', msg, ordStrFormatter('2nd'))
 
   const index = ctx.index
   const [reply, [context, result]] = dup(p(ctx))

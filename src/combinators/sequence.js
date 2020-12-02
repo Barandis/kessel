@@ -9,8 +9,8 @@ import {
   assertNumber,
   assertParser,
   assertParsers,
-  ordinalNumber,
-  ordinalParser,
+  ordNumFormatter,
+  ordParFormatter,
 } from 'kessel/assert'
 import { ok, Parser, Status, maybeFatal } from 'kessel/core'
 import { merge } from 'kessel/error'
@@ -252,8 +252,8 @@ export const skipMany1 = p => Parser(ctx => {
  *     content parser results, discarding the separator parser results.
  */
 export const sepBy = (p, sep) => Parser(ctx => {
-  ASSERT && assertParser('sepBy', p, ordinalParser('1st'))
-  ASSERT && assertParser('sepBy', sep, ordinalParser('2nd'))
+  ASSERT && assertParser('sepBy', p, ordParFormatter('1st'))
+  ASSERT && assertParser('sepBy', sep, ordParFormatter('2nd'))
 
   let index = ctx.index
   const [reply, [next, result]] = dup(p(ctx))
@@ -305,8 +305,8 @@ export const sepBy = (p, sep) => Parser(ctx => {
  *     content parser results, discarding the separator parser results.
  */
 export const sepBy1 = (p, sep) => Parser(ctx => {
-  ASSERT && assertParser('sepBy1', p, ordinalParser('1st'))
-  ASSERT && assertParser('sepBy1', sep, ordinalParser('2nd'))
+  ASSERT && assertParser('sepBy1', p, ordParFormatter('1st'))
+  ASSERT && assertParser('sepBy1', sep, ordParFormatter('2nd'))
 
   let index = ctx.index
   const [reply, [next, result]] = dup(p(ctx))
@@ -357,8 +357,8 @@ export const sepBy1 = (p, sep) => Parser(ctx => {
  *     content parser results, discarding the separator parser results.
  */
 export const sepEndBy = (p, sep) => Parser(ctx => {
-  ASSERT && assertParser('sepEndBy', p, ordinalParser('1st'))
-  ASSERT && assertParser('sepEndBy', sep, ordinalParser('2nd'))
+  ASSERT && assertParser('sepEndBy', p, ordParFormatter('1st'))
+  ASSERT && assertParser('sepEndBy', sep, ordParFormatter('2nd'))
 
   let index = ctx.index
   const [reply, [next, result]] = dup(p(ctx))
@@ -411,8 +411,8 @@ export const sepEndBy = (p, sep) => Parser(ctx => {
  *     content parser results, discarding the separator parser results.
  */
 export const sepEndBy1 = (p, sep) => Parser(ctx => {
-  ASSERT && assertParser('sepEndBy1', p, ordinalParser('1st'))
-  ASSERT && assertParser('sepEndBy1', sep, ordinalParser('2nd'))
+  ASSERT && assertParser('sepEndBy1', p, ordParFormatter('1st'))
+  ASSERT && assertParser('sepEndBy1', sep, ordParFormatter('2nd'))
 
   let index = ctx.index
   const [reply, [next, result]] = dup(p(ctx))
@@ -453,8 +453,8 @@ export const sepEndBy1 = (p, sep) => Parser(ctx => {
  *     an array of all of the successful results of `p`.
  */
 export const repeat = (p, n) => Parser(ctx => {
-  ASSERT && assertParser('repeat', p, ordinalParser('1st'))
-  ASSERT && assertNumber('repeat', n, ordinalNumber('2nd'))
+  ASSERT && assertParser('repeat', p, ordParFormatter('1st'))
+  ASSERT && assertNumber('repeat', n, ordNumFormatter('2nd'))
 
   const index = ctx.index
   const values = []
@@ -495,8 +495,8 @@ export const repeat = (p, n) => Parser(ctx => {
  *     times until the end parser succeeds.
  */
 export const manyTill = (p, end) => Parser(ctx => {
-  ASSERT && assertParser('manyTill', p, ordinalParser('1st'))
-  ASSERT && assertParser('manyTill', end, ordinalParser('2nd'))
+  ASSERT && assertParser('manyTill', p, ordParFormatter('1st'))
+  ASSERT && assertParser('manyTill', end, ordParFormatter('2nd'))
 
   const index = ctx.index
   const values = []
@@ -521,6 +521,14 @@ export const manyTill = (p, end) => Parser(ctx => {
   return ok(context, values)
 })
 
+/**
+ * Private formatting function for assertion messages about op parsers
+ * not returning functions
+ *
+ * @param {number} ord The number of the op parser that fails to produce
+ *     a function
+ * @returns {string} An appropriate assertion failure message.
+ */
 function opFormatter(ord) {
   return value => `expected ${ord} op parser to return a function; found ${
     stringify(value)
@@ -551,8 +559,8 @@ function opFormatter(ord) {
  *     that result from `p`.
  */
 export const assocL = (p, op, x) => Parser(ctx => {
-  ASSERT && assertParser('assocL', p, ordinalParser('1st'))
-  ASSERT && assertParser('assocL', op, ordinalParser('2nd'))
+  ASSERT && assertParser('assocL', p, ordParFormatter('1st'))
+  ASSERT && assertParser('assocL', op, ordParFormatter('2nd'))
 
   const [reply, [next, result]] = dup(p(ctx))
   if (result.status === Fatal) return reply
@@ -615,8 +623,8 @@ export const assocL = (p, op, x) => Parser(ctx => {
  *     that result from `p`.
  */
 export const assoc1L = (p, op) => Parser(ctx => {
-  ASSERT && assertParser('assoc1L', p, ordinalParser('1st'))
-  ASSERT && assertParser('assoc1L', op, ordinalParser('2nd'))
+  ASSERT && assertParser('assoc1L', p, ordParFormatter('1st'))
+  ASSERT && assertParser('assoc1L', op, ordParFormatter('2nd'))
 
   const [reply, [next, result]] = dup(p(ctx))
   if (result.status !== Ok) return reply
@@ -679,8 +687,8 @@ export const assoc1L = (p, op) => Parser(ctx => {
  *     that result from `p`.
  */
 export const assocR = (p, op, x) => Parser(ctx => {
-  ASSERT && assertParser('assocR', p, ordinalParser('1st'))
-  ASSERT && assertParser('assocR', op, ordinalParser('2nd'))
+  ASSERT && assertParser('assocR', p, ordParFormatter('1st'))
+  ASSERT && assertParser('assocR', op, ordParFormatter('2nd'))
 
   const [reply, [next, result]] = dup(p(ctx))
   if (result.status === Fatal) return reply
@@ -743,8 +751,8 @@ export const assocR = (p, op, x) => Parser(ctx => {
  *     that result from `p`.
  */
 export const assoc1R = (p, op) => Parser(ctx => {
-  ASSERT && assertParser('assoc1R', p, ordinalParser('1st'))
-  ASSERT && assertParser('assoc1R', op, ordinalParser('2nd'))
+  ASSERT && assertParser('assoc1R', p, ordParFormatter('1st'))
+  ASSERT && assertParser('assoc1R', op, ordParFormatter('2nd'))
 
   const [reply, [next, result]] = dup(p(ctx))
   if (result.status !== Ok) return reply

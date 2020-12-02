@@ -10,9 +10,9 @@ import {
   assertParser,
   assertParsers,
   formatter,
-  ordinalFunction,
-  ordinalNumber,
-  ordinalParser,
+  ordFnFormatter,
+  ordNumFormatter,
+  ordParFormatter,
 } from 'kessel/assert'
 import { maybeFatal, ok, Parser, Status } from 'kessel/core'
 import { dup, ordinal } from 'kessel/util'
@@ -40,8 +40,8 @@ const { Ok } = Status
  *     return value as a second parser to apply the input to.
  */
 export const chain = (p, fn) => Parser(ctx => {
-  ASSERT && assertParser('chain', p, ordinalParser('1st'))
-  ASSERT && assertFunction('chain', fn, ordinalFunction('2nd'))
+  ASSERT && assertParser('chain', p, ordParFormatter('1st'))
+  ASSERT && assertFunction('chain', fn, ordFnFormatter('2nd'))
 
   const index = ctx.index
 
@@ -79,8 +79,8 @@ export const chain = (p, fn) => Parser(ctx => {
  *     return value as its result.
  */
 export const map = (p, fn) => Parser(ctx => {
-  ASSERT && assertParser('map', p, ordinalParser('1st'))
-  ASSERT && assertFunction('map', fn, ordinalFunction('2nd'))
+  ASSERT && assertParser('map', p, ordParFormatter('1st'))
+  ASSERT && assertFunction('map', fn, ordFnFormatter('2nd'))
 
   const [reply, [context, result]] = dup(p(ctx))
   return result.status === Ok ? ok(context, fn(result.value)) : reply
@@ -157,7 +157,7 @@ export const skip = p => Parser(ctx => {
  *     success.
  */
 export const value = (p, x) => Parser(ctx => {
-  ASSERT && assertParser('value', p, ordinalParser('1st'))
+  ASSERT && assertParser('value', p, ordParFormatter('1st'))
 
   const [tuple, [context, result]] = dup(p(ctx))
   return result.status === Ok ? ok(context, x) : tuple
@@ -178,8 +178,8 @@ export const value = (p, x) => Parser(ctx => {
  *     results in the value of the first.
  */
 export const left = (p1, p2) => Parser(ctx => {
-  ASSERT && assertParser('left', p1, ordinalParser('1st'))
-  ASSERT && assertParser('left', p2, ordinalParser('2nd'))
+  ASSERT && assertParser('left', p1, ordParFormatter('1st'))
+  ASSERT && assertParser('left', p2, ordParFormatter('2nd'))
 
   const index = ctx.index
 
@@ -206,8 +206,8 @@ export const left = (p1, p2) => Parser(ctx => {
  *     results in the value of the second.
  */
 export const right = (p1, p2) => Parser(ctx => {
-  ASSERT && assertParser('right', p1, ordinalParser('1st'))
-  ASSERT && assertParser('right', p2, ordinalParser('2nd'))
+  ASSERT && assertParser('right', p1, ordParFormatter('1st'))
+  ASSERT && assertParser('right', p2, ordParFormatter('2nd'))
 
   const index = ctx.index
 
@@ -234,8 +234,8 @@ export const right = (p1, p2) => Parser(ctx => {
  *     results in the values of both parsers in an array.
  */
 export const both = (p1, p2) => Parser(ctx => {
-  ASSERT && assertParser('both', p1, ordinalParser('1st'))
-  ASSERT && assertParser('both', p2, ordinalParser('2nd'))
+  ASSERT && assertParser('both', p1, ordParFormatter('1st'))
+  ASSERT && assertParser('both', p2, ordParFormatter('2nd'))
 
   const index = ctx.index
 
@@ -279,7 +279,7 @@ export const pipe = (...ps) => Parser(ctx => {
   const fn = ps.pop()
 
   ASSERT && assertParsers('pipe', ps)
-  ASSERT && assertFunction('pipe', fn, ordinalFunction(ordinal(ps.length + 1)))
+  ASSERT && assertFunction('pipe', fn, ordFnFormatter(ordinal(ps.length + 1)))
 
   const index = ctx.index
   const values = []
@@ -317,9 +317,9 @@ export const pipe = (...ps) => Parser(ctx => {
  *     order and then results in the result of its content parser.
  */
 export const between = (pre, post, p) => Parser(ctx => {
-  ASSERT && assertParser('between', pre, ordinalParser('1st'))
-  ASSERT && assertParser('between', post, ordinalParser('2nd'))
-  ASSERT && assertParser('between', p, ordinalParser('3rd'))
+  ASSERT && assertParser('between', pre, ordParFormatter('1st'))
+  ASSERT && assertParser('between', post, ordParFormatter('2nd'))
+  ASSERT && assertParser('between', p, ordParFormatter('3rd'))
 
   const index = ctx.index
 
@@ -349,8 +349,8 @@ export const between = (pre, post, p) => Parser(ctx => {
  *     result of `p`.
  */
 export const nth = (p, n) => Parser(ctx => {
-  ASSERT && assertParser('nth', p, ordinalParser('1st'))
-  ASSERT && assertNumber('nth', n, ordinalNumber('2nd'))
+  ASSERT && assertParser('nth', p, ordParFormatter('1st'))
+  ASSERT && assertNumber('nth', n, ordNumFormatter('2nd'))
 
   const [reply, [context, result]] = dup(p(ctx))
   if (result.status !== Ok) return reply
