@@ -160,7 +160,7 @@ export const many1 = p => Parser(ctx => {
   if (result.status !== Ok) return reply
 
   let context = next
-  const values = [result.value]
+  const values = result.value !== null ? [result.value] : []
 
   while (true) {
     const [reply, [next, result]] = dup(p(context))

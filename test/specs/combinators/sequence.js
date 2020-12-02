@@ -136,7 +136,11 @@ describe('Sequence combinators', () => {
       })
     })
     it('does not add null to the results', () => {
-      pass(many(choice(any, eof)), 'abc', ['a', 'b', 'c'])
+      pass(
+        many(map(letter, x => x === 'a' ? null : x)),
+        'abc',
+        ['b', 'c'],
+      )
     })
   })
 
@@ -163,7 +167,16 @@ describe('Sequence combinators', () => {
       })
     })
     it('does not add null to the results', () => {
-      pass(many1(choice(any, eof)), 'abc', ['a', 'b', 'c'])
+      pass(
+        many1(map(letter, x => x === 'a' ? null : x)),
+        'abc',
+        ['b', 'c'],
+      )
+      pass(
+        many1(map(letter, x => x === 'b' ? null : x)),
+        'abc',
+        ['a', 'c'],
+      )
     })
   })
 
