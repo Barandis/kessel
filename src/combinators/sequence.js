@@ -8,6 +8,7 @@ import {
   assertGeneratorFunction,
   assertNumber,
   assertParser,
+  assertParsers,
   ordinalNumber,
   ordinalParser,
 } from 'kessel/assert'
@@ -40,12 +41,8 @@ function loopMessage(name) {
  *     time, in order, and fails if any of those parsers fail.
  */
 export const sequence = (...ps) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    for (const [i, p] of ps.entries()) {
-      assertParser('sequence', p, ordinalParser(ordinal(i + 1)))
-    }
-  }
+  ASSERT && assertParsers('sequence', ps)
+
   const values = []
   const index = ctx.index
   let next = ctx
@@ -86,7 +83,8 @@ export const sequence = (...ps) => Parser(ctx => {
  *     succeed) in the return value of the generator.
  */
 export const block = genFn => Parser(ctx => {
-  if (ASSERT) assertGeneratorFunction('block', genFn)
+  ASSERT && assertGeneratorFunction('block', genFn)
+
   const gen = genFn()
   const index = ctx.index
   let nextValue
@@ -97,12 +95,10 @@ export const block = genFn => Parser(ctx => {
     const { value, done } = gen.next(nextValue)
     if (done) return ok(next, value)
 
-    /* istanbul ignore else */
-    if (ASSERT) {
-      assertParser('block', value, v => `expected ${
-        ordinal(i + 1)
-      } yield to be to a parser; found ${stringify(v)}`)
-    }
+    ASSERT && assertParser('block', value, v => `expected ${
+      ordinal(i + 1)
+    } yield to be to a parser; found ${stringify(v)}`)
+
     const [nextCtx, result] = value(next)
     next = nextCtx
 
@@ -256,11 +252,9 @@ export const skipMany1 = p => Parser(ctx => {
  *     content parser results, discarding the separator parser results.
  */
 export const sepBy = (p, sep) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    assertParser('sepBy', p, ordinalParser('1st'))
-    assertParser('sepBy', sep, ordinalParser('2nd'))
-  }
+  ASSERT && assertParser('sepBy', p, ordinalParser('1st'))
+  ASSERT && assertParser('sepBy', sep, ordinalParser('2nd'))
+
   let index = ctx.index
   const [reply, [nextCtx, result]] = dup(p(ctx))
   if (result.status === Fatal) return reply
@@ -311,11 +305,9 @@ export const sepBy = (p, sep) => Parser(ctx => {
  *     content parser results, discarding the separator parser results.
  */
 export const sepBy1 = (p, sep) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    assertParser('sepBy1', p, ordinalParser('1st'))
-    assertParser('sepBy1', sep, ordinalParser('2nd'))
-  }
+  ASSERT && assertParser('sepBy1', p, ordinalParser('1st'))
+  ASSERT && assertParser('sepBy1', sep, ordinalParser('2nd'))
+
   let index = ctx.index
   const [reply, [nextCtx, result]] = dup(p(ctx))
   if (result.status !== Ok) return reply
@@ -365,11 +357,9 @@ export const sepBy1 = (p, sep) => Parser(ctx => {
  *     content parser results, discarding the separator parser results.
  */
 export const sepEndBy = (p, sep) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    assertParser('sepEndBy', p, ordinalParser('1st'))
-    assertParser('sepEndBy', sep, ordinalParser('2nd'))
-  }
+  ASSERT && assertParser('sepEndBy', p, ordinalParser('1st'))
+  ASSERT && assertParser('sepEndBy', sep, ordinalParser('2nd'))
+
   let index = ctx.index
   const [reply, [nextCtx, result]] = dup(p(ctx))
   if (result.status === Fatal) return reply
@@ -421,11 +411,9 @@ export const sepEndBy = (p, sep) => Parser(ctx => {
  *     content parser results, discarding the separator parser results.
  */
 export const sepEndBy1 = (p, sep) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    assertParser('sepEndBy1', p, ordinalParser('1st'))
-    assertParser('sepEndBy1', sep, ordinalParser('2nd'))
-  }
+  ASSERT && assertParser('sepEndBy1', p, ordinalParser('1st'))
+  ASSERT && assertParser('sepEndBy1', sep, ordinalParser('2nd'))
+
   let index = ctx.index
   const [reply, [nextCtx, result]] = dup(p(ctx))
   if (result.status !== Ok) return reply
@@ -465,11 +453,9 @@ export const sepEndBy1 = (p, sep) => Parser(ctx => {
  *     an array of all of the successful results of `p`.
  */
 export const repeat = (p, n) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    assertParser('repeat', p, ordinalParser('1st'))
-    assertNumber('repeat', n, ordinalNumber('2nd'))
-  }
+  ASSERT && assertParser('repeat', p, ordinalParser('1st'))
+  ASSERT && assertNumber('repeat', n, ordinalNumber('2nd'))
+
   const index = ctx.index
   const values = []
   let next = ctx
@@ -509,11 +495,9 @@ export const repeat = (p, n) => Parser(ctx => {
  *     times until the end parser succeeds.
  */
 export const manyTill = (p, end) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    assertParser('manyTill', p, ordinalParser('1st'))
-    assertParser('manyTill', end, ordinalParser('2nd'))
-  }
+  ASSERT && assertParser('manyTill', p, ordinalParser('1st'))
+  ASSERT && assertParser('manyTill', end, ordinalParser('2nd'))
+
   const index = ctx.index
   const values = []
   let next = ctx
@@ -567,11 +551,9 @@ function opFormatter(ord) {
  *     that result from `p`.
  */
 export const assocL = (p, op, x) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    assertParser('assocL', p, ordinalParser('1st'))
-    assertParser('assocL', op, ordinalParser('2nd'))
-  }
+  ASSERT && assertParser('assocL', p, ordinalParser('1st'))
+  ASSERT && assertParser('assocL', op, ordinalParser('2nd'))
+
   const [reply, [nextCtx, result]] = dup(p(ctx))
   if (result.status === Fatal) return reply
   if (result.status === Error) return ok(nextCtx, x)
@@ -593,9 +575,10 @@ export const assocL = (p, op, x) => Parser(ctx => {
     if (resultp.status === Fatal) return replyp
     if (resultp.status === Error) break
 
-    if (ASSERT) {
-      assertFunction('assocL', resultop.value, opFormatter(ordinal(i + 1)))
-    }
+    ASSERT && assertFunction(
+      'assocL', resultop.value, opFormatter(ordinal(i + 1)),
+    )
+
     ops.push(resultop.value)
     values.push(resultp.value)
     index = next.index
@@ -632,11 +615,9 @@ export const assocL = (p, op, x) => Parser(ctx => {
  *     that result from `p`.
  */
 export const assoc1L = (p, op) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    assertParser('assoc1L', p, ordinalParser('1st'))
-    assertParser('assoc1L', op, ordinalParser('2nd'))
-  }
+  ASSERT && assertParser('assoc1L', p, ordinalParser('1st'))
+  ASSERT && assertParser('assoc1L', op, ordinalParser('2nd'))
+
   const [reply, [nextCtx, result]] = dup(p(ctx))
   if (result.status !== Ok) return reply
 
@@ -657,9 +638,10 @@ export const assoc1L = (p, op) => Parser(ctx => {
     if (resultp.status === Fatal) return replyp
     if (resultp.status === Error) break
 
-    if (ASSERT) {
-      assertFunction('assoc1L', resultop.value, opFormatter(ordinal(i + 1)))
-    }
+    ASSERT && assertFunction(
+      'assoc1L', resultop.value, opFormatter(ordinal(i + 1)),
+    )
+
     ops.push(resultop.value)
     values.push(resultp.value)
     index = next.index
@@ -697,11 +679,9 @@ export const assoc1L = (p, op) => Parser(ctx => {
  *     that result from `p`.
  */
 export const assocR = (p, op, x) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    assertParser('assocR', p, ordinalParser('1st'))
-    assertParser('assocR', op, ordinalParser('2nd'))
-  }
+  ASSERT && assertParser('assocR', p, ordinalParser('1st'))
+  ASSERT && assertParser('assocR', op, ordinalParser('2nd'))
+
   const [reply, [nextCtx, result]] = dup(p(ctx))
   if (result.status === Fatal) return reply
   if (result.status === Error) return ok(nextCtx, x)
@@ -723,9 +703,10 @@ export const assocR = (p, op, x) => Parser(ctx => {
     if (resultp.status === Fatal) return replyp
     if (resultp.status === Error) break
 
-    if (ASSERT) {
-      assertFunction('assocR', resultop.value, opFormatter(ordinal(i + 1)))
-    }
+    ASSERT && assertFunction(
+      'assocR', resultop.value, opFormatter(ordinal(i + 1)),
+    )
+
     ops.push(resultop.value)
     values.push(resultp.value)
     index = next.index
@@ -762,11 +743,9 @@ export const assocR = (p, op, x) => Parser(ctx => {
  *     that result from `p`.
  */
 export const assoc1R = (p, op) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    assertParser('assoc1R', p, ordinalParser('1st'))
-    assertParser('assoc1R', op, ordinalParser('2nd'))
-  }
+  ASSERT && assertParser('assoc1R', p, ordinalParser('1st'))
+  ASSERT && assertParser('assoc1R', op, ordinalParser('2nd'))
+
   const [reply, [nextCtx, result]] = dup(p(ctx))
   if (result.status !== Ok) return reply
 
@@ -787,9 +766,10 @@ export const assoc1R = (p, op) => Parser(ctx => {
     if (resultp.status === Fatal) return replyp
     if (resultp.status === Error) break
 
-    if (ASSERT) {
-      assertFunction('assoc1R', resultop.value, opFormatter(ordinal(i + 1)))
-    }
+    ASSERT && assertFunction(
+      'assoc1R', resultop.value, opFormatter(ordinal(i + 1)),
+    )
+
     ops.push(resultop.value)
     values.push(resultp.value)
     index = next.index

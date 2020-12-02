@@ -8,6 +8,7 @@ import {
   assertGeneratorFunction,
   assertNumber,
   assertParser,
+  assertParsers,
   ordinalFunction,
   ordinalNumber,
   ordinalParser,
@@ -37,12 +38,8 @@ const { Ok, Error, Fatal } = Status
  *     one succeeds.
  */
 export const choice = (...ps) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    for (const [i, p] of ps.entries()) {
-      assertParser('choice', p, ordinalParser(ordinal(i + 1)))
-    }
-  }
+  ASSERT && assertParsers('choice', ps)
+
   let errors = []
 
   for (const p of ps) {
@@ -68,8 +65,8 @@ export const choice = (...ps) => Parser(ctx => {
  *     if its contained parser succeeds.
  */
 export const opt = p => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) assertParser('opt', p)
+  ASSERT && assertParser('opt', p)
+
   const [reply, [next, result]] = dup(p(ctx))
   return result.status !== Error ? reply : ok(next, null)
 })
@@ -91,8 +88,8 @@ export const opt = p => Parser(ctx => {
  *     parser's successful result or the provided value.
  */
 export const def = (p, x) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) assertParser('def', p, ordinalParser('1st'))
+  ASSERT && assertParser('def', p, ordinalParser('1st'))
+
   const [reply, [next, result]] = dup(p(ctx))
   return result.status !== Error ? reply : ok(next, x)
 })
@@ -114,8 +111,8 @@ export const def = (p, x) => Parser(ctx => {
  *     parser fails fatally, this one will instead fail non-fatally.
  */
 export const attempt = p => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) assertParser('attempt', p)
+  ASSERT && assertParser('attempt', p)
+
   const index = ctx.index
   const [reply, [next, result]] = dup(p(ctx))
   if (result.status !== Ok) {
@@ -149,12 +146,8 @@ export const attempt = p => Parser(ctx => {
  *     time, in order, and fails if any of those parsers fail.
  */
 export const sequenceB = (...ps) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    for (const [i, p] of ps.entries()) {
-      assertParser('sequenceB', p, ordinalParser(ordinal(i + 1)))
-    }
-  }
+  ASSERT && assertParsers('sequenceB', ps)
+
   const values = []
   const index = ctx.index
   let next = ctx
@@ -200,11 +193,9 @@ export const sequenceB = (...ps) => Parser(ctx => {
  *     return value as a second parser to apply the input to.
  */
 export const chainB = (p, fn) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    assertParser('chainB', p, ordinalParser('1st'))
-    assertFunction('chainB', fn, ordinalFunction('2nd'))
-  }
+  ASSERT && assertParser('chainB', p, ordinalParser('1st'))
+  ASSERT && assertFunction('chainB', fn, ordinalFunction('2nd'))
+
   const index = ctx.index
 
   const [reply1, [next1, result1]] = dup(p(ctx))
@@ -238,11 +229,9 @@ export const chainB = (p, fn) => Parser(ctx => {
  *     results in the value of the first.
  */
 export const leftB = (p1, p2) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    assertParser('leftB', p1, ordinalParser('1st'))
-    assertParser('leftB', p2, ordinalParser('2nd'))
-  }
+  ASSERT && assertParser('leftB', p1, ordinalParser('1st'))
+  ASSERT && assertParser('leftB', p2, ordinalParser('2nd'))
+
   const index = ctx.index
 
   const [reply1, [next1, result1]] = dup(p1(ctx))
@@ -278,11 +267,9 @@ export const leftB = (p1, p2) => Parser(ctx => {
  *     results in the value of the second.
  */
 export const rightB = (p1, p2) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    assertParser('rightB', p1, ordinalParser('1st'))
-    assertParser('rightB', p2, ordinalParser('2nd'))
-  }
+  ASSERT && assertParser('rightB', p1, ordinalParser('1st'))
+  ASSERT && assertParser('rightB', p2, ordinalParser('2nd'))
+
   const index = ctx.index
 
   const [reply1, [next1, result1]] = dup(p1(ctx))
@@ -317,11 +304,9 @@ export const rightB = (p1, p2) => Parser(ctx => {
  *     results in the values of both parsers in an array.
  */
 export const bothB = (p1, p2) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    assertParser('bothB', p1, ordinalParser('1st'))
-    assertParser('bothB', p2, ordinalParser('2nd'))
-  }
+  ASSERT && assertParser('bothB', p1, ordinalParser('1st'))
+  ASSERT && assertParser('bothB', p2, ordinalParser('2nd'))
+
   const index = ctx.index
 
   const [reply1, [next1, result1]] = dup(p1(ctx))
@@ -353,11 +338,9 @@ export const bothB = (p1, p2) => Parser(ctx => {
  *     an array of all of the successful results of `p`.
  */
 export const repeatB = (p, n) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    assertParser('repeatB', p, ordinalParser('1st'))
-    assertNumber('repeatB', n, ordinalNumber('2nd'))
-  }
+  ASSERT && assertParser('repeatB', p, ordinalParser('1st'))
+  ASSERT && assertNumber('repeatB', n, ordinalNumber('2nd'))
+
   const index = ctx.index
   const values = []
   let next = ctx
@@ -401,11 +384,9 @@ export const repeatB = (p, n) => Parser(ctx => {
  *     times until the end parser succeeds.
  */
 export const manyTillB = (p, end) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    assertParser('manyTillB', p, ordinalParser('1st'))
-    assertParser('manyTillB', end, ordinalParser('2nd'))
-  }
+  ASSERT && assertParser('manyTillB', p, ordinalParser('1st'))
+  ASSERT && assertParser('manyTillB', end, ordinalParser('2nd'))
+
   const index = ctx.index
   const values = []
   let next = ctx
@@ -456,7 +437,8 @@ export const manyTillB = (p, end) => Parser(ctx => {
  *     succeed) in the return value of the generator.
  */
 export const blockB = genFn => Parser(ctx => {
-  if (ASSERT) assertGeneratorFunction('blockB', genFn)
+  ASSERT && assertGeneratorFunction('blockB', genFn)
+
   const gen = genFn()
   const index = ctx.index
   let nextValue
@@ -467,12 +449,10 @@ export const blockB = genFn => Parser(ctx => {
     const { value, done } = gen.next(nextValue)
     if (done) return ok(next, value)
 
-    /* istanbul ignore else */
-    if (ASSERT) {
-      assertParser('blockB', value, v => `expected ${
-        ordinal(i + 1)
-      } yield to be to a parser; found ${stringify(v)}`)
-    }
+    ASSERT && assertParser('blockB', value, v => `expected ${
+      ordinal(i + 1)
+    } yield to be to a parser; found ${stringify(v)}`)
+
     const [reply, [nextCtx, result]] = dup(value(next))
     next = nextCtx
 
@@ -511,13 +491,10 @@ export const blockB = genFn => Parser(ctx => {
  */
 export const pipeB = (...ps) => Parser(ctx => {
   const fn = ps.pop()
-  /* istanbul ignore else */
-  if (ASSERT) {
-    for (const [i, p] of ps.entries()) {
-      assertParser('pipeB', p, ordinalParser(ordinal(i + 1)))
-    }
-    assertFunction('pipeB', fn, ordinalFunction(ordinal(ps.length + 1)))
-  }
+
+  ASSERT && assertParsers('pipeB', ps)
+  ASSERT && assertFunction('pipeB', fn, ordinalFunction(ordinal(ps.length + 1)))
+
   const index = ctx.index
   const values = []
   let next = ctx
@@ -553,12 +530,10 @@ export const pipeB = (...ps) => Parser(ctx => {
  *     order and then results in the result of its content parser.
  */
 export const betweenB = (pre, post, p) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    assertParser('betweenB', pre, ordinalParser('1st'))
-    assertParser('betweenB', post, ordinalParser('2nd'))
-    assertParser('betweenB', p, ordinalParser('3rd'))
-  }
+  ASSERT && assertParser('betweenB', pre, ordinalParser('1st'))
+  ASSERT && assertParser('betweenB', post, ordinalParser('2nd'))
+  ASSERT && assertParser('betweenB', p, ordinalParser('3rd'))
+
   const index = ctx.index
 
   const [reply1, [next1, result1]] = dup(pre(ctx))

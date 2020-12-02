@@ -38,11 +38,9 @@ function pass(ctx, result, errors) {
  *     failure.
  */
 export const label = (p, msg) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    assertParser('label', p, ordinalParser('1st'))
-    assertString('label', msg, ordinalString('2nd'))
-  }
+  ASSERT && assertParser('label', p, ordinalParser('1st'))
+  ASSERT && assertString('label', msg, ordinalString('2nd'))
+
   const index = ctx.index
   const [reply, [next, result]] = dup(p(ctx))
   return index === next.index ? pass(next, result, expected(msg)) : reply
@@ -73,11 +71,9 @@ export const label = (p, msg) => Parser(ctx => {
  *     as appropriate if `p` fails.
  */
 export const backLabel = (p, msg) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    assertParser('backLabel', p, ordinalParser('1st'))
-    assertString('backLabel', msg, ordinalString('2nd'))
-  }
+  ASSERT && assertParser('backLabel', p, ordinalParser('1st'))
+  ASSERT && assertString('backLabel', msg, ordinalString('2nd'))
+
   const index = ctx.index
   const [reply, [next, result]] = dup(p(ctx))
   if (result.status === Ok) {

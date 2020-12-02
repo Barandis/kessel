@@ -57,8 +57,8 @@ const CharParser = fn => Parser(ctx => {
  *     character in the input.
  */
 export const char = c => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) assertChar('char', c)
+  ASSERT && assertChar('char', c)
+
   const [reply, [next, result]] = dup(CharParser(ch => c === ch)(ctx))
   return result.status === Ok ? reply : error(next, expecteds.char(c))
 })
@@ -76,8 +76,8 @@ export const char = c => Parser(ctx => {
  *     other-cased counterpart) is the next character in the input.
  */
 export const charI = c => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) assertChar('charI', c)
+  ASSERT && assertChar('charI', c)
+
   const [reply, [next, result]] = dup(CharParser(
     ch => c.toLowerCase() === ch.toLowerCase(),
   )(ctx))
@@ -103,8 +103,7 @@ export const charI = c => Parser(ctx => {
  *     on it when applied to input.
  */
 export const satisfy = fn => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) assertFunction('satisfy', fn)
+  ASSERT && assertFunction('satisfy', fn)
   return CharParser(fn)(ctx)
 })
 
@@ -126,11 +125,9 @@ export const satisfy = fn => Parser(ctx => {
  *     on it when applied to input.
  */
 export const satisfyM = (fn, message) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    assertFunction('satisfyM', fn, ordinalFunction('1st'))
-    assertString('satisfyM', message, ordinalString('2nd'))
-  }
+  ASSERT && assertFunction('satisfyM', fn, ordinalFunction('1st'))
+  ASSERT && assertString('satisfyM', message, ordinalString('2nd'))
+
   const [reply, [next, result]] = dup(CharParser(fn)(ctx))
   return result.status === Ok ? reply : error(next, expected(message))
 })
@@ -160,11 +157,9 @@ export const satisfyM = (fn, message) => Parser(ctx => {
  *     character is between `start` and `end` (inclusive).
  */
 export const range = (start, end) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    assertChar('range', start, ordinalChar('1st'))
-    assertChar('range', end, ordinalChar('2nd'))
-  }
+  ASSERT && assertChar('range', start, ordinalChar('1st'))
+  ASSERT && assertChar('range', end, ordinalChar('2nd'))
+
   const fn = c => c >= start && c <= end
   const [reply, [next, result]] = dup(CharParser(fn)(ctx))
   return result.status === Ok ? reply : error(next, expecteds.range(start, end))
@@ -206,8 +201,8 @@ export const eof = Parser(ctx => {
  *     one of the characters in `chars`.
  */
 export const anyOf = chars => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) assertStringOrArray('anyOf', chars)
+  ASSERT && assertStringOrArray('anyOf', chars)
+
   const { index, view } = ctx
   const { width, next } = nextChar(index, view)
   const arr = [...chars]
@@ -230,8 +225,8 @@ export const anyOf = chars => Parser(ctx => {
  *     one of the characters in `chars`.
  */
 export const noneOf = chars => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) assertStringOrArray('noneOf', chars)
+  ASSERT && assertStringOrArray('noneOf', chars)
+
   const { index, view } = ctx
   const { width, next } = nextChar(index, view)
   const arr = [...chars]

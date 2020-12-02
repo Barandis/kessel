@@ -32,8 +32,8 @@ const { Ok } = Status
  *     with it, but which consumes no input either way.
  */
 export const lookAhead = p => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) assertParser('lookAhead', p)
+  ASSERT && assertParser('lookAhead', p)
+
   const index = ctx.index
   const [next, result] = p(ctx)
   return result.status === Ok ? ok(next, result.value, index)
@@ -58,8 +58,8 @@ export const lookAhead = p => Parser(ctx => {
  *     consume any input, or otherwise passes the result through.
  */
 export const notEmpty = p => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) assertParser('notEmpty', p)
+  ASSERT && assertParser('notEmpty', p)
+
   const index = ctx.index
   const [reply, [next, result]] = dup(p(ctx))
   return result.status !== Ok || next.index !== index ? reply : error(next)
@@ -84,11 +84,9 @@ export const notEmpty = p => Parser(ctx => {
  *     consume any input, or otherwise passes the result through.
  */
 export const notEmptyM = (p, msg) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    assertParser('notEmptyM', p, ordinalParser('1st'))
-    assertString('notEmptyM', msg, ordinalString('2nd'))
-  }
+  ASSERT && assertParser('notEmptyM', p, ordinalParser('1st'))
+  ASSERT && assertString('notEmptyM', msg, ordinalString('2nd'))
+
   const index = ctx.index
   const [reply, [next, result]] = dup(p(ctx))
   return result.status !== Ok || next.index !== index ? reply
@@ -109,8 +107,8 @@ export const notEmptyM = (p, msg) => Parser(ctx => {
  *     parser context, whether or not `p` succeeds.
  */
 export const followedBy = p => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) assertParser('followedBy', p)
+  ASSERT && assertParser('followedBy', p)
+
   const index = ctx.index
   const [next, result] = p(ctx)
   return result.status === Ok ? ok(next, null, index)
@@ -132,11 +130,9 @@ export const followedBy = p => Parser(ctx => {
  *     parser context, whether or not `p` succeeds.
  */
 export const followedByM = (p, msg) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    assertParser('followedByM', p, ordinalParser('1st'))
-    assertString('followedByM', msg, ordinalString('2nd'))
-  }
+  ASSERT && assertParser('followedByM', p, ordinalParser('1st'))
+  ASSERT && assertString('followedByM', msg, ordinalString('2nd'))
+
   const index = ctx.index
   const [next, result] = p(ctx)
   return result.status === Ok ? ok(next, null, index)
@@ -158,8 +154,8 @@ export const followedByM = (p, msg) => Parser(ctx => {
  *     succeeds.
  */
 export const notFollowedBy = p => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) assertParser('notFollowedBy', p)
+  ASSERT && assertParser('notFollowedBy', p)
+
   const index = ctx.index
   const [next, result] = p(ctx)
   return result.status === Ok ? error(next, undefined, index)
@@ -182,11 +178,9 @@ export const notFollowedBy = p => Parser(ctx => {
  *     parser context, whether or not `p` succeeds.
  */
 export const notFollowedByM = (p, msg) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    assertParser('notFollowedByM', p, ordinalParser('1st'))
-    assertString('notFollowedByM', msg, ordinalString('2nd'))
-  }
+  ASSERT && assertParser('notFollowedByM', p, ordinalParser('1st'))
+  ASSERT && assertString('notFollowedByM', msg, ordinalString('2nd'))
+
   const index = ctx.index
   const [next, result] = p(ctx)
   return result.status === Ok ? error(next, expected(msg), index)

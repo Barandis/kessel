@@ -22,7 +22,7 @@ import {
   sequenceB,
 } from 'kessel/combinators/alternative'
 import { lookAhead } from 'kessel/combinators/conditional'
-import { many, sequence } from 'kessel/combinators/sequence'
+import { many1, sequence } from 'kessel/combinators/sequence'
 import { parse, Status } from 'kessel/core'
 import { ErrorType } from 'kessel/error'
 import { space } from 'kessel/index'
@@ -575,7 +575,7 @@ describe('Alternative and error recovery combinators', () => {
   })
 
   describe('betweenB', () => {
-    const parser = betweenB(char('('), char(')'), many(noneOf(')')))
+    const parser = betweenB(char('('), char(')'), many1(noneOf(')')))
 
     it('throws if its first argument is not a parser', () => {
       error(
@@ -609,6 +609,11 @@ describe('Alternative and error recovery combinators', () => {
       })
     })
     it('fails non-fatally if input is consumed on a non-fatal failure', () => {
+      fail(parser, '()', {
+        expected: "none of ')'",
+        index: 0,
+        status: Error,
+      })
       fail(parser, '(abc', {
         expected: "')'",
         index: 0,
@@ -619,6 +624,11 @@ describe('Alternative and error recovery combinators', () => {
       fail(betweenB(char('('), char(')'), sequence(letter, letter)), '(a)', {
         expected: 'a letter',
         index: 2,
+        status: Fatal,
+      })
+      fail(betweenB(char('('), sequence(char(')'), char(')')), letter), '(a)', {
+        expected: "')'",
+        index: 3,
         status: Fatal,
       })
     })

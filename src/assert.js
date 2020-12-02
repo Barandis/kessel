@@ -4,7 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import { Parser } from './core'
-import { charLength, stringify } from './util'
+import { charLength, ordinal, stringify } from './util'
 
 export const formatter = type =>
   value => `expected ${type}; found ${stringify(value)}`
@@ -82,5 +82,11 @@ export function assertNumber(name, value, formatter = numFormatter) {
 export function assertParser(name, value, formatter = parserFormatter) {
   if (typeof value !== 'function' || !Parser.created(value)) {
     failAssert(name, value, formatter)
+  }
+}
+
+export function assertParsers(name, values) {
+  for (const [i, value] of values.entries()) {
+    assertParser(name, value, ordinalParser(ordinal(i + 1)))
   }
 }

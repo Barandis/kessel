@@ -88,8 +88,7 @@ const RegexParser = re => Parser(ctx => {
  *     if a match is found.
  */
 export const regex = re => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) assertStringOrRegExp('regex', re)
+  ASSERT && assertStringOrRegExp('regex', re)
 
   // First, convert to a regular expression if it's a string
   let regex = typeof re === 'string' ? new RegExp(re) : re

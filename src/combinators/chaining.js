@@ -8,6 +8,7 @@ import {
   assertFunction,
   assertNumber,
   assertParser,
+  assertParsers,
   formatter,
   ordinalFunction,
   ordinalNumber,
@@ -39,20 +40,18 @@ const { Ok } = Status
  *     return value as a second parser to apply the input to.
  */
 export const chain = (p, fn) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    assertParser('chain', p, ordinalParser('1st'))
-    assertFunction('chain', fn, ordinalFunction('2nd'))
-  }
+  ASSERT && assertParser('chain', p, ordinalParser('1st'))
+  ASSERT && assertFunction('chain', fn, ordinalFunction('2nd'))
+
   const index = ctx.index
 
   const [reply1, [next1, result1]] = dup(p(ctx))
   if (result1.status !== Ok) return reply1
 
   const p2 = fn(result1.value)
-  if (ASSERT) {
-    assertParser('chain', p2, formatter('the 2nd argument to return a parser'))
-  }
+  ASSERT && assertParser(
+    'chain', p2, formatter('the 2nd argument to return a parser'),
+  )
 
   const [reply2, [next2, result2]] = dup(p2(next1))
   return result2.status === Ok ? reply2
@@ -80,11 +79,9 @@ export const chain = (p, fn) => Parser(ctx => {
  *     return value as its result.
  */
 export const map = (p, fn) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    assertParser('map', p, ordinalParser('1st'))
-    assertFunction('map', fn, ordinalFunction('2nd'))
-  }
+  ASSERT && assertParser('map', p, ordinalParser('1st'))
+  ASSERT && assertFunction('map', fn, ordinalFunction('2nd'))
+
   const [reply, [next, result]] = dup(p(ctx))
   return result.status === Ok ? ok(next, fn(result.value)) : reply
 })
@@ -116,15 +113,14 @@ export const map = (p, fn) => Parser(ctx => {
  *     array of strings.
  */
 export const join = p => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) assertParser('join', p)
+  ASSERT && assertParser('join', p)
+
   const [reply, [next, result]] = dup(p(ctx))
   if (result.status !== Ok) return reply
 
   const v = result.value
-  if (ASSERT) {
-    assertArray('join', v, formatter('argument to return an array'))
-  }
+  ASSERT && assertArray('join', v, formatter('argument to return an array'))
+
   return ok(next, v.join(''))
 })
 
@@ -141,8 +137,8 @@ export const join = p => Parser(ctx => {
  *     parser does on success, but will produce no result.
  */
 export const skip = p => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) assertParser('skip', p)
+  ASSERT && assertParser('skip', p)
+
   const [reply, [next, result]] = dup(p(ctx))
   return result.status === Ok ? ok(next, null) : reply
 })
@@ -161,8 +157,8 @@ export const skip = p => Parser(ctx => {
  *     success.
  */
 export const value = (p, x) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) assertParser('value', p, ordinalParser('1st'))
+  ASSERT && assertParser('value', p, ordinalParser('1st'))
+
   const [tuple, [next, result]] = dup(p(ctx))
   return result.status === Ok ? ok(next, x) : tuple
 })
@@ -182,11 +178,9 @@ export const value = (p, x) => Parser(ctx => {
  *     results in the value of the first.
  */
 export const left = (p1, p2) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    assertParser('left', p1, ordinalParser('1st'))
-    assertParser('left', p2, ordinalParser('2nd'))
-  }
+  ASSERT && assertParser('left', p1, ordinalParser('1st'))
+  ASSERT && assertParser('left', p2, ordinalParser('2nd'))
+
   const index = ctx.index
 
   const [reply1, [next1, result1]] = dup(p1(ctx))
@@ -212,11 +206,9 @@ export const left = (p1, p2) => Parser(ctx => {
  *     results in the value of the second.
  */
 export const right = (p1, p2) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    assertParser('right', p1, ordinalParser('1st'))
-    assertParser('right', p2, ordinalParser('2nd'))
-  }
+  ASSERT && assertParser('right', p1, ordinalParser('1st'))
+  ASSERT && assertParser('right', p2, ordinalParser('2nd'))
+
   const index = ctx.index
 
   const [reply1, [next1, result1]] = dup(p1(ctx))
@@ -242,11 +234,9 @@ export const right = (p1, p2) => Parser(ctx => {
  *     results in the values of both parsers in an array.
  */
 export const both = (p1, p2) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    assertParser('both', p1, ordinalParser('1st'))
-    assertParser('both', p2, ordinalParser('2nd'))
-  }
+  ASSERT && assertParser('both', p1, ordinalParser('1st'))
+  ASSERT && assertParser('both', p2, ordinalParser('2nd'))
+
   const index = ctx.index
 
   const [reply1, [next1, result1]] = dup(p1(ctx))
@@ -287,13 +277,10 @@ export const both = (p1, p2) => Parser(ctx => {
  */
 export const pipe = (...ps) => Parser(ctx => {
   const fn = ps.pop()
-  /* istanbul ignore else */
-  if (ASSERT) {
-    for (const [i, p] of ps.entries()) {
-      assertParser('pipe', p, ordinalParser(ordinal(i + 1)))
-    }
-    assertFunction('pipe', fn, ordinalFunction(ordinal(ps.length + 1)))
-  }
+
+  ASSERT && assertParsers('pipe', ps)
+  ASSERT && assertFunction('pipe', fn, ordinalFunction(ordinal(ps.length + 1)))
+
   const index = ctx.index
   const values = []
   let next = ctx
@@ -330,12 +317,10 @@ export const pipe = (...ps) => Parser(ctx => {
  *     order and then results in the result of its content parser.
  */
 export const between = (pre, post, p) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    assertParser('between', pre, ordinalParser('1st'))
-    assertParser('between', post, ordinalParser('2nd'))
-    assertParser('between', p, ordinalParser('3rd'))
-  }
+  ASSERT && assertParser('between', pre, ordinalParser('1st'))
+  ASSERT && assertParser('between', post, ordinalParser('2nd'))
+  ASSERT && assertParser('between', p, ordinalParser('3rd'))
+
   const index = ctx.index
 
   const [reply1, [next1, result1]] = dup(pre(ctx))
@@ -364,18 +349,15 @@ export const between = (pre, post, p) => Parser(ctx => {
  *     result of `p`.
  */
 export const nth = (p, n) => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) {
-    assertParser('nth', p, ordinalParser('1st'))
-    assertNumber('nth', n, ordinalNumber('2nd'))
-  }
+  ASSERT && assertParser('nth', p, ordinalParser('1st'))
+  ASSERT && assertNumber('nth', n, ordinalNumber('2nd'))
+
   const [reply, [next, result]] = dup(p(ctx))
   if (result.status !== Ok) return reply
 
   const v = result.value
-  if (ASSERT) {
-    assertArray('nth', v, formatter('1st argument to return an array'))
-  }
+  ASSERT && assertArray('nth', v, formatter('1st argument to return an array'))
+
   return ok(next, v[n])
 })
 
@@ -391,15 +373,14 @@ export const nth = (p, n) => Parser(ctx => {
  *     result of `p`.
  */
 export const first = p => Parser(ctx => {
-  /* istanbul ignore else */
-  assertParser('first', p)
+  ASSERT && assertParser('first', p)
+
   const [reply, [next, result]] = dup(p(ctx))
   if (result.status !== Ok) return reply
 
   const v = result.value
-  if (ASSERT) {
-    assertArray('first', v, formatter('argument to return an array'))
-  }
+  ASSERT && assertArray('first', v, formatter('argument to return an array'))
+
   return ok(next, v[0])
 })
 
@@ -415,15 +396,14 @@ export const first = p => Parser(ctx => {
  *     result of `p`.
  */
 export const second = p => Parser(ctx => {
-  /* istanbul ignore else */
-  assertParser('second', p)
+  ASSERT && assertParser('second', p)
+
   const [reply, [next, result]] = dup(p(ctx))
   if (result.status !== Ok) return reply
 
   const v = result.value
-  if (ASSERT) {
-    assertArray('second', v, formatter('argument to return an array'))
-  }
+  ASSERT && assertArray('second', v, formatter('argument to return an array'))
+
   return ok(next, v[1])
 })
 
@@ -439,15 +419,14 @@ export const second = p => Parser(ctx => {
  *     result of `p`.
  */
 export const third = p => Parser(ctx => {
-  /* istanbul ignore else */
-  assertParser('third', p)
+  ASSERT && assertParser('third', p)
+
   const [reply, [next, result]] = dup(p(ctx))
   if (result.status !== Ok) return reply
 
   const v = result.value
-  if (ASSERT) {
-    assertArray('third', v, formatter('argument to return an array'))
-  }
+  ASSERT && assertArray('third', v, formatter('argument to return an array'))
+
   return ok(next, v[2])
 })
 
@@ -463,15 +442,14 @@ export const third = p => Parser(ctx => {
  *     result of `p`.
  */
 export const fourth = p => Parser(ctx => {
-  /* istanbul ignore else */
-  assertParser('fourth', p)
+  ASSERT && assertParser('fourth', p)
+
   const [reply, [next, result]] = dup(p(ctx))
   if (result.status !== Ok) return reply
 
   const v = result.value
-  if (ASSERT) {
-    assertArray('fourth', v, formatter('argument to return an array'))
-  }
+  ASSERT && assertArray('fourth', v, formatter('argument to return an array'))
+
   return ok(next, v[3])
 })
 
@@ -487,14 +465,13 @@ export const fourth = p => Parser(ctx => {
  *     result of `p`.
  */
 export const fifth = p => Parser(ctx => {
-  /* istanbul ignore else */
-  assertParser('fifth', p)
+  ASSERT && assertParser('fifth', p)
+
   const [reply, [next, result]] = dup(p(ctx))
   if (result.status !== Ok) return reply
 
   const v = result.value
-  if (ASSERT) {
-    assertArray('fifth', v, formatter('argument to return an array'))
-  }
+  ASSERT && assertArray('fifth', v, formatter('argument to return an array'))
+
   return ok(next, v[4])
 })

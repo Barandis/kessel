@@ -55,8 +55,8 @@ const StringParser = (length, fn) => Parser(ctx => {
  *     matches the next characters in the input.
  */
 export const string = str => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) assertString('string', str)
+  ASSERT && assertString('string', str)
+
   const [reply, [next, result]] = dup(StringParser(
     charLength(str), chars => str === chars,
   )(ctx))
@@ -80,8 +80,8 @@ export const string = str => Parser(ctx => {
  *     case-insensitively matches the next characters in the input.
  */
 export const stringI = str => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) assertString('stringI', str)
+  ASSERT && assertString('stringI', str)
+
   const [reply, [next, result]] = dup(StringParser(
     charLength(str), chars => str.toLowerCase() === chars.toLowerCase(),
   )(ctx))
@@ -108,8 +108,8 @@ export const all = Parser(ctx => {
  *     them into a string for its result.
  */
 export const anyString = n => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) assertNumber('anyString', n)
+  ASSERT && assertNumber('anyString', n)
+
   const [reply, [next, result]] = dup(StringParser(n, () => true)(ctx))
   return result.status === Ok ? reply : error(next, expecteds.anyString(n))
 })

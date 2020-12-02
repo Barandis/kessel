@@ -27,8 +27,7 @@ export const always = x => Parser(ctx => ok(ctx, x))
  *     error message.
  */
 export const fail = msg => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) assertString('fail', msg)
+  ASSERT && assertString('fail', msg)
   return error(ctx, generic(msg))
 })
 
@@ -42,8 +41,7 @@ export const fail = msg => Parser(ctx => {
  *     supplied error message.
  */
 export const failFatally = msg => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) assertString('failFatally', msg)
+  ASSERT && assertString('failFatally', msg)
   return fatal(ctx, generic(msg))
 })
 
@@ -57,7 +55,6 @@ export const failFatally = msg => Parser(ctx => {
  *     error message.
  */
 export const failUnexpected = msg => Parser(ctx => {
-  /* istanbul ignore else */
-  if (ASSERT) assertString('failUnexpected', msg)
+  ASSERT && assertString('failUnexpected', msg)
   return error(ctx, unexpected(msg))
 })
