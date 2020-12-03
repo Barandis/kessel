@@ -4,7 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import { Parser } from './core'
-import { charLength, ordinal, stringify } from './util'
+import { charLength, enumerate, ordinal, stringify } from './util'
 
 export const formatter = type =>
   value => `expected ${type}; found ${stringify(value)}`
@@ -87,7 +87,7 @@ export function assertParser(name, value, formatter = parFormatter) {
 }
 
 export function assertParsers(name, values) {
-  for (const [i, value] of values.entries()) {
+  for (const [i, value] of enumerate(values)) {
     assertParser(name, value, ordParFormatter(ordinal(i + 1)))
   }
 }

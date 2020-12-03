@@ -21,8 +21,8 @@ export const encoder = new TextEncoder()
 export const decoder = new TextDecoder()
 
 /**
- * Creates an iterator that covers a range from a starting value to an
- * ending value, stepping by a certain value between each.
+ * An iterator that covers a range from a starting value to an ending
+ * value, stepping by a certain value between each.
  *
  * @param {number} [start=0] The first number of the range.
  * @param {number} end The last number of the range. By default this
@@ -58,6 +58,32 @@ export function *range(start, end, step, inclusive) {
     current = forward ? current + p : current - p
   }
   /* eslint-enable require-atomic-updates */
+}
+
+/**
+ * An iterator that pairs values in an iterable with their indexes in a
+ * series of two-element arrays. The first array element is the index;
+ * the second is the value from the iterable.
+ *
+ * For arrays, this can be done with `array.entries()`, which produces
+ * two-element arrays in the same format. However, this generator
+ * function will work with any kind of object implementing the
+ * `Iterable` interface.
+ *
+ * @param {Iterable} iterable An iterable object whose elements will
+ *     be paired with their indexes.
+ * @yields {[number, *]} The iterable's values, paired with their
+ *     indexes.
+ */
+export function *enumerate(iterable) {
+  const iterator = iterable[Symbol.iterator]()
+  let result = iterator.next()
+  let index = 0
+
+  while (!result.done) {
+    yield [index++, result.value]
+    result = iterator.next()
+  }
 }
 
 /**
