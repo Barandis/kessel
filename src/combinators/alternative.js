@@ -64,8 +64,8 @@ export const choice = (...ps) => Parser(ctx => {
  *     contained parser fails fatally. This parser consumes text only
  *     if its contained parser succeeds.
  */
-export const opt = p => Parser(ctx => {
-  ASSERT && assertParser('opt', p)
+export const optional = p => Parser(ctx => {
+  ASSERT && assertParser('optional', p)
 
   const [reply, [context, result]] = twin(p(ctx))
   return result.status !== Error ? reply : ok(context, null)
@@ -87,8 +87,8 @@ export const opt = p => Parser(ctx => {
  * @returns {Parser} A parser which results in either its contained
  *     parser's successful result or the provided value.
  */
-export const def = (p, x) => Parser(ctx => {
-  ASSERT && assertParser('def', p, ordParFormatter('1st'))
+export const orElse = (p, x) => Parser(ctx => {
+  ASSERT && assertParser('orElse', p, ordParFormatter('1st'))
 
   const [reply, [context, result]] = twin(p(ctx))
   return result.status !== Error ? reply : ok(context, x)

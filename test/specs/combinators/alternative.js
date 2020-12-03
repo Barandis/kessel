@@ -13,10 +13,10 @@ import {
   chainB,
   choice,
   repeatB,
-  def,
+  orElse,
   leftB,
   manyTillB,
-  opt,
+  optional,
   pipeB,
   rightB,
   sequenceB,
@@ -63,23 +63,23 @@ describe('Alternative and error recovery combinators', () => {
     })
   })
 
-  describe('opt', () => {
+  describe('optional', () => {
     it('throws if its argument is not a parser', () => {
-      error(opt(0), '', '[opt]: expected a parser; found 0')
+      error(optional(0), '', '[optional]: expected a parser; found 0')
     })
     it('consumes input and provides a result on success', () => {
-      pass(opt(char('a')), 'abc', { result: 'a', index: 1 })
+      pass(optional(char('a')), 'abc', { result: 'a', index: 1 })
     })
     it('succeeds without consuming if its parser fails', () => {
-      pass(opt(char('a')), 'bcd', { result: null, index: 0 })
+      pass(optional(char('a')), 'bcd', { result: null, index: 0 })
     })
     it('fails fatally if its parser fails fatally', () => {
-      fail(opt(sequence(char('a'), char('b'))), 'acd', {
+      fail(optional(sequence(char('a'), char('b'))), 'acd', {
         expected: "'b'",
         index: 1,
         status: Fatal,
       })
-      pass(opt(attempt(sequence(char('a'), char('b')))), 'acd', {
+      pass(optional(attempt(sequence(char('a'), char('b')))), 'acd', {
         result: null,
         index: 0,
       })
@@ -118,22 +118,22 @@ describe('Alternative and error recovery combinators', () => {
     })
   })
 
-  describe('def', () => {
+  describe('orElse', () => {
     it('throws if its first argument is not a parser', () => {
       error(
-        def(0),
+        orElse(0),
         '',
-        '[def]: expected 1st argument to be a parser; found 0',
+        '[orElse]: expected 1st argument to be a parser; found 0',
       )
     })
     it('succeeds with its parser\'s successful result', () => {
-      pass(def(char('a'), 'z'), 'abc', 'a')
+      pass(orElse(char('a'), 'z'), 'abc', 'a')
     })
     it('succeeds with its value if is parser fails', () => {
-      pass(def(char('b'), 'z'), 'abc', 'z')
+      pass(orElse(char('b'), 'z'), 'abc', 'z')
     })
     it('fails fatally if its parser does', () => {
-      fail(def(sequence(string('ab'), string('cd')), 'z'), 'abce', {
+      fail(orElse(sequence(string('ab'), string('cd')), 'z'), 'abce', {
         expected: "'cd'",
         status: Fatal,
       })
