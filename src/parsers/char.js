@@ -15,7 +15,7 @@ import {
 import { error, ok, Parser, Status } from 'kessel/core'
 import { expected } from 'kessel/error'
 import { expecteds } from 'kessel/messages'
-import { dup, nextChar } from 'kessel/util'
+import { nextChar, twin } from 'kessel/util'
 
 const { Ok } = Status
 
@@ -59,7 +59,7 @@ const CharParser = fn => Parser(ctx => {
 export const char = c => Parser(ctx => {
   ASSERT && assertChar('char', c)
 
-  const [reply, [next, result]] = dup(CharParser(ch => c === ch)(ctx))
+  const [reply, [next, result]] = twin(CharParser(ch => c === ch)(ctx))
   return result.status === Ok ? reply : error(next, expecteds.char(c))
 })
 
@@ -78,7 +78,7 @@ export const char = c => Parser(ctx => {
 export const charI = c => Parser(ctx => {
   ASSERT && assertChar('charI', c)
 
-  const [reply, [context, result]] = dup(CharParser(
+  const [reply, [context, result]] = twin(CharParser(
     ch => c.toLowerCase() === ch.toLowerCase(),
   )(ctx))
   return result.status === Ok ? reply : error(context, expecteds.charI(c))
@@ -128,7 +128,7 @@ export const satisfyM = (fn, message) => Parser(ctx => {
   ASSERT && assertFunction('satisfyM', fn, ordFnFormatter('1st'))
   ASSERT && assertString('satisfyM', message, ordStrFormatter('2nd'))
 
-  const [reply, [context, result]] = dup(CharParser(fn)(ctx))
+  const [reply, [context, result]] = twin(CharParser(fn)(ctx))
   return result.status === Ok ? reply : error(context, expected(message))
 })
 
@@ -161,7 +161,7 @@ export const range = (start, end) => Parser(ctx => {
   ASSERT && assertChar('range', end, ordCharFormatter('2nd'))
 
   const fn = c => c >= start && c <= end
-  const [reply, [context, result]] = dup(CharParser(fn)(ctx))
+  const [reply, [context, result]] = twin(CharParser(fn)(ctx))
   return result.status === Ok ? reply
     : error(context, expecteds.range(start, end))
 })
@@ -244,7 +244,7 @@ export const noneOf = chars => Parser(ctx => {
  */
 export const digit = Parser(ctx => {
   const fn = c => c >= '0' && c <= '9'
-  const [reply, [context, result]] = dup(CharParser(fn)(ctx))
+  const [reply, [context, result]] = twin(CharParser(fn)(ctx))
   return result.status === Ok ? reply : error(context, expecteds.digit)
 })
 
@@ -256,7 +256,7 @@ export const hex = Parser(ctx => {
   const fn = c => c >= '0' && c <= '9'
     || c >= 'a' && c <= 'f'
     || c >= 'A' && c <= 'F'
-  const [reply, [context, result]] = dup(CharParser(fn)(ctx))
+  const [reply, [context, result]] = twin(CharParser(fn)(ctx))
   return result.status === Ok ? reply : error(context, expecteds.hex)
 })
 
@@ -266,7 +266,7 @@ export const hex = Parser(ctx => {
  */
 export const octal = Parser(ctx => {
   const fn = c => c >= '0' && c <= '7'
-  const [reply, [context, result]] = dup(CharParser(fn)(ctx))
+  const [reply, [context, result]] = twin(CharParser(fn)(ctx))
   return result.status === Ok ? reply : error(context, expecteds.octal)
 })
 
@@ -277,7 +277,7 @@ export const octal = Parser(ctx => {
  */
 export const letter = Parser(ctx => {
   const fn = c => c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z'
-  const [reply, [context, result]] = dup(CharParser(fn)(ctx))
+  const [reply, [context, result]] = twin(CharParser(fn)(ctx))
   return result.status === Ok ? reply : error(context, expecteds.letter)
 })
 
@@ -290,7 +290,7 @@ export const alpha = Parser(ctx => {
   const fn = c => c >= 'a' && c <= 'z'
     || c >= 'A' && c <= 'Z'
     || c >= '0' && c <= '9'
-  const [reply, [context, result]] = dup(CharParser(fn)(ctx))
+  const [reply, [context, result]] = twin(CharParser(fn)(ctx))
   return result.status === Ok ? reply : error(context, expecteds.alpha)
 })
 
@@ -301,7 +301,7 @@ export const alpha = Parser(ctx => {
  */
 export const upper = Parser(ctx => {
   const fn = c => c >= 'A' && c <= 'Z'
-  const [reply, [context, result]] = dup(CharParser(fn)(ctx))
+  const [reply, [context, result]] = twin(CharParser(fn)(ctx))
   return result.status === Ok ? reply : error(context, expecteds.upper)
 })
 
@@ -312,6 +312,6 @@ export const upper = Parser(ctx => {
  */
 export const lower = Parser(ctx => {
   const fn = c => c >= 'a' && c <= 'z'
-  const [reply, [context, result]] = dup(CharParser(fn)(ctx))
+  const [reply, [context, result]] = twin(CharParser(fn)(ctx))
   return result.status === Ok ? reply : error(context, expecteds.lower)
 })

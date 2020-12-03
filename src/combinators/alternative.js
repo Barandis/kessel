@@ -15,7 +15,7 @@ import {
 } from 'kessel/assert'
 import { error, fatal, ok, Parser, Status } from 'kessel/core'
 import { merge, nested } from 'kessel/error'
-import { dup, ordinal, range, stringify } from 'kessel/util'
+import { ordinal, range, stringify, twin } from 'kessel/util'
 
 const { Ok, Error, Fatal } = Status
 
@@ -43,7 +43,7 @@ export const choice = (...ps) => Parser(ctx => {
   let errors = []
 
   for (const p of ps) {
-    const [reply, [context, result]] = dup(p(ctx))
+    const [reply, [context, result]] = twin(p(ctx))
     if (result.status === Ok) return reply
 
     errors = merge(errors, result.errors)
@@ -67,7 +67,7 @@ export const choice = (...ps) => Parser(ctx => {
 export const opt = p => Parser(ctx => {
   ASSERT && assertParser('opt', p)
 
-  const [reply, [context, result]] = dup(p(ctx))
+  const [reply, [context, result]] = twin(p(ctx))
   return result.status !== Error ? reply : ok(context, null)
 })
 
@@ -90,7 +90,7 @@ export const opt = p => Parser(ctx => {
 export const def = (p, x) => Parser(ctx => {
   ASSERT && assertParser('def', p, ordParFormatter('1st'))
 
-  const [reply, [context, result]] = dup(p(ctx))
+  const [reply, [context, result]] = twin(p(ctx))
   return result.status !== Error ? reply : ok(context, x)
 })
 
@@ -114,7 +114,7 @@ export const attempt = p => Parser(ctx => {
   ASSERT && assertParser('attempt', p)
 
   const index = ctx.index
-  const [reply, [context, result]] = dup(p(ctx))
+  const [reply, [context, result]] = twin(p(ctx))
   if (result.status !== Ok) {
     const err = index === context.index
       ? result.errors
@@ -153,7 +153,7 @@ export const sequenceB = (...ps) => Parser(ctx => {
   let context = ctx
 
   for (const p of ps) {
-    const [reply, [next, result]] = dup(p(context))
+    const [reply, [next, result]] = twin(p(context))
     context = next
 
     if (result.status === Fatal) return reply
@@ -198,10 +198,10 @@ export const chainB = (p, fn) => Parser(ctx => {
 
   const index = ctx.index
 
-  const [reply1, [context1, result1]] = dup(p(ctx))
+  const [reply1, [context1, result1]] = twin(p(ctx))
   if (result1.status !== Ok) return reply1
 
-  const [reply2, [context2, result2]] = dup(fn(result1.value)(context1))
+  const [reply2, [context2, result2]] = twin(fn(result1.value)(context1))
   if (result2.status !== Error) return reply2
   const err = index === context2.index
     ? result2.errors
@@ -234,10 +234,10 @@ export const leftB = (p1, p2) => Parser(ctx => {
 
   const index = ctx.index
 
-  const [reply1, [context1, result1]] = dup(p1(ctx))
+  const [reply1, [context1, result1]] = twin(p1(ctx))
   if (result1.status !== Ok) return reply1
 
-  const [reply2, [context2, result2]] = dup(p2(context1))
+  const [reply2, [context2, result2]] = twin(p2(context1))
   if (result2.status === Fatal) return reply2
   if (result2.status === Ok) return ok(context2, result1.value)
 
@@ -272,10 +272,10 @@ export const rightB = (p1, p2) => Parser(ctx => {
 
   const index = ctx.index
 
-  const [reply1, [context1, result1]] = dup(p1(ctx))
+  const [reply1, [context1, result1]] = twin(p1(ctx))
   if (result1.status !== Status.Ok) return reply1
 
-  const [reply2, [context2, result2]] = dup(p2(context1))
+  const [reply2, [context2, result2]] = twin(p2(context1))
   if (result2.status !== Error) return reply2
 
   const err = index === context2.index
@@ -309,10 +309,10 @@ export const bothB = (p1, p2) => Parser(ctx => {
 
   const index = ctx.index
 
-  const [reply1, [context1, result1]] = dup(p1(ctx))
+  const [reply1, [context1, result1]] = twin(p1(ctx))
   if (result1.status !== Ok) return reply1
 
-  const [reply2, [context2, result2]] = dup(p2(context1))
+  const [reply2, [context2, result2]] = twin(p2(context1))
   if (result2.status === Fatal) return reply2
   if (result2.status === Ok) return ok(context2, [result1.value, result2.value])
 
@@ -346,7 +346,7 @@ export const repeatB = (p, n) => Parser(ctx => {
   let context = ctx
 
   for (const _ of range(n)) {
-    const [reply, [next, result]] = dup(p(context))
+    const [reply, [next, result]] = twin(p(context))
     context = next
     if (result.status === Fatal) return reply
     if (result.status === Error) {
@@ -392,12 +392,12 @@ export const manyTillB = (p, end) => Parser(ctx => {
   let context = ctx
 
   while (true) {
-    const [reply1, [context1, result1]] = dup(end(context))
+    const [reply1, [context1, result1]] = twin(end(context))
     context = context1
     if (result1.status === Fatal) return reply1
     if (result1.status === Ok) break
 
-    const [reply2, [context2, result2]] = dup(p(context))
+    const [reply2, [context2, result2]] = twin(p(context))
     context = context2
     if (result2.status === Fatal) return reply2
     if (result2.status === Error) {
@@ -453,7 +453,7 @@ export const blockB = genFn => Parser(ctx => {
       ordinal(i + 1)
     } yield to be to a parser; found ${stringify(v)}`)
 
-    const [reply, [next, result]] = dup(value(context))
+    const [reply, [next, result]] = twin(value(context))
     context = next
 
     if (result.status === Fatal) return reply
@@ -500,7 +500,7 @@ export const pipeB = (...ps) => Parser(ctx => {
   let context = ctx
 
   for (const p of ps) {
-    const [reply, [next, result]] = dup(p(context))
+    const [reply, [next, result]] = twin(p(context))
     context = next
 
     if (result.status === Fatal) return reply
@@ -536,14 +536,14 @@ export const betweenB = (pre, post, p) => Parser(ctx => {
 
   const index = ctx.index
 
-  const [reply1, [context1, result1]] = dup(pre(ctx))
+  const [reply1, [context1, result1]] = twin(pre(ctx))
   if (result1.status !== Ok) return reply1
 
-  const [reply2, [context2, result2]] = dup(p(context1))
+  const [reply2, [context2, result2]] = twin(p(context1))
   if (result2.status === Fatal) return reply2
   if (result2.status === Error) return error(context2, result2.errors, index)
 
-  const [reply3, [context3, result3]] = dup(post(context2))
+  const [reply3, [context3, result3]] = twin(post(context2))
   if (result3.status === Fatal) return reply3
   if (result3.status === Error) return error(context3, result3.errors, index)
   return ok(context3, result2.value)

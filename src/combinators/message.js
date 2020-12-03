@@ -11,7 +11,7 @@ import {
 } from 'kessel/assert'
 import { fatal, Parser, Status } from 'kessel/core'
 import { compound, ErrorType, expected } from 'kessel/error'
-import { dup } from 'kessel/util'
+import { twin } from 'kessel/util'
 
 const { Ok } = Status
 const { Nested } = ErrorType
@@ -42,7 +42,7 @@ export const label = (p, msg) => Parser(ctx => {
   ASSERT && assertString('label', msg, ordStrFormatter('2nd'))
 
   const index = ctx.index
-  const [reply, [context, result]] = dup(p(ctx))
+  const [reply, [context, result]] = twin(p(ctx))
   return index === context.index ? pass(context, result, expected(msg)) : reply
 })
 
@@ -75,7 +75,7 @@ export const backLabel = (p, msg) => Parser(ctx => {
   ASSERT && assertString('backLabel', msg, ordStrFormatter('2nd'))
 
   const index = ctx.index
-  const [reply, [context, result]] = dup(p(ctx))
+  const [reply, [context, result]] = twin(p(ctx))
   if (result.status === Ok) {
     return index === context.index
       ? pass(context, result, expected(msg)) : reply

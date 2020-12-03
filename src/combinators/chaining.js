@@ -15,7 +15,7 @@ import {
   ordParFormatter,
 } from 'kessel/assert'
 import { maybeFatal, ok, Parser, Status } from 'kessel/core'
-import { dup, ordinal } from 'kessel/util'
+import { ordinal, twin } from 'kessel/util'
 
 const { Ok } = Status
 
@@ -45,7 +45,7 @@ export const chain = (p, fn) => Parser(ctx => {
 
   const index = ctx.index
 
-  const [reply1, [context1, result1]] = dup(p(ctx))
+  const [reply1, [context1, result1]] = twin(p(ctx))
   if (result1.status !== Ok) return reply1
 
   const p2 = fn(result1.value)
@@ -53,7 +53,7 @@ export const chain = (p, fn) => Parser(ctx => {
     'chain', p2, formatter('the 2nd argument to return a parser'),
   )
 
-  const [reply2, [context2, result2]] = dup(p2(context1))
+  const [reply2, [context2, result2]] = twin(p2(context1))
   return result2.status === Ok ? reply2
     : maybeFatal(context2.index !== index, context2, result2.errors)
 })
@@ -82,7 +82,7 @@ export const map = (p, fn) => Parser(ctx => {
   ASSERT && assertParser('map', p, ordParFormatter('1st'))
   ASSERT && assertFunction('map', fn, ordFnFormatter('2nd'))
 
-  const [reply, [context, result]] = dup(p(ctx))
+  const [reply, [context, result]] = twin(p(ctx))
   return result.status === Ok ? ok(context, fn(result.value)) : reply
 })
 
@@ -115,7 +115,7 @@ export const map = (p, fn) => Parser(ctx => {
 export const join = p => Parser(ctx => {
   ASSERT && assertParser('join', p)
 
-  const [reply, [context, result]] = dup(p(ctx))
+  const [reply, [context, result]] = twin(p(ctx))
   if (result.status !== Ok) return reply
 
   const v = result.value
@@ -139,7 +139,7 @@ export const join = p => Parser(ctx => {
 export const skip = p => Parser(ctx => {
   ASSERT && assertParser('skip', p)
 
-  const [reply, [context, result]] = dup(p(ctx))
+  const [reply, [context, result]] = twin(p(ctx))
   return result.status === Ok ? ok(context, null) : reply
 })
 
@@ -159,7 +159,7 @@ export const skip = p => Parser(ctx => {
 export const value = (p, x) => Parser(ctx => {
   ASSERT && assertParser('value', p, ordParFormatter('1st'))
 
-  const [tuple, [context, result]] = dup(p(ctx))
+  const [tuple, [context, result]] = twin(p(ctx))
   return result.status === Ok ? ok(context, x) : tuple
 })
 
@@ -183,7 +183,7 @@ export const left = (p1, p2) => Parser(ctx => {
 
   const index = ctx.index
 
-  const [reply1, [context1, result1]] = dup(p1(ctx))
+  const [reply1, [context1, result1]] = twin(p1(ctx))
   if (result1.status !== Ok) return reply1
 
   const [context2, result2] = p2(context1)
@@ -211,10 +211,10 @@ export const right = (p1, p2) => Parser(ctx => {
 
   const index = ctx.index
 
-  const [reply1, [context1, result1]] = dup(p1(ctx))
+  const [reply1, [context1, result1]] = twin(p1(ctx))
   if (result1.status !== Status.Ok) return reply1
 
-  const [reply2, [context2, result2]] = dup(p2(context1))
+  const [reply2, [context2, result2]] = twin(p2(context1))
   return result2.status === Ok ? reply2
     : maybeFatal(context2.index !== index, context2, result2.errors)
 })
@@ -239,7 +239,7 @@ export const both = (p1, p2) => Parser(ctx => {
 
   const index = ctx.index
 
-  const [reply1, [context1, result1]] = dup(p1(ctx))
+  const [reply1, [context1, result1]] = twin(p1(ctx))
   if (result1.status !== Ok) return reply1
 
   const [context2, result2] = p2(context1)
@@ -323,7 +323,7 @@ export const between = (pre, post, p) => Parser(ctx => {
 
   const index = ctx.index
 
-  const [reply1, [context1, result1]] = dup(pre(ctx))
+  const [reply1, [context1, result1]] = twin(pre(ctx))
   if (result1.status !== Ok) return reply1
 
   const [context2, result2] = p(context1)
@@ -352,7 +352,7 @@ export const nth = (p, n) => Parser(ctx => {
   ASSERT && assertParser('nth', p, ordParFormatter('1st'))
   ASSERT && assertNumber('nth', n, ordNumFormatter('2nd'))
 
-  const [reply, [context, result]] = dup(p(ctx))
+  const [reply, [context, result]] = twin(p(ctx))
   if (result.status !== Ok) return reply
 
   const v = result.value
@@ -375,7 +375,7 @@ export const nth = (p, n) => Parser(ctx => {
 export const first = p => Parser(ctx => {
   ASSERT && assertParser('first', p)
 
-  const [reply, [context, result]] = dup(p(ctx))
+  const [reply, [context, result]] = twin(p(ctx))
   if (result.status !== Ok) return reply
 
   const v = result.value
@@ -398,7 +398,7 @@ export const first = p => Parser(ctx => {
 export const second = p => Parser(ctx => {
   ASSERT && assertParser('second', p)
 
-  const [reply, [context, result]] = dup(p(ctx))
+  const [reply, [context, result]] = twin(p(ctx))
   if (result.status !== Ok) return reply
 
   const v = result.value
@@ -421,7 +421,7 @@ export const second = p => Parser(ctx => {
 export const third = p => Parser(ctx => {
   ASSERT && assertParser('third', p)
 
-  const [reply, [context, result]] = dup(p(ctx))
+  const [reply, [context, result]] = twin(p(ctx))
   if (result.status !== Ok) return reply
 
   const v = result.value
@@ -444,7 +444,7 @@ export const third = p => Parser(ctx => {
 export const fourth = p => Parser(ctx => {
   ASSERT && assertParser('fourth', p)
 
-  const [reply, [context, result]] = dup(p(ctx))
+  const [reply, [context, result]] = twin(p(ctx))
   if (result.status !== Ok) return reply
 
   const v = result.value
@@ -467,7 +467,7 @@ export const fourth = p => Parser(ctx => {
 export const fifth = p => Parser(ctx => {
   ASSERT && assertParser('fifth', p)
 
-  const [reply, [context, result]] = dup(p(ctx))
+  const [reply, [context, result]] = twin(p(ctx))
   if (result.status !== Ok) return reply
 
   const v = result.value

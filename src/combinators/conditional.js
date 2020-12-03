@@ -11,7 +11,7 @@ import {
 } from 'kessel/assert'
 import { error, ok, Parser, Status } from 'kessel/core'
 import { expected } from 'kessel/error'
-import { dup } from 'kessel/util'
+import { twin } from 'kessel/util'
 
 const { Ok } = Status
 
@@ -61,7 +61,7 @@ export const notEmpty = p => Parser(ctx => {
   ASSERT && assertParser('notEmpty', p)
 
   const index = ctx.index
-  const [reply, [context, result]] = dup(p(ctx))
+  const [reply, [context, result]] = twin(p(ctx))
   return result.status !== Ok || context.index !== index ? reply
     : error(context)
 })
@@ -89,7 +89,7 @@ export const notEmptyM = (p, msg) => Parser(ctx => {
   ASSERT && assertString('notEmptyM', msg, ordStrFormatter('2nd'))
 
   const index = ctx.index
-  const [reply, [context, result]] = dup(p(ctx))
+  const [reply, [context, result]] = twin(p(ctx))
   return result.status !== Ok || context.index !== index ? reply
     : error(context, expected(msg))
 })

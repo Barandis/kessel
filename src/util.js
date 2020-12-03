@@ -190,27 +190,58 @@ export function quote(str) {
 /**
  * Creates an array of two copies of the provided value.
  *
- * While this will duplicate any value, it's primarily useful for
- * covering a missing part of JavaScript destructuring, so `value`
- * should generally be an array or object.
+ * This sort of emulates *as-patterns* in a limited way in JavaScript.
+ * In languages like Haskell and ML, when pattern matching is done,
+ * there is a construct to be able to retain a larger part of the
+ * destructured pattern while also breaking it down further. In Haskell,
  *
- * That missing part is reference to the entire value. JavaScript will
- * allow destructuring to reference any and all parts of a value, but it
- * does not have a syntax (like the `@` operator in languages like Scala
- * and Haskell) to reference the entire value at the same time. Using
- * this function, one of the copies can be retained as a whole while
- * providing another copy for destructuring.
- *
- * ### Example
- * ```
- * const [whole, [ctx, value]] = dup(parse(parser, input))
+ * ```haskell
+ * (head : tail) = [1, 2, 3, 4, 5]
  * ```
  *
- * @param {Reply} value Any value.
+ * will assign `1` to `head`, and `[2, 3, 4, 5]` to `tail`. This can be
+ * done in JavaScript as well, like this:
+ *
+ * ```javascript
+ * const [head, ...tail] = [1, 2, 3, 4, 5]
+ * ```
+ *
+ * However, Haskell can go farther: it can also assign the entire list
+ * as a whole to another variable while still assigning its elements as
+ * above. It's done like this:
+ *
+ * ```haskell
+ * list @ (head : tail) = [1, 2, 3, 4, 5]
+ * ```
+ *
+ * This will, in addition to the assignments above, assign `[1, 2, 3, 4,
+ * 5]` to `list`. The `@` sign is read *as*, and this construct is
+ * called an *as-pattern* (perhaps because the ML way of doing it uses
+ * the `as` keyword instead of the `@` symbol).
+ *
+ * There is no facility to do this in JavaScript. But there are many
+ * places in this library where a `Reply` is descturctured into its
+ * `Context` and `Result` elements, yet there is a need to conditionally
+ * use the entire `Reply` as well (normally to return it if some
+ * condition is met). Rather than create a new `Reply` from these parts,
+ * `twin` can be used to duplicate the references to the `Reply`. Then
+ * only *one* of the duplicate references can be destructured, while the
+ * other one is retained as a whole.
+ *
+ * ```javascript
+ * const [reply, [context, result]] = twin(parser(ctx))
+ * ```
+ *
+ * As-patterns can be used on pieces of a pattern instead of the entire
+ * pattern, and `twin` cannot do that. But it serves for what is needed
+ * in Kessel.
+ *
+ * @param {Reply} value A reply that needs to be destructured while
+ *     maintaining a reference to the whole.
  * @returns {[Reply, Reply]} An array containing two copies of the
- *     value.
+ *     reply. One can be destructured while the other is retained whole.
  */
-export function dup(value) {
+export function twin(value) {
   return [value, value]
 }
 
