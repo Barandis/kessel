@@ -12,6 +12,8 @@
     "bundle:noassert:prod": "cross-env NODE_ENV=development webpack --progress --colors --config webpack.prod.noassert.js",
     "bundle": "npm run bundle:dev && npm run bundle:prod && npm run bundle:noassert:dev && npm run bundle:noassert:prod",
     "commit": "npx git-cz",
+    "docs": "mkdocs build",
+    "docs:serve": "mkdocs serve",
     "fix": "eslint ./src ./test --fix",
     "lint": "eslint ./src ./test",
     "test": "cross-env NODE_PATH=./src NODE_ENV=test mocha ./test --require config/mocha.js --reporter dot --recursive",

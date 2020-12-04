@@ -1,0 +1,123 @@
+site_name: Kessel
+docs_dir: src/docs
+site_dir: docs
+site_description: 'Kessel parser combinators for JavaScript'
+site_author: 'Thomas J. Otterson'
+copyright: 'Copyright &copy; 2020 Thomas J. Otterson'
+
+repo_url: https://github.com/Barandis/kessel
+edit_uri: ''
+
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.tabbed
+  - admonition
+
+theme:
+  name: material
+  palette:
+    scheme: default
+  features:
+    - navigation.instant
+    - navigation.tabs
+
+nav:
+  - Home: index.md
+  - Overview: overview.md
+  - Installation: installation.md
+  - 'API Reference':
+    - Summary: api.md
+    - Parsers:
+      - all: parsers/all.md
+      - alpha: parsers/alpha.md
+      - alphaU: parsers/alphau.md
+      - always: parsers/always.md
+      - any: parsers/any.md
+      - anyOf: parsers/anyof.md
+      - anyString: parsers/anystring.md
+      - assoc1L: parsers/assoc1l.md
+      - assoc1R: parsers/assoc1r.md
+      - assocL: parsers/assocl.md
+      - assocR: parsers/assocr.md
+      - attempt: parsers/attempt.md
+      - backLabel: parsers/backlabel.md
+      - between: parsers/between.md
+      - betweenB: parsers/betweenb.md
+      - block: parsers/block.md
+      - blockB: parsers/blockb.md
+      - both: parsers/both.md
+      - bothB: parsers/bothb.md
+      - chain: parsers/chain.md
+      - chainB: parsers/chainb.md
+      - char: parsers/char.md
+      - charI: parsers/chari.md
+      - choice: parsers/choice.md
+      - digit: parsers/digit.md
+      - eof: parsers/eof.md
+      - fail: parsers/fail.md
+      - failFatally: parsers/failfatally.md
+      - failUnexpected: parsers/failunexpected.md
+      - fifth: parsers/fifth.md
+      - first: parsers/first.md
+      - followedBy: parsers/followedby.md
+      - followedByM: parsers/followedbym.md
+      - fourth: parsers/fourth.md
+      - hex: parsers/hex.md
+      - join: parsers/join.md
+      - label: parsers/label.md
+      - left: parsers/left.md
+      - leftB: parsers/leftb.md
+      - letter: parsers/letter.md
+      - letterU: parsers/letteru.md
+      - lookAhead: parsers/lookahead.md
+      - lower: parsers/lower.md
+      - lowerU: parsers/loweru.md
+      - many: parsers/many.md
+      - many1: parsers/many1.md
+      - manyTill: parsers/manytill.md
+      - manyTillB: parsers/manytillb.md
+      - map: parsers/map.md
+      - newline: parsers/newline.md
+      - newlineU: parsers/newlineu.md
+      - noneOf: parsers/noneof.md
+      - notEmpty: parsers/notempty.md
+      - notEmptyM: parsers/notemptym.md
+      - notFollowedBy: parsers/notfollowedby.md
+      - notFollowedByM: parsers/notfollowedbym.md
+      - nth: parsers/nth.md
+      - octal: parsers/octal.md
+      - optional: parsers/optional.md
+      - orElse: parsers/orelse.md
+      - pipe: parsers/pipe.md
+      - pipeB: parsers/pipeb.md
+      - range: parsers/range.md
+      - regex: parsers/regex.md
+      - repeat: parsers/repeat.md
+      - repeatB: parsers/repeatb.md
+      - right: parsers/right.md
+      - rightB: parsers/rightb.md
+      - satisfy: parsers/satisfy.md
+      - satisfyM: parsers/satisfym.md
+      - second: parsers/second.md
+      - sepBy: parsers/sepby.md
+      - sepBy1: parsers/sepby1.md
+      - sepEndBy: parsers/sependby.md
+      - sepEndBy1: parsers/sependby1.md
+      - sequence: parsers/sequence.md
+      - sequenceB: parsers/sequenceb.md
+      - skip: parsers/skip.md
+      - skipMany: parsers/skipmany.md
+      - skipMany1: parsers/skipmany1.md
+      - space: parsers/space.md
+      - spaces: parsers/spaces.md
+      - spaces1: parsers/spaces1.md
+      - spaces1U: parsers/spaces1u.md
+      - spacesU: parsers/spacesu.md
+      - spaceU: parsers/spaceu.md
+      - string: parsers/string.md
+      - stringI: parsers/stringi.md
+      - third: parsers/third.md
+      - upper: parsers/upper.md
+      - upperU: parsers/upperu.md
+      - value: parsers/value.md

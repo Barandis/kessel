@@ -1,0 +1,31 @@
+<!--
+ Copyright (c) 2020 Thomas J. Otterson
+ 
+ This software is released under the MIT License.
+ https://opensource.org/licenses/MIT
+-->
+
+> `spaces`
+
+```javascript
+const parser = spaces
+
+const s = parse(parser, '   abc')
+console.log(status(s))  // Symbol(ok)
+console.log(success(s)) // null
+```
+
+Reads zero or more ASCII whitespace characters and discards them.
+
+ASCII whitespace characters include any ASCII newline (`\r`, `\n`, or `\r\n`) along with a space (` `) or a horizontal tab (`\t`).
+
+#### Success
+
+* Always succeeds. All ASCII whitespace characters until the next non-whitespace character are consumed and discarded.
+
+#### See Also
+
+* [`newline`](newline.md)
+* [`space`](space.md)
+* [`spaces1`](spaces1.md)
+* [`spacesU`](spacesu.md)

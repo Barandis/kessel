@@ -1,0 +1,2279 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Kessel parser combinators for JavaScript">
+      
+      
+      
+      
+        <meta name="author" content="Thomas J. Otterson">
+      
+      <link rel="shortcut icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-6.1.6">
+    
+    
+      
+        <title>Summary - Kessel</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.6910b76c.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.196e0c26.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>body,input{font-family:"Roboto",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono",SFMono-Regular,Consolas,Menlo,monospace}</style>
+      
+    
+    
+    
+    
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
+      
+  
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#summary" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid" aria-label="Header">
+    <a href=".." title="Kessel" class="md-header-nav__button md-logo" aria-label="Kessel">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header-nav__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header-nav__title" data-md-component="header-title">
+      
+        <div class="md-header-nav__ellipsis">
+          <span class="md-header-nav__topic md-ellipsis">
+            Kessel
+          </span>
+          <span class="md-header-nav__topic md-ellipsis">
+            
+              Summary
+            
+          </span>
+        </div>
+      
+    </div>
+    
+      <label class="md-header-nav__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" data-md-component="search-reset" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header-nav__source">
+        
+<a href="https://github.com/Barandis/kessel" title="Go to repository" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+
+  
+
+<nav class="md-tabs md-tabs--active" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  <li class="md-tabs__item">
+    
+    
+    <a href=".." class="md-tabs__link">
+      Home
+    </a>
+  </li>
+
+      
+        
+      
+        
+      
+        
+  
+  
+    <li class="md-tabs__item">
+      
+      
+        
+      
+      <a href="./" class="md-tabs__link md-tabs__link--active">
+        API Reference
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Kessel" class="md-nav__button md-logo" aria-label="Kessel">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    Kessel
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/Barandis/kessel" title="Go to repository" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href=".." class="md-nav__link">
+      Home
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../overview/" class="md-nav__link">
+      Overview
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../installation/" class="md-nav__link">
+      Installation
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4" checked>
+    <label class="md-nav__link" for="nav-4">
+      API Reference
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="API Reference" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        <span class="md-nav__icon md-icon"></span>
+        API Reference
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Summary
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+    
+    <a href="./" class="md-nav__link md-nav__link--active">
+      Summary
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#terminology" class="md-nav__link">
+    Terminology
+  </a>
+  
+    <nav class="md-nav" aria-label="Terminology">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parser" class="md-nav__link">
+    Parser
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#return" class="md-nav__link">
+    Return
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parsers" class="md-nav__link">
+    Parsers
+  </a>
+  
+    <nav class="md-nav" aria-label="Parsers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#table-1-single-character-parsers" class="md-nav__link">
+    Table 1: Single character parsers
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#table-2-string-multiple-character-parsers" class="md-nav__link">
+    Table 2: String (multiple-character) parsers
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#table-3-whitespace-parsers" class="md-nav__link">
+    Table 3: Whitespace parsers
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#table-4-miscellaneous-parsers" class="md-nav__link">
+    Table 4: Miscellaneous parsers
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#table-5-chaining-combinators" class="md-nav__link">
+    Table 5: Chaining combinators
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#table-6-sequence-combinators" class="md-nav__link">
+    Table 6: Sequence combinators
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#table-7-alternative-and-backtracking-combinators" class="md-nav__link">
+    Table 7: Alternative and backtracking combinators
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#table-8-conditional-and-lookahead-combinators" class="md-nav__link">
+    Table 8: Conditional and lookahead combinators
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#table-9-error-message-combinators" class="md-nav__link">
+    Table 9: Error message combinators
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-2" type="checkbox" id="nav-4-2" >
+    <label class="md-nav__link" for="nav-4-2">
+      Parsers
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Parsers" data-md-level="2">
+      <label class="md-nav__title" for="nav-4-2">
+        <span class="md-nav__icon md-icon"></span>
+        Parsers
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/all/" class="md-nav__link">
+      all
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/alpha/" class="md-nav__link">
+      alpha
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/alphau/" class="md-nav__link">
+      alphaU
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/always/" class="md-nav__link">
+      always
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/any/" class="md-nav__link">
+      any
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/anyof/" class="md-nav__link">
+      anyOf
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/anystring/" class="md-nav__link">
+      anyString
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/assoc1l/" class="md-nav__link">
+      assoc1L
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/assoc1r/" class="md-nav__link">
+      assoc1R
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/assocl/" class="md-nav__link">
+      assocL
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/assocr/" class="md-nav__link">
+      assocR
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/attempt/" class="md-nav__link">
+      attempt
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/backlabel/" class="md-nav__link">
+      backLabel
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/between/" class="md-nav__link">
+      between
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/betweenb/" class="md-nav__link">
+      betweenB
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/block/" class="md-nav__link">
+      block
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/blockb/" class="md-nav__link">
+      blockB
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/both/" class="md-nav__link">
+      both
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/bothb/" class="md-nav__link">
+      bothB
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/chain/" class="md-nav__link">
+      chain
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/chainb/" class="md-nav__link">
+      chainB
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/char/" class="md-nav__link">
+      char
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/chari/" class="md-nav__link">
+      charI
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/choice/" class="md-nav__link">
+      choice
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/digit/" class="md-nav__link">
+      digit
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/eof/" class="md-nav__link">
+      eof
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/fail/" class="md-nav__link">
+      fail
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/failfatally/" class="md-nav__link">
+      failFatally
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/failunexpected/" class="md-nav__link">
+      failUnexpected
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/fifth/" class="md-nav__link">
+      fifth
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/first/" class="md-nav__link">
+      first
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/followedby/" class="md-nav__link">
+      followedBy
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/followedbym/" class="md-nav__link">
+      followedByM
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/fourth/" class="md-nav__link">
+      fourth
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/hex/" class="md-nav__link">
+      hex
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/join/" class="md-nav__link">
+      join
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/label/" class="md-nav__link">
+      label
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/left/" class="md-nav__link">
+      left
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/leftb/" class="md-nav__link">
+      leftB
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/letter/" class="md-nav__link">
+      letter
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/letteru/" class="md-nav__link">
+      letterU
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/lookahead/" class="md-nav__link">
+      lookAhead
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/lower/" class="md-nav__link">
+      lower
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/loweru/" class="md-nav__link">
+      lowerU
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/many/" class="md-nav__link">
+      many
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/many1/" class="md-nav__link">
+      many1
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/manytill/" class="md-nav__link">
+      manyTill
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/manytillb/" class="md-nav__link">
+      manyTillB
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/map/" class="md-nav__link">
+      map
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/newline/" class="md-nav__link">
+      newline
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/newlineu/" class="md-nav__link">
+      newlineU
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/noneof/" class="md-nav__link">
+      noneOf
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/notempty/" class="md-nav__link">
+      notEmpty
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/notemptym/" class="md-nav__link">
+      notEmptyM
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/notfollowedby/" class="md-nav__link">
+      notFollowedBy
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/notfollowedbym/" class="md-nav__link">
+      notFollowedByM
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/nth/" class="md-nav__link">
+      nth
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/octal/" class="md-nav__link">
+      octal
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/optional/" class="md-nav__link">
+      optional
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/orelse/" class="md-nav__link">
+      orElse
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/pipe/" class="md-nav__link">
+      pipe
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/pipeb/" class="md-nav__link">
+      pipeB
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/range/" class="md-nav__link">
+      range
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/regex/" class="md-nav__link">
+      regex
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/repeat/" class="md-nav__link">
+      repeat
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/repeatb/" class="md-nav__link">
+      repeatB
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/right/" class="md-nav__link">
+      right
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/rightb/" class="md-nav__link">
+      rightB
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/satisfy/" class="md-nav__link">
+      satisfy
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/satisfym/" class="md-nav__link">
+      satisfyM
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/second/" class="md-nav__link">
+      second
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/sepby/" class="md-nav__link">
+      sepBy
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/sepby1/" class="md-nav__link">
+      sepBy1
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/sependby/" class="md-nav__link">
+      sepEndBy
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/sependby1/" class="md-nav__link">
+      sepEndBy1
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/sequence/" class="md-nav__link">
+      sequence
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/sequenceb/" class="md-nav__link">
+      sequenceB
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/skip/" class="md-nav__link">
+      skip
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/skipmany/" class="md-nav__link">
+      skipMany
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/skipmany1/" class="md-nav__link">
+      skipMany1
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/space/" class="md-nav__link">
+      space
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/spaces/" class="md-nav__link">
+      spaces
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/spaces1/" class="md-nav__link">
+      spaces1
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/spaces1u/" class="md-nav__link">
+      spaces1U
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/spacesu/" class="md-nav__link">
+      spacesU
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/spaceu/" class="md-nav__link">
+      spaceU
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/string/" class="md-nav__link">
+      string
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/stringi/" class="md-nav__link">
+      stringI
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/third/" class="md-nav__link">
+      third
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/upper/" class="md-nav__link">
+      upper
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/upperu/" class="md-nav__link">
+      upperU
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/value/" class="md-nav__link">
+      value
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#terminology" class="md-nav__link">
+    Terminology
+  </a>
+  
+    <nav class="md-nav" aria-label="Terminology">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parser" class="md-nav__link">
+    Parser
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#return" class="md-nav__link">
+    Return
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parsers" class="md-nav__link">
+    Parsers
+  </a>
+  
+    <nav class="md-nav" aria-label="Parsers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#table-1-single-character-parsers" class="md-nav__link">
+    Table 1: Single character parsers
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#table-2-string-multiple-character-parsers" class="md-nav__link">
+    Table 2: String (multiple-character) parsers
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#table-3-whitespace-parsers" class="md-nav__link">
+    Table 3: Whitespace parsers
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#table-4-miscellaneous-parsers" class="md-nav__link">
+    Table 4: Miscellaneous parsers
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#table-5-chaining-combinators" class="md-nav__link">
+    Table 5: Chaining combinators
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#table-6-sequence-combinators" class="md-nav__link">
+    Table 6: Sequence combinators
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#table-7-alternative-and-backtracking-combinators" class="md-nav__link">
+    Table 7: Alternative and backtracking combinators
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#table-8-conditional-and-lookahead-combinators" class="md-nav__link">
+    Table 8: Conditional and lookahead combinators
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#table-9-error-message-combinators" class="md-nav__link">
+    Table 9: Error message combinators
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                <!--
+ Copyright (c) 2020 Thomas J. Otterson
+
+ This software is released under the MIT License.
+ https://opensource.org/licenses/MIT
+-->
+
+<h1 id="summary">Summary</h1>
+<h2 id="terminology">Terminology</h2>
+<p>A couple notes on terms you'll find in this API documentation.</p>
+<h3 id="parser">Parser</h3>
+<p>Everything in the Parser API Reference is referred to as a <em>parser</em>. This is not exactly accurate; in Kessel, a parser is a function that takes a context as an argument and returns a tuple of an updated context and a result. By that definition, the only parsers in here are things like <a href="../parsers/any/"><code>any</code></a> and <a href="../parsers/letter/"><code>letter</code></a> that don't take any additional parameters.</p>
+<p>A number of items in the reference are functions that <em>produce</em> parsers. Examples are <a href="../parsers/char/"><code>char</code></a> and <a href="../parsers/string/"><code>string</code></a>. These require extra information to know what to parse - <code>char</code> needs to know <em>which</em> character it's looking for, for example - so they have parameters to let them accept that information. But these functions <em>return</em> parsers. In other words, <code>char</code> is not a parser, but <code>char('a')</code> is. Because of that, it's safe enough to refer to these functions as parsers as well.</p>
+<p>The final class of object in the Parser API Reference is the <em>combinator</em>. A combinator is a function that takes one or more parsers as parameters, maybe with other parameters as well, and return another parser. (<a href="/parsers/block.md"><code>block</code></a> and <a href="../parsers/blockb/"><code>blockB</code></a> take generator functions instead of parsers, but since those generator functions can call parsers in their bodies, they can also be considered combinators.)</p>
+<p>Combinators are a little different because they don't actually read text. Every parser or parser-producing function, at the core, is a function that reads one or more characters of text and either succeeds or fails depending on whether it read the character(s) it was expecting. Combinators don't do that; they modify or compose other parsers. For example, <a href="../parsers/many/"><code>many</code></a> doesn't read any text at all, but it tells the parser passed into it to read text zero or more times.</p>
+<p>But in the end it's all the same. <code>many</code> may not parse text directly, but it has a value passed to it which may be a parser itself. If it's not, then it must be a combinator that has a value passed to <em>it</em>. Eventually, there's going to be a parser, and it will read text. So <code>many</code> may not be a parser, and the same with <a href="../parsers/choice/"><code>choice</code></a> and <a href="../parsers/pipe/"><code>pipe</code></a> and <a href="../parsers/join/"><code>join</code></a>, but <code>pipe(choice(char('_'), letter), join(many(choice(char('_'), letter, digit))), (first, rest) =&gt; first + rest)</code> is definitely a parser. (One which does a pretty reasonable job of parsing a programming language identifier..md)</p>
+<p>In summary, every entry in the Parser API Reference either <em>is</em> a function that takes a context and returns a tuple of a context and a result, or it <em>produces</em> one. And directly or indirectly, every entry reads text. So unless there needs to be some distinction between these three different kinds of objects, it's safe to just call them all <em>parsers</em>.</p>
+<h3 id="return">Return</h3>
+<p>As has already been stated way more times than is necessary, a parser returns a tuple of a context and a result. But as is also very clear, that's way too many words to use too many times.</p>
+<p>In this documentation, we will talk about parsers <em>returning</em> values. In this case, "this parser returns a string" means "this parser returns a tuple of a context and a result, and upon success, the value of that result is a string." I think we can all agree that one is more fun to read (and write) than the other.</p>
+<h2 id="parsers">Parsers</h2>
+<h3 id="table-1-single-character-parsers">Table 1: Single character parsers</h3>
+<table>
+<thead>
+<tr>
+<th>Parser</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../parsers/char/"><code>char</code></a></td>
+<td>Parses a single character.</td>
+</tr>
+<tr>
+<td><a href="../parsers/chari/"><code>charI</code></a></td>
+<td>Parses a single character, but without case sensitivity.</td>
+</tr>
+<tr>
+<td><a href="../parsers/satisfy/"><code>satisfy</code></a></td>
+<td>Parses a single character for which a predicate returns <code>true</code>.</td>
+</tr>
+<tr>
+<td><a href="../parsers/satisfym/"><code>satisfyM</code></a></td>
+<td>Parses a single character for which a predicate returns <code>true</code>. Fails with a message string if the predicate returns <code>false</code>.</td>
+</tr>
+<tr>
+<td><a href="../parsers/range/"><code>range</code></a></td>
+<td>Parses a single character whose code point is between two other characters.</td>
+</tr>
+<tr>
+<td><a href="../parsers/any/"><code>any</code></a></td>
+<td>Parses any one character.</td>
+</tr>
+<tr>
+<td><a href="../parsers/anyof/"><code>anyOf</code></a></td>
+<td>Parses a single character which is included in a string or an array.</td>
+</tr>
+<tr>
+<td><a href="../parsers/noneof/"><code>noneOf</code></a></td>
+<td>Parses a single character which is <em>not</em> in included in a string or an array.</td>
+</tr>
+<tr>
+<td><a href="parsers/digit"><code>digit</code></a></td>
+<td>Parses a single decimal digit (<code>0-9</code>).</td>
+</tr>
+<tr>
+<td><a href="parsers/hex"><code>hex</code></a></td>
+<td>Parses a single hexadecmial digit (<code>0-9</code>, <code>a-f</code>, or <code>A-F</code>).</td>
+</tr>
+<tr>
+<td><a href="parsers/octal"><code>octal</code></a></td>
+<td>Parses a single octal digit (<code>0-7</code>).</td>
+</tr>
+<tr>
+<td><a href="parsers/letter"><code>letter</code></a></td>
+<td>Parses a single ASCII letter (<code>a-z</code> or <code>A-Z</code>).</td>
+</tr>
+<tr>
+<td><a href="parsers/alpha"><code>alpha</code></a></td>
+<td>Parses a single ASCII alphanumeric character (<code>0-9</code>, <code>a-z</code>, or <code>A-Z</code>).</td>
+</tr>
+<tr>
+<td><a href="parsers/lower"><code>lower</code></a></td>
+<td>Parses a single ASCII lowercase letter (<code>a-z</code>).</td>
+</tr>
+<tr>
+<td><a href="parsers/upper"><code>upper</code></a></td>
+<td>Parses a single ASCII uppercase letter (<code>A-Z</code>).</td>
+</tr>
+<tr>
+<td><a href="../parsers/letteru/"><code>letterU</code></a></td>
+<td>Parses a single UTF-8 letter.</td>
+</tr>
+<tr>
+<td><a href="../parsers/alphau/"><code>alphaU</code></a></td>
+<td>Parses a single UTF-8 alphanumeric character.</td>
+</tr>
+<tr>
+<td><a href="../parsers/loweru/"><code>lowerU</code></a></td>
+<td>Parses a single UTF-8 lowercase letter.</td>
+</tr>
+<tr>
+<td><a href="../parsers/upperu/"><code>upperU</code></a></td>
+<td>Parses a single UTF-8 uppercase letter.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="table-2-string-multiple-character-parsers">Table 2: String (multiple-character) parsers</h3>
+<table>
+<thead>
+<tr>
+<th>Parser</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../parsers/string/"><code>string</code></a></td>
+<td>Parses a string.</td>
+</tr>
+<tr>
+<td><a href="../parsers/stringi/"><code>stringI</code></a></td>
+<td>Parses a string, but without case sensitivity.</td>
+</tr>
+<tr>
+<td><a href="../parsers/regex/"><code>regex</code></a></td>
+<td>Parses a string matching a regular expression pattern.</td>
+</tr>
+<tr>
+<td><a href="../parsers/all/"><code>all</code></a></td>
+<td>Parses the remainder of the input as a string.</td>
+</tr>
+<tr>
+<td><a href="../parsers/anystring/"><code>anyString</code></a></td>
+<td>Parses a string of a certain number of characters.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="table-3-whitespace-parsers">Table 3: Whitespace parsers</h3>
+<table>
+<thead>
+<tr>
+<th>Parser</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="parsers/newline"><code>newline</code></a></td>
+<td>Parses a single ASCII newline character (<code>\r</code>, <code>\n</code>, or <code>\r\n</code>).</td>
+</tr>
+<tr>
+<td><a href="parsers/space"><code>space</code></a></td>
+<td>Parses a single ASCII whitespace character (<code></code>, <code>\t</code>, or a newline).</td>
+</tr>
+<tr>
+<td><a href="../parsers/spaces/"><code>spaces</code></a></td>
+<td>Skips zero or more ASCII whitespace characters.</td>
+</tr>
+<tr>
+<td><a href="../parsers/spaces1/"><code>spaces1</code></a></td>
+<td>Skips one or more ASCII whitespace characters.</td>
+</tr>
+<tr>
+<td><a href="../parsers/newlineu/"><code>newlineU</code></a></td>
+<td>Parses a single UTF-8 newline character.</td>
+</tr>
+<tr>
+<td><a href="parsers/spaceu"><code>spaceU</code></a></td>
+<td>Parses a single UTF-8 whitespace character (including newlines.md).</td>
+</tr>
+<tr>
+<td><a href="../parsers/spacesu/"><code>spacesU</code></a></td>
+<td>Skips zero or more UTF-8 whitespace characters.</td>
+</tr>
+<tr>
+<td><a href="../parsers/spaces1u/"><code>spaces1U</code></a></td>
+<td>Skips one or more UTF-8 whitespace characters.</td>
+</tr>
+<tr>
+<td><a href="../parsers/eof/"><code>eof</code></a></td>
+<td>Succeeds only at the end of the input.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="table-4-miscellaneous-parsers">Table 4: Miscellaneous parsers</h3>
+<table>
+<thead>
+<tr>
+<th>Parser</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../parsers/always/"><code>always</code></a></td>
+<td>Always succeeds and returns a value.</td>
+</tr>
+<tr>
+<td><a href="../parsers/fail/"><code>fail</code></a></td>
+<td>Fails with an expected message.</td>
+</tr>
+<tr>
+<td><a href="../parsers/failunexpected/"><code>failUnexpected</code></a></td>
+<td>Fails with an unexpected message.</td>
+</tr>
+<tr>
+<td><a href="../parsers/failfatally/"><code>failFatally</code></a></td>
+<td>Fails fatally with an expected message.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="table-5-chaining-combinators">Table 5: Chaining combinators</h3>
+<table>
+<thead>
+<tr>
+<th>Parser</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../parsers/chain/"><code>chain</code></a></td>
+<td>Applies a parser, then applies a function to the result, then applies the parser returned by the function.</td>
+</tr>
+<tr>
+<td><a href="../parsers/value/"><code>value</code></a></td>
+<td>Applies a parser and returns a value.</td>
+</tr>
+<tr>
+<td><a href="../parsers/skip/"><code>skip</code></a></td>
+<td>Applies a parser and discards the result.</td>
+</tr>
+<tr>
+<td><a href="../parsers/map/"><code>map</code></a></td>
+<td>Applies a parser, then applies a function to the result, then returns the result of that function.</td>
+</tr>
+<tr>
+<td><a href="../parsers/left/"><code>left</code></a></td>
+<td>Applies two parsers in order and returns the result of the first one.</td>
+</tr>
+<tr>
+<td><a href="../parsers/right/"><code>right</code></a></td>
+<td>Applies two parsers in order and returns the result of the second one.</td>
+</tr>
+<tr>
+<td><a href="../parsers/both/"><code>both</code></a></td>
+<td>Applies two parsers in order and returns their results in a tuple.</td>
+</tr>
+<tr>
+<td><a href="../parsers/pipe/"><code>pipe</code></a></td>
+<td>Applies a series of parsers in order, then passes the results as arguments to a function, then returns the result of that function.</td>
+</tr>
+<tr>
+<td><a href="../parsers/between/"><code>between</code></a></td>
+<td>Applies a content parser between two other parsers, returning only the content parser's result.</td>
+</tr>
+<tr>
+<td><a href="../parsers/nth/"><code>nth</code></a></td>
+<td>Applies a parser and returns the nth element of the resulting array.</td>
+</tr>
+<tr>
+<td><a href="../parsers/first/"><code>first</code></a></td>
+<td>Applies a parser and returns the first element of the resulting array.</td>
+</tr>
+<tr>
+<td><a href="../parsers/second/"><code>second</code></a></td>
+<td>Applies a parser and returns the second element of the resulting array.</td>
+</tr>
+<tr>
+<td><a href="../parsers/third/"><code>third</code></a></td>
+<td>Applies a parser and returns the third element of the resulting array.</td>
+</tr>
+<tr>
+<td><a href="../parsers/fourth/"><code>fourth</code></a></td>
+<td>Applies a parser and returns the fourth element of the resulting array.</td>
+</tr>
+<tr>
+<td><a href="../parsers/fifth/"><code>fifth</code></a></td>
+<td>Applies a parser and returns the fifth element of the resulting array.</td>
+</tr>
+<tr>
+<td><a href="../parsers/join/"><code>join</code></a></td>
+<td>Applies a parser and returns its resulting array elements joined together into a string.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="table-6-sequence-combinators">Table 6: Sequence combinators</h3>
+<table>
+<thead>
+<tr>
+<th>Parser</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../parsers/sequence/"><code>sequence</code></a></td>
+<td>Applies a series of parsers in order, returning their results in an array.</td>
+</tr>
+<tr>
+<td><a href="../parsers/block/"><code>block</code></a></td>
+<td>Runs a generator function. The generator can <code>yield</code> parsers, whose results will be returned as the result of the <code>yield</code> expressions. Returns the result of the generator.</td>
+</tr>
+<tr>
+<td><a href="../parsers/many/"><code>many</code></a></td>
+<td>Applies a parser zero or more times until it fails, returning all of the results in an array.</td>
+</tr>
+<tr>
+<td><a href="../parsers/many1/"><code>many1</code></a></td>
+<td>Applies a parser one or more times until it fails, returning all of the results in an array.</td>
+</tr>
+<tr>
+<td><a href="../parsers/skipmany/"><code>skipMany</code></a></td>
+<td>Applies a parser zero or more times until it fails, discarding the results.</td>
+</tr>
+<tr>
+<td><a href="../parsers/skipmany1/"><code>skipMany1</code></a></td>
+<td>Applies a parser one or more times until it fails, discarding the results.</td>
+</tr>
+<tr>
+<td><a href="../parsers/sepby/"><code>sepBy</code></a></td>
+<td>Applies a content parser zero or more times with an application of a separator parser between each. Returns the content parser results.</td>
+</tr>
+<tr>
+<td><a href="../parsers/sepby1/"><code>sepBy1</code></a></td>
+<td>Applies a content parser one or more times with an application of a separator parser between each. Returns the content parser results.</td>
+</tr>
+<tr>
+<td><a href="../parsers/sependby/"><code>sepEndBy</code></a></td>
+<td>Applies a content parser zero or more times with an application of a separator parser between each and optionally at the end. Returns the content parser results.</td>
+</tr>
+<tr>
+<td><a href="../parsers/sependby1/"><code>sepEndBy1</code></a></td>
+<td>Applies a content parser one or more times with an application of a separator parser between each and optionally at the end. Returns the content parser results.</td>
+</tr>
+<tr>
+<td><a href="../parsers/repeat/"><code>repeat</code></a></td>
+<td>Applies a parser a certain number of times, returning the results in an array.</td>
+</tr>
+<tr>
+<td><a href="../parsers/manytill/"><code>manyTill</code></a></td>
+<td>Applies a content parser zero or more times until an end parser succeeds. Returns the content parser's results.</td>
+</tr>
+<tr>
+<td><a href="../parsers/assocl/"><code>assocL</code></a></td>
+<td>Applies a content parser zero or more times with an application of an operator parser between each. Returns the value obtained by left associative application of all functions returned by the operator parser to the results returned by the content parser.</td>
+</tr>
+<tr>
+<td><a href="../parsers/assoc1l/"><code>assoc1L</code></a></td>
+<td>Applies a content parser one or more times with an application of an operator parser between each. Returns the value obtained by left associative application of all functions returned by the operator parser to the results returned by the content parser.</td>
+</tr>
+<tr>
+<td><a href="../parsers/assocr/"><code>assocR</code></a></td>
+<td>Applies a content parser zero or more times with an application of an operator parser between each. Returns the value obtained by right associative application of all functions returned by the operator parser to the results returned by the content parser.</td>
+</tr>
+<tr>
+<td><a href="../parsers/assoc1r/"><code>assoc1R</code></a></td>
+<td>Applies a content parser one or more times with an application of an operator parser between each. Returns the value obtained by right associative application of all functions returned by the operator parser to the results returned by the content parser.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="table-7-alternative-and-backtracking-combinators">Table 7: Alternative and backtracking combinators</h3>
+<table>
+<thead>
+<tr>
+<th>Parser</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../parsers/choice/"><code>choice</code></a></td>
+<td>Applies a series of parsers one at a time until one succeeds.</td>
+</tr>
+<tr>
+<td><a href="../parsers/optional/"><code>optional</code></a></td>
+<td>Applies a parser and returns its result on success. On failure, succeeds but returns nothing.</td>
+</tr>
+<tr>
+<td><a href="../parsers/orelse/"><code>orElse</code></a></td>
+<td>Applies a parser and returns either its result upon success or another value upon failure.</td>
+</tr>
+<tr>
+<td><a href="../parsers/attempt/"><code>attempt</code></a></td>
+<td>Applies a parser, backtracking to its original position if the parser fails and consumes input.</td>
+</tr>
+<tr>
+<td><a href="../parsers/sequenceb/"><code>sequenceB</code></a></td>
+<td>Applies a series of parsers in order, returning their results in an array. Backtracks to where the first parser was applied if any other of its parsers fails.</td>
+</tr>
+<tr>
+<td><a href="../parsers/blockb/"><code>blockB</code></a></td>
+<td>Runs a generator function. The generator can <code>yield</code> parsers, whose results will be returned as the result of the <code>yield</code> expressions. Returns the result of the generator. Backtracks to where the first yielded parser was applied if any later parser fails.</td>
+</tr>
+<tr>
+<td><a href="../parsers/chainb/"><code>chainB</code></a></td>
+<td>Applies a parser, then applies a function to the result, then applies the parser returned by the function. Backtracks to where the first parser was applied if the parser returned by the function fails.</td>
+</tr>
+<tr>
+<td><a href="../parsers/leftb/"><code>leftB</code></a></td>
+<td>Applies two parsers in order and returns the result of the first one. Backtracks to the location where the first parser was applied if the second one fails.</td>
+</tr>
+<tr>
+<td><a href="../parsers/rightb/"><code>rightB</code></a></td>
+<td>Applies two parsers in order and returns the result of the second one. Backtracks to the location where the first parser was applied if the second one fails.</td>
+</tr>
+<tr>
+<td><a href="../parsers/bothb/"><code>bothB</code></a></td>
+<td>Applies two parsers in order and returns the results of both in a tuple. Backtracks to the location where the first parser was applied if the second one fails.</td>
+</tr>
+<tr>
+<td><a href="../parsers/pipeb/"><code>pipeB</code></a></td>
+<td>Applies a series of parsers in order, then passes the results as arguments to a function, then returns the result of that function. Backtracks to where the first parser was applied if any other parser fails.</td>
+</tr>
+<tr>
+<td><a href="../parsers/repeatb/"><code>repeatB</code></a></td>
+<td>Applies a parser a certain number of times, returning the results in an array. Backtracks to where the first parser was applied if any other parser fails.</td>
+</tr>
+<tr>
+<td><a href="../parsers/manytillb/"><code>manyTillB</code></a></td>
+<td>Applies a content parser zero or more times until an end parser succeeds. Returns the content parser's results. Backtracks to where the content parser was first applied if it fails before the end parser succeeds.</td>
+</tr>
+<tr>
+<td><a href="../parsers/betweenb/"><code>betweenB</code></a></td>
+<td>Applies a content parser between two other parsers, returning only the content parser's result. Backtracks to where the first parser was applied if either other parser fails.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="table-8-conditional-and-lookahead-combinators">Table 8: Conditional and lookahead combinators</h3>
+<table>
+<thead>
+<tr>
+<th>Parser</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../parsers/lookahead/"><code>lookAhead</code></a></td>
+<td>Applies a parser and returns its result without consuming input.</td>
+</tr>
+<tr>
+<td><a href="../parsers/notempty/"><code>notEmpty</code></a></td>
+<td>Applies a parser and fails if the parser succeeds without consuming input.</td>
+</tr>
+<tr>
+<td><a href="../parsers/followedby/"><code>followedBy</code></a></td>
+<td>Applies a parser and succeeds without consuming input if that parser succeeds.</td>
+</tr>
+<tr>
+<td><a href="../parsers/notfollowedby/"><code>notFollowedBy</code></a></td>
+<td>Applies a parser and succeeds without consuming input if that parser fails.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="table-9-error-message-combinators">Table 9: Error message combinators</h3>
+<table>
+<thead>
+<tr>
+<th>Parser</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../parsers/label/"><code>label</code></a></td>
+<td>Applies a parser and replaces its errors with an expected error if that parser fails.</td>
+</tr>
+<tr>
+<td><a href="../parsers/backlabel/"><code>backLabel</code></a></td>
+<td>Applies a parser and replaces its errors with an expected error if that parser fails. Backtracks to where the parser was applied and adds additional information to the error message if that parser consumes input.</td>
+</tr>
+<tr>
+<td><a href="../parsers/notemptym/"><code>notEmptyM</code></a></td>
+<td>Applies a parser and fails if the parser succeeds without consuming input. Overwrites the error message with a custom one on failure.</td>
+</tr>
+<tr>
+<td><a href="../parsers/followedbym/"><code>followedByM</code></a></td>
+<td>Applies a parser and succeeds without consuming input if that parser succeeds. Overwrites the error message with a custom one on failure.</td>
+</tr>
+<tr>
+<td><a href="../parsers/notfollowedbym/"><code>notFollowedByM</code></a></td>
+<td>Applies a parser and succeeds without consuming input if that parser fails. Overwrites the error message with a custom one on failure.</td>
+</tr>
+</tbody>
+</table>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
+        
+          <a href="../installation/" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-footer-nav__button md-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+            </div>
+            <div class="md-footer-nav__title">
+              <div class="md-ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Installation
+              </div>
+            </div>
+          </a>
+        
+        
+          <a href="../parsers/all/" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-footer-nav__title">
+              <div class="md-ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                all
+              </div>
+            </div>
+            <div class="md-footer-nav__button md-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            Copyright &copy; 2020 Thomas J. Otterson
+          </div>
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../assets/javascripts/vendor.fd16492e.min.js"></script>
+      <script src="../assets/javascripts/bundle.7836ba4d.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}</script>
+      
+      <script>
+        app = initialize({
+          base: "..",
+          features: ['navigation.instant', 'navigation.tabs'],
+          search: Object.assign({
+            worker: "../assets/javascripts/worker/search.4ac00218.min.js"
+          }, typeof search !== "undefined" && search)
+        })
+      </script>
+      
+    
+  </body>
+</html>
