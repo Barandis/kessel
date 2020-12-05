@@ -45,4 +45,3 @@ Reads `n` characters and returns them as a single string.
 
 * [`all`](all.md)
 * [`any`](any.md)
-* 

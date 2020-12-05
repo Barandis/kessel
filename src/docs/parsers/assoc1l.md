@@ -64,4 +64,3 @@ See [`assocL`](assocl.md) for an explanation of the success case of the example.
 
 * [`assocL`](assocl.md)
 * [`assoc1R`](assoc1r.md)
-* 

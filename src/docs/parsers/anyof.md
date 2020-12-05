@@ -45,4 +45,3 @@ Reads a single character and succeeds if that character is included in `cs`.
 #### See Also
 
 * [`noneOf`](noneof.md)
-* 

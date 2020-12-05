@@ -87,9 +87,10 @@ This example exists as a test in the file `csv.js` in the `test/specs` directory
 
 ### Documentation
 
-Details for every function and parser in the API will be written after the long weekend.
+Documenting has begun and is available (partially) on the [Documentation Page][5].
 
 [1]: https://hackage.haskell.org/package/parsec
 [2]: https://www.quanttec.com/fparsec/
 [3]: http://book.realworldhaskell.org/read/using-parsec.html
 [4]: https://en.wikipedia.org/wiki/Comma-separated_values#Example
+[5]: https://barandis.github.io/kessel/
