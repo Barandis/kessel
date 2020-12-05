@@ -138,7 +138,7 @@ In this documentation, we will talk about parsers *returning* values. In this ca
 |--------|-------------|
 | [`choice`](parsers/choice.md) | Applies a series of parsers one at a time until one succeeds. |
 | [`optional`](parsers/optional.md) | Applies a parser and returns its result on success. On failure, succeeds but returns nothing. |
-| [`orElse`](parsers/orelse.md) | Applies a parser and returns either its result upon success or another value upon failure. |
+| [`orValue`](parsers/orvalue.md) | Applies a parser and returns either its result upon success or another value upon failure. |
 | [`attempt`](parsers/attempt.md) | Applies a parser, backtracking to its original position if the parser fails and consumes input. |
 | [`sequenceB`](parsers/sequenceb.md) | Applies a series of parsers in order, returning their results in an array. Backtracks to where the first parser was applied if any other of its parsers fails. |
 | [`blockB`](parsers/blockb.md) | Runs a generator function. The generator can `yield` parsers, whose results will be returned as the result of the `yield` expressions. Returns the result of the generator. Backtracks to where the first yielded parser was applied if any later parser fails. |

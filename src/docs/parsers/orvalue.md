@@ -5,10 +5,10 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `orElse(p, x)`
+> `orValue(p, x)`
 
 ```javascript
-const parser = orElse(join(sequence(letter, digit)), 'Z0')
+const parser = orValue(join(sequence(letter, digit)), 'Z0')
 
 const s = parse(parser, 'a1')
 console.log(status(s))  // Symbol(ok)
@@ -29,7 +29,7 @@ console.log(failure(t)) // Parse error at (line 1, column 2):
 
 Applies a parser and returns its result on success or an arbitrary value on failure.
 
-The only way `orElse` can fail is if its parser fails fatally. For this reason, a common use case is to wrap the parser in [`attempt`](attempt.md) to ensure that the default value is always returned on any kind of failure. Take care when doing this, as backtracking can erase important error information.
+The only way `orValue` can fail is if its parser fails fatally. For this reason, a common use case is to wrap the parser in [`attempt`](attempt.md) to ensure that the default value is always returned on any kind of failure. Take care when doing this, as backtracking can erase important error information.
 
 `x` can be a value of any type, so this becomes one of the small number of combinators that can return results that are not strings or arrays of strings.
 

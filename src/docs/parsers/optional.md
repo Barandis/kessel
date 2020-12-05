@@ -52,5 +52,5 @@ A common use case is to skip some optional input; in this case, `optional` can b
 #### See Also
 
 * [`lookAhead`](lookahead.md)
-* [`orElse`](orelse.md)
+* [`orValue`](orvalue.md)
 * [`skip`](skip.md)

@@ -77,8 +77,8 @@ export const optional = p => Parser(ctx => {
  * value `x`. This parser only fails if its contained parser fails
  * fatally.
  *
- * `def(p, x)` is an optimized implementation of `choice([p,
- * constant(x)])`.
+ * `orValue(p, x)` is an optimized implementation of `orElse(p,
+ * value(x))`.
  *
  * @param {Parser} p A parser whose result will be the created parser's
  *     result if it succeeds.
@@ -87,8 +87,8 @@ export const optional = p => Parser(ctx => {
  * @returns {Parser} A parser which results in either its contained
  *     parser's successful result or the provided value.
  */
-export const orElse = (p, x) => Parser(ctx => {
-  ASSERT && assertParser('orElse', p, ordParFormatter('1st'))
+export const orValue = (p, x) => Parser(ctx => {
+  ASSERT && assertParser('orValue', p, ordParFormatter('1st'))
 
   const [reply, [context, result]] = twin(p(ctx))
   return result.status !== Error ? reply : ok(context, x)

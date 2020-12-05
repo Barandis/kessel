@@ -65,7 +65,7 @@ export {
   leftB,
   manyTillB,
   optional,
-  orElse,
+  orValue,
   pipeB,
   repeatB,
   rightB,

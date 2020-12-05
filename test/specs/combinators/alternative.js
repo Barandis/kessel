@@ -13,7 +13,7 @@ import {
   chainB,
   choice,
   repeatB,
-  orElse,
+  orValue,
   leftB,
   manyTillB,
   optional,
@@ -118,22 +118,22 @@ describe('Alternative and error recovery combinators', () => {
     })
   })
 
-  describe('orElse', () => {
+  describe('orValue', () => {
     it('throws if its first argument is not a parser', () => {
       error(
-        orElse(0),
+        orValue(0),
         '',
-        '[orElse]: expected 1st argument to be a parser; found 0',
+        '[orValue]: expected 1st argument to be a parser; found 0',
       )
     })
     it('succeeds with its parser\'s successful result', () => {
-      pass(orElse(char('a'), 'z'), 'abc', 'a')
+      pass(orValue(char('a'), 'z'), 'abc', 'a')
     })
     it('succeeds with its value if is parser fails', () => {
-      pass(orElse(char('b'), 'z'), 'abc', 'z')
+      pass(orValue(char('b'), 'z'), 'abc', 'z')
     })
     it('fails fatally if its parser does', () => {
-      fail(orElse(sequence(string('ab'), string('cd')), 'z'), 'abce', {
+      fail(orValue(sequence(string('ab'), string('cd')), 'z'), 'abce', {
         expected: "'cd'",
         status: Fatal,
       })
