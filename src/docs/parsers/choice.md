@@ -8,7 +8,7 @@
 > `choice(...ps)`
 
 ```javascript
-const parser = choice(left(letter, digit), right(digit, letter))
+const parser = choice(left(letter, digit), right(digit, letter), space)
 
 const s = parse(parser, 'a1')
 console.log(status(s))  // Symbol(ok)
@@ -18,13 +18,17 @@ const r = parse(parser, '1a')
 console.log(status(r))  // Symbol(ok)
 console.log(success(r)) // "a"
 
-const f = parse(parser, ' a')
+const p = parse(parser, ' ')
+console.log(status(p))  // Symbol(ok)
+console.log(success(p)) // " "
+
+const f = parse(parser, '-a')
 console.log(status(f))  // Symbol(error)
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
-                        //  a
+                        // -a
                         // ^
-                        // Expected a letter or a digit
+                        // Expected a letter, a digit, or whitespace
 
 const t = parse(parser, 'a ')
 console.log(status(t))  // Symbol(fatal)
@@ -43,11 +47,9 @@ If a parser in `ps` fails fatally, no further parsers will be applied and `choic
 
 If all parsers in `ps` fail, then `choice` fails as well.
 
-The example shows *two* success cases. In the first one, the application of the first parser (`left(letter, digit)`) succeeds and its result is returned. In the second one, the application of the first parser fails, but the application of the second one (`right(digit, letter)`) succeeds and its result is returned.
+`choice(p, q)` is the same as `orElse(p, q)`, while `choice(p, q, r)` is the same as `orElse(orElse(p, q), r)`, etc. Because of JavaScript's lack of custom operators, `choice` becomes much more popular. In languages with custom operators, that `orElse(orElse(p, q), r)` would become a much more manageable `p <|> q <|> r` (if `orElse` was implemented as `<|>`, as it is in Parsec and FParsec), and `choice` itself would be less necessary.
 
-In the first failure case, both parsers fail but neither consumes any input, so `choice` fails non-fatally. In the second case, the first parser fails fatally (it consumes `a` before it fails on the space), so the second parser is never applied and `choice` fails fatally.
-
-Because `choice` fails immediately if any of its parsers fails fatally, it is quite common to wrap its parsers in `attempt` to turn their fatal failures into non-fatal failures. Take care in doing this, as backtracking can erase useful error information.
+The example shows *three* success cases, `s`, `r`, and `p`, one for each parser passed to `choice`. If all of these fail, as in the first failure case (`f`), then failure is the result. In the second failure case (`t`), the first parser fails but consumes input as it does so, so `choice` is halted at that point without applying its second or third parsers. Fatal failure is the result.
 
 #### Parameters
 
@@ -72,4 +74,5 @@ Because `choice` fails immediately if any of its parsers fails fatally, it is qu
 #### See Also
 
 * [`attempt`](attempt.md)
+* [`orElse`](orelse.md)
 * [`sequence`](sequence.md)

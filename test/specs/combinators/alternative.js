@@ -20,12 +20,13 @@ import {
   pipeB,
   rightB,
   sequenceB,
+  orElse,
 } from 'kessel/combinators/alternative'
 import { lookAhead } from 'kessel/combinators/conditional'
 import { many1, sequence } from 'kessel/combinators/sequence'
 import { parse, Status } from 'kessel/core'
 import { ErrorType } from 'kessel/error'
-import { space } from 'kessel/index'
+import { andThen, space } from 'kessel/index'
 import { any, char, digit, eof, letter, noneOf } from 'kessel/parsers/char'
 import { string } from 'kessel/parsers/string'
 import { error, fail, pass } from 'test/helper'
@@ -33,6 +34,37 @@ import { error, fail, pass } from 'test/helper'
 const { Error, Fatal } = Status
 
 describe('Alternative and error recovery combinators', () => {
+  describe('orElse', () => {
+    const parser = orElse(
+      andThen(char('a'), char('b')),
+      andThen(char('c'), char('d')),
+    )
+
+    it('throws if either argument is not a parser', () => {
+      error(
+        andThen(0, any),
+        '',
+        '[andThen]: expected 1st argument to be a parser; found 0',
+      )
+      error(
+        andThen(any, 0),
+        '',
+        '[andThen]: expected 2nd argument to be a parser; found 0',
+      )
+    })
+    it('succeeds if one of its parsers succeeds', () => {
+      pass(parser, 'abcd', ['a', 'b'])
+      pass(parser, 'cdef', ['c', 'd'])
+    })
+    it('fails if both parsers fail', () => {
+      fail(parser, 'wxyz', "'a' or 'c'")
+    })
+    it('fails if either parser fails fatally', () => {
+      fail(parser, 'cefg', "'a' or 'd'")
+      fail(parser, 'axcd', "'b'")
+    })
+  })
+
   describe('choice', () => {
     const parser = choice(
       sequence(char('a'), char('b')),

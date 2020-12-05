@@ -100,7 +100,6 @@ In this documentation, we will talk about parsers *returning* values. In this ca
 | [`map`](parsers/map.md) | Applies a parser, then applies a function to the result, then returns the result of that function. |
 | [`left`](parsers/left.md) | Applies two parsers in order and returns the result of the first one. |
 | [`right`](parsers/right.md) | Applies two parsers in order and returns the result of the second one. |
-| [`both`](parsers/both.md) | Applies two parsers in order and returns their results in a tuple. |
 | [`pipe`](parsers/pipe.md) | Applies a series of parsers in order, then passes the results as arguments to a function, then returns the result of that function. |
 | [`between`](parsers/between.md) | Applies a content parser between two other parsers, returning only the content parser's result. |
 | [`nth`](parsers/nth.md) | Applies a parser and returns the nth element of the resulting array. |
@@ -115,6 +114,7 @@ In this documentation, we will talk about parsers *returning* values. In this ca
 
 | Parser | Description |
 |--------|-------------|
+| [`andThen`](parsers/andthen.md) | Applies two parsers in order and returns their results in a tuple. |
 | [`sequence`](parsers/sequence.md) | Applies a series of parsers in order, returning their results in an array. |
 | [`block`](parsers/block.md) | Runs a generator function. The generator can `yield` parsers, whose results will be returned as the result of the `yield` expressions. Returns the result of the generator. |
 | [`many`](parsers/many.md) | Applies a parser zero or more times until it fails, returning all of the results in an array. |
@@ -132,26 +132,32 @@ In this documentation, we will talk about parsers *returning* values. In this ca
 | [`assocR`](parsers/assocr.md) | Applies a content parser zero or more times with an application of an operator parser between each. Returns the value obtained by right associative application of all functions returned by the operator parser to the results returned by the content parser.|
 | [`assoc1R`](parsers/assoc1r.md) | Applies a content parser one or more times with an application of an operator parser between each. Returns the value obtained by right associative application of all functions returned by the operator parser to the results returned by the content parser. |
 
-### Table 7: Alternative and backtracking combinators
+### Table 7: Alternative combinators
 
 | Parser | Description |
 |--------|-------------|
+| [`orElse`](parsers/orelse.md) | Applies a parser and, if it fails, a second parser. |
 | [`choice`](parsers/choice.md) | Applies a series of parsers one at a time until one succeeds. |
 | [`optional`](parsers/optional.md) | Applies a parser and returns its result on success. On failure, succeeds but returns nothing. |
 | [`orValue`](parsers/orvalue.md) | Applies a parser and returns either its result upon success or another value upon failure. |
+
+### Table 8: Backtracking combinators
+
+| Parser | Description |
+|--------|-------------|
 | [`attempt`](parsers/attempt.md) | Applies a parser, backtracking to its original position if the parser fails and consumes input. |
 | [`sequenceB`](parsers/sequenceb.md) | Applies a series of parsers in order, returning their results in an array. Backtracks to where the first parser was applied if any other of its parsers fails. |
 | [`blockB`](parsers/blockb.md) | Runs a generator function. The generator can `yield` parsers, whose results will be returned as the result of the `yield` expressions. Returns the result of the generator. Backtracks to where the first yielded parser was applied if any later parser fails. |
 | [`chainB`](parsers/chainb.md) | Applies a parser, then applies a function to the result, then applies the parser returned by the function. Backtracks to where the first parser was applied if the parser returned by the function fails. |
 | [`leftB`](parsers/leftb.md) | Applies two parsers in order and returns the result of the first one. Backtracks to the location where the first parser was applied if the second one fails. |
 | [`rightB`](parsers/rightb.md) | Applies two parsers in order and returns the result of the second one. Backtracks to the location where the first parser was applied if the second one fails. |
-| [`bothB`](parsers/bothb.md) | Applies two parsers in order and returns the results of both in a tuple. Backtracks to the location where the first parser was applied if the second one fails. |
+| [`andThenB`](parsers/andthenb.md) | Applies two parsers in order and returns the results of both in a tuple. Backtracks to the location where the first parser was applied if the second one fails. |
 | [`pipeB`](parsers/pipeb.md) | Applies a series of parsers in order, then passes the results as arguments to a function, then returns the result of that function. Backtracks to where the first parser was applied if any other parser fails. |
 | [`repeatB`](parsers/repeatb.md) | Applies a parser a certain number of times, returning the results in an array. Backtracks to where the first parser was applied if any other parser fails. |
 | [`manyTillB`](parsers/manytillb.md) | Applies a content parser zero or more times until an end parser succeeds. Returns the content parser's results. Backtracks to where the content parser was first applied if it fails before the end parser succeeds. |
 | [`betweenB`](parsers/betweenb.md) | Applies a content parser between two other parsers, returning only the content parser's result. Backtracks to where the first parser was applied if either other parser fails. |
 
-### Table 8: Conditional and lookahead combinators
+### Table 9: Conditional and lookahead combinators
 
 | Parser | Description |
 |--------|-------------|
@@ -160,7 +166,7 @@ In this documentation, we will talk about parsers *returning* values. In this ca
 | [`followedBy`](parsers/followedby.md) | Applies a parser and succeeds without consuming input if that parser succeeds. |
 | [`notFollowedBy`](parsers/notfollowedby.md) | Applies a parser and succeeds without consuming input if that parser fails. |
 
-### Table 9: Error message combinators
+### Table 10: Error message combinators
 
 | Parser | Description |
 |--------|-------------|
