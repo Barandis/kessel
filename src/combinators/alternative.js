@@ -294,7 +294,7 @@ export const rightB = (p1, p2) => Parser(ctx => {
  * parser was applied, even if the first parser consumed input. A fatal
  * error from either parser will still result in an overall fatal error.
  *
- * Note that `bothB(p1, p2)` is not the same as `backtrack(both(p1,
+ * Note that `andThenB(p1, p2)` is not the same as `attempt(andThen(p1,
  * p2))`, as the former will fail fatally if one of its parsers fails
  * fatally, while the latter will fail non-fatally in that case.
  *
@@ -303,9 +303,9 @@ export const rightB = (p1, p2) => Parser(ctx => {
  * @returns {Parser} A parser that applies both contained parsers and
  *     results in the values of both parsers in an array.
  */
-export const bothB = (p1, p2) => Parser(ctx => {
-  ASSERT && assertParser('bothB', p1, ordParFormatter('1st'))
-  ASSERT && assertParser('bothB', p2, ordParFormatter('2nd'))
+export const andThenB = (p1, p2) => Parser(ctx => {
+  ASSERT && assertParser('andThenB', p1, ordParFormatter('1st'))
+  ASSERT && assertParser('andThenB', p2, ordParFormatter('2nd'))
 
   const index = ctx.index
 

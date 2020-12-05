@@ -33,6 +33,8 @@ nav:
       - alpha: parsers/alpha.md
       - alphaU: parsers/alphau.md
       - always: parsers/always.md
+      - andThen: parsers/andthen.md
+      - andThenB: parsers/andthenb.md
       - any: parsers/any.md
       - anyOf: parsers/anyof.md
       - anyString: parsers/anystring.md
@@ -46,8 +48,6 @@ nav:
       - betweenB: parsers/betweenb.md
       - block: parsers/block.md
       - blockB: parsers/blockb.md
-      - both: parsers/both.md
-      - bothB: parsers/bothb.md
       - chain: parsers/chain.md
       - chainB: parsers/chainb.md
       - char: parsers/char.md

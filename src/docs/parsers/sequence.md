@@ -63,8 +63,8 @@ All of the results are gathered into an array, but `null` results are skipped.
 
 #### See Also
 
+* [`andThen`](andthen.md)
 * [`block`](block.md)
-* [`both`](both.md)
 * [`left`](left.md)
 * [`right`](right.md)
 * [`sequenceB`](sequenceb.md)

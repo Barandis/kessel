@@ -64,7 +64,7 @@ There is another version of this parser ([`rightB`](rightb.md)) that will backtr
 
 #### See Also
 
-* [`both`](both.md)
+* [`andThen`](andthen.md)
 * [`left`](left.md)
 * [`rightB`](rightb.md)
 * [`sequence`](sequence.md)

@@ -9,7 +9,7 @@ import {
   attempt,
   betweenB,
   blockB,
-  bothB,
+  andThenB,
   chainB,
   choice,
   repeatB,
@@ -333,30 +333,33 @@ describe('Alternative and error recovery combinators', () => {
     })
   })
 
-  describe('bothB', () => {
+  describe('andThenB', () => {
     it('throws if its first argument is not a parser', () => {
       error(
-        bothB(0, any),
+        andThenB(0, any),
         '',
-        '[bothB]: expected 1st argument to be a parser; found 0',
+        '[andThenB]: expected 1st argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       error(
-        bothB(any, 0),
+        andThenB(any, 0),
         '',
-        '[bothB]: expected 2nd argument to be a parser; found 0',
+        '[andThenB]: expected 2nd argument to be a parser; found 0',
       )
     })
     it('returns the result of its right parser if both pass', () => {
-      pass(bothB(letter, digit), 'a1', ['a', '1'])
+      pass(andThenB(letter, digit), 'a1', ['a', '1'])
     })
     it('fails non-fatally if one parser fails and no input is consumed', () => {
-      fail(bothB(letter, digit), '1', { expected: 'a letter', status: Error })
-      fail(bothB(eof, char('a')), '', { expected: "'a'", status: Error })
+      fail(andThenB(letter, digit), '1', {
+        expected: 'a letter',
+        status: Error,
+      })
+      fail(andThenB(eof, char('a')), '', { expected: "'a'", status: Error })
     })
     it('fails non-fatally on non-fatal errors after consumption', () => {
-      const [ctx, result] = parse(bothB(letter, digit), 'aa')
+      const [ctx, result] = parse(andThenB(letter, digit), 'aa')
       const err = result.errors[0]
 
       expect(ctx.index).to.equal(0)
@@ -365,12 +368,12 @@ describe('Alternative and error recovery combinators', () => {
       expect(err.errors[0].label).to.equal('a digit')
     })
     it('still fails fatally if either parser fails fatally', () => {
-      fail(bothB(sequence(letter, letter), digit), 'a11', {
+      fail(andThenB(sequence(letter, letter), digit), 'a11', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
-      fail(bothB(letter, sequence(letter, digit)), 'aab', {
+      fail(andThenB(letter, sequence(letter, digit)), 'aab', {
         expected: 'a digit',
         index: 2,
         status: Fatal,

@@ -64,7 +64,7 @@ There is another version of this parser ([`leftB`](leftb.md)) that will backtrac
 
 #### See Also
 
-* [`both`](both.md)
+* [`andThen`](andthen.md)
 * [`leftB`](leftb.md)
 * [`right`](right.md)
 * [`sequence`](sequence.md)

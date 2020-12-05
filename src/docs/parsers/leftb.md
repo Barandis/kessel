@@ -64,7 +64,7 @@ The result of the second parser is discarded. If either parser fails, then the e
 
 #### See Also
 
-* [`bothB`](bothb.md)
+* [`andThenB`](andthenb.md)
 * [`left`](left.md)
 * [`rightB`](rightb.md)
 * [`sequenceB`](sequenceb.md)

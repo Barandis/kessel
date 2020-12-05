@@ -5,10 +5,10 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `bothB(p1, p2)`
+> `andThenB(p1, p2)`
 
 ```javascript
-const parser = bothB(letter, digit)
+const parser = andThenB(letter, digit)
 
 const s = parse(parser, 'a1')
 console.log(status(s))  // Symbol(ok)
@@ -39,7 +39,7 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 
 Applies two parsers in order, returning their results in a tuple.
 
-If either parser fails, then the entire `bothB` parser also fails. If input was consumed by either parser and one of them fails, backtracking will take the state back to where it was before `p1` was applied.
+If either parser fails, then the entire `andThenB` parser also fails. If input was consumed by either parser and one of them fails, backtracking will take the state back to where it was before `p1` was applied.
 
 #### Parameters
 
@@ -64,7 +64,7 @@ If either parser fails, then the entire `bothB` parser also fails. If input was 
 
 #### See Also
 
-* [`both`](both.md)
+* [`andThen`](andThen.md)
 * [`leftB`](leftb.md)
 * [`rightB`](rightb.md)
 * [`sequenceB`](sequenceb.md)

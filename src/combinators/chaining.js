@@ -233,9 +233,9 @@ export const right = (p1, p2) => Parser(ctx => {
  * @returns {Parser} A parser that applies both contained parsers and
  *     results in the values of both parsers in an array.
  */
-export const both = (p1, p2) => Parser(ctx => {
-  ASSERT && assertParser('both', p1, ordParFormatter('1st'))
-  ASSERT && assertParser('both', p2, ordParFormatter('2nd'))
+export const andThen = (p1, p2) => Parser(ctx => {
+  ASSERT && assertParser('andThen', p1, ordParFormatter('1st'))
+  ASSERT && assertParser('andThen', p2, ordParFormatter('2nd'))
 
   const index = ctx.index
 

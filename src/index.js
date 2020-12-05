@@ -56,10 +56,10 @@ export {
 // COMBINATORS
 
 export {
+  andThenB,
   attempt,
   betweenB,
   blockB,
-  bothB,
   chainB,
   choice,
   leftB,
@@ -72,8 +72,8 @@ export {
   sequenceB,
 } from './combinators/alternative'
 export {
+  andThen,
   between,
-  both,
   chain,
   fifth,
   first,

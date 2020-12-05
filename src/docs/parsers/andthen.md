@@ -5,10 +5,10 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `both(p1, p2)`
+> `andThen(p1, p2)`
 
 ```javascript
-const parser = both(letter, digit)
+const parser = andThen(letter, digit)
 
 const s = parse(parser, 'a1')
 console.log(status(s))  // Symbol(ok)
@@ -33,11 +33,11 @@ console.log(failure(t)) // Parse error at (line 1, column 2):
 
 Applies two parsers in order, returning their results in a tuple.
 
-If either parser fails, then the entire `both` parser also fails. If input was consumed by either parser and one of them fails, then the failure is fatal (whether or not `p1` or `p2` failed fatally). In the examples, `f` represents a non-fatal failure because the first parser ([`letter`](letter.md)) failed without consuming, but `t` represents a fata failure because the first parser consumed a character before the second parser ([`digit`](digit.md)) failed non-fatally.
+If either parser fails, then the entire `andThen` parser also fails. If input was consumed by either parser and one of them fails, then the failure is fatal (whether or not `p1` or `p2` failed fatally). In the examples, `f` represents a non-fatal failure because the first parser ([`letter`](letter.md)) failed without consuming, but `t` represents a fata failure because the first parser consumed a character before the second parser ([`digit`](digit.md)) failed non-fatally.
 
-There is another version of this parser ([`bothB`](bothb.md)) that will backtrack and fail non-fatally if `p1` succeeds and `p2` fails non-fatally.
+There is another version of this parser ([`andThenB`](andthenb.md)) that will backtrack and fail non-fatally if `p1` succeeds and `p2` fails non-fatally.
 
-`both(p1, p2)` is an optimized implementation of `chain(p1, a => chain(p2, b => always([a, b])))`.
+`andThen(p1, p2)` is an optimized implementation of `chain(p1, a => chain(p2, b => always([a, b])))`.
 
 #### Parameters
 
@@ -64,7 +64,7 @@ There is another version of this parser ([`bothB`](bothb.md)) that will backtrac
 
 #### See Also
 
-* [`bothB`](bothb.md)
+* [`andThenB`](andthenb.md)
 * [`left`](left.md)
 * [`right`](right.md)
 * [`sequence`](sequence.md)

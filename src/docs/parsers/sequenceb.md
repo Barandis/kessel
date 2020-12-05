@@ -65,8 +65,8 @@ All of the results are gathered into an array, but `null` results are skipped.
 
 #### See Also
 
+* [`andThenB`](andthenb.md)
 * [`blockB`](blockb.md)
-* [`bothB`](bothb.md)
 * [`leftB`](leftb.md)
 * [`rightB`](rightb.md)
 * [`sequence`](sequence.md)

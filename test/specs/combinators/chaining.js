@@ -5,7 +5,7 @@
 
 import {
   between,
-  both,
+  andThen,
   chain,
   fifth,
   first,
@@ -232,41 +232,41 @@ describe('Chaining and piping combinators', () => {
     })
   })
 
-  describe('both', () => {
+  describe('andThen', () => {
     it('throws if its first argument is not a parser', () => {
       error(
-        both(0, any),
+        andThen(0, any),
         '',
-        '[both]: expected 1st argument to be a parser; found 0',
+        '[andThen]: expected 1st argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       error(
-        both(any, 0),
+        andThen(any, 0),
         '',
-        '[both]: expected 2nd argument to be a parser; found 0',
+        '[andThen]: expected 2nd argument to be a parser; found 0',
       )
     })
     it('returns the result of both parsers if both pass', () => {
-      pass(both(letter, digit), 'a1', ['a', '1'])
+      pass(andThen(letter, digit), 'a1', ['a', '1'])
     })
     it('fails non-fatally if one parser fails and no input is consumed', () => {
-      fail(both(letter, digit), '1', {
+      fail(andThen(letter, digit), '1', {
         expected: 'a letter',
         status: Status.Error,
       })
-      fail(both(eof, char('a')), '', {
+      fail(andThen(eof, char('a')), '', {
         expected: "'a'",
         status: Status.Error,
       })
     })
     it('fails fatally if any input is consumed on failure', () => {
-      fail(both(sequence(letter, letter), digit), 'a11', {
+      fail(andThen(sequence(letter, letter), digit), 'a11', {
         expected: 'a letter',
         index: 1,
         status: Status.Fatal,
       })
-      fail(both(letter, digit), 'ab', {
+      fail(andThen(letter, digit), 'ab', {
         expected: 'a digit',
         index: 1,
         status: Status.Fatal,
