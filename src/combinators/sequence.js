@@ -48,13 +48,13 @@ export const sequence = (...ps) => Parser(ctx => {
   let context = ctx
 
   for (const p of ps) {
-    const [next, result] = p(context)
-    context = next
+    const [pctx, pres] = p(context)
+    context = pctx
 
-    if (result.status !== Ok) {
-      return maybeFatal(context.index !== index, context, result.errors)
+    if (pres.status !== Ok) {
+      return maybeFatal(context.index !== index, context, pres.errors)
     }
-    if (result.value !== null) values.push(result.value)
+    if (pres.value !== null) values.push(pres.value)
   }
   return ok(context, values)
 })
@@ -99,13 +99,13 @@ export const block = genFn => Parser(ctx => {
       ordinal(i + 1)
     } yield to be to a parser; found ${stringify(v)}`)
 
-    const [next, result] = value(context)
-    context = next
+    const [pctx, pres] = value(context)
+    context = pctx
 
-    if (result.status !== Ok) {
-      return maybeFatal(context.index !== index, context, result.errors)
+    if (pres.status !== Ok) {
+      return maybeFatal(context.index !== index, context, pres.errors)
     }
-    nextValue = result.value
+    nextValue = pres.value
     i++
   }
 })
@@ -129,12 +129,12 @@ export const many = p => Parser(ctx => {
   let context = ctx
 
   while (true) {
-    const [reply, [next, result]] = twin(p(context))
-    context = next
+    const [prep, [pctx, pres]] = twin(p(context))
+    context = pctx
 
-    if (result.status === Fatal) return reply
-    if (result.status === Error) break
-    if (result.value !== null) values.push(result.value)
+    if (pres.status === Fatal) return prep
+    if (pres.status === Error) break
+    if (pres.value !== null) values.push(pres.value)
     if (context.index >= context.view.byteLength) break
   }
   return ok(context, values)
@@ -156,19 +156,19 @@ export const many = p => Parser(ctx => {
 export const many1 = p => Parser(ctx => {
   ASSERT && assertParser('many1', p)
 
-  const [reply, [next, result]] = twin(p(ctx))
-  if (result.status !== Ok) return reply
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  if (pres.status !== Ok) return prep
 
-  let context = next
-  const values = result.value !== null ? [result.value] : []
+  let context = pctx
+  const values = pres.value !== null ? [pres.value] : []
 
   while (true) {
-    const [reply, [next, result]] = twin(p(context))
-    context = next
+    const [prep, [pctx, pres]] = twin(p(context))
+    context = pctx
 
-    if (result.status === Fatal) return reply
-    if (result.status === Error) break
-    if (result.value !== null) values.push(result.value)
+    if (pres.status === Fatal) return prep
+    if (pres.status === Error) break
+    if (pres.value !== null) values.push(pres.value)
     if (context.index >= context.view.byteLength) break
   }
   return ok(context, values)
@@ -190,11 +190,11 @@ export const skipMany = p => Parser(ctx => {
   let context = ctx
 
   while (true) {
-    const [reply, [next, result]] = twin(p(context))
-    context = next
+    const [prep, [pctx, pres]] = twin(p(context))
+    context = pctx
 
-    if (result.status === Fatal) return reply
-    if (result.status === Error) break
+    if (pres.status === Fatal) return prep
+    if (pres.status === Error) break
     if (context.index >= context.view.byteLength) break
   }
   return ok(context, null)
@@ -214,17 +214,17 @@ export const skipMany = p => Parser(ctx => {
 export const skipMany1 = p => Parser(ctx => {
   ASSERT && assertParser('skipMany1', p)
 
-  const [reply, [next, result]] = twin(p(ctx))
-  if (result.status !== Ok) return reply
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  if (pres.status !== Ok) return prep
 
-  let context = next
+  let context = pctx
 
   while (true) {
-    const [reply, [next, result]] = twin(p(context))
-    context = next
+    const [prep, [pctx, pres]] = twin(p(context))
+    context = pctx
 
-    if (result.status === Fatal) return reply
-    if (result.status === Error) break
+    if (pres.status === Fatal) return prep
+    if (pres.status === Error) break
     if (context.index >= context.view.byteLength) break
   }
   return ok(context, null)
@@ -256,28 +256,28 @@ export const sepBy = (p, sep) => Parser(ctx => {
   ASSERT && assertParser('sepBy', sep, ordParFormatter('2nd'))
 
   let index = ctx.index
-  const [reply, [next, result]] = twin(p(ctx))
-  if (result.status === Fatal) return reply
-  if (result.status === Error) return ok(next, [])
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  if (pres.status === Fatal) return prep
+  if (pres.status === Error) return ok(pctx, [])
 
-  const values = [result.value]
-  let context = next
+  const values = [pres.value]
+  let context = pctx
 
   while (true) {
     index = context.index
 
-    const [reply1, [context1, result1]] = twin(sep(context))
-    context = context1
-    if (result1.status === Fatal) return reply1
-    if (result1.status === Error) break
+    const [seprep, [sepctx, sepres]] = twin(sep(context))
+    context = sepctx
+    if (sepres.status === Fatal) return seprep
+    if (sepres.status === Error) break
 
-    const [reply2, [context2, result2]] = twin(p(context))
-    context = context2
-    if (result2.status === Fatal) return reply2
-    if (result2.status === Error) break
+    const [prep, [pctx, pres]] = twin(p(context))
+    context = pctx
+    if (pres.status === Fatal) return prep
+    if (pres.status === Error) break
 
     if (context.index === index) throw new TypeError(loopMessage('sepBy'))
-    values.push(result2.value)
+    values.push(pres.value)
   }
   return ok(context, values, index)
 })
@@ -309,27 +309,27 @@ export const sepBy1 = (p, sep) => Parser(ctx => {
   ASSERT && assertParser('sepBy1', sep, ordParFormatter('2nd'))
 
   let index = ctx.index
-  const [reply, [next, result]] = twin(p(ctx))
-  if (result.status !== Ok) return reply
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  if (pres.status !== Ok) return prep
 
-  const values = [result.value]
-  let context = next
+  const values = [pres.value]
+  let context = pctx
 
   while (true) {
     index = context.index
 
-    const [reply1, [context1, result1]] = twin(sep(context))
-    context = context1
-    if (result1.status === Fatal) return reply1
-    if (result1.status === Error) break
+    const [seprep, [sepctx, sepres]] = twin(sep(context))
+    context = sepctx
+    if (sepres.status === Fatal) return seprep
+    if (sepres.status === Error) break
 
-    const [reply2, [context2, result2]] = twin(p(context))
-    context = context2
-    if (result2.status === Fatal) return reply2
-    if (result2.status === Error) break
+    const [prep, [pctx, pres]] = twin(p(context))
+    context = pctx
+    if (pres.status === Fatal) return prep
+    if (pres.status === Error) break
 
     if (context.index === index) throw new TypeError(loopMessage('sepBy1'))
-    values.push(result2.value)
+    values.push(pres.value)
   }
   return ok(context, values, index)
 })
@@ -361,31 +361,31 @@ export const sepEndBy = (p, sep) => Parser(ctx => {
   ASSERT && assertParser('sepEndBy', sep, ordParFormatter('2nd'))
 
   let index = ctx.index
-  const [reply, [next, result]] = twin(p(ctx))
-  if (result.status === Fatal) return reply
-  if (result.status === Error) return ok(next, [])
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  if (pres.status === Fatal) return prep
+  if (pres.status === Error) return ok(pctx, [])
 
-  const values = [result.value]
-  let context = next
+  const values = [pres.value]
+  let context = pctx
 
   while (true) {
     index = context.index
 
-    const [reply1, [context1, result1]] = twin(sep(context))
-    context = context1
-    if (result1.status === Fatal) return reply1
-    if (result1.status === Error) break
+    const [seprep, [sepctx, sepres]] = twin(sep(context))
+    context = sepctx
+    if (sepres.status === Fatal) return seprep
+    if (sepres.status === Error) break
 
-    const [reply2, [context2, result2]] = twin(p(context))
-    context = context2
-    if (result2.status === Fatal) return reply2
-    if (result2.status === Error) break
+    const [prep, [pctx, pres]] = twin(p(context))
+    context = pctx
+    if (pres.status === Fatal) return prep
+    if (pres.status === Error) break
 
     if (context.index === index) throw new TypeError(loopMessage('sepEndBy'))
-    values.push(result2.value)
+    values.push(pres.value)
   }
-  const [sepNext, _] = sep({ ...context, index })
-  return ok(sepNext, values)
+  const [seprep, [sepctx, sepres]] = twin(sep({ ...context, index }))
+  return sepres.status === Fatal ? seprep : ok(sepctx, values)
 })
 
 /**
@@ -415,30 +415,30 @@ export const sepEndBy1 = (p, sep) => Parser(ctx => {
   ASSERT && assertParser('sepEndBy1', sep, ordParFormatter('2nd'))
 
   let index = ctx.index
-  const [reply, [next, result]] = twin(p(ctx))
-  if (result.status !== Ok) return reply
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  if (pres.status !== Ok) return prep
 
-  const values = [result.value]
-  let context = next
+  const values = [pres.value]
+  let context = pctx
 
   while (true) {
     index = context.index
 
-    const [reply1, [context1, result1]] = twin(sep(context))
-    context = context1
-    if (result1.status === Fatal) return reply1
-    if (result1.status === Error) break
+    const [seprep, [sepctx, sepres]] = twin(sep(context))
+    context = sepctx
+    if (sepres.status === Fatal) return seprep
+    if (sepres.status === Error) break
 
-    const [reply2, [context2, result2]] = twin(p(context))
-    context = context2
-    if (result2.status === Fatal) return reply2
-    if (result2.status === Error) break
+    const [prep, [pctx, pres]] = twin(p(context))
+    context = pctx
+    if (pres.status === Fatal) return prep
+    if (pres.status === Error) break
 
     if (context.index === index) throw new TypeError(loopMessage('sepEndBy1'))
-    values.push(result2.value)
+    values.push(pres.value)
   }
-  const [sepNext, _] = sep({ ...context, index })
-  return ok(sepNext, values)
+  const [seprep, [sepctx, sepres]] = twin(sep({ ...context, index }))
+  return sepres.status === Fatal ? seprep : ok(sepctx, values)
 })
 
 /**
@@ -461,12 +461,12 @@ export const repeat = (p, n) => Parser(ctx => {
   let context = ctx
 
   for (const _ of range(n)) {
-    const [next, result] = p(context)
-    context = next
-    if (result.status !== Ok) {
-      return maybeFatal(context.index !== index, context, result.errors)
+    const [pctx, pres] = p(context)
+    context = pctx
+    if (pres.status !== Ok) {
+      return maybeFatal(context.index !== index, context, pres.errors)
     }
-    values.push(result.value)
+    values.push(pres.value)
   }
   return ok(context, values)
 })
@@ -503,20 +503,20 @@ export const manyTill = (p, end) => Parser(ctx => {
   let context = ctx
 
   while (true) {
-    const [reply1, [context1, result1]] = twin(end(context))
-    context = context1
-    if (result1.status === Fatal) return reply1
-    if (result1.status === Ok) break
+    const [endrep, [endctx, endres]] = twin(end(context))
+    context = endctx
+    if (endres.status === Fatal) return endrep
+    if (endres.status === Ok) break
 
-    const [reply2, [context2, result2]] = twin(p(context))
-    context = context2
-    if (result2.status === Fatal) return reply2
-    if (result2.status === Error) {
+    const [prep, [pctx, pres]] = twin(p(context))
+    context = pctx
+    if (pres.status === Fatal) return prep
+    if (pres.status === Error) {
       return maybeFatal(
-        context.index !== index, context, merge(result2.errors, result1.errors),
+        context.index !== index, context, merge(pres.errors, endres.errors),
       )
     }
-    if (result2.value !== null) values.push(result2.value)
+    if (pres.value !== null) values.push(pres.value)
   }
   return ok(context, values)
 })
@@ -562,33 +562,33 @@ export const assocL = (p, op, x) => Parser(ctx => {
   ASSERT && assertParser('assocL', p, ordParFormatter('1st'))
   ASSERT && assertParser('assocL', op, ordParFormatter('2nd'))
 
-  const [reply, [next, result]] = twin(p(ctx))
-  if (result.status === Fatal) return reply
-  if (result.status === Error) return ok(next, x)
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  if (pres.status === Fatal) return prep
+  if (pres.status === Error) return ok(pctx, x)
 
-  const values = [result.value]
+  const values = [pres.value]
   const ops = []
-  let context = next
+  let context = pctx
   let index = context.index
   let i = 0
 
   while (true) {
-    const [replyop, [contextop, resultop]] = twin(op(context))
-    context = contextop
-    if (resultop.status === Fatal) return replyop
-    if (resultop.status === Error) break
+    const [oprep, [opctx, opres]] = twin(op(context))
+    context = opctx
+    if (opres.status === Fatal) return oprep
+    if (opres.status === Error) break
 
-    const [replyp, [contextp, resultp]] = twin(p(context))
-    context = contextp
-    if (resultp.status === Fatal) return replyp
-    if (resultp.status === Error) break
+    const [prep, [pctx, pres]] = twin(p(context))
+    context = pctx
+    if (pres.status === Fatal) return prep
+    if (pres.status === Error) break
 
     ASSERT && assertFunction(
-      'assocL', resultop.value, opFormatter(ordinal(i + 1)),
+      'assocL', opres.value, opFormatter(ordinal(i + 1)),
     )
 
-    ops.push(resultop.value)
-    values.push(resultp.value)
+    ops.push(opres.value)
+    values.push(pres.value)
     index = context.index
     i++
   }
@@ -626,32 +626,32 @@ export const assoc1L = (p, op) => Parser(ctx => {
   ASSERT && assertParser('assoc1L', p, ordParFormatter('1st'))
   ASSERT && assertParser('assoc1L', op, ordParFormatter('2nd'))
 
-  const [reply, [next, result]] = twin(p(ctx))
-  if (result.status !== Ok) return reply
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  if (pres.status !== Ok) return prep
 
-  const values = [result.value]
+  const values = [pres.value]
   const ops = []
-  let context = next
+  let context = pctx
   let index = context.index
   let i = 0
 
   while (true) {
-    const [replyop, [contextop, resultop]] = twin(op(context))
-    context = contextop
-    if (resultop.status === Fatal) return replyop
-    if (resultop.status === Error) break
+    const [oprep, [opctx, opres]] = twin(op(context))
+    context = opctx
+    if (opres.status === Fatal) return oprep
+    if (opres.status === Error) break
 
-    const [replyp, [contextp, resultp]] = twin(p(context))
-    context = contextp
-    if (resultp.status === Fatal) return replyp
-    if (resultp.status === Error) break
+    const [prep, [pctx, pres]] = twin(p(context))
+    context = pctx
+    if (pres.status === Fatal) return prep
+    if (pres.status === Error) break
 
     ASSERT && assertFunction(
-      'assoc1L', resultop.value, opFormatter(ordinal(i + 1)),
+      'assoc1L', opres.value, opFormatter(ordinal(i + 1)),
     )
 
-    ops.push(resultop.value)
-    values.push(resultp.value)
+    ops.push(opres.value)
+    values.push(pres.value)
     index = context.index
     i++
   }
@@ -690,33 +690,33 @@ export const assocR = (p, op, x) => Parser(ctx => {
   ASSERT && assertParser('assocR', p, ordParFormatter('1st'))
   ASSERT && assertParser('assocR', op, ordParFormatter('2nd'))
 
-  const [reply, [next, result]] = twin(p(ctx))
-  if (result.status === Fatal) return reply
-  if (result.status === Error) return ok(next, x)
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  if (pres.status === Fatal) return prep
+  if (pres.status === Error) return ok(pctx, x)
 
-  const values = [result.value]
+  const values = [pres.value]
   const ops = []
-  let context = next
+  let context = pctx
   let index = context.index
   let i = 0
 
   while (true) {
-    const [replyop, [contextop, resultop]] = twin(op(context))
-    context = contextop
-    if (resultop.status === Fatal) return replyop
-    if (resultop.status === Error) break
+    const [oprep, [opctx, opres]] = twin(op(context))
+    context = opctx
+    if (opres.status === Fatal) return oprep
+    if (opres.status === Error) break
 
-    const [replyp, [contextp, resultp]] = twin(p(context))
-    context = contextp
-    if (resultp.status === Fatal) return replyp
-    if (resultp.status === Error) break
+    const [prep, [pctx, pres]] = twin(p(context))
+    context = pctx
+    if (pres.status === Fatal) return prep
+    if (pres.status === Error) break
 
     ASSERT && assertFunction(
-      'assocR', resultop.value, opFormatter(ordinal(i + 1)),
+      'assocR', opres.value, opFormatter(ordinal(i + 1)),
     )
 
-    ops.push(resultop.value)
-    values.push(resultp.value)
+    ops.push(opres.value)
+    values.push(pres.value)
     index = context.index
     i++
   }
@@ -754,32 +754,32 @@ export const assoc1R = (p, op) => Parser(ctx => {
   ASSERT && assertParser('assoc1R', p, ordParFormatter('1st'))
   ASSERT && assertParser('assoc1R', op, ordParFormatter('2nd'))
 
-  const [reply, [next, result]] = twin(p(ctx))
-  if (result.status !== Ok) return reply
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  if (pres.status !== Ok) return prep
 
-  const values = [result.value]
+  const values = [pres.value]
   const ops = []
-  let context = next
+  let context = pctx
   let index = context.index
   let i = 0
 
   while (true) {
-    const [replyop, [contextop, resultop]] = twin(op(context))
-    context = contextop
-    if (resultop.status === Fatal) return replyop
-    if (resultop.status === Error) break
+    const [oprep, [opctx, opres]] = twin(op(context))
+    context = opctx
+    if (opres.status === Fatal) return oprep
+    if (opres.status === Error) break
 
-    const [replyp, [contextp, resultp]] = twin(p(context))
-    context = contextp
-    if (resultp.status === Fatal) return replyp
-    if (resultp.status === Error) break
+    const [prep, [pctx, pres]] = twin(p(context))
+    context = pctx
+    if (pres.status === Fatal) return prep
+    if (pres.status === Error) break
 
     ASSERT && assertFunction(
-      'assoc1R', resultop.value, opFormatter(ordinal(i + 1)),
+      'assoc1R', opres.value, opFormatter(ordinal(i + 1)),
     )
 
-    ops.push(resultop.value)
-    values.push(resultp.value)
+    ops.push(opres.value)
+    values.push(pres.value)
     index = context.index
     i++
   }

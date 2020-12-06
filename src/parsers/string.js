@@ -37,7 +37,8 @@ const StringParser = (length, fn) => Parser(ctx => {
 
   const { width, next } = nextChars(index, view, length)
   return charLength(next) !== length || !fn(next)
-    ? error(ctx) : ok(ctx, next, index + width)
+    ? error(ctx)
+    : ok(ctx, next, index + width)
 })
 
 /**
@@ -57,10 +58,10 @@ const StringParser = (length, fn) => Parser(ctx => {
 export const string = str => Parser(ctx => {
   ASSERT && assertString('string', str)
 
-  const [reply, [context, result]] = twin(StringParser(
+  const [sprep, [spctx, spres]] = twin(StringParser(
     charLength(str), chars => str === chars,
   )(ctx))
-  return result.status === Ok ? reply : error(context, expecteds.string(str))
+  return spres.status === Ok ? sprep : error(spctx, expecteds.string(str))
 })
 
 /**
@@ -82,10 +83,10 @@ export const string = str => Parser(ctx => {
 export const stringI = str => Parser(ctx => {
   ASSERT && assertString('stringI', str)
 
-  const [reply, [context, result]] = twin(StringParser(
+  const [sprep, [spctx, spres]] = twin(StringParser(
     charLength(str), chars => str.toLowerCase() === chars.toLowerCase(),
   )(ctx))
-  return result.status === Ok ? reply : error(context, expecteds.stringI(str))
+  return spres.status === Ok ? sprep : error(spctx, expecteds.stringI(str))
 })
 
 /**
@@ -110,6 +111,6 @@ export const all = Parser(ctx => {
 export const anyString = n => Parser(ctx => {
   ASSERT && assertNumber('anyString', n)
 
-  const [reply, [context, result]] = twin(StringParser(n, () => true)(ctx))
-  return result.status === Ok ? reply : error(context, expecteds.anyString(n))
+  const [sprep, [spctx, spres]] = twin(StringParser(n, () => true)(ctx))
+  return spres.status === Ok ? sprep : error(spctx, expecteds.anyString(n))
 })

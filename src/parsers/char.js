@@ -59,8 +59,8 @@ const CharParser = fn => Parser(ctx => {
 export const char = c => Parser(ctx => {
   ASSERT && assertChar('char', c)
 
-  const [reply, [next, result]] = twin(CharParser(ch => c === ch)(ctx))
-  return result.status === Ok ? reply : error(next, expecteds.char(c))
+  const [cprep, [cpctx, cpres]] = twin(CharParser(ch => c === ch)(ctx))
+  return cpres.status === Ok ? cprep : error(cpctx, expecteds.char(c))
 })
 
 /**
@@ -78,10 +78,10 @@ export const char = c => Parser(ctx => {
 export const charI = c => Parser(ctx => {
   ASSERT && assertChar('charI', c)
 
-  const [reply, [context, result]] = twin(CharParser(
+  const [cprep, [cpctx, cpres]] = twin(CharParser(
     ch => c.toLowerCase() === ch.toLowerCase(),
   )(ctx))
-  return result.status === Ok ? reply : error(context, expecteds.charI(c))
+  return cpres.status === Ok ? cprep : error(cpctx, expecteds.charI(c))
 })
 
 /**
@@ -128,8 +128,8 @@ export const satisfyM = (fn, message) => Parser(ctx => {
   ASSERT && assertFunction('satisfyM', fn, ordFnFormatter('1st'))
   ASSERT && assertString('satisfyM', message, ordStrFormatter('2nd'))
 
-  const [reply, [context, result]] = twin(CharParser(fn)(ctx))
-  return result.status === Ok ? reply : error(context, expected(message))
+  const [cprep, [cpctx, cpres]] = twin(CharParser(fn)(ctx))
+  return cpres.status === Ok ? cprep : error(cpctx, expected(message))
 })
 
 /**
@@ -149,21 +149,20 @@ export const satisfyM = (fn, message) => Parser(ctx => {
  * a completely different part of the Unicode spectrum and therefore is
  * not "between" `a` and `z`. Take care with non-ascii characters.
  *
- * @param {string} start The character that defines the start of the
+ * @param {string} s The character that defines the start of the
  *     range of characters to match. It is included in that range.
- * @param {string} end The character that defines the end of the range
+ * @param {string} e The character that defines the end of the range
  *     of characters to match. It is included in that range.
  * @returns {Parser} A parser that will succeed if the next input
  *     character is between `start` and `end` (inclusive).
  */
-export const range = (start, end) => Parser(ctx => {
-  ASSERT && assertChar('range', start, ordCharFormatter('1st'))
-  ASSERT && assertChar('range', end, ordCharFormatter('2nd'))
+export const range = (s, e) => Parser(ctx => {
+  ASSERT && assertChar('range', s, ordCharFormatter('1st'))
+  ASSERT && assertChar('range', e, ordCharFormatter('2nd'))
 
-  const fn = c => c >= start && c <= end
-  const [reply, [context, result]] = twin(CharParser(fn)(ctx))
-  return result.status === Ok ? reply
-    : error(context, expecteds.range(start, end))
+  const fn = c => c >= s && c <= e
+  const [cprep, [cpctx, cpres]] = twin(CharParser(fn)(ctx))
+  return cpres.status === Ok ? cprep : error(cpctx, expecteds.range(s, e))
 })
 
 /**
@@ -195,21 +194,22 @@ export const eof = Parser(ctx => {
  * ignored). If the read character is among those characters, the parser
  * will succeed.
  *
- * @param {(string|string[])} chars The characters, either in an array
- *     or a string, in which the next input character has to be a
- *     member for the parser to succeed.
- * @returns {Parser} A parser that succeeds if the next character is
- *     one of the characters in `chars`.
+ * @param {(string|string[])} cs The characters, either in an array or a
+ *     string, in which the next input character has to be a member for
+ *     the parser to succeed.
+ * @returns {Parser} A parser that succeeds if the next character is one
+ *     of the characters in `chars`.
  */
-export const anyOf = chars => Parser(ctx => {
-  ASSERT && assertStringOrArray('anyOf', chars)
+export const anyOf = cs => Parser(ctx => {
+  ASSERT && assertStringOrArray('anyOf', cs)
 
   const { index, view } = ctx
   const { width, next } = nextChar(index, view)
-  const arr = [...chars]
+  const arr = [...cs]
 
   return arr.includes(next)
-    ? ok(ctx, next, index + width) : error(ctx, expecteds.anyOf(arr))
+    ? ok(ctx, next, index + width)
+    : error(ctx, expecteds.anyOf(arr))
 })
 
 /**
@@ -219,21 +219,22 @@ export const anyOf = chars => Parser(ctx => {
  * ignored). If the read character is *not* among those characters, the
  * parser will succeed.
  *
- * @param {(string|string[])} chars The characters, either in an array
- *     or a string, in which the next input character has to not be a
- *     member for the parser to succeed.
+ * @param {(string|string[])} cs The characters, either in an array or a
+ *     string, in which the next input character has to not be a member
+ *     for the parser to succeed.
  * @returns {Parser} A parser that succeeds if the next character is not
  *     one of the characters in `chars`.
  */
-export const noneOf = chars => Parser(ctx => {
-  ASSERT && assertStringOrArray('noneOf', chars)
+export const noneOf = cs => Parser(ctx => {
+  ASSERT && assertStringOrArray('noneOf', cs)
 
   const { index, view } = ctx
   const { width, next } = nextChar(index, view)
-  const arr = [...chars]
+  const arr = [...cs]
 
   return arr.includes(next)
-    ? error(ctx, expecteds.noneOf(arr)) : ok(ctx, next, index + width)
+    ? error(ctx, expecteds.noneOf(arr))
+    : ok(ctx, next, index + width)
 })
 
 /**
@@ -244,8 +245,8 @@ export const noneOf = chars => Parser(ctx => {
  */
 export const digit = Parser(ctx => {
   const fn = c => c >= '0' && c <= '9'
-  const [reply, [context, result]] = twin(CharParser(fn)(ctx))
-  return result.status === Ok ? reply : error(context, expecteds.digit)
+  const [cprep, [cpctx, cpres]] = twin(CharParser(fn)(ctx))
+  return cpres.status === Ok ? cprep : error(cpctx, expecteds.digit)
 })
 
 /**
@@ -256,8 +257,8 @@ export const hex = Parser(ctx => {
   const fn = c => c >= '0' && c <= '9'
     || c >= 'a' && c <= 'f'
     || c >= 'A' && c <= 'F'
-  const [reply, [context, result]] = twin(CharParser(fn)(ctx))
-  return result.status === Ok ? reply : error(context, expecteds.hex)
+  const [cprep, [cpctx, cpres]] = twin(CharParser(fn)(ctx))
+  return cpres.status === Ok ? cprep : error(cpctx, expecteds.hex)
 })
 
 /**
@@ -266,8 +267,8 @@ export const hex = Parser(ctx => {
  */
 export const octal = Parser(ctx => {
   const fn = c => c >= '0' && c <= '7'
-  const [reply, [context, result]] = twin(CharParser(fn)(ctx))
-  return result.status === Ok ? reply : error(context, expecteds.octal)
+  const [cprep, [cpctx, cpres]] = twin(CharParser(fn)(ctx))
+  return cpres.status === Ok ? cprep : error(cpctx, expecteds.octal)
 })
 
 /**
@@ -277,8 +278,8 @@ export const octal = Parser(ctx => {
  */
 export const letter = Parser(ctx => {
   const fn = c => c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z'
-  const [reply, [context, result]] = twin(CharParser(fn)(ctx))
-  return result.status === Ok ? reply : error(context, expecteds.letter)
+  const [cprep, [cpctx, cpres]] = twin(CharParser(fn)(ctx))
+  return cpres.status === Ok ? cprep : error(cpctx, expecteds.letter)
 })
 
 /**
@@ -290,8 +291,8 @@ export const alpha = Parser(ctx => {
   const fn = c => c >= 'a' && c <= 'z'
     || c >= 'A' && c <= 'Z'
     || c >= '0' && c <= '9'
-  const [reply, [context, result]] = twin(CharParser(fn)(ctx))
-  return result.status === Ok ? reply : error(context, expecteds.alpha)
+  const [cprep, [cpctx, cpres]] = twin(CharParser(fn)(ctx))
+  return cpres.status === Ok ? cprep : error(cpctx, expecteds.alpha)
 })
 
 /**
@@ -301,8 +302,8 @@ export const alpha = Parser(ctx => {
  */
 export const upper = Parser(ctx => {
   const fn = c => c >= 'A' && c <= 'Z'
-  const [reply, [context, result]] = twin(CharParser(fn)(ctx))
-  return result.status === Ok ? reply : error(context, expecteds.upper)
+  const [cprep, [cpctx, cpres]] = twin(CharParser(fn)(ctx))
+  return cpres.status === Ok ? cprep : error(cpctx, expecteds.upper)
 })
 
 /**
@@ -312,6 +313,6 @@ export const upper = Parser(ctx => {
  */
 export const lower = Parser(ctx => {
   const fn = c => c >= 'a' && c <= 'z'
-  const [reply, [context, result]] = twin(CharParser(fn)(ctx))
-  return result.status === Ok ? reply : error(context, expecteds.lower)
+  const [cprep, [cpctx, cpres]] = twin(CharParser(fn)(ctx))
+  return cpres.status === Ok ? cprep : error(cpctx, expecteds.lower)
 })

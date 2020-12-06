@@ -7,7 +7,6 @@ import { expect } from 'chai'
 
 import { attempt, choice } from 'kessel/combinators/alternative'
 import { right } from 'kessel/combinators/chaining'
-import { lookAhead } from 'kessel/combinators/conditional'
 import { label, attemptM } from 'kessel/combinators/message'
 import { sequence } from 'kessel/combinators/sequence'
 import { parse, Status } from 'kessel/core'
@@ -48,11 +47,6 @@ describe('Message combinators', () => {
       fail(parser, 'def', "'a', 'b', or 'c'")
       fail(label(parser, 'a, b, or c'), 'def', 'a, b, or c')
     })
-    it('adds an error message on success without consuming', () => {
-      const [_, result] = parse(label(lookAhead(char('a')), 'test'), 'a')
-      expect(result.status).to.equal(Status.Ok)
-      expect(result.errors[0].label).to.equal('test')
-    })
   })
 
   describe('attemptM', () => {
@@ -78,11 +72,6 @@ describe('Message combinators', () => {
     it('changes the expected if its parser fails without consuming', () => {
       fail(char('a'), 'bcd', "'a'")
       fail(attemptM(char('a'), 'letter a'), 'bcd', 'letter a')
-    })
-    it('adds an error message on success without consuming', () => {
-      const [_, result] = parse(attemptM(lookAhead(char('a')), 'test'), 'a')
-      expect(result.status).to.equal(Status.Ok)
-      expect(result.errors[0].label).to.equal('test')
     })
     it('adds a compound error if its parser fails while consuming', () => {
       const [ctx, result] = parse(

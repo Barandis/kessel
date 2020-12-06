@@ -45,17 +45,17 @@ export const chain = (p, fn) => Parser(ctx => {
 
   const index = ctx.index
 
-  const [reply1, [context1, result1]] = twin(p(ctx))
-  if (result1.status !== Ok) return reply1
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  if (pres.status !== Ok) return prep
 
-  const p2 = fn(result1.value)
+  const q = fn(pres.value)
   ASSERT && assertParser(
-    'chain', p2, formatter('the 2nd argument to return a parser'),
+    'chain', q, formatter('the 2nd argument to return a parser'),
   )
 
-  const [reply2, [context2, result2]] = twin(p2(context1))
-  return result2.status === Ok ? reply2
-    : maybeFatal(context2.index !== index, context2, result2.errors)
+  const [qrep, [qctx, qres]] = twin(q(pctx))
+  return qres.status === Ok ? qrep
+    : maybeFatal(qctx.index !== index, qctx, qres.errors)
 })
 
 /**
@@ -68,7 +68,7 @@ export const chain = (p, fn) => Parser(ctx => {
  *
  * `map(p, fn)` is an optimized implementation of `chain(p, x =>
  * always(fn(x)))`. This also makes it a more efficient version of
- * `pipe([p], fn)` (a single-parser `pipe`).
+ * `pipe(p, fn)` (a single-parser `pipe`).
  *
  * @param {Parser} p The parser to apply to the input.
  * @param {function(*):*} fn A mapping function that is passed the
@@ -82,8 +82,8 @@ export const map = (p, fn) => Parser(ctx => {
   ASSERT && assertParser('map', p, ordParFormatter('1st'))
   ASSERT && assertFunction('map', fn, ordFnFormatter('2nd'))
 
-  const [reply, [context, result]] = twin(p(ctx))
-  return result.status === Ok ? ok(context, fn(result.value)) : reply
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  return pres.status === Ok ? ok(pctx, fn(pres.value)) : prep
 })
 
 /**
@@ -115,13 +115,13 @@ export const map = (p, fn) => Parser(ctx => {
 export const join = p => Parser(ctx => {
   ASSERT && assertParser('join', p)
 
-  const [reply, [context, result]] = twin(p(ctx))
-  if (result.status !== Ok) return reply
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  if (pres.status !== Ok) return prep
 
-  const v = result.value
+  const v = pres.value
   ASSERT && assertArray('join', v, formatter('argument to return an array'))
 
-  return ok(context, v.join(''))
+  return ok(pctx, v.join(''))
 })
 
 /**
@@ -139,8 +139,8 @@ export const join = p => Parser(ctx => {
 export const skip = p => Parser(ctx => {
   ASSERT && assertParser('skip', p)
 
-  const [reply, [context, result]] = twin(p(ctx))
-  return result.status === Ok ? ok(context, null) : reply
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  return pres.status === Ok ? ok(pctx, null) : prep
 })
 
 /**
@@ -159,92 +159,92 @@ export const skip = p => Parser(ctx => {
 export const value = (p, x) => Parser(ctx => {
   ASSERT && assertParser('value', p, ordParFormatter('1st'))
 
-  const [tuple, [context, result]] = twin(p(ctx))
-  return result.status === Ok ? ok(context, x) : tuple
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  return pres.status === Ok ? ok(pctx, x) : prep
 })
 
 /**
- * Creates a parser that will apply the parsers `p1` and `p2` in
- * sequence and then return the result of `p1`. If either `p1` or `p2`
+ * Creates a parser that will apply the parsers `p` and `q` in
+ * sequence and then return the result of `p`. If either `p` or `q`
  * fail, this parser will also fail, and the failure will be fatal if
  * any input had been consumed by either parser.
  *
- * `left(p1, p2)` is an optimized implementation of `chain(p1, x =>
- * value(p2, x))`.
+ * `left(p, q)` is an optimized implementation of `chain(p, x =>
+ * value(q, x))`.
  *
- * @param {Parser} p1 The first parser to apply.
- * @param {Parser} p2 The second parser to apply.
+ * @param {Parser} p The first parser to apply.
+ * @param {Parser} q The second parser to apply.
  * @returns {Parser} A parser that applies both contained parsers and
  *     results in the value of the first.
  */
-export const left = (p1, p2) => Parser(ctx => {
-  ASSERT && assertParser('left', p1, ordParFormatter('1st'))
-  ASSERT && assertParser('left', p2, ordParFormatter('2nd'))
+export const left = (p, q) => Parser(ctx => {
+  ASSERT && assertParser('left', p, ordParFormatter('1st'))
+  ASSERT && assertParser('left', q, ordParFormatter('2nd'))
 
   const index = ctx.index
 
-  const [reply1, [context1, result1]] = twin(p1(ctx))
-  if (result1.status !== Ok) return reply1
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  if (pres.status !== Ok) return prep
 
-  const [context2, result2] = p2(context1)
-  return result2.status === Ok ? ok(context2, result1.value)
-    : maybeFatal(context2.index !== index, context2, result2.errors)
+  const [qctx, qres] = q(pctx)
+  return qres.status === Ok ? ok(qctx, pres.value)
+    : maybeFatal(qctx.index !== index, qctx, qres.errors)
 })
 
 /**
- * Creates a parser that will apply the parsers `p1` and `p2` in
- * sequence and then return the result of `p2`. If either `p1` or `p2`
+ * Creates a parser that will apply the parsers `p` and `q` in
+ * sequence and then return the result of `q`. If either `p` or `q`
  * fail, this parser will also fail, and the failure will be fatal if
  * any input had been consumed by either parser.
  *
- * `right(p1, p2)` is an optimized implementation of `chain(p1, () =>
- * p2)`.
+ * `right(p, q)` is an optimized implementation of `chain(p, () =>
+ * q)`.
  *
- * @param {Parser} p1 The first parser to apply.
- * @param {Parser} p2 The second parser to apply.
+ * @param {Parser} p The first parser to apply.
+ * @param {Parser} q The second parser to apply.
  * @returns {Parser} A parser that applies both contained parsers and
  *     results in the value of the second.
  */
-export const right = (p1, p2) => Parser(ctx => {
-  ASSERT && assertParser('right', p1, ordParFormatter('1st'))
-  ASSERT && assertParser('right', p2, ordParFormatter('2nd'))
+export const right = (p, q) => Parser(ctx => {
+  ASSERT && assertParser('right', p, ordParFormatter('1st'))
+  ASSERT && assertParser('right', q, ordParFormatter('2nd'))
 
   const index = ctx.index
 
-  const [reply1, [context1, result1]] = twin(p1(ctx))
-  if (result1.status !== Status.Ok) return reply1
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  if (pres.status !== Status.Ok) return prep
 
-  const [reply2, [context2, result2]] = twin(p2(context1))
-  return result2.status === Ok ? reply2
-    : maybeFatal(context2.index !== index, context2, result2.errors)
+  const [qrep, [qctx, qres]] = twin(q(pctx))
+  return qres.status === Ok ? qrep
+    : maybeFatal(qctx.index !== index, qctx, qres.errors)
 })
 
 /**
- * Creates a parser that will apply the parsers `p1` and `p2` in
+ * Creates a parser that will apply the parsers `p` and `q` in
  * sequence and then return the result of both in an array. If either
- * `p1` or `p2` fail, this parser will also fail, and the failure will
+ * `p` or `q` fail, this parser will also fail, and the failure will
  * be fatal if any input had been consumed by either parser.
  *
- * `both(p1, p2)` is an optimized implementation of `chain(p1, a =>
- * chain(p2, b => always([a, b])))`.
+ * `andThen(p, q)` is an optimized implementation of `chain(p, a =>
+ * chain(q, b => always([a, b])))`.
  *
- * @param {Parser} p1 The first parser to apply.
- * @param {Parser} p2 The second parser to apply.
+ * @param {Parser} p The first parser to apply.
+ * @param {Parser} q The second parser to apply.
  * @returns {Parser} A parser that applies both contained parsers and
  *     results in the values of both parsers in an array.
  */
-export const andThen = (p1, p2) => Parser(ctx => {
-  ASSERT && assertParser('andThen', p1, ordParFormatter('1st'))
-  ASSERT && assertParser('andThen', p2, ordParFormatter('2nd'))
+export const andThen = (p, q) => Parser(ctx => {
+  ASSERT && assertParser('andThen', p, ordParFormatter('1st'))
+  ASSERT && assertParser('andThen', q, ordParFormatter('2nd'))
 
   const index = ctx.index
 
-  const [reply1, [context1, result1]] = twin(p1(ctx))
-  if (result1.status !== Ok) return reply1
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  if (pres.status !== Ok) return prep
 
-  const [context2, result2] = p2(context1)
-  return result2.status === Ok ? ok(context2, [result1.value, result2.value])
-    : maybeFatal(context2.index !== index, context2, result2.errors)
+  const [qctx, qres] = q(pctx)
+  return qres.status === Ok ? ok(qctx, [pres.value, qres.value])
+    : maybeFatal(qctx.index !== index, qctx, qres.errors)
 })
 
 /**
@@ -257,9 +257,9 @@ export const andThen = (p1, p2) => Parser(ctx => {
  * discarded. This ensures that the same number of arguments are passed
  * to `fn` no matter the results from the parsers.
  *
- * `pipe(p1, p2, fn)` is an optimized implementation of `chain(p1, a =>
- * chain(p2, b => always(fn(a, b))))`, `pipe(p1, p2, p3, fn)` is an
- * optimized implementation of `chain(p1, a => chain(p2, b => chain(p3,
+ * `pipe(p, q, fn)` is an optimized implementation of `chain(p, a =>
+ * chain(q, b => always(fn(a, b))))`, `pipe(p, q, r, fn)` is an
+ * optimized implementation of `chain(p, a => chain(q, b => chain(r,
  * c => always(fn(a, b, c)))))`, and so on.
  *
  * If the array has one element, the parser becomes equivalent to `map`
@@ -286,13 +286,13 @@ export const pipe = (...ps) => Parser(ctx => {
   let context = ctx
 
   for (const p of ps) {
-    const [next, result] = p(context)
-    context = next
+    const [pctx, pres] = p(context)
+    context = pctx
 
-    if (result.status !== Ok) {
-      return maybeFatal(context.index !== index, context, result.errors)
+    if (pres.status !== Ok) {
+      return maybeFatal(context.index !== index, context, pres.errors)
     }
-    values.push(result.value)
+    values.push(pres.value)
   }
   return ok(context, fn(...values))
 })
@@ -323,17 +323,17 @@ export const between = (pre, post, p) => Parser(ctx => {
 
   const index = ctx.index
 
-  const [reply1, [context1, result1]] = twin(pre(ctx))
-  if (result1.status !== Ok) return reply1
+  const [prerep, [prectx, preres]] = twin(pre(ctx))
+  if (preres.status !== Ok) return prerep
 
-  const [context2, result2] = p(context1)
-  if (result2.status !== Ok) {
-    return maybeFatal(context2.index !== index, context2, result2.errors)
+  const [pctx, pres] = p(prectx)
+  if (pres.status !== Ok) {
+    return maybeFatal(pctx.index !== index, pctx, pres.errors)
   }
 
-  const [context3, result3] = post(context2)
-  return result3.status === Ok ? ok(context3, result2.value)
-    : maybeFatal(context3.index !== index, context3, result3.errors)
+  const [postctx, postres] = post(pctx)
+  return postres.status === Ok ? ok(postctx, pres.value)
+    : maybeFatal(postctx.index !== index, postctx, postres.errors)
 })
 
 /**
@@ -352,13 +352,13 @@ export const nth = (p, n) => Parser(ctx => {
   ASSERT && assertParser('nth', p, ordParFormatter('1st'))
   ASSERT && assertNumber('nth', n, ordNumFormatter('2nd'))
 
-  const [reply, [context, result]] = twin(p(ctx))
-  if (result.status !== Ok) return reply
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  if (pres.status !== Ok) return prep
 
-  const v = result.value
+  const v = pres.value
   ASSERT && assertArray('nth', v, formatter('1st argument to return an array'))
 
-  return ok(context, v[n])
+  return ok(pctx, v[n])
 })
 
 /**
@@ -375,13 +375,13 @@ export const nth = (p, n) => Parser(ctx => {
 export const first = p => Parser(ctx => {
   ASSERT && assertParser('first', p)
 
-  const [reply, [context, result]] = twin(p(ctx))
-  if (result.status !== Ok) return reply
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  if (pres.status !== Ok) return prep
 
-  const v = result.value
+  const v = pres.value
   ASSERT && assertArray('first', v, formatter('argument to return an array'))
 
-  return ok(context, v[0])
+  return ok(pctx, v[0])
 })
 
 /**
@@ -398,13 +398,13 @@ export const first = p => Parser(ctx => {
 export const second = p => Parser(ctx => {
   ASSERT && assertParser('second', p)
 
-  const [reply, [context, result]] = twin(p(ctx))
-  if (result.status !== Ok) return reply
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  if (pres.status !== Ok) return prep
 
-  const v = result.value
+  const v = pres.value
   ASSERT && assertArray('second', v, formatter('argument to return an array'))
 
-  return ok(context, v[1])
+  return ok(pctx, v[1])
 })
 
 /**
@@ -421,13 +421,13 @@ export const second = p => Parser(ctx => {
 export const third = p => Parser(ctx => {
   ASSERT && assertParser('third', p)
 
-  const [reply, [context, result]] = twin(p(ctx))
-  if (result.status !== Ok) return reply
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  if (pres.status !== Ok) return prep
 
-  const v = result.value
+  const v = pres.value
   ASSERT && assertArray('third', v, formatter('argument to return an array'))
 
-  return ok(context, v[2])
+  return ok(pctx, v[2])
 })
 
 /**
@@ -444,13 +444,13 @@ export const third = p => Parser(ctx => {
 export const fourth = p => Parser(ctx => {
   ASSERT && assertParser('fourth', p)
 
-  const [reply, [context, result]] = twin(p(ctx))
-  if (result.status !== Ok) return reply
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  if (pres.status !== Ok) return prep
 
-  const v = result.value
+  const v = pres.value
   ASSERT && assertArray('fourth', v, formatter('argument to return an array'))
 
-  return ok(context, v[3])
+  return ok(pctx, v[3])
 })
 
 /**
@@ -467,11 +467,11 @@ export const fourth = p => Parser(ctx => {
 export const fifth = p => Parser(ctx => {
   ASSERT && assertParser('fifth', p)
 
-  const [reply, [context, result]] = twin(p(ctx))
-  if (result.status !== Ok) return reply
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  if (pres.status !== Ok) return prep
 
-  const v = result.value
+  const v = pres.value
   ASSERT && assertArray('fifth', v, formatter('argument to return an array'))
 
-  return ok(context, v[4])
+  return ok(pctx, v[4])
 })

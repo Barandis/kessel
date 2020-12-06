@@ -9,6 +9,7 @@ import {
   assertNumber,
   assertParser,
   assertParsers,
+  formatter,
   ordFnFormatter,
   ordNumFormatter,
   ordParFormatter,
@@ -26,24 +27,24 @@ const { Ok, Error, Fatal } = Status
  * result of the first that succeeds. If neither succeed, or if one
  * fails fatally, then the parser fails.
  *
- * @param {Parser} p1 The first parser to apply.
- * @param {Parser} p2 The second parser to apply.
+ * @param {Parser} p The first parser to apply.
+ * @param {Parser} q The second parser to apply.
  * @returns {Parser} A parser that applies the first parser and then
  *     if necessary the second parser, returning the result of the
  *     first to succeed.
  */
-export const orElse = (p1, p2) => Parser(ctx => {
-  ASSERT && assertParser('orElse', p1, ordParFormatter('1st'))
-  ASSERT && assertParser('orElse', p2, ordParFormatter('2nd'))
+export const orElse = (p, q) => Parser(ctx => {
+  ASSERT && assertParser('orElse', p, ordParFormatter('1st'))
+  ASSERT && assertParser('orElse', q, ordParFormatter('2nd'))
 
-  const [reply1, [context1, result1]] = twin(p1(ctx))
-  if (result1.status !== Error) return reply1
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  if (pres.status !== Error) return prep
 
-  const [reply2, [context2, result2]] = twin(p2(context1))
-  return result2.status === Ok ? reply2 : maybeFatal(
-    result2.status === Fatal,
-    context2,
-    merge(result1.errors, result2.errors),
+  const [qrep, [qctx, qres]] = twin(q(pctx))
+  return qres.status === Ok ? qrep : maybeFatal(
+    qres.status === Fatal,
+    qctx,
+    merge(pres.errors, qres.errors),
   )
 })
 
@@ -69,11 +70,11 @@ export const choice = (...ps) => Parser(ctx => {
   let errors = []
 
   for (const p of ps) {
-    const [reply, [context, result]] = twin(p(ctx))
-    if (result.status === Ok) return reply
+    const [prep, [pctx, pres]] = twin(p(ctx))
+    if (pres.status === Ok) return prep
 
-    errors = merge(errors, result.errors)
-    if (result.status === Fatal) return fatal(context, errors)
+    errors = merge(errors, pres.errors)
+    if (pres.status === Fatal) return fatal(pctx, errors)
   }
   return error(ctx, errors)
 })
@@ -93,8 +94,8 @@ export const choice = (...ps) => Parser(ctx => {
 export const optional = p => Parser(ctx => {
   ASSERT && assertParser('optional', p)
 
-  const [reply, [context, result]] = twin(p(ctx))
-  return result.status !== Error ? reply : ok(context, null)
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  return pres.status !== Error ? prep : ok(pctx, null)
 })
 
 /**
@@ -116,8 +117,8 @@ export const optional = p => Parser(ctx => {
 export const orValue = (p, x) => Parser(ctx => {
   ASSERT && assertParser('orValue', p, ordParFormatter('1st'))
 
-  const [reply, [context, result]] = twin(p(ctx))
-  return result.status !== Error ? reply : ok(context, x)
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  return pres.status !== Error ? prep : ok(pctx, x)
 })
 
 /**
@@ -140,14 +141,11 @@ export const attempt = p => Parser(ctx => {
   ASSERT && assertParser('attempt', p)
 
   const index = ctx.index
-  const [reply, [context, result]] = twin(p(ctx))
-  if (result.status !== Ok) {
-    const err = index === context.index
-      ? result.errors
-      : nested(context, result.errors)
-    return error(context, err, index)
-  }
-  return reply
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  if (pres.status === Ok) return prep
+
+  const err = index === pctx.index ? pres.errors : nested(pctx, pres.errors)
+  return error(pctx, err, index)
 })
 
 /**
@@ -163,7 +161,7 @@ export const attempt = p => Parser(ctx => {
  * result in an overall fatal error.
  *
  * Note that `sequenceB(ps)` is not the same as
- * `backtrack(sequence(ps))`, as the former will fail fatally if one of
+ * `attempt(sequence(ps))`, as the former will fail fatally if one of
  * `ps` fails fatally, while the latter will fail non-fatally in that
  * case.
  *
@@ -179,17 +177,17 @@ export const sequenceB = (...ps) => Parser(ctx => {
   let context = ctx
 
   for (const p of ps) {
-    const [reply, [next, result]] = twin(p(context))
-    context = next
+    const [prep, [pctx, pres]] = twin(p(context))
+    context = pctx
 
-    if (result.status === Fatal) return reply
-    if (result.status === Error) {
+    if (pres.status === Fatal) return prep
+    if (pres.status === Error) {
       const err = index === context.index
-        ? result.errors
-        : nested(context, result.errors)
+        ? pres.errors
+        : nested(context, pres.errors)
       return error(context, err, index)
     }
-    if (result.value !== null) values.push(result.value)
+    if (pres.value !== null) values.push(pres.value)
   }
   return ok(context, values)
 })
@@ -205,7 +203,7 @@ export const sequenceB = (...ps) => Parser(ctx => {
  * parser consumed input. A fatal error from either parser will still
  * result in an overall fatal error.
  *
- * Note that `chainB(p, fn)` is not the same as `backtrack(chain(p,
+ * Note that `chainB(p, fn)` is not the same as `attempt(chain(p,
  * fn))`, as the former will fail fatally if one of its parsers fails
  * fatally, while the latter will fail non-fatally in that case.
  *
@@ -224,128 +222,126 @@ export const chainB = (p, fn) => Parser(ctx => {
 
   const index = ctx.index
 
-  const [reply1, [context1, result1]] = twin(p(ctx))
-  if (result1.status !== Ok) return reply1
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  if (pres.status !== Ok) return prep
 
-  const [reply2, [context2, result2]] = twin(fn(result1.value)(context1))
-  if (result2.status !== Error) return reply2
-  const err = index === context2.index
-    ? result2.errors
-    : nested(context2, result2.errors)
-  return error(context2, err, index)
+  const q = fn(pres.value)
+  ASSERT && assertParser(
+    'chainB', q, formatter('the 2nd argument to return a parser'),
+  )
+
+  const [qrep, [qctx, qres]] = twin(q(pctx))
+  if (qres.status !== Error) return qrep
+
+  const err = index === qctx.index ? qres.errors : nested(qctx, qres.errors)
+  return error(qctx, err, index)
 })
 
 /**
- * Creates a parser that will apply the parsers `p1` and `p2` in
- * sequence and then return the result of `p1`. If either `p1` or `p2`
+ * Creates a parser that will apply the parsers `p` and `q` in
+ * sequence and then return the result of `p`. If either `p` or `q`
  * fail, this parser will also fail.
  *
- * If `p2` fails non-fatally, the entire parser will also fail
+ * If `q` fails non-fatally, the entire parser will also fail
  * non-fatally, reverting the context to what it was before the first
  * parser was applied, even if the first parser consumed input. A fatal
  * error from either parser will still result in an overall fatal error.
  *
- * Note that `leftB(p1, p2)` is not the same as `backtrack(left(p1,
- * p2))`, as the former will fail fatally if one of its parsers fails
+ * Note that `leftB(p, q)` is not the same as `attempt(left(p,
+ * q))`, as the former will fail fatally if one of its parsers fails
  * fatally, while the latter will fail non-fatally in that case.
  *
- * @param {Parser} p1 The first parser to apply.
- * @param {Parser} p2 The second parser to apply.
+ * @param {Parser} p The first parser to apply.
+ * @param {Parser} q The second parser to apply.
  * @returns {Parser} A parser that applies both contained parsers and
  *     results in the value of the first.
  */
-export const leftB = (p1, p2) => Parser(ctx => {
-  ASSERT && assertParser('leftB', p1, ordParFormatter('1st'))
-  ASSERT && assertParser('leftB', p2, ordParFormatter('2nd'))
+export const leftB = (p, q) => Parser(ctx => {
+  ASSERT && assertParser('leftB', p, ordParFormatter('1st'))
+  ASSERT && assertParser('leftB', q, ordParFormatter('2nd'))
 
   const index = ctx.index
 
-  const [reply1, [context1, result1]] = twin(p1(ctx))
-  if (result1.status !== Ok) return reply1
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  if (pres.status !== Ok) return prep
 
-  const [reply2, [context2, result2]] = twin(p2(context1))
-  if (result2.status === Fatal) return reply2
-  if (result2.status === Ok) return ok(context2, result1.value)
+  const [qrep, [qctx, qres]] = twin(q(pctx))
+  if (qres.status === Fatal) return qrep
+  if (qres.status === Ok) return ok(qctx, pres.value)
 
-  const err = index === context2.index
-    ? result2.errors
-    : nested(context2, result2.errors)
-  return error(context2, err, index)
+  const err = index === qctx.index ? qres.errors : nested(qctx, qres.errors)
+  return error(qctx, err, index)
 })
 
 /**
- * Creates a parser that will apply the parsers `p1` and `p2` in
- * sequence and then return the result of `p2`. If either `p1` or `p2`
+ * Creates a parser that will apply the parsers `p` and `q` in
+ * sequence and then return the result of `q`. If either `p` or `q`
  * fail, this parser will also fail.
  *
- * If `p2` fails non-fatally, the entire parser will also fail
+ * If `q` fails non-fatally, the entire parser will also fail
  * non-fatally, reverting the context to what it was before the first
  * parser was applied, even if the first parser consumed input. A fatal
  * error from either parser will still result in an overall fatal error.
  *
- * Note that `rightB(p1, p2)` is not the same as `backtrack(right(p1,
- * p2))`, as the former will fail fatally if one of its parsers fails
+ * Note that `rightB(p, q)` is not the same as `attempt(right(p,
+ * q))`, as the former will fail fatally if one of its parsers fails
  * fatally, while the latter will fail non-fatally in that case.
  *
- * @param {Parser} p1 The first parser to apply.
- * @param {Parser} p2 The second parser to apply.
+ * @param {Parser} p The first parser to apply.
+ * @param {Parser} q The second parser to apply.
  * @returns {Parser} A parser that applies both contained parsers and
  *     results in the value of the second.
  */
-export const rightB = (p1, p2) => Parser(ctx => {
-  ASSERT && assertParser('rightB', p1, ordParFormatter('1st'))
-  ASSERT && assertParser('rightB', p2, ordParFormatter('2nd'))
+export const rightB = (p, q) => Parser(ctx => {
+  ASSERT && assertParser('rightB', p, ordParFormatter('1st'))
+  ASSERT && assertParser('rightB', q, ordParFormatter('2nd'))
 
   const index = ctx.index
 
-  const [reply1, [context1, result1]] = twin(p1(ctx))
-  if (result1.status !== Status.Ok) return reply1
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  if (pres.status !== Status.Ok) return prep
 
-  const [reply2, [context2, result2]] = twin(p2(context1))
-  if (result2.status !== Error) return reply2
+  const [qrep, [qctx, qres]] = twin(q(pctx))
+  if (qres.status !== Error) return qrep
 
-  const err = index === context2.index
-    ? result2.errors
-    : nested(context2, result2.errors)
-  return error(context2, err, index)
+  const err = index === qctx.index ? qres.errors : nested(qctx, qres.errors)
+  return error(qctx, err, index)
 })
 
 /**
- * Creates a parser that will apply the parsers `p1` and `p2` in
+ * Creates a parser that will apply the parsers `p` and `q` in
  * sequence and then return the result of both in an array. If either
- * `p1` or `p2` fail, this parser will also fail.
+ * `p` or `q` fail, this parser will also fail.
  *
- * If `p2` fails non-fatally, the entire parser will also fail
+ * If `q` fails non-fatally, the entire parser will also fail
  * non-fatally, reverting the context to what it was before the first
  * parser was applied, even if the first parser consumed input. A fatal
  * error from either parser will still result in an overall fatal error.
  *
- * Note that `andThenB(p1, p2)` is not the same as `attempt(andThen(p1,
- * p2))`, as the former will fail fatally if one of its parsers fails
+ * Note that `andThenB(p, q)` is not the same as `attempt(andThen(p,
+ * q))`, as the former will fail fatally if one of its parsers fails
  * fatally, while the latter will fail non-fatally in that case.
  *
- * @param {Parser} p1 The first parser to apply.
- * @param {Parser} p2 The second parser to apply.
+ * @param {Parser} p The first parser to apply.
+ * @param {Parser} q The second parser to apply.
  * @returns {Parser} A parser that applies both contained parsers and
  *     results in the values of both parsers in an array.
  */
-export const andThenB = (p1, p2) => Parser(ctx => {
-  ASSERT && assertParser('andThenB', p1, ordParFormatter('1st'))
-  ASSERT && assertParser('andThenB', p2, ordParFormatter('2nd'))
+export const andThenB = (p, q) => Parser(ctx => {
+  ASSERT && assertParser('andThenB', p, ordParFormatter('1st'))
+  ASSERT && assertParser('andThenB', q, ordParFormatter('2nd'))
 
   const index = ctx.index
 
-  const [reply1, [context1, result1]] = twin(p1(ctx))
-  if (result1.status !== Ok) return reply1
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  if (pres.status !== Ok) return prep
 
-  const [reply2, [context2, result2]] = twin(p2(context1))
-  if (result2.status === Fatal) return reply2
-  if (result2.status === Ok) return ok(context2, [result1.value, result2.value])
+  const [qrep, [qctx, qres]] = twin(q(pctx))
+  if (qres.status === Fatal) return qrep
+  if (qres.status === Ok) return ok(qctx, [pres.value, qres.value])
 
-  const err = index === context2.index
-    ? result2.errors
-    : nested(context2, result2.errors)
-  return error(context2, err, index)
+  const err = index === qctx.index ? qres.errors : nested(qctx, qres.errors)
+  return error(qctx, err, index)
 })
 
 /**
@@ -372,16 +368,16 @@ export const repeatB = (p, n) => Parser(ctx => {
   let context = ctx
 
   for (const _ of range(n)) {
-    const [reply, [next, result]] = twin(p(context))
-    context = next
-    if (result.status === Fatal) return reply
-    if (result.status === Error) {
+    const [prep, [pctx, pres]] = twin(p(context))
+    context = pctx
+    if (pres.status === Fatal) return prep
+    if (pres.status === Error) {
       const err = index === context.index
-        ? result.errors
-        : nested(context, result.errors)
+        ? pres.errors
+        : nested(context, pres.errors)
       return error(context, err, index)
     }
-    values.push(result.value)
+    values.push(pres.value)
   }
   return ok(context, values)
 })
@@ -418,21 +414,21 @@ export const manyTillB = (p, end) => Parser(ctx => {
   let context = ctx
 
   while (true) {
-    const [reply1, [context1, result1]] = twin(end(context))
-    context = context1
-    if (result1.status === Fatal) return reply1
-    if (result1.status === Ok) break
+    const [endrep, [endctx, endres]] = twin(end(context))
+    context = endctx
+    if (endres.status === Fatal) return endrep
+    if (endres.status === Ok) break
 
-    const [reply2, [context2, result2]] = twin(p(context))
-    context = context2
-    if (result2.status === Fatal) return reply2
-    if (result2.status === Error) {
-      const err = index === context2.index
-        ? merge(result2.errors, result1.errors)
-        : nested(context2, merge(result2.errors, result1.errors))
-      return error(context2, err, index)
+    const [prep, [pctx, pres]] = twin(p(context))
+    context = pctx
+    if (pres.status === Fatal) return prep
+    if (pres.status === Error) {
+      const err = index === pctx.index
+        ? merge(pres.errors, endres.errors)
+        : nested(pctx, merge(pres.errors, endres.errors))
+      return error(pctx, err, index)
     }
-    values.push(result2.value)
+    values.push(pres.value)
   }
   return ok(context, values)
 })
@@ -479,12 +475,12 @@ export const blockB = genFn => Parser(ctx => {
       ordinal(i + 1)
     } yield to be to a parser; found ${stringify(v)}`)
 
-    const [reply, [next, result]] = twin(value(context))
-    context = next
+    const [prep, [pctx, pres]] = twin(value(context))
+    context = pctx
 
-    if (result.status === Fatal) return reply
-    if (result.status === Error) return error(next, result.errors, index)
-    nextValue = result.value
+    if (pres.status === Fatal) return prep
+    if (pres.status === Error) return error(pctx, pres.errors, index)
+    nextValue = pres.value
     i++
   }
 })
@@ -526,12 +522,12 @@ export const pipeB = (...ps) => Parser(ctx => {
   let context = ctx
 
   for (const p of ps) {
-    const [reply, [next, result]] = twin(p(context))
-    context = next
+    const [prep, [pctx, pres]] = twin(p(context))
+    context = pctx
 
-    if (result.status === Fatal) return reply
-    if (result.status === Error) return error(context, result.errors, index)
-    values.push(result.value)
+    if (pres.status === Fatal) return prep
+    if (pres.status === Error) return error(context, pres.errors, index)
+    values.push(pres.value)
   }
   return ok(context, fn(...values))
 })
@@ -562,15 +558,15 @@ export const betweenB = (pre, post, p) => Parser(ctx => {
 
   const index = ctx.index
 
-  const [reply1, [context1, result1]] = twin(pre(ctx))
-  if (result1.status !== Ok) return reply1
+  const [prerep, [prectx, preres]] = twin(pre(ctx))
+  if (preres.status !== Ok) return prerep
 
-  const [reply2, [context2, result2]] = twin(p(context1))
-  if (result2.status === Fatal) return reply2
-  if (result2.status === Error) return error(context2, result2.errors, index)
+  const [prep, [pctx, pres]] = twin(p(prectx))
+  if (pres.status === Fatal) return prep
+  if (pres.status === Error) return error(pctx, pres.errors, index)
 
-  const [reply3, [context3, result3]] = twin(post(context2))
-  if (result3.status === Fatal) return reply3
-  if (result3.status === Error) return error(context3, result3.errors, index)
-  return ok(context3, result2.value)
+  const [postrep, [postctx, postres]] = twin(post(pctx))
+  if (postres.status === Fatal) return postrep
+  if (postres.status === Error) return error(postctx, postres.errors, index)
+  return ok(postctx, pres.value)
 })

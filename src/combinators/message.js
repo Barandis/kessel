@@ -13,7 +13,7 @@ import { error, Parser, Status } from 'kessel/core'
 import { compound, ErrorType, expected } from 'kessel/error'
 import { twin } from 'kessel/util'
 
-const { Ok } = Status
+const { Ok, Error } = Status
 const { Nested } = ErrorType
 
 /** @typedef {import('kessel/core').Parser} Parser */
@@ -41,9 +41,8 @@ export const label = (p, msg) => Parser(ctx => {
   ASSERT && assertParser('label', p, ordParFormatter('1st'))
   ASSERT && assertString('label', msg, ordStrFormatter('2nd'))
 
-  const index = ctx.index
-  const [reply, [context, result]] = twin(p(ctx))
-  return index === context.index ? pass(context, result, expected(msg)) : reply
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  return pres.status === Error ? pass(pctx, pres, expected(msg)) : prep
 })
 
 /**
@@ -58,10 +57,7 @@ export const label = (p, msg) => Parser(ctx => {
  * *did* consume input, the context is reset to the context before the
  * parser was applied, the error is set to a compound error using the
  * supplied message (with the nested error being the original error that
- * came from the failure point), and a fatal error is returned.
- *
- * This is one of the few places where a fatal error happens after
- * backtracking.
+ * came from the failure point), and failure happens.
  *
  * @param {Parser} p The parser to be applied.
  * @param {string} msg The new error message to be used. This will be
@@ -74,17 +70,14 @@ export const attemptM = (p, msg) => Parser(ctx => {
   ASSERT && assertParser('attemptM', p, ordParFormatter('1st'))
   ASSERT && assertString('attemptM', msg, ordStrFormatter('2nd'))
 
-  const index = ctx.index
-  const [reply, [context, result]] = twin(p(ctx))
-  if (result.status === Ok) {
-    return index === context.index
-      ? pass(context, result, expected(msg)) : reply
-  } else if (index === context.index) {
-    if (result.errors.length === 1 && result.errors[0].type === Nested) {
-      const { ctx, errors } = result.errors[0]
-      return pass(context, result, compound(msg, ctx, errors))
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  if (pres.status === Ok) return prep
+  if (pres.status === Error) {
+    if (pres.errors.length === 1 && pres.errors[0].type === Nested) {
+      const { ctx, errors } = pres.errors[0]
+      return pass(pctx, pres, compound(msg, ctx, errors))
     }
-    return pass(context, result, expected(msg))
+    return pass(pctx, pres, expected(msg))
   }
-  return error(ctx, compound(msg, context, result.errors))
+  return error(ctx, compound(msg, pctx, pres.errors))
 })
