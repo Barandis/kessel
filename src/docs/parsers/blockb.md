@@ -7,10 +7,18 @@
 
 > `blockB(genFn)`
 
+Executes a generator function that can yield to parsers in its body.
+
+This is a backtracking version of the [`block`](#block) parser. It operates in exactly the same manner, except that if one of its parsers fail non-fatally after other of its parsers have consumed some input, it will backtrack to the position it was at the beginning of the `blockB` parser and report a non-fatal failure (`block` in this case would not backtrack and its failure would be fatal).
+
+The same caveats also apply; `blockB` can implement any other parser, but it's best to use a more specific one if it suits.
+
+#### Example
+
 ```javascript
 const parser = blockB(function *() {
   yield spaces
-  const sign = yield choice(char('+'), char('-'))
+  const sign = yield optional(orElse(char('+'), char('-')))
   const number = yield join(many1(digit))
   yield spaces
 
@@ -22,13 +30,13 @@ const s = parse(parser, '   -1729   ')
 console.log(status(s))  // Symbol(ok)
 console.log(success(s)) // -1729
 
-const f = parse(parser, '1729')
+const f = parse(parser, 'abcd')
 console.log(status(f))  // Symbol(error)
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
-                        // 1729
+                        // abcd
                         // ^
-                        // Expected '+' or '-'
+                        // Expected a digit
 
 const t = parse(parser, '-abcd')
 console.log(status(t))  // Symbol(error)
@@ -45,13 +53,7 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
                         //   Expected a digit
 ```
 
-Executes a generator function. The generator can `yield` parsers whose results are returned to the generator when it's restarted. Returns the return value of the generator.
-
-If any of these parsers fail, the `blockB` parser itself also fails. This failure will be non-fatal, even if input had been consumed; in this case, the parser backtracks to its location when the first yielded parser was applied.
-
-See [`block`](block.md) for an explanation of the example. The two examples are identical except in that the `t` case in this example will backtrack and fail non-fatally, while the same case in [`block`](block.md)'s example will not backtrack and will fail fatally.
-
-Simpler `blockB`s can often be rewritten into [`sequenceB`](sequenceb.md) parsers. The full power of `blockB` is most appropriate when a) calculations need to be done to the results of yielded parsers, b) a non-string result needs to be returned, or c.md) some of the parsers may be working asynchronously.
+See [`block`](#block) for a detailed breakdown of the example. That example works exactly the same as this one except with regard to the third case. With `block`, this case is a fatal error, but `blockB` backtracks and converts the error to a non-fatal one.
 
 #### Parameters
 

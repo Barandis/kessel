@@ -7,6 +7,10 @@
 
 > `regex(pattern)`
 
+Matches the current input location against a regular expression pattern.
+
+#### Example
+
 ```javascript
 const parser = regex(/^\d+/)
 
@@ -22,8 +26,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Expected a string matching /^\d+/
 ```
-
-Matches the current input location against a regular expression pattern.
 
 #### Parameters
 

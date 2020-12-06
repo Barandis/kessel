@@ -7,6 +7,12 @@
 
 > `spaceU`
 
+Parse a Unicode whitespace character.
+
+A character is a Unicode whitespace character if it has the Unicode `White_Space` binary property. There are around 25 of these characters.
+
+#### Example
+
 ```javascript
 const parser = spaceU
 
@@ -22,10 +28,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Expected a Unicode whitespace character
 ```
-
-Reads a character and succeeds if that character is a Unicode whitespace character.
-
-A character is a Unicode whitespace character if it has the Unicode `White_Space` binary property. There are around 25 of these characters.
 
 #### Success
 

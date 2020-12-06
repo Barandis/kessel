@@ -7,6 +7,10 @@
 
 > `anyOf(cs)`
 
+Parses a character if that character is included in `cs`.
+
+#### Example
+
 ```javascript
 const parser = anyOf('Test')
 
@@ -22,8 +26,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Expected any of 'T', 'e', 's', or 't'
 ```
-
-Reads a single character and succeeds if that character is included in `cs`.
 
 #### Parameters
 

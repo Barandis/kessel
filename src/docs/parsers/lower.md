@@ -7,6 +7,12 @@
 
 > `lower`
 
+Parses an ASCII lowercase letter (`a-z`).
+
+This does not parse UTF-8 lowercase letters in general. Use [`lowerU`](loweru.md) for that.
+
+#### Example
+
 ```javascript
 const parser = lower
 
@@ -22,10 +28,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Expected a lowercase letter
 ```
-
-Reads the next character and succeeds if that character is an ASCII lowercase letter (`a-z`).
-
-This does not parse UTF-8 lowercase letters in general. Use [`lowerU`](loweru.md) for that.
 
 #### Success
 

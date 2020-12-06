@@ -7,6 +7,12 @@
 
 > `lowerU`
 
+Parses a Unicode lowercase letter.
+
+A character is a Unicode lowercase letter if it has the Unicode `Lowercase`. This is approximately equal to characters that match the regular expression `/\p{Ll}/u` but includes a few other characters as well.
+
+#### Example
+
 ```javascript
 const parser = lowerU
 
@@ -22,10 +28,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Expected a Unicode lowercase letter
 ```
-
-Reads the next character and succeeds if that character is a Unicode lowercase letter.
-
-A character is a Unicode lowercase letter if it has the Unicode `Lowercase`. This is approximately equal to characters that match the regular expression `/\p{Ll}/u` but includes a few other characters as well.
 
 #### Success
 

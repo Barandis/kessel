@@ -5,7 +5,13 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `andThenB(p1, p2)`
+> `andThenB(p, q)`
+
+Applies two parsers in order, returning their results in a tuple.
+
+If either parser fails, then the entire `andThenB` parser also fails. If input was consumed by either parser and one of them fails, backtracking will take the state back to where it was before `p` was applied.
+
+#### Example
 
 ```javascript
 const parser = andThenB(letter, digit)
@@ -37,34 +43,30 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
                         //   Expected a digit
 ```
 
-Applies two parsers in order, returning their results in a tuple.
-
-If either parser fails, then the entire `andThenB` parser also fails. If input was consumed by either parser and one of them fails, backtracking will take the state back to where it was before `p1` was applied.
-
 #### Parameters
 
-* `p1` The first parser to apply. If both parsers succeed, this parser's result will be the first element of `both`'s result.
-* `p2` The second parser to apply. If both parsers succeed, this parser's result will be the second element of `both`'s result.
+* `p` The first parser to apply. If both parsers succeed, this parser's result will be the first element of `andThenB`'s result.
+* `q` The second parser to apply. If both parsers succeed, this parser's result will be the second element of `andThenB`'s result.
 
 #### Success
 
-* Succeeds if both `p1` and `p2` succeed. Returns the result of `p1`.
+* Succeeds if both `p` and `q` succeed. Returns their results in a tuple.
 
 #### Failure
 
-* Fails if either `p1` or `p2` fails. If any input was consumed, backtracking will occur and an additional error message will be provided that details the circumstances of the backtracking.
+* Fails if either `p` or `q` fails. If any input was consumed, backtracking will occur and an additional error message will be provided that details the circumstances of the backtracking.
 
 #### Fatal Failure
 
-* Fails fatally if either `p1` or `p2` fails fatally.
+* Fails fatally if either `p` or `q` fails fatally.
 
 #### Throws
 
-* Throws an error if either `p1` or `p2` are not parsers.
+* Throws an error if either `p` or `q` are not parsers.
 
 #### See Also
 
-* [`andThen`](andThen.md)
+* [`andThen`](andthen.md)
 * [`leftB`](leftb.md)
 * [`rightB`](rightb.md)
 * [`sequenceB`](sequenceb.md)

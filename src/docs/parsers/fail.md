@@ -7,6 +7,10 @@
 
 > `fail(msg)`
 
+Fails automatically with a custom expected error message.
+
+#### Example
+
 ```javascript
 const parser = fail('a letter')
 
@@ -18,8 +22,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Expected a letter
 ```
-
-Fails automatically, applying a custom expected error message.
 
 #### Parameters
 

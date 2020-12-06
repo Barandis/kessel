@@ -61,7 +61,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#parameters" class="md-skip">
+        <a href="#example" class="md-skip">
           Skip to content
         </a>
       
@@ -372,6 +372,30 @@
 
 
   <li class="md-nav__item">
+    <a href="../andthen/" class="md-nav__link">
+      andThen
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../andthenb/" class="md-nav__link">
+      andThenB
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
     <a href="../any/" class="md-nav__link">
       any
     </a>
@@ -468,8 +492,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../backlabel/" class="md-nav__link">
-      backLabel
+    <a href="../attemptm/" class="md-nav__link">
+      attemptM
     </a>
   </li>
 
@@ -526,30 +550,6 @@
           
           
 
-
-  <li class="md-nav__item">
-    <a href="../both/" class="md-nav__link">
-      both
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../bothb/" class="md-nav__link">
-      bothB
-    </a>
-  </li>
-
-        
-          
-          
-          
-
   
 
 
@@ -577,6 +577,13 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#parameters" class="md-nav__link">
@@ -1101,6 +1108,18 @@
 
 
   <li class="md-nav__item">
+    <a href="../orelse/" class="md-nav__link">
+      orElse
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
     <a href="../orvalue/" class="md-nav__link">
       orValue
     </a>
@@ -1523,6 +1542,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#parameters" class="md-nav__link">
     Parameters
   </a>
@@ -1589,6 +1615,10 @@
 <blockquote>
 <p><code>chain(p, fn)</code></p>
 </blockquote>
+<p>Applies a parser to the input, passes its result to a function, and then applies the parser that function returns to the input.</p>
+<p><code>chain</code> is not used that often itself, but it is a primitive combinator that provides the basis for numerous other parsers (including all of those in the "Chaining combinators" section of the <a href="../../api/#table-5-chaining-combinators">API summary</a>).</p>
+<p>There is another version of this parser (<a href="../chainb/"><code>chainB</code></a>) that will backtrack and fail non-fatally if the parser returned by <code>fn</code> fails non-fatally.</p>
+<h4 id="example">Example</h4>
 <div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">chain</span><span class="p">(</span><span class="nx">any</span><span class="p">,</span> <span class="nx">c</span> <span class="p">=&gt;</span> <span class="kr">char</span><span class="p">(</span><span class="nx">c</span><span class="p">))</span>
 
 <span class="kr">const</span> <span class="nx">s</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;aabbcc&#39;</span><span class="p">)</span>
@@ -1612,10 +1642,8 @@
                         <span class="c1">//  ^</span>
                         <span class="c1">// Expected &#39;a&#39;</span>
 </code></pre></div>
-<p>Applies a parser to the input, passes its result to a function, and then applies the parser that function returns to the input.</p>
-<p>In the example, <code>chain</code> first applies <code>any</code>, which returns the next character of the input. <code>fn</code> then returns <code>char(c)</code>, where <code>c</code> is the result of the <code>any</code> application, and this parser is applied. The upshot is that this example of <code>chain</code> succeeds if the next two characters are the same.</p>
-<p>In the case of <code>f</code>, <code>chain</code> fails fatally. This is because a character was consumed in <code>p</code>'s success, and if a character is consumed before failure, fatal failure is the result. There is another version of this parser (<a href="../chainb/"><code>chainB</code></a>) that will backtrack and fail non-fatally if the parser returned by <code>fn</code> fails non-fatally.</p>
-<p><code>chain</code> is not used that often itself, but it provides the basis for numerous other parsers (parsers/including all of those in the "Chaining combinators" section of the <a href="../../api/#table-5-chaining-combinators">API summary</a>).</p>
+<p>In this example, <code>chain</code> first applies <code>any</code>, which returns the next character of the input. <code>fn</code> then returns <code>char(c)</code>, where <code>c</code> is the result of the <code>any</code> application, and this parser is applied. The upshot is that this example of <code>chain</code> succeeds if the next two characters are the same.</p>
+<p>In the case of <code>f</code>, <code>chain</code> fails fatally. This is because a character was consumed in <code>p</code>'s success, and if a character is consumed before failure, fatal failure is the result.</p>
 <h4 id="parameters">Parameters</h4>
 <ul>
 <li><code>p</code> The parser which is applied first and whose result is passed into <code>fn</code>.</li>
@@ -1628,7 +1656,7 @@
 <h4 id="failure">Failure</h4>
 <ul>
 <li>Fails if <code>p</code> fails.</li>
-<li>Fsils if the parser returned by <code>fn</code> fails after <code>p</code> succeeds but consumes no input.</li>
+<li>Fails if the parser returned by <code>fn</code> fails after <code>p</code> succeeds but consumes no input.</li>
 </ul>
 <h4 id="fatal-failure">Fatal Failure</h4>
 <ul>
@@ -1664,7 +1692,7 @@
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
         
-          <a href="../bothb/" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../blockb/" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-footer-nav__button md-icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
             </div>
@@ -1673,7 +1701,7 @@
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                bothB
+                blockB
               </div>
             </div>
           </a>

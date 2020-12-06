@@ -398,22 +398,29 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#table-7-alternative-and-backtracking-combinators" class="md-nav__link">
-    Table 7: Alternative and backtracking combinators
+  <a href="#table-7-alternative-combinators" class="md-nav__link">
+    Table 7: Alternative combinators
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#table-8-conditional-and-lookahead-combinators" class="md-nav__link">
-    Table 8: Conditional and lookahead combinators
+  <a href="#table-8-backtracking-combinators" class="md-nav__link">
+    Table 8: Backtracking combinators
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#table-9-error-message-combinators" class="md-nav__link">
-    Table 9: Error message combinators
+  <a href="#table-9-conditional-and-lookahead-combinators" class="md-nav__link">
+    Table 9: Conditional and lookahead combinators
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#table-10-error-message-combinators" class="md-nav__link">
+    Table 10: Error message combinators
   </a>
   
 </li>
@@ -494,6 +501,30 @@
   <li class="md-nav__item">
     <a href="../parsers/always/" class="md-nav__link">
       always
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/andthen/" class="md-nav__link">
+      andThen
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/andthenb/" class="md-nav__link">
+      andThenB
     </a>
   </li>
 
@@ -600,8 +631,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../parsers/backlabel/" class="md-nav__link">
-      backLabel
+    <a href="../parsers/attemptm/" class="md-nav__link">
+      attemptM
     </a>
   </li>
 
@@ -650,30 +681,6 @@
   <li class="md-nav__item">
     <a href="../parsers/blockb/" class="md-nav__link">
       blockB
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../parsers/both/" class="md-nav__link">
-      both
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../parsers/bothb/" class="md-nav__link">
-      bothB
     </a>
   </li>
 
@@ -1154,6 +1161,18 @@
   <li class="md-nav__item">
     <a href="../parsers/optional/" class="md-nav__link">
       optional
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/orelse/" class="md-nav__link">
+      orElse
     </a>
   </li>
 
@@ -1665,22 +1684,29 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#table-7-alternative-and-backtracking-combinators" class="md-nav__link">
-    Table 7: Alternative and backtracking combinators
+  <a href="#table-7-alternative-combinators" class="md-nav__link">
+    Table 7: Alternative combinators
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#table-8-conditional-and-lookahead-combinators" class="md-nav__link">
-    Table 8: Conditional and lookahead combinators
+  <a href="#table-8-backtracking-combinators" class="md-nav__link">
+    Table 8: Backtracking combinators
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#table-9-error-message-combinators" class="md-nav__link">
-    Table 9: Error message combinators
+  <a href="#table-9-conditional-and-lookahead-combinators" class="md-nav__link">
+    Table 9: Conditional and lookahead combinators
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#table-10-error-message-combinators" class="md-nav__link">
+    Table 10: Error message combinators
   </a>
   
 </li>
@@ -1950,10 +1976,6 @@
 <td>Applies two parsers in order and returns the result of the second one.</td>
 </tr>
 <tr>
-<td><a href="../parsers/both/"><code>both</code></a></td>
-<td>Applies two parsers in order and returns their results in a tuple.</td>
-</tr>
-<tr>
 <td><a href="../parsers/pipe/"><code>pipe</code></a></td>
 <td>Applies a series of parsers in order, then passes the results as arguments to a function, then returns the result of that function.</td>
 </tr>
@@ -2000,6 +2022,10 @@
 </tr>
 </thead>
 <tbody>
+<tr>
+<td><a href="../parsers/andthen/"><code>andThen</code></a></td>
+<td>Applies two parsers in order and returns their results in a tuple.</td>
+</tr>
 <tr>
 <td><a href="../parsers/sequence/"><code>sequence</code></a></td>
 <td>Applies a series of parsers in order, returning their results in an array.</td>
@@ -2066,7 +2092,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="table-7-alternative-and-backtracking-combinators">Table 7: Alternative and backtracking combinators</h3>
+<h3 id="table-7-alternative-combinators">Table 7: Alternative combinators</h3>
 <table>
 <thead>
 <tr>
@@ -2075,6 +2101,10 @@
 </tr>
 </thead>
 <tbody>
+<tr>
+<td><a href="../parsers/orelse/"><code>orElse</code></a></td>
+<td>Applies a parser and, if it fails, a second parser.</td>
+</tr>
 <tr>
 <td><a href="../parsers/choice/"><code>choice</code></a></td>
 <td>Applies a series of parsers one at a time until one succeeds.</td>
@@ -2087,6 +2117,17 @@
 <td><a href="../parsers/orvalue/"><code>orValue</code></a></td>
 <td>Applies a parser and returns either its result upon success or another value upon failure.</td>
 </tr>
+</tbody>
+</table>
+<h3 id="table-8-backtracking-combinators">Table 8: Backtracking combinators</h3>
+<table>
+<thead>
+<tr>
+<th>Parser</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
 <tr>
 <td><a href="../parsers/attempt/"><code>attempt</code></a></td>
 <td>Applies a parser, backtracking to its original position if the parser fails and consumes input.</td>
@@ -2112,7 +2153,7 @@
 <td>Applies two parsers in order and returns the result of the second one. Backtracks to the location where the first parser was applied if the second one fails.</td>
 </tr>
 <tr>
-<td><a href="../parsers/bothb/"><code>bothB</code></a></td>
+<td><a href="../parsers/andthenb/"><code>andThenB</code></a></td>
 <td>Applies two parsers in order and returns the results of both in a tuple. Backtracks to the location where the first parser was applied if the second one fails.</td>
 </tr>
 <tr>
@@ -2133,7 +2174,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="table-8-conditional-and-lookahead-combinators">Table 8: Conditional and lookahead combinators</h3>
+<h3 id="table-9-conditional-and-lookahead-combinators">Table 9: Conditional and lookahead combinators</h3>
 <table>
 <thead>
 <tr>
@@ -2160,7 +2201,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="table-9-error-message-combinators">Table 9: Error message combinators</h3>
+<h3 id="table-10-error-message-combinators">Table 10: Error message combinators</h3>
 <table>
 <thead>
 <tr>
@@ -2174,7 +2215,7 @@
 <td>Applies a parser and replaces its errors with an expected error if that parser fails.</td>
 </tr>
 <tr>
-<td><a href="../parsers/backlabel/"><code>backLabel</code></a></td>
+<td><a href="../parsers/attemptm/"><code>attemptM</code></a></td>
 <td>Applies a parser and replaces its errors with an expected error if that parser fails. Backtracks to where the parser was applied and adds additional information to the error message if that parser consumes input.</td>
 </tr>
 <tr>

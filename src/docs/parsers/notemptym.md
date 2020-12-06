@@ -7,6 +7,12 @@
 
 > `notEmptyM(p, msg)`
 
+Applies a parser and succeeds if that parser succeeds and returns a result. If the parser does not return a result, `notEmpty` will fail.
+
+If this parser fails, it will use [`expected(msg)`](../tools/expected.md) as an error message.
+
+#### Example
+
 ```javascript
 const parser = notEmpty(optional(char('+')), 'something other than +')
 
@@ -22,10 +28,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Expected something other than +
 ```
-
-Applies a parser and succeeds if that parser succeeds and returns a result. If the parser does not return a result, `notEmpty` will fail.
-
-If this parser fails, it will use [`expected(msg)`](../tools/expected.md) as an error message.
 
 #### Parameters
 

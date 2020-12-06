@@ -7,6 +7,18 @@
 
 > `sequence(...ps)`
 
+Applies a series of parsers in order, returning an array that contains each parser's result.
+
+`sequence` will only succeed if *all* of its parsers succeed. If one of them fails, `sequence` will fail fatally if it had consumed any input up to that point, even if the parser that failed did so non-fatally.
+
+There is another version of this parser ([`sequenceB`](sequenceb.md)) that fails non-fatally and backtracks if the parser that fails does so non-fatally.
+
+All of the results are gathered into an array, but `null` results are skipped.
+
+A two-parser `sequence` is the same as [`andThen`](andthen.md).
+
+#### Example
+
 ```javascript
 const parser = sequence(letter, digit, letter)
 
@@ -30,14 +42,6 @@ console.log(failure(t)) // Parse error at (line 1, column 3):
                         //   ^
                         // Expected a letter
 ```
-
-Applies a series of parsers in order, returning an array that contains each parser's result.
-
-`sequence` will only succeed if *all* of its parsers succeed. If one of them fails, `sequence` will fail fatally if it had consumed any input up to that point, even if the parser that failed did so non-fatally.
-
-There is another version of this parser ([`sequenceB`](sequenceb.md)) that fails non-fatally and backtracks if the parser that fails does so non-fatally.
-
-All of the results are gathered into an array, but `null` results are skipped.
 
 #### Parameters
 

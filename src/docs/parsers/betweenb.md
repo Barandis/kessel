@@ -7,6 +7,14 @@
 
 > `betweenB(pre, post, p)`
 
+Applies a pre-parser, a content parser, and a post-parser in order, returning the value of the content parser.
+
+All three parsers must succeed for `betweenB` to succeed. Take care to avoid parsing too far with `p`; e.g., if the example used `join(many(any))` as a content parser instead of what it does, it would also match the ending `"`. This would mean that `post` would never succeed because `p` already consumed its `"`, so `betweenB` would never succeed.
+
+If any of the parsers fails after some input was consumed, the state will be backtracked to where it was before `pre` was applied.
+
+#### Example
+
 ```javascript
 const parser = betweenB(char('"'), char('"'), join(many(noneOf('"'))))
 
@@ -37,12 +45,6 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
                         //   Expected '"'
                         //   Note: failure occurred at the end of input
 ```
-
-Applies a pre-parser, a content parser, and a post-parser in order, returning the value of the content parser.
-
-All three parsers must succeed for `between` to succeed. Take care to avoid parsing too far with `p`; e.g., if the example used `join(many(any))` as a content parser instead of what it does, it would also match the ending `"`. This would mean that `post` would never succeed because `p` already consumed its `"`, so `between` would never succeed.
-
-If any of the parsers fails after some input was consumed, the state will be backtracked to where it was before `pre` was applied.
 
 #### Parameters
 

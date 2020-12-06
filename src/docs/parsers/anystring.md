@@ -7,6 +7,10 @@
 
 > `anyString(n)`
 
+Parses a string that is `n` characters long.
+
+#### Example
+
 ```javascript
 const parser = anyString(3)
 
@@ -22,8 +26,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Expected a string of 3 characters
 ```
-
-Reads `n` characters and returns them as a single string.
 
 #### Parameters
 

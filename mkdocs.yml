@@ -43,7 +43,7 @@ nav:
       - assocL: parsers/assocl.md
       - assocR: parsers/assocr.md
       - attempt: parsers/attempt.md
-      - backLabel: parsers/backlabel.md
+      - attemptM: parsers/attemptm.md
       - between: parsers/between.md
       - betweenB: parsers/betweenb.md
       - block: parsers/block.md

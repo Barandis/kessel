@@ -61,7 +61,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#parameters" class="md-skip">
+        <a href="#example" class="md-skip">
           Skip to content
         </a>
       
@@ -372,6 +372,30 @@
 
 
   <li class="md-nav__item">
+    <a href="../andthen/" class="md-nav__link">
+      andThen
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../andthenb/" class="md-nav__link">
+      andThenB
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
     <a href="../any/" class="md-nav__link">
       any
     </a>
@@ -468,8 +492,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../backlabel/" class="md-nav__link">
-      backLabel
+    <a href="../attemptm/" class="md-nav__link">
+      attemptM
     </a>
   </li>
 
@@ -518,30 +542,6 @@
   <li class="md-nav__item">
     <a href="../blockb/" class="md-nav__link">
       blockB
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../both/" class="md-nav__link">
-      both
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../bothb/" class="md-nav__link">
-      bothB
     </a>
   </li>
 
@@ -999,6 +999,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#parameters" class="md-nav__link">
     Parameters
   </a>
@@ -1084,6 +1091,18 @@
   <li class="md-nav__item">
     <a href="../optional/" class="md-nav__link">
       optional
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../orelse/" class="md-nav__link">
+      orElse
     </a>
   </li>
 
@@ -1516,6 +1535,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#parameters" class="md-nav__link">
     Parameters
   </a>
@@ -1575,6 +1601,9 @@
 <blockquote>
 <p><code>notFollowedBy(p)</code></p>
 </blockquote>
+<p>Applies a parser and succeeds without consuming input if that parser fails.</p>
+<p><code>notFollowedBy</code> cannot feasibly produce an error message on failure. To add an error message, either wrap this parser in <a href="../label/"><code>label</code></a> or use <a href="../notfollowedbym/"><code>notFollowedByM</code></a> instead.</p>
+<h4 id="example">Example</h4>
 <div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">notFollowedBy</span><span class="p">(</span><span class="nx">digit</span><span class="p">)</span>
 
 <span class="kr">const</span> <span class="nx">s</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span>
@@ -1589,8 +1618,6 @@
                         <span class="c1">// ^</span>
                         <span class="c1">// Unknown message(s)</span>
 </code></pre></div>
-<p>Applies a parser and succeeds without consuming input if that parser fails.</p>
-<p><code>notFollowedBy</code> cannot feasibly produce an error message on failure. To add an error message, either wrap this parser in <a href="../label/"><code>label</code></a> or use <a href="../notfollowedbym/"><code>notFollowedByM</code></a> instead.</p>
 <h4 id="parameters">Parameters</h4>
 <ul>
 <li><code>p</code> The parser to apply. If it fails, <code>notFollowedBy</code> succeeds.</li>

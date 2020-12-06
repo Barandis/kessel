@@ -7,6 +7,14 @@
 
 > `upperU`
 
+Parses either a Unicode uppercase letter or a Unicode titlecase character.
+
+A character is a Unicode uppercase character if it has the Unicode `Uppercase` binary property. This is approximately equal to characters that match the regular expression `/\p{Lu}/u` except with a few additional characters.
+
+A character is a Unicode titlecase character if it has the Unicode `Letter, Titlecase` property, which is the same as characters that match the regular expression `/\p{Lt}/u`. Titlecase characters are typically ligatures of an uppercase character with a lowercase character, such as `ǈ`. (The double-lowercase counterparts such as `ǉ` are considered lowercase letters and would be parsed by [`lowerU`](loweru.md).)
+
+#### Example
+
 ```javascript
 const parser = upperU
 
@@ -22,12 +30,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Expected a Unicode uppercase letter
 ```
-
-Reads the next character and succeeds if that character is either a Unicode uppercase letter or a Unicode titlecase character.
-
-A character is a Unicode uppercase character if it has the Unicode `Uppercase` binary property. This is approximately equal to characters that match the regular expression `/\p{Lu}/u` except with a few additional characters.
-
-A character is a Unicode titlecase character if it has the Unicode `Letter, Titlecase` property, which is the same as characters that match the regular expression `/\p{Lt}/u`. Titlecase characters are typically ligatures of an uppercase character with a lowercase character, such as `ǈ`. (The double-lowercase counterparts such as `ǉ` are considered lowercase letters and would be parsed by [`lowerU`](loweru.md).)
 
 #### Success
 

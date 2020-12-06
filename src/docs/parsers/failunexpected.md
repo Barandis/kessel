@@ -7,6 +7,12 @@
 
 > `failUnexpected(msg)`
 
+Fails automatically with a custom unexpected error message.
+
+This is the only current parser that adds an unexpected error message.
+
+#### Example
+
 ```javascript
 const parser = failUnexpected('digit')
 
@@ -18,8 +24,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Unexpected digit
 ```
-
-Fails automatically, applying a custom unexpected error message.
 
 #### Parameters
 

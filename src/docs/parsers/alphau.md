@@ -7,6 +7,12 @@
 
 > `alphaU`
 
+Parses a Unicode alphanumeric character.
+
+A character is a Unicode alphanumeric character if it has either the Unicode `Alphabetic` binary property or the Unicode `Number` binary property.
+
+#### Example
+
 ```javascript
 const parser = alphaU
 
@@ -22,10 +28,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Expected a Unicode alphanumeric character
 ```
-
-Reads the next character and succeeds if that character is a Unicode alphanumeric character.
-
-A character is a Unicode alphanumeric character if it has either the Unicode `Alphabetic` binary property or the Unicode `Number` binary property.
 
 #### Success
 

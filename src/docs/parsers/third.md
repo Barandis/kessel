@@ -7,6 +7,14 @@
 
 > `third(p)`
 
+Applies a parser and returns the third element of the resulting array.
+
+This parser works only if `p` returns an array, and it returns the third element of that array. It's most useful with parsers like [`sequence`](sequence.md) and [`many`](many.md) that always return arrays, though it will work with parsers like [`map`](map.md) and [`always`](always.md) if they are programmed to return arrays.
+
+`third(p)` is an optimized implementation of `chain(p, x => always(x[2]))`.
+
+#### Example
+
 ```javascript
 const parser = third(many1(any))
 
@@ -23,12 +31,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Expected any character
                         // Note: failure occurred at the end of input
 ```
-
-Applies a parser and returns the third element of the resulting array.
-
-This parser works only if `p` returns an array, and it returns the third element of that array. It's most useful with parsers like [`sequence`](sequence.md) and [`many`](many.md) that always return arrays, though it will work with parsers like [`map`](map.md) and [`always`](always.md) if they are programmed to return arrays.
-
-`third(p)` is an optimized implementation of `chain(p, x => always(x[2]))`.
 
 #### Parameters
 

@@ -7,6 +7,16 @@
 
 > `orElse(p, q)`
 
+The primitive combinator for alternatives. `orElse` will apply its two parsers one after another until one of the two succeeds.
+
+If one of the two parsers fails fatally, `orElse` will stop at that point and fail fatally (i.e., if `p` fails fatally, `q` will never even be applied). If both parsers simply fail, `orElse` will also fail.
+
+Because of the requirement that failure not be fatal for this parser to continue (input can't be consumed by one parser and there be hope for the other parser to succeed from a different starting point), it isn't unusual to use backtracking parsers or [`attempt`](#attempt) for either `p` or `q`.
+
+In parser packages in other languages that support custom operators, `orElse` is often implemented as an operator like `<|>` or `<+>`.
+
+#### Example
+
 ```javascript
 const parser = orElse(left(letter, digit), right(digit, letter))
 
@@ -34,14 +44,6 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
                         //  ^
                         // Expected a digit or a letter
 ```
-
-The primitive combinator for alternatives. `orElse` will apply its two parsers one after another until one of the two succeeds.
-
-If one of the two parsers fails fatally, `orElse` will stop at that point and fail fatally (i.e., if `p` fails fatally, `q` will never even be applied). If both parsers simply fail, `orElse` will also fail.
-
-Because of the requirement that failure not be fatal for this parser to continue (input can't be consumed by one parser and there be hope for the other parser to succeed from a different starting point), it isn't unusual to use backtracking parsers or [`attempt`](#attempt) for either `p` or `q`.
-
-In parser packages in other languages that support custom operators, `orElse` is often implemented as an operator like `<|>` or `<+>`.
 
 #### Parameters
 

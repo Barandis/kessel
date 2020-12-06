@@ -7,6 +7,12 @@
 
 > `letter`
 
+Parses an ASCII letter (`a-z` or `A-Z`).
+
+This does not parse UTF-8 letters in general. Use [`letterU`](letteru.md) for that.
+
+#### Example
+
 ```javascript
 const parser = letter
 
@@ -22,10 +28,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Expected a letter
 ```
-
-Reads the next character and succeeds if that character is an ASCII letter (`a-z` or `A-Z`).
-
-This does not parse UTF-8 letters in general. Use [`letterU`](letteru.md) for that.
 
 #### Success
 

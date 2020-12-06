@@ -61,7 +61,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#parameters" class="md-skip">
+        <a href="#example" class="md-skip">
           Skip to content
         </a>
       
@@ -372,6 +372,30 @@
 
 
   <li class="md-nav__item">
+    <a href="../andthen/" class="md-nav__link">
+      andThen
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../andthenb/" class="md-nav__link">
+      andThenB
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
     <a href="../any/" class="md-nav__link">
       any
     </a>
@@ -468,8 +492,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../backlabel/" class="md-nav__link">
-      backLabel
+    <a href="../attemptm/" class="md-nav__link">
+      attemptM
     </a>
   </li>
 
@@ -518,30 +542,6 @@
   <li class="md-nav__item">
     <a href="../blockb/" class="md-nav__link">
       blockB
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../both/" class="md-nav__link">
-      both
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../bothb/" class="md-nav__link">
-      bothB
     </a>
   </li>
 
@@ -1032,6 +1032,18 @@
 
 
   <li class="md-nav__item">
+    <a href="../orelse/" class="md-nav__link">
+      orElse
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
     <a href="../orvalue/" class="md-nav__link">
       orValue
     </a>
@@ -1141,6 +1153,13 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#parameters" class="md-nav__link">
@@ -1523,6 +1542,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#parameters" class="md-nav__link">
     Parameters
   </a>
@@ -1587,8 +1613,13 @@
 -->
 
 <blockquote>
-<p><code>right(p1, p2)</code></p>
+<p><code>right(p, q)</code></p>
 </blockquote>
+<p>Applies two parsers in order, returning the result of the second one.</p>
+<p>The result of the first parser is discarded. If either parser fails, then the entire <code>right</code> parser also fails. If input was consumed by either parser and one of them fails, then the failure is fatal (whether or not <code>p</code> or <code>q</code> failed fatally).</p>
+<p>There is another version of this parser (<a href="../rightb/"><code>rightB</code></a>) that will backtrack and fail non-fatally if <code>p</code> succeeds and <code>q</code> fails non-fatally.</p>
+<p><code>right(p, q)</code> is an optimized implementation of <code>chain(p, () =&gt; q)</code>.</p>
+<h4 id="example">Example</h4>
 <div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">right</span><span class="p">(</span><span class="nx">letter</span><span class="p">,</span> <span class="nx">digit</span><span class="p">)</span>
 
 <span class="kr">const</span> <span class="nx">s</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;a1&#39;</span><span class="p">)</span>
@@ -1611,36 +1642,33 @@
                         <span class="c1">//  ^</span>
                         <span class="c1">// Expected a digit</span>
 </code></pre></div>
-<p>Applies two parsers in order, returning the result of the second one.</p>
-<p>The result of the first parser is discarded. If either parser fails, then the entire <code>right</code> parser also fails. If input was consumed by either parser and one of them fails, then the failure is fatal (whether or not <code>p1</code> or <code>p2</code> failed fatally). In the examples, <code>f</code> represents a non-fatal failure because the first parser (<a href="../letter/"><code>letter</code></a>) failed without consuming, but <code>t</code> represents a fata failure because the first parser consumed a character before the second parser (<a href="../digit/"><code>digit</code></a>) failed non-fatally.</p>
-<p>There is another version of this parser (<a href="../rightb/"><code>rightB</code></a>) that will backtrack and fail non-fatally if <code>p1</code> succeeds and <code>p2</code> fails non-fatally.</p>
-<p><code>right(p1, p2)</code> is an optimized implementation of <code>chain(p1, () =&gt; p2)</code>.</p>
+<p>In this example, <code>f</code> represents a non-fatal failure because the first parser (<code>letter</code>) failed without consuming, but <code>t</code> represents a fata failure because the first parser consumed a character before the second parser (<code>digit</code>) failed non-fatally.</p>
 <h4 id="parameters">Parameters</h4>
 <ul>
-<li><code>p1</code> The first parser to apply. This parser's result will be discarded.</li>
-<li><code>p2</code> The second parser to apply. If both parsers succeed, this parser's result will be <code>right</code>'s result.</li>
+<li><code>p</code> The first parser to apply. This parser's result will be discarded.</li>
+<li><code>q</code> The second parser to apply. If both parsers succeed, this parser's result will be <code>right</code>'s result.</li>
 </ul>
 <h4 id="success">Success</h4>
 <ul>
-<li>Succeeds if both <code>p1</code> and <code>p2</code> succeed. Returns the result of <code>p2</code>.</li>
+<li>Succeeds if both <code>p</code> and <code>q</code> succeed. Returns the result of <code>q</code>.</li>
 </ul>
 <h4 id="failure">Failure</h4>
 <ul>
-<li>Fails if <code>p1</code> fails.</li>
-<li>Fails if <code>p2</code> fails after <code>p1</code> succeeds but does not consume any input.</li>
+<li>Fails if <code>p</code> fails.</li>
+<li>Fails if <code>q</code> fails after <code>p</code> succeeds but does not consume any input.</li>
 </ul>
 <h4 id="fatal-failure">Fatal Failure</h4>
 <ul>
-<li>Fails fatally if either <code>p1</code> or <code>p2</code> fail fatally.</li>
-<li>Fails fatally if <code>p2</code> fails after <code>p1</code> succeeds and consumes some input.</li>
+<li>Fails fatally if either <code>p</code> or <code>q</code> fail fatally.</li>
+<li>Fails fatally if <code>q</code> fails after <code>p</code> succeeds and consumes some input.</li>
 </ul>
 <h4 id="throws">Throws</h4>
 <ul>
-<li>Throws an error if either <code>p1</code> or <code>p2</code> are not parsers.</li>
+<li>Throws an error if either <code>p</code> or <code>q</code> are not parsers.</li>
 </ul>
 <h4 id="see-also">See Also</h4>
 <ul>
-<li><a href="../both/"><code>both</code></a></li>
+<li><a href="../andthen/"><code>andThen</code></a></li>
 <li><a href="../left/"><code>left</code></a></li>
 <li><a href="../rightb/"><code>rightB</code></a></li>
 <li><a href="../sequence/"><code>sequence</code></a></li>

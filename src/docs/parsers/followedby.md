@@ -7,6 +7,14 @@
 
 > `followedBy(p)`
 
+Applies a parser and succeeds without consuming input if that parser succeeds.
+
+This parser is similar to [`lookAhead`](lookahead.md) except that it does not produce a result.
+
+`followedBy` does not produce an error message on failure. It could, but other related parsers like [`notEmpty`](notempty.md) and [`notFollowedBy`](notfollowedby.md) cannot, so the choice was made to make `followedBy` consistent with those parsers. To add an error message, either wrap this parser in [`label`](label.md) or use [`followedByM`](followedbym.md) instead.
+
+#### Example
+
 ```javascript
 const parser = followedBy(digit)
 
@@ -22,12 +30,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Unknown message(s)
 ```
-
-Applies a parser and succeeds without consuming input if that parser succeeds.
-
-This parser is similar to [`lookAhead`](lookahead.md) except that it does not produce a result.
-
-`followedBy` does not produce an error message on failure. It could, but other related parsers like [`notEmpty`](notempty.md) and [`notFollowedBy`](notfollowedby.md) cannot, so the choice was made to make `followedBy` consistent with those parsers. To add an error message, either wrap this parser in [`label`](label.md) or use [`followedByM`](followedbym.md) instead.
 
 #### Parameters
 

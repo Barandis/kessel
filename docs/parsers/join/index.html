@@ -61,7 +61,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#parameters" class="md-skip">
+        <a href="#example" class="md-skip">
           Skip to content
         </a>
       
@@ -372,6 +372,30 @@
 
 
   <li class="md-nav__item">
+    <a href="../andthen/" class="md-nav__link">
+      andThen
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../andthenb/" class="md-nav__link">
+      andThenB
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
     <a href="../any/" class="md-nav__link">
       any
     </a>
@@ -468,8 +492,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../backlabel/" class="md-nav__link">
-      backLabel
+    <a href="../attemptm/" class="md-nav__link">
+      attemptM
     </a>
   </li>
 
@@ -518,30 +542,6 @@
   <li class="md-nav__item">
     <a href="../blockb/" class="md-nav__link">
       blockB
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../both/" class="md-nav__link">
-      both
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../bothb/" class="md-nav__link">
-      bothB
     </a>
   </li>
 
@@ -769,6 +769,13 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#parameters" class="md-nav__link">
@@ -1091,6 +1098,18 @@
   <li class="md-nav__item">
     <a href="../optional/" class="md-nav__link">
       optional
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../orelse/" class="md-nav__link">
+      orElse
     </a>
   </li>
 
@@ -1523,6 +1542,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#parameters" class="md-nav__link">
     Parameters
   </a>
@@ -1589,6 +1615,10 @@
 <blockquote>
 <p><code>join(p)</code></p>
 </blockquote>
+<p>Applies a parser and returns the elements of the resulting array into a string.</p>
+<p>This combinator solves the problem in JavaScript that there is no separate character type, and therefore a string is not just a list/array of characters. (Parsec parsers, for example, can return arrays of characters which Haskell regards also as strings in their own right.) Parsers like <a href="../sequence/"><code>sequence</code></a> and <a href="../many/"><code>many</code></a> return arrays, and often they are arrays of single-character strings. <code>join</code> will turn these results into simple strings.</p>
+<p><code>join(p)</code> is an optimized implementation of <code>chain(p, x =&gt; x.join(''))</code>.</p>
+<h4 id="example">Example</h4>
 <div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">join</span><span class="p">(</span><span class="nx">many1</span><span class="p">(</span><span class="nx">any</span><span class="p">))</span>
 
 <span class="kr">const</span> <span class="nx">s</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;abcde&#39;</span><span class="p">)</span>
@@ -1603,9 +1633,6 @@
                         <span class="c1">// ^</span>
                         <span class="c1">// Expected any character</span>
 </code></pre></div>
-<p>Applies a parser and returns the elements of the resulting array into a string.</p>
-<p>This combinator solves the problem in JavaScript that there is no separate character type, and therefore a string is not just a list/array of characters. (parsers/Parsec parsers, for example, can return arrays of characters which Haskell regards also as strings in their own right.) Parsers like <a href="../sequence/"><code>sequence</code></a> and <a href="../many/"><code>many</code></a> return arrays, and often they are arrays of single-character strings. <code>join</code> will turn these results into simple strings.</p>
-<p><code>join(p)</code> is an optimized implementation of <code>chain(p, x =&gt; x.join(''))</code>.</p>
 <h4 id="parameters">Parameters</h4>
 <ul>
 <li><code>p</code> The parser that is applied, which must return an array.</li>

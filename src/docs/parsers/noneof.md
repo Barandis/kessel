@@ -7,6 +7,10 @@
 
 > `noneOf(cs)`
 
+Parses a character if that character is not included in `cs`.
+
+#### Example
+
 ```javascript
 const parser = noneOf('Test')
 
@@ -22,8 +26,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Expected none of 'T', 'e', 's', or 't'
 ```
-
-Reads a single character and succeeds if that character is not included in `cs`.
 
 #### Parameters
 

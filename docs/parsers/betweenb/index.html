@@ -61,7 +61,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#parameters" class="md-skip">
+        <a href="#example" class="md-skip">
           Skip to content
         </a>
       
@@ -372,6 +372,30 @@
 
 
   <li class="md-nav__item">
+    <a href="../andthen/" class="md-nav__link">
+      andThen
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../andthenb/" class="md-nav__link">
+      andThenB
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
     <a href="../any/" class="md-nav__link">
       any
     </a>
@@ -468,8 +492,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../backlabel/" class="md-nav__link">
-      backLabel
+    <a href="../attemptm/" class="md-nav__link">
+      attemptM
     </a>
   </li>
 
@@ -517,6 +541,13 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#parameters" class="md-nav__link">
@@ -587,30 +618,6 @@
   <li class="md-nav__item">
     <a href="../blockb/" class="md-nav__link">
       blockB
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../both/" class="md-nav__link">
-      both
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../bothb/" class="md-nav__link">
-      bothB
     </a>
   </li>
 
@@ -1101,6 +1108,18 @@
 
 
   <li class="md-nav__item">
+    <a href="../orelse/" class="md-nav__link">
+      orElse
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
     <a href="../orvalue/" class="md-nav__link">
       orValue
     </a>
@@ -1523,6 +1542,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#parameters" class="md-nav__link">
     Parameters
   </a>
@@ -1589,6 +1615,10 @@
 <blockquote>
 <p><code>betweenB(pre, post, p)</code></p>
 </blockquote>
+<p>Applies a pre-parser, a content parser, and a post-parser in order, returning the value of the content parser.</p>
+<p>All three parsers must succeed for <code>betweenB</code> to succeed. Take care to avoid parsing too far with <code>p</code>; e.g., if the example used <code>join(many(any))</code> as a content parser instead of what it does, it would also match the ending <code>"</code>. This would mean that <code>post</code> would never succeed because <code>p</code> already consumed its <code>"</code>, so <code>betweenB</code> would never succeed.</p>
+<p>If any of the parsers fails after some input was consumed, the state will be backtracked to where it was before <code>pre</code> was applied.</p>
+<h4 id="example">Example</h4>
 <div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">betweenB</span><span class="p">(</span><span class="kr">char</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">),</span> <span class="kr">char</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">),</span> <span class="nx">join</span><span class="p">(</span><span class="nx">many</span><span class="p">(</span><span class="nx">noneOf</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">))))</span>
 
 <span class="kr">const</span> <span class="nx">s</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;&quot;test&quot;&#39;</span><span class="p">)</span>
@@ -1618,9 +1648,6 @@
                         <span class="c1">//   Expected &#39;&quot;&#39;</span>
                         <span class="c1">//   Note: failure occurred at the end of input</span>
 </code></pre></div>
-<p>Applies a pre-parser, a content parser, and a post-parser in order, returning the value of the content parser.</p>
-<p>All three parsers must succeed for <code>between</code> to succeed. Take care to avoid parsing too far with <code>p</code>; e.g., if the example used <code>join(many(any))</code> as a content parser instead of what it does, it would also match the ending <code>"</code>. This would mean that <code>post</code> would never succeed because <code>p</code> already consumed its <code>"</code>, so <code>between</code> would never succeed.</p>
-<p>If any of the parsers fails after some input was consumed, the state will be backtracked to where it was before <code>pre</code> was applied.</p>
 <h4 id="parameters">Parameters</h4>
 <ul>
 <li><code>pre</code> The parser that is applied first. Its result is discarded.</li>

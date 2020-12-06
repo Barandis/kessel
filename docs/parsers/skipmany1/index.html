@@ -61,7 +61,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#parameters" class="md-skip">
+        <a href="#example" class="md-skip">
           Skip to content
         </a>
       
@@ -372,6 +372,30 @@
 
 
   <li class="md-nav__item">
+    <a href="../andthen/" class="md-nav__link">
+      andThen
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../andthenb/" class="md-nav__link">
+      andThenB
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
     <a href="../any/" class="md-nav__link">
       any
     </a>
@@ -468,8 +492,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../backlabel/" class="md-nav__link">
-      backLabel
+    <a href="../attemptm/" class="md-nav__link">
+      attemptM
     </a>
   </li>
 
@@ -518,30 +542,6 @@
   <li class="md-nav__item">
     <a href="../blockb/" class="md-nav__link">
       blockB
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../both/" class="md-nav__link">
-      both
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../bothb/" class="md-nav__link">
-      bothB
     </a>
   </li>
 
@@ -1032,6 +1032,18 @@
 
 
   <li class="md-nav__item">
+    <a href="../orelse/" class="md-nav__link">
+      orElse
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
     <a href="../orvalue/" class="md-nav__link">
       orValue
     </a>
@@ -1299,6 +1311,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#parameters" class="md-nav__link">
     Parameters
   </a>
@@ -1523,6 +1542,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#parameters" class="md-nav__link">
     Parameters
   </a>
@@ -1589,6 +1615,10 @@
 <blockquote>
 <p><code>skipMany1(p)</code></p>
 </blockquote>
+<p>Applies a parser as many times as possible until it fails, discarding the parser's results.</p>
+<p><code>skipMany1</code> executes a parser one or more times, as long as it continues to succeed. When the parser fails, that does not mean that <code>skipMany1</code> fails (as long as the parser succeeded at least once); that signals that <code>skipMany1</code> is through executing.</p>
+<p>As long as <code>p</code> succeeds at least once, the only way <code>skipMany1</code> can fail is if <code>p</code> fails fatally.</p>
+<h4 id="example">Example</h4>
 <div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">skipMany1</span><span class="p">(</span><span class="nx">right</span><span class="p">(</span><span class="nx">digit</span><span class="p">,</span> <span class="nx">letter</span><span class="p">))</span>
 
 <span class="kr">const</span> <span class="nx">s</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;1a2b&#39;</span><span class="p">)</span>
@@ -1611,9 +1641,6 @@
                         <span class="c1">//  ^</span>
                         <span class="c1">// Expected a letter</span>
 </code></pre></div>
-<p>Applies a parser as many times as possible until it fails, discarding the parser's results.</p>
-<p><code>skipMany1</code> executes a parser one or more times, as long as it continues to succeed. When the parser fails, that does not mean that <code>skipMany1</code> fails (as long as the parser succeeded at least once); that signals that <code>skipMany1</code> is through executing.</p>
-<p>As long as <code>p</code> succeeds at least once, the only way <code>skipMany1</code> can fail is if <code>p</code> fails fatally.</p>
 <h4 id="parameters">Parameters</h4>
 <ul>
 <li><code>p</code> The parser to apply repeatedly until it fails.</li>

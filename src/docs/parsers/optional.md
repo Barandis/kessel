@@ -7,6 +7,14 @@
 
 > `optional(p)`
 
+Optionally matches a parser. If this parser succeeds, its result is returned. If it fails, `null` is returned.
+
+`optional` will only fail (fatally) if its parser fails fatally.
+
+A common use case is to skip some optional input; in this case, `optional` can be wrapped in [`skip`](skip.md), it can be placed in a position in another combinator where its output is ignored (such as [`left`](left.md)'s second parser.md), or its output can simply not be used.
+
+#### Example
+
 ```javascript
 const parser = optional(sequence(letter, digit))
 
@@ -26,12 +34,6 @@ console.log(failure(t)) // Parse error at (line 1, column 2):
                         //  ^
                         // Expected a digit
 ```
-
-Optionally matches a parser. If this parser succeeds, its result is returned. If it fails, `null` is returned.
-
-`optional` will only fail (fatally) if its parser fails fatally.
-
-A common use case is to skip some optional input; in this case, `optional` can be wrapped in [`skip`](skip.md), it can be placed in a position in another combinator where its output is ignored (such as [`left`](left.md)'s second parser.md), or its output can simply not be used.
 
 #### Parameters
 

@@ -7,6 +7,10 @@
 
 > `satisfyM(fn, msg)`
 
+Parses a character for which predicate `fn` returns `true` when passed that character. If the parser fails, `msg` is used as the expected error message.
+
+#### Example
+
 ```javascript
 const parser = satisfyM(x => x === x.toUpperCase(), 'an uppercase letter')
 
@@ -23,8 +27,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Expected an uppercase letter
 
 ```
-
-Reads a single character, succeeding if predicate `fn` returns `true` when passed that character.
 
 #### Parameters
 

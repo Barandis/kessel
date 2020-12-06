@@ -7,6 +7,12 @@
 
 > `char(c)`
 
+Parses the character `c`.
+
+There is no character type in JavaScript, as a "character" is just a string with a length of 1. However, using `char` is a bit more efficient than using `string` and should be used as long as only one character is needed.
+
+#### Example
+
 ```javascript
 const parser = char('a')
 
@@ -22,10 +28,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Expected 'a'
 ```
-
-Reads a single character from input and succeeds if it is `c`.
-
-There is no character type in JavaScript, as a "character" is just a string with a length of 1. However, using `char` is a bit more efficient than using `string` and should be used as long as only one character is needed.
 
 #### Parameters
 

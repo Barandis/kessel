@@ -7,6 +7,14 @@
 
 > `many1(p)`
 
+Applies a parser as many times as possible until it fails, collecting the results into a resulting array.
+
+`many1` executes a parser one or more times, as long as it continues to succeed. The operation of the parser in EBNF is `p+`. When the parser fails, that does not mean that `many1` fails (as long as the parser succeeded at least once); that signals that `many1` is through executing and the successful results up to that point are returned.
+
+As long as `p` succeeds at least once, the only way `many1` can fail is if `p` fails fatally.
+
+#### Example
+
 ```javascript
 const parser = many1(right(digit, letter))
 
@@ -30,12 +38,6 @@ console.log(failure(t)) // Parse error at (line 1, column 2):
                         //  ^
                         // Expected a letter
 ```
-
-Applies a parser as many times as possible until it fails, collecting the results into a resulting array.
-
-`many1` executes a parser one or more times, as long as it continues to succeed. The operation of the parser in EBNF is `p+`. When the parser fails, that does not mean that `many1` fails (as long as the parser succeeded at least once); that signals that `many1` is through executing and the successful results up to that point are returned.
-
-As long as `p` succeeds at least once, the only way `many1` can fail is if `p` fails fatally.
 
 #### Parameters
 

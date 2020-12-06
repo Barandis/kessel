@@ -61,7 +61,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#parameters" class="md-skip">
+        <a href="#example" class="md-skip">
           Skip to content
         </a>
       
@@ -372,6 +372,30 @@
 
 
   <li class="md-nav__item">
+    <a href="../andthen/" class="md-nav__link">
+      andThen
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../andthenb/" class="md-nav__link">
+      andThenB
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
     <a href="../any/" class="md-nav__link">
       any
     </a>
@@ -468,8 +492,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../backlabel/" class="md-nav__link">
-      backLabel
+    <a href="../attemptm/" class="md-nav__link">
+      attemptM
     </a>
   </li>
 
@@ -518,30 +542,6 @@
   <li class="md-nav__item">
     <a href="../blockb/" class="md-nav__link">
       blockB
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../both/" class="md-nav__link">
-      both
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../bothb/" class="md-nav__link">
-      bothB
     </a>
   </li>
 
@@ -1030,6 +1030,18 @@
           
           
 
+
+  <li class="md-nav__item">
+    <a href="../orelse/" class="md-nav__link">
+      orElse
+    </a>
+  </li>
+
+        
+          
+          
+          
+
   
 
 
@@ -1057,6 +1069,13 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#parameters" class="md-nav__link">
@@ -1516,6 +1535,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#parameters" class="md-nav__link">
     Parameters
   </a>
@@ -1575,6 +1601,10 @@
 <blockquote>
 <p><code>orValue(p, x)</code></p>
 </blockquote>
+<p>Applies a parser and returns its result on success or an arbitrary value on failure.</p>
+<p>The only way <code>orValue</code> can fail is if its parser fails fatally. For this reason, a common use case is to wrap the parser in <a href="../attempt/"><code>attempt</code></a> to ensure that the default value is always returned on any kind of failure. Take care when doing this, as backtracking can erase important error information.</p>
+<p><code>x</code> can be a value of any type, so this becomes one of the small number of combinators that can return results that are not strings or arrays of strings.</p>
+<h4 id="example">Example</h4>
 <div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">orValue</span><span class="p">(</span><span class="nx">join</span><span class="p">(</span><span class="nx">sequence</span><span class="p">(</span><span class="nx">letter</span><span class="p">,</span> <span class="nx">digit</span><span class="p">)),</span> <span class="s1">&#39;Z0&#39;</span><span class="p">)</span>
 
 <span class="kr">const</span> <span class="nx">s</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;a1&#39;</span><span class="p">)</span>
@@ -1593,9 +1623,6 @@
                         <span class="c1">//  ^</span>
                         <span class="c1">// Expected a digit</span>
 </code></pre></div>
-<p>Applies a parser and returns its result on success or an arbitrary value on failure.</p>
-<p>The only way <code>orValue</code> can fail is if its parser fails fatally. For this reason, a common use case is to wrap the parser in <a href="../attempt/"><code>attempt</code></a> to ensure that the default value is always returned on any kind of failure. Take care when doing this, as backtracking can erase important error information.</p>
-<p><code>x</code> can be a value of any type, so this becomes one of the small number of combinators that can return results that are not strings or arrays of strings.</p>
 <h4 id="parameters">Parameters</h4>
 <ul>
 <li><code>p</code> The parser that gets applied. If it succeeds, its result is returned.</li>
@@ -1636,7 +1663,7 @@
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
         
-          <a href="../optional/" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../orelse/" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-footer-nav__button md-icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
             </div>
@@ -1645,7 +1672,7 @@
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                optional
+                orElse
               </div>
             </div>
           </a>

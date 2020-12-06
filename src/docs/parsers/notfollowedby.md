@@ -7,6 +7,12 @@
 
 > `notFollowedBy(p)`
 
+Applies a parser and succeeds without consuming input if that parser fails.
+
+`notFollowedBy` cannot feasibly produce an error message on failure. To add an error message, either wrap this parser in [`label`](label.md) or use [`notFollowedByM`](notfollowedbym.md) instead.
+
+#### Example
+
 ```javascript
 const parser = notFollowedBy(digit)
 
@@ -22,10 +28,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Unknown message(s)
 ```
-
-Applies a parser and succeeds without consuming input if that parser fails.
-
-`notFollowedBy` cannot feasibly produce an error message on failure. To add an error message, either wrap this parser in [`label`](label.md) or use [`notFollowedByM`](notfollowedbym.md) instead.
 
 #### Parameters
 

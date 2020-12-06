@@ -7,6 +7,16 @@
 
 > `sequenceB(...ps)`
 
+Applies a series of parsers in order, returning an array that contains each parser's result.
+
+`sequenceB` will only succeed if *all* of its parsers succeed. If one of them fails, `sequenceB` will also fail. If input was consumed before the failure occurred, `sequenceB` will backtrack to the location where its first parser was applied.
+
+All of the results are gathered into an array, but `null` results are skipped.
+
+A two-parser `sequenceB` is the same as [`andThenB`](andthenb.md).
+
+#### Example
+
 ```javascript
 const parser = sequenceB(letter, digit, letter)
 
@@ -36,12 +46,6 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
                         //     ^
                         //   Expected a letter
 ```
-
-Applies a series of parsers in order, returning an array that contains each parser's result.
-
-`sequenceB` will only succeed if *all* of its parsers succeed. If one of them fails, `sequenceB` will also fail. If input was consumed before the failure occurred, `sequenceB` will backtrack to the location where its first parser was applied.
-
-All of the results are gathered into an array, but `null` results are skipped.
 
 #### Parameters
 

@@ -7,6 +7,10 @@
 
 > `charI(c)`
 
+Parses the character `c` or its opposite case equivalent. In other words, this is a case-insensitive version of [`char`](#char).
+
+#### Example
+
 ```javascript
 const parser = charI('a')
 
@@ -22,8 +26,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Expected 'a'
 ```
-
-Reads a single character, succeeding if that character is either `c` or its opposite case counterpart.
 
 #### Parameters
 

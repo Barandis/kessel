@@ -7,6 +7,14 @@
 
 > `map(p, fn)`
 
+Applies a parser and returns the value that a function returns when passed the parser's result.
+
+`fn` can return anything, so `map` is one of the few combinators that can return something other than a string.
+
+`map(p, fn)` is an optimized implementation of `chain(p, x => always(fn(x)))`.
+
+#### Example
+
 ```javascript
 const parser = map(lower, c => c.toUpperCase())
 
@@ -23,13 +31,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Expected a lowercase letter
 ```
 
-Applies a parser and returns the value that a function returns when passed the parser's result.
-
-In the example, a `lower` parser is used to read a lowercase letter. That character is passed into a function that uppercases it, then that uppercase letter is returned.
-
-`fn` can return anything, so `map` is one of the few combinators that can return something other than a string.
-
-`map(p, fn)` is an optimized implementation of `chain(p, x => always(fn(x)))`.
+In this example, a `lower` parser is used to read a lowercase letter. That character is passed into a function that uppercases it, then that uppercase letter is returned.
 
 #### Parameters
 

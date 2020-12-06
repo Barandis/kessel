@@ -7,6 +7,12 @@
 
 > `satisfy(fn)`
 
+Parses a character for which the predicate `fn` returns `true` when passed that character.
+
+Since the parser cannot reasonably figure out what conditions cause `fn` to pass, it does not generate an error message on failure.  To provide an error message, either wrap the parser with [`label`](label.md) or use [`satisfyM`](satisfym.md).
+
+#### Example
+
 ```javascript
 const parser = satisfy(x => x === x.toUpperCase())
 
@@ -24,8 +30,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 ```
 
-Reads a single character, succeeding if predicate `fn` returns `true` when passed that character.
-
 #### Parameters
 
 * `fn` The predicate function that the next character must pass in order for the parser to succeed.
@@ -36,7 +40,7 @@ Reads a single character, succeeding if predicate `fn` returns `true` when passe
 
 #### Failure
 
-* Fails if `fn` returns `false` when the next character is passed into it. If this happens, the parser does not generate an error message because it cannot have enough information to know what `fn` was going to pass. To provide an error message, either wrap the parser with [`label`](label.md) or use [`satisfyL`](satisfym.md).
+* Fails if `fn` returns `false` when the next character is passed into it. 
 
 #### Throws
 

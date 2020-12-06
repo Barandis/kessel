@@ -7,6 +7,14 @@
 
 > `followedByM(p, msg)`
 
+Applies a parser and succeeds without consuming input if that parser succeeds.
+
+This parser is similar to [`lookAhead`](lookahead.md) except that it does not produce a result.
+
+If `followedByM` fails, it will add a [`expected(msg)`](../tools/expected.md) as an error message.
+
+#### Example
+
 ```javascript
 const parser = followedByM(digit, 'a digit')
 
@@ -22,12 +30,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Expected a digit
 ```
-
-Applies a parser and succeeds without consuming input if that parser succeeds.
-
-This parser is similar to [`lookAhead`](lookahead.md) except that it does not produce a result.
-
-If `followedByM` fails, it will add a [`expected(msg)`](../tools/expected.md) as an error message.
 
 #### Parameters
 

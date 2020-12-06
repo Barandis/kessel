@@ -7,6 +7,14 @@
 
 > `skipMany1(p)`
 
+Applies a parser as many times as possible until it fails, discarding the parser's results.
+
+`skipMany1` executes a parser one or more times, as long as it continues to succeed. When the parser fails, that does not mean that `skipMany1` fails (as long as the parser succeeded at least once); that signals that `skipMany1` is through executing.
+
+As long as `p` succeeds at least once, the only way `skipMany1` can fail is if `p` fails fatally.
+
+#### Example
+
 ```javascript
 const parser = skipMany1(right(digit, letter))
 
@@ -30,12 +38,6 @@ console.log(failure(t)) // Parse error at (line 1, column 2):
                         //  ^
                         // Expected a letter
 ```
-
-Applies a parser as many times as possible until it fails, discarding the parser's results.
-
-`skipMany1` executes a parser one or more times, as long as it continues to succeed. When the parser fails, that does not mean that `skipMany1` fails (as long as the parser succeeded at least once); that signals that `skipMany1` is through executing.
-
-As long as `p` succeeds at least once, the only way `skipMany1` can fail is if `p` fails fatally.
 
 #### Parameters
 

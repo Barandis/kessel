@@ -7,6 +7,12 @@
 
 > `failFatally(msg)`
 
+Fails fatally automatically with a custom expected error message.
+
+Note that this explicit failure parser is the only way to fail fatally without consuming input. Every other case of fatal failure in Kessel is associated with failure after consuming input.
+
+#### Example
+
 ```javascript
 const parser = failFatally('a letter')
 
@@ -18,8 +24,6 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
                         // ^
                         // Expected a letter
 ```
-
-Fails automatically, applying a custom expected error message.
 
 #### Parameters
 

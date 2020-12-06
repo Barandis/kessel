@@ -7,6 +7,20 @@
 
 > `choice(...ps)`
 
+Applies each of its parsers, one at a time, until the first one succeeds, the first one fails fatally, or they all fail.
+
+If a parser in `ps` succeeds, no further parsers will be applied and the result of the successful parser will be returned.
+
+If a parser in `ps` fails fatally, no further parsers will be applied and `choice` will fail fatally. This rule is necessary to ensure that each branch of the `choice` is starting from the same state (a fatal failure generally means input is consumed and the state has therefore changed).
+
+If all parsers in `ps` fail, then `choice` fails as well.
+
+`choice(p, q)` is the same as `orElse(p, q)`, while `choice(p, q, r)` is the same as `orElse(orElse(p, q), r)`, etc. Because of JavaScript's lack of custom operators, `choice` becomes much more commonly used. In languages with custom operators, that `orElse(orElse(p, q), r)` would become a much more manageable `p <|> q <|> r` (if `orElse` was implemented as `<|>`, as it is in Parsec and FParsec), and `choice` itself would be less necessary.
+
+`orElse(p, q)` is more efficient than `choice(p, q)`, though once a third parser is added `choice` becomes more efficient. The differences should not be enough to be of concern.
+
+#### Example
+
 ```javascript
 const parser = choice(left(letter, digit), right(digit, letter), space)
 
@@ -38,16 +52,6 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
                         //  ^
                         // Expected a digit or a letter
 ```
-
-Applies each of its parsers, one at a time, until the first one succeeds, the first one fails fatally, or they all fail.
-
-If a parser in `ps` succeeds, no further parsers will be applied and the result of the successful parser will be returned.
-
-If a parser in `ps` fails fatally, no further parsers will be applied and `choice` will fail fatally. This rule is necessary to ensure that each branch of the `choice` is starting from the same state (a fatal failure generally means input is consumed and the state has therefore changed).
-
-If all parsers in `ps` fail, then `choice` fails as well.
-
-`choice(p, q)` is the same as `orElse(p, q)`, while `choice(p, q, r)` is the same as `orElse(orElse(p, q), r)`, etc. Because of JavaScript's lack of custom operators, `choice` becomes much more popular. In languages with custom operators, that `orElse(orElse(p, q), r)` would become a much more manageable `p <|> q <|> r` (if `orElse` was implemented as `<|>`, as it is in Parsec and FParsec), and `choice` itself would be less necessary.
 
 The example shows *three* success cases, `s`, `r`, and `p`, one for each parser passed to `choice`. If all of these fail, as in the first failure case (`f`), then failure is the result. In the second failure case (`t`), the first parser fails but consumes input as it does so, so `choice` is halted at that point without applying its second or third parsers. Fatal failure is the result.
 

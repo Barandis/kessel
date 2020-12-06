@@ -7,6 +7,14 @@
 
 > `join(p)`
 
+Applies a parser and returns the elements of the resulting array into a string.
+
+This combinator solves the problem in JavaScript that there is no separate character type, and therefore a string is not just a list/array of characters. (Parsec parsers, for example, can return arrays of characters which Haskell regards also as strings in their own right.) Parsers like [`sequence`](sequence.md) and [`many`](many.md) return arrays, and often they are arrays of single-character strings. `join` will turn these results into simple strings.
+
+`join(p)` is an optimized implementation of `chain(p, x => x.join(''))`.
+
+#### Example
+
 ```javascript
 const parser = join(many1(any))
 
@@ -22,12 +30,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Expected any character
 ```
-
-Applies a parser and returns the elements of the resulting array into a string.
-
-This combinator solves the problem in JavaScript that there is no separate character type, and therefore a string is not just a list/array of characters. (parsers/Parsec parsers, for example, can return arrays of characters which Haskell regards also as strings in their own right.) Parsers like [`sequence`](sequence.md) and [`many`](many.md) return arrays, and often they are arrays of single-character strings. `join` will turn these results into simple strings.
-
-`join(p)` is an optimized implementation of `chain(p, x => x.join(''))`.
 
 #### Parameters
 

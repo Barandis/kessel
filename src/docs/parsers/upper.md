@@ -7,6 +7,12 @@
 
 > `upper`
 
+Parses an ASCII uppercase letter (`A-Z`).
+
+This does not parse UTF-8 uppercase letters in general. Use [`upperU`](upperu.md) for that.
+
+#### Example
+
 ```javascript
 const parser = upper
 
@@ -22,10 +28,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Expected an uppercase letter
 ```
-
-Reads the next character and succeeds if that character is an ASCII uppercase letter (`A-Z`).
-
-This does not parse UTF-8 uppercase letters in general. Use [`upperU`](upperu.md) for that.
 
 #### Success
 

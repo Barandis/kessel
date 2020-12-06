@@ -7,6 +7,10 @@
 
 > `hex`
 
+Parses a hexadecimal digit (`0-9`, `a-f`, or `A-F`).
+
+#### Example
+
 ```javascript
 const parser = hex
 
@@ -22,8 +26,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Expected a hexadecimal digit
 ```
-
-Reads a character and succeeds if that character is a hexadecimal digit (`0-9`, `a-f`, or `A-F`).
 
 #### Success
 

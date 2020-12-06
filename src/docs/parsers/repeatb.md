@@ -7,6 +7,12 @@
 
 > `repeatB(p, n)`
 
+Applies a parser a certain number of times, collecting the results into an array to return.
+
+The parser `p` must succeed the full `n` times for `repeatB` to succeed. Any fewer successes results in failure. Any input that is consumed in the process will be backtracked.
+
+#### Example
+
 ```javascript
 const parser = repeatB(letter, 3)
 
@@ -36,10 +42,6 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
                         //     ^
                         //   Expected a letter
 ```
-
-Applies a parser a certain number of times, collecting the results into an array to return.
-
-The parser `p` must succeed the full `n` times for `repeatB` to succeed. Any fewer successes results in failure. Any input that is consumed in the process will be backtracked.
 
 #### Parameters
 

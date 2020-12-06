@@ -7,6 +7,12 @@
 
 > `newlineU`
 
+Parses a Unicode newline.
+
+Unicode newlines include the ASCII newlines `\r`, `\n`, and `\r\n`, as well as the characters "next line" (`\u0085`), "line separator" (`\u2028`), and "paragraph separator" (`\u2029`).
+
+#### Example
+
 ```javascript
 const parser = newlineU
 
@@ -22,10 +28,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Expected a Unicode newline
 ```
-
-Reads a character (or two, if the first character is `\r`) and succeeds if it is a Unicode newline.
-
-Unicode newlines include the ASCII newlines `\r`, `\n`, and `\r\n`, as well as the characters "next line" (`\u0085`), "line separator" (`\u2028`), and "paragraph separator" (`\u2029`).
 
 #### Success
 

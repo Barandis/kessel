@@ -7,6 +7,12 @@
 
 > `range(s, e)`
 
+Parses a character between `s` and `e` (inclusive).
+
+"Between" is defined according to code points. This is fine in most cases, but it can get weird with higher code points. For example, there is no "h" in the set of mathematical lowercase italic symbols. The "h" that would be used in that set of symbols would instead be the Planck's Constant character, which is in a completely different part of the UTF-8 spectrum and therefore is not "between" mathematical lowercase italic symbols `a` and `z`. Take care with non-ASCII characters.
+
+#### Example
+
 ```javascript
 const parser = range('0', '3')
 
@@ -22,10 +28,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Expected a character between '0' and '3'
 ```
-
-Reads a single character, succeeding if that character is between `s` and `e` inclusive.
-
-"Between" is defined according to code points. This is fine in most cases, but it can get weird with higher code points. For example, there is no "h" in the set of mathematical lowercase italic symbols. The "h" that would be used in that set of symbols would instead be the Planck's Constant character, which is in a completely different part of the UTF-8 spectrum and therefore is not "between" mathematical lowercase italic symbols `a` and `z`. Take care with non-ASCII characters.
 
 #### Parameters
 

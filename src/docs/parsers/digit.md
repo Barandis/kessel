@@ -7,6 +7,12 @@
 
 > `digit`
 
+Parses a decimal digit (`0-9`).
+
+Note that this parses ASCII digits, not UTF-8 digits in general. For that, use [`regex(/^\p{Nd}/u)`](regex.md).
+
+#### Example
+
 ```javascript
 const parser = digit
 
@@ -22,10 +28,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Expected a digit
 ```
-
-Reads a character and succeeds if it is a decimal digit (`0-9`).
-
-Note that this parses ASCII digits, not UTF-8 digits in general. For that, use [`regex(/^\p{Nd}/u)`](regex.md).
 
 #### Success
 

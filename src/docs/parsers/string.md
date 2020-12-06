@@ -7,6 +7,14 @@
 
 > `string(str)`
 
+Parses the string `str`.
+
+The number of characters read equals the number of characters in `str`. If there are not that many characters remaining in the input, the parser will automatically fail.
+
+If `str` is the empty string, the parser will automatically succeed and consume no input.
+
+#### Example
+
 ```javascript
 const parser = string('Test')
 
@@ -22,12 +30,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Expected 'Test'
 ```
-
-Reads a number of characters and succeeds if those characters equal `str`.
-
-The number of characters read equals the number of characters in `str`. If there are not that many characters remaining in the input, the parser will automatically fail.
-
-If `str` is the empty string, the parser will automatically succeed and consume no input.
 
 #### Parameters
 

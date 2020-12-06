@@ -7,6 +7,12 @@
 
 > `notFollowedByM(p, msg)`
 
+Applies a parser and succeeds without consuming input if that parser fails.
+
+If this parser fails, it will add [`expected(msg)`](../tools/expected.md) as an error message.
+
+#### Example
+
 ```javascript
 const parser = notFollowedByM(digit, 'something other than a digit')
 
@@ -22,10 +28,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Expected something other than a digit
 ```
-
-Applies a parser and succeeds without consuming input if that parser fails.
-
-If this parser fails, it will add [`expected(msg)`](../tools/expected.md) as an error message.
 
 #### Parameters
 

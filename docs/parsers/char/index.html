@@ -61,7 +61,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#parameters" class="md-skip">
+        <a href="#example" class="md-skip">
           Skip to content
         </a>
       
@@ -372,6 +372,30 @@
 
 
   <li class="md-nav__item">
+    <a href="../andthen/" class="md-nav__link">
+      andThen
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../andthenb/" class="md-nav__link">
+      andThenB
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
     <a href="../any/" class="md-nav__link">
       any
     </a>
@@ -468,8 +492,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../backlabel/" class="md-nav__link">
-      backLabel
+    <a href="../attemptm/" class="md-nav__link">
+      attemptM
     </a>
   </li>
 
@@ -518,30 +542,6 @@
   <li class="md-nav__item">
     <a href="../blockb/" class="md-nav__link">
       blockB
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../both/" class="md-nav__link">
-      both
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../bothb/" class="md-nav__link">
-      bothB
     </a>
   </li>
 
@@ -601,6 +601,13 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#parameters" class="md-nav__link">
@@ -1094,6 +1101,18 @@
 
 
   <li class="md-nav__item">
+    <a href="../orelse/" class="md-nav__link">
+      orElse
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
     <a href="../orvalue/" class="md-nav__link">
       orValue
     </a>
@@ -1516,6 +1535,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#parameters" class="md-nav__link">
     Parameters
   </a>
@@ -1575,6 +1601,9 @@
 <blockquote>
 <p><code>char(c)</code></p>
 </blockquote>
+<p>Parses the character <code>c</code>.</p>
+<p>There is no character type in JavaScript, as a "character" is just a string with a length of 1. However, using <code>char</code> is a bit more efficient than using <code>string</code> and should be used as long as only one character is needed.</p>
+<h4 id="example">Example</h4>
 <div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="kr">char</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)</span>
 
 <span class="kr">const</span> <span class="nx">s</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;abc&#39;</span><span class="p">)</span>
@@ -1589,8 +1618,6 @@
                         <span class="c1">// ^</span>
                         <span class="c1">// Expected &#39;a&#39;</span>
 </code></pre></div>
-<p>Reads a single character from input and succeeds if it is <code>c</code>.</p>
-<p>There is no character type in JavaScript, as a "character" is just a string with a length of 1. However, using <code>char</code> is a bit more efficient than using <code>string</code> and should be used as long as only one character is needed.</p>
 <h4 id="parameters">Parameters</h4>
 <ul>
 <li><code>c</code> The character that the next input character must be in order to succeed.</li>

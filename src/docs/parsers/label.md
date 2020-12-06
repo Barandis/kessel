@@ -7,6 +7,14 @@
 
 > `label(p, msg)`
 
+Applies a parser and overwrites its error message on failure.
+
+`label` does nothing except pass the result along if its parser consumes any input (parsers/typically, but not always, if it succeeds or fails fatally). If it does *not* consume input, it replaces whatever error message was generated with [`expected(msg)`](../tools/expected.md).
+
+This is typically used to clarify error messages, especially in parsers like [`choice`](choice.md) that might have many branches with their own error messages. For instance, if `choice(upper, lower, digit.md)` in the example below was not wrapped with `label`, its expected error message would be `'Expected an uppercase letter, a lowercase letter, or a digit'`. `label` is used to consolidate that message into `'Expected an alphanumeric character'`.
+
+#### Example
+
 ```javascript
 const parser = label(choice(upper, lower, digit), 'an alphanumeric character')
 
@@ -22,12 +30,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Expected an alphanumeric character
 ```
-
-Applies a parser and overwrites its error message on failure.
-
-`label` does nothing except pass the result along if its parser consumes any input (parsers/typically, but not always, if it succeeds or fails fatally). If it does *not* consume input, it replaces whatever error message was generated with [`expected(msg)`](../tools/expected.md).
-
-This is typically used to clarify error messages, especially in parsers like [`choice`](choice.md) that might have many branches with their own error messages. For instance, if `choice(upper, lower, digit.md)` in the example was not wrapped with `label`, its expected error message would be `"Expected an uppercase letter, a lowercase letter, or a digit"`. `label` is used to consolidate that message into `"Expected an alphanumeric character"`.
 
 #### Parameters
 
@@ -53,7 +55,7 @@ This is typically used to clarify error messages, especially in parsers like [`c
 
 #### See Also
 
-* [`backLabel`](backlabel.md)
+* [`attemptM`](attemptm.md)
 * [`choice`](choice.md)
 * [`followedBy`](followedby.md)
 * [`notEmpty`](notempty.md)

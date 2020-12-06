@@ -7,6 +7,10 @@
 
 > `any`
 
+Parses any single character.
+
+#### Example
+
 ```javascript
 const parser = any
 
@@ -23,8 +27,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Expected any character
                         // Note: failure occurred at the end of input
 ```
-
-Reads any single character.
 
 #### Success
 

@@ -7,6 +7,12 @@
 
 > `spaces`
 
+Parses zero or more ASCII whitespace characters and discards them.
+
+ASCII whitespace characters include any ASCII newline (`\r`, `\n`, or `\r\n`) along with a space (` `) or a horizontal tab (`\t`).
+
+#### Example
+
 ```javascript
 const parser = spaces
 
@@ -14,10 +20,6 @@ const s = parse(parser, '   abc')
 console.log(status(s))  // Symbol(ok)
 console.log(success(s)) // null
 ```
-
-Reads zero or more ASCII whitespace characters and discards them.
-
-ASCII whitespace characters include any ASCII newline (`\r`, `\n`, or `\r\n`) along with a space (` `) or a horizontal tab (`\t`).
 
 #### Success
 

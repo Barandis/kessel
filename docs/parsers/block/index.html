@@ -61,7 +61,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#parameters" class="md-skip">
+        <a href="#example" class="md-skip">
           Skip to content
         </a>
       
@@ -372,6 +372,30 @@
 
 
   <li class="md-nav__item">
+    <a href="../andthen/" class="md-nav__link">
+      andThen
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../andthenb/" class="md-nav__link">
+      andThenB
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
     <a href="../any/" class="md-nav__link">
       any
     </a>
@@ -468,8 +492,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../backlabel/" class="md-nav__link">
-      backLabel
+    <a href="../attemptm/" class="md-nav__link">
+      attemptM
     </a>
   </li>
 
@@ -531,6 +555,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#parameters" class="md-nav__link">
     Parameters
   </a>
@@ -587,30 +618,6 @@
   <li class="md-nav__item">
     <a href="../blockb/" class="md-nav__link">
       blockB
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../both/" class="md-nav__link">
-      both
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../bothb/" class="md-nav__link">
-      bothB
     </a>
   </li>
 
@@ -1101,6 +1108,18 @@
 
 
   <li class="md-nav__item">
+    <a href="../orelse/" class="md-nav__link">
+      orElse
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
     <a href="../orvalue/" class="md-nav__link">
       orValue
     </a>
@@ -1523,6 +1542,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#parameters" class="md-nav__link">
     Parameters
   </a>
@@ -1589,9 +1615,16 @@
 <blockquote>
 <p><code>block(genFn)</code></p>
 </blockquote>
+<p>Executes a generator function that can yield to parsers in its body.</p>
+<p><code>block</code> is the most versatile parser in the entire library and provides a way to parse pretty much anything without having to write a custom parser. It corresponds to using do-notation blocks in Haskell (hence the name <code>block</code>).</p>
+<p>The generator function can do anything that any function could do. In addition, it can have <code>yield</code> expressions that yield any parser. That parser will be applied at that point, and if it's successful, its result will be fed back into the generator function, able to be used as needed (for example, in <code>const number = yield join(many1(digit))</code> in the example, the result of the <code>join</code> parser is assigned to the variable <code>number</code>). When the generator function returns, its return value becomes the value returned by the <code>block</code> parser.</p>
+<p>If any of the parsers fail when yielded, then <code>block</code> will fail. If any input was consumed before the failure, that failure will be fatal.</p>
+<p><code>block</code> can be used to implement pretty much any other combinator. It, in conjunction with <a href="#any"><code>any</code></a>, could be used to implement any other parser in this library. However, if there is a parser that already does what needs to be done, it's sure to be more efficient than just shoving everything into a <code>block</code>.</p>
+<p>This is most notable with sequences. A <code>block</code> parser that discards a number of parser results and keeps one, returning that result, can very often be implemented as a <a href="#parser"><code>sequence</code></a> wrapped in <a href="#nth"><code>nth</code></a>. This is a fairly common use case.</p>
+<h4 id="example">Example</h4>
 <div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">block</span><span class="p">(</span><span class="kd">function</span> <span class="o">*</span><span class="p">()</span> <span class="p">{</span>
   <span class="k">yield</span> <span class="nx">spaces</span>
-  <span class="kr">const</span> <span class="nx">sign</span> <span class="o">=</span> <span class="k">yield</span> <span class="nx">choice</span><span class="p">(</span><span class="kr">char</span><span class="p">(</span><span class="s1">&#39;+&#39;</span><span class="p">),</span> <span class="kr">char</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">))</span>
+  <span class="kr">const</span> <span class="nx">sign</span> <span class="o">=</span> <span class="k">yield</span> <span class="nx">optional</span><span class="p">(</span><span class="nx">orElse</span><span class="p">(</span><span class="kr">char</span><span class="p">(</span><span class="s1">&#39;+&#39;</span><span class="p">),</span> <span class="kr">char</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)))</span>
   <span class="kr">const</span> <span class="nx">number</span> <span class="o">=</span> <span class="k">yield</span> <span class="nx">join</span><span class="p">(</span><span class="nx">many1</span><span class="p">(</span><span class="nx">digit</span><span class="p">))</span>
   <span class="k">yield</span> <span class="nx">spaces</span>
 
@@ -1599,17 +1632,17 @@
   <span class="k">return</span> <span class="nx">result</span>
 <span class="p">})</span>
 
-<span class="kr">const</span> <span class="nx">s</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;   -1729   &#39;</span><span class="p">)</span>
+<span class="kr">const</span> <span class="nx">s</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;   1729   &#39;</span><span class="p">)</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">status</span><span class="p">(</span><span class="nx">s</span><span class="p">))</span>  <span class="c1">// Symbol(ok)</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">success</span><span class="p">(</span><span class="nx">s</span><span class="p">))</span> <span class="c1">// -1729</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">success</span><span class="p">(</span><span class="nx">s</span><span class="p">))</span> <span class="c1">// 1729</span>
 
-<span class="kr">const</span> <span class="nx">f</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;1729&#39;</span><span class="p">)</span>
+<span class="kr">const</span> <span class="nx">f</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;abcd&#39;</span><span class="p">)</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">status</span><span class="p">(</span><span class="nx">f</span><span class="p">))</span>  <span class="c1">// Symbol(error)</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">failure</span><span class="p">(</span><span class="nx">f</span><span class="p">))</span> <span class="c1">// Parse error at (line 1, column 1):</span>
                         <span class="c1">//</span>
-                        <span class="c1">// 1729</span>
+                        <span class="c1">// abcd</span>
                         <span class="c1">// ^</span>
-                        <span class="c1">// Expected &#39;+&#39; or &#39;-&#39;</span>
+                        <span class="c1">// Expected a digit</span>
 
 <span class="kr">const</span> <span class="nx">t</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;-abcd&#39;</span><span class="p">)</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">status</span><span class="p">(</span><span class="nx">t</span><span class="p">))</span>  <span class="c1">// Symbol(fatal)</span>
@@ -1619,14 +1652,14 @@
                         <span class="c1">//  ^</span>
                         <span class="c1">// Expected a digit</span>
 </code></pre></div>
-<p>Executes a generator function. The generator can <code>yield</code> parsers whose results are returned to the generator when it's restarted. Returns the return value of the generator.</p>
-<p><code>block</code> is the most flexible of all of the parsers in the library, able to do anything that can be coded into a function and able to return any value.</p>
-<p>In the example, a <code>spaces</code> parser is applied first, which skips any leading whitespace (<code>yield spaces</code> is not assigned to a variable, so the result of the <code>spaces</code> parser is discarded). Next is a <code>choice(char('+'), char('-'))</code> parser, which will match either <code>+</code> or <code>-</code> and assign that character to the variable <code>sign</code>. The third parser to run is <code>join(many1(digit))</code>, which reads one or more digits, joins them into a string, and assigns that string to the variable <code>number</code>. Finally, another <code>spaces</code> parser is applied and its result discarded.</p>
-<p>The result of the parser is then calculated by parsing the string <code>number</code> with parseInt to create an integer, which is then multiplied by -1 if the value of <code>sign</code> is <code>-</code>. This is then returned by the last line of the generator function.</p>
-<p>Note that in the success case, the value that's returned is the <em>number</em> <code>-1729</code>, not the <em>string</em> <code>'-1729'</code>. The <code>return</code> statement in the generator function returns a number, so that's what the result of the <code>block</code> parser will be. This illustrates that <code>block</code> can do anything that a function can do.</p>
-<p>If any of these parsers fail, the <code>block</code> parser itself also fails. As shown in the two failure cases, if no input has yet been consumed (as in the <code>f</code> case), the failure is non-fatal. In the second (<code>t</code>) failure case, the <code>-</code> is consumed before the <code>digit</code> parser fails to parse the character <code>a</code>, and since something has been consumed, that failure will be fatal.</p>
-<p>There is another version of this parser, <a href="../blockb/"><code>blockB</code></a>, which will fail non-fatally and backtrack if a yielded parser fails non-fatally.</p>
-<p>Simpler <code>block</code>s can often be rewritten into <a href="../sequence/"><code>sequence</code></a> parsers. The full power of <code>block</code> is most appropriate when a) calculations need to be done to the results of yielded parsers, b) a non-string result needs to be returned, or c.md) some of the parsers may be working asynchronously.</p>
+<p>The first yielded parser here is <code>spaces</code>. This skips zero or more whitespace characters. Its result is discarded as it is not assigned to anything (besides, <code>spaces</code> only returns <code>null</code> so its result isn't useful).</p>
+<p>The second yielded parser is <code>optional(orElse(char('+'), char('-')))</code>. This will match either a <code>'+'</code> or <code>'-'</code> if it's there, or return <code>null</code> if the next character is neither of those (without <code>optional</code> it would fail, and we don't want that because it's okay for a number to have no sign). This value (either <code>'+'</code>, <code>'-'</code>, or <code>null</code>) is assigned to the variable <code>sign</code>.</p>
+<p>The third yielded parser is <code>join(many1(digit))</code>. This simply matches a series of one or more digit characters (<code>0-9</code>), returning them as a single string instead of an array of characters (because of <code>join</code>). This parses a natural number, assigning the result to <code>number</code>. (When combined with <code>sign</code>, this could be a negative number as well, so the two together parse an integer.)</p>
+<p>The fourth yielded parser skips whitespace at the end, similar to the first parser.</p>
+<p>After the parsing is done, <code>sign</code> and <code>number</code> are used in a calculation that turns them into an integer of the JavaScript <code>number</code> type. This number is returned at the end, so the <code>block</code> parser in total results in this number. Note that it isn't a string, like most parsers return; <code>block</code> can return anything that its function can return.</p>
+<p>The first case (<code>s</code>) shows success. Whitespace was skipped before and after the number, an optional sign was parsed (which was not present), and then the string <code>'1729'</code> was parsed. The calculation turned this into the number <code>1729</code>, which was returned.</p>
+<p>The second case (<code>f</code>) fails because the first character is not a digit. It does not have to be whitespace (<code>spaces</code> can match zero spaces) and it does not have to be a sign (that parser is optional), but the <code>digit</code> part of the third parser has to be matched. No input was consumed before this failure, so it is not a fatal failure.</p>
+<p>The third case (<code>t</code>) fails because, while the whitespace was ignored and the optional sign was parsed, the third parser fails against the non-digit <code>'a'</code>. Since input <em>was</em> consumed (the negative sign) before this failure, it is fatal.</p>
 <h4 id="parameters">Parameters</h4>
 <ul>
 <li><code>genFn</code> A generator function that provides the body of the <code>block</code> parser. This generator function can <code>yield</code> parsers, which will have those parsers' results fed back into the function when it's restarted (so that they can be assigned to variables, used in calculations, etc.). The return value of this generator function becomes the result of the <code>block</code> parser.</li>

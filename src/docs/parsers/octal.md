@@ -7,6 +7,10 @@
 
 > `octal`
 
+Parses an octal digit (`0-7`).
+
+#### Example
+
 ```javascript
 const parser = octal
 
@@ -22,8 +26,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Expected an octal digit
 ```
-
-Reads the next character and succeeds if that character is an octal digit (`0-7`).
 
 #### Success
 

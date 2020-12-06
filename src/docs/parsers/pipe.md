@@ -7,6 +7,20 @@
 
 > `pipe(...ps, fn)`
 
+Applies some parsers in order, then returns the result of a function to which all of the parser results have been passed.
+
+`fn` will be passed one argument for every member of `ps`. JavaScript does not enforce that there has to be a parameter for each passed argument, but likely you will want to provide an `fn` that has an arity equal to the number of parsers in `ps`.
+
+Unlike [`sequence`](sequence.md), `null` parser results are *not* discarded. This ensures that the same number of arguments will be passed to `fn` no matter the results of the parsers.
+
+There is another version of this parser ([`pipeB`](pipeb.md)) that fails non-fatally and backtracks if the parser that fails does so non-fatally.
+
+`fn` can return anything, so this is one of the few combinators that can return something other than a string.
+
+`pipe(p1, p2, fn)` is an optimized implementation of `chain(p1, a => chain(p2, b => always(fn(a, b))))`, `pipe(p1, p2, p3, fn)` is an optimized implementation of `chain(p1, a => chain(p2, b => chain(p3, c => always(fn(a, b, c)))))`, and so on.
+
+#### Example
+
 ```javascript
 const parser = pipe(upper, lower, (a, b) => a.toLowerCase() + b.toUpperCase())
 
@@ -31,19 +45,7 @@ console.log(failure(t)) // Parse error at (line 1, column 2):
                         // Expected a lowercase letter
 ```
 
-Applies some parsers in order, then returns the result of a function to which all of the parser results have been passed.
-
-`fn` will be passed one argument for every member of `ps`. JavaScript does not enforce that there has to be a parameter for each passed argument, but likely you will want to provide an `fn` that has an arity equal to the number of parsers in `ps`.
-
-In the example, the `upper` and `lower` parsers are applied, and the results of each are passed to an arity-2 function which lowercases the first argument and uppercases the second. The first failure example (`f`) shows non-fatal failure caused by the first parser failing non-fatally, but the second (`t`) shows a fatal failure caused by a parser (`upper` in this case) consuming a character before a later parser fails.
-
-Unlike [`sequence`](sequence.md), `null` parser results are *not* discarded. This ensures that the same number of arguments will be passed to `fn` no matter the results of the parsers.
-
-There is another version of this parser ([`pipeB`](pipeb.md)) that fails non-fatally and backtracks if the parser that fails does so non-fatally.
-
-`fn` can return anything, so this is one of the few combinators that can return something other than a string.
-
-`pipe(p1, p2, fn)` is an optimized implementation of `chain(p1, a => chain(p2, b => always(fn(a, b))))`, `pipe(p1, p2, p3, fn)` is an optimized implementation of `chain(p1, a => chain(p2, b => chain(p3, c => always(fn(a, b, c)))))`, and so on.
+In this example, the `upper` and `lower` parsers are applied, and the results of each are passed to an arity-2 function which lowercases the first argument and uppercases the second. The first failure example (`f`) shows non-fatal failure caused by the first parser failing non-fatally, but the second (`t`) shows a fatal failure caused by a parser (`upper` in this case) consuming a character before a later parser fails.
 
 #### Parameters
 

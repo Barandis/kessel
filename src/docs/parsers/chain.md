@@ -7,6 +7,14 @@
 
 > `chain(p, fn)`
 
+Applies a parser to the input, passes its result to a function, and then applies the parser that function returns to the input.
+
+`chain` is not used that often itself, but it is a primitive combinator that provides the basis for numerous other parsers (including all of those in the "Chaining combinators" section of the [API summary](../api.md#table-5-chaining-combinators)).
+
+ There is another version of this parser ([`chainB`](chainb.md)) that will backtrack and fail non-fatally if the parser returned by `fn` fails non-fatally.
+
+#### Example
+
 ```javascript
 const parser = chain(any, c => char(c))
 
@@ -32,13 +40,9 @@ console.log(failure(t)) // Parse error at (line 1, column 2):
                         // Expected 'a'
 ```
 
-Applies a parser to the input, passes its result to a function, and then applies the parser that function returns to the input.
+In this example, `chain` first applies `any`, which returns the next character of the input. `fn` then returns `char(c)`, where `c` is the result of the `any` application, and this parser is applied. The upshot is that this example of `chain` succeeds if the next two characters are the same.
 
-In the example, `chain` first applies `any`, which returns the next character of the input. `fn` then returns `char(c)`, where `c` is the result of the `any` application, and this parser is applied. The upshot is that this example of `chain` succeeds if the next two characters are the same.
-
-In the case of `f`, `chain` fails fatally. This is because a character was consumed in `p`'s success, and if a character is consumed before failure, fatal failure is the result. There is another version of this parser ([`chainB`](chainb.md)) that will backtrack and fail non-fatally if the parser returned by `fn` fails non-fatally.
-
-`chain` is not used that often itself, but it provides the basis for numerous other parsers (parsers/including all of those in the "Chaining combinators" section of the [API summary](../api.md#table-5-chaining-combinators)).
+In the case of `f`, `chain` fails fatally. This is because a character was consumed in `p`'s success, and if a character is consumed before failure, fatal failure is the result.
 
 #### Parameters
 
@@ -52,7 +56,7 @@ In the case of `f`, `chain` fails fatally. This is because a character was consu
 #### Failure
 
 * Fails if `p` fails.
-* Fsils if the parser returned by `fn` fails after `p` succeeds but consumes no input.
+* Fails if the parser returned by `fn` fails after `p` succeeds but consumes no input.
 
 #### Fatal Failure
 

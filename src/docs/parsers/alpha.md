@@ -7,6 +7,12 @@
 
 > `alpha`
 
+Parses an ASCII alphanumeric character (`0-9`, `a-z`, or `A-Z`).
+
+This does not parse UTF-8 alphanumeric characters in general. Use [`alphaU`](#alphaU) for that.
+
+#### Example
+
 ```javascript
 const parser = alpha
 
@@ -22,10 +28,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Expected an alphanumeric character
 ```
-
-Reads the next character and succeeds if that character is an ASCII alphanumeric character (`0-9`, `a-z`, or `A-Z`).
-
-This does not parse UTF-8 alphanumeric characters in general. Use [`alphaU`](#alphaU) for that.
 
 #### Success
 

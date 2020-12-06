@@ -61,7 +61,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#parameters" class="md-skip">
+        <a href="#example" class="md-skip">
           Skip to content
         </a>
       
@@ -372,6 +372,30 @@
 
 
   <li class="md-nav__item">
+    <a href="../andthen/" class="md-nav__link">
+      andThen
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../andthenb/" class="md-nav__link">
+      andThenB
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
     <a href="../any/" class="md-nav__link">
       any
     </a>
@@ -468,8 +492,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../backlabel/" class="md-nav__link">
-      backLabel
+    <a href="../attemptm/" class="md-nav__link">
+      attemptM
     </a>
   </li>
 
@@ -518,30 +542,6 @@
   <li class="md-nav__item">
     <a href="../blockb/" class="md-nav__link">
       blockB
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../both/" class="md-nav__link">
-      both
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../bothb/" class="md-nav__link">
-      bothB
     </a>
   </li>
 
@@ -903,6 +903,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#parameters" class="md-nav__link">
     Parameters
   </a>
@@ -1091,6 +1098,18 @@
   <li class="md-nav__item">
     <a href="../optional/" class="md-nav__link">
       optional
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../orelse/" class="md-nav__link">
+      orElse
     </a>
   </li>
 
@@ -1523,6 +1542,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#parameters" class="md-nav__link">
     Parameters
   </a>
@@ -1587,8 +1613,12 @@
 -->
 
 <blockquote>
-<p><code>manyTill(p, pend)</code></p>
+<p><code>manyTill(p, end)</code></p>
 </blockquote>
+<p>Applies a content parser zero or more times as long as an end parser continues to fail. Once the end parser succeeds, the content parser's successes are collected into an array and returned.</p>
+<p>This parser differs from <a href="../between/"><code>between</code></a> in that the <code>end</code> parser is applied <em>first</em>; because of this, there is no possibility of content parser <code>p</code> consuming whatever <code>end</code> is supposed to match and thereby causing the combinator to fail.</p>
+<p>The operation of this parser in EBNF is <code>(!end p)* end</code>.</p>
+<h4 id="example">Example</h4>
 <div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">manyTill</span><span class="p">(</span><span class="nx">letter</span><span class="p">,</span> <span class="kr">char</span><span class="p">(</span><span class="s1">&#39;&gt;&#39;</span><span class="p">))</span>
 
 <span class="kr">const</span> <span class="nx">s</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;abcd&gt;&#39;</span><span class="p">)</span>
@@ -1611,31 +1641,28 @@
                         <span class="c1">//   ^</span>
                         <span class="c1">// Expected a letter</span>
 </code></pre></div>
-<p>Applies a content parser zero or more times as long as an end parser continues to fail. Once the end parser succeeds, the content parser's successes are collected into an array and returned.</p>
-<p>This parser differs from <a href="../between/"><code>between</code></a> in that the <code>pend</code> parser is applied <em>first</em>; because of this, there is no possibility of content parser <code>p</code> consuming whatever <code>pend</code> is supposed to match and thereby causing the combinator to fail.</p>
-<p>The operation of this parser in EBNF is <code>(!pend p)* pend</code>.</p>
 <h4 id="parameters">Parameters</h4>
 <ul>
-<li><code>p</code> The content parser. After <code>pend</code> succeeds, the prior results of this parser are returned as an array.</li>
-<li><code>pend</code> The end parser. <code>p</code> will continue to be applied until <code>pend</code> succeeds. Its result is discarded.</li>
+<li><code>p</code> The content parser. After <code>end</code> succeeds, the prior results of this parser are returned as an array.</li>
+<li><code>end</code> The end parser. <code>p</code> will continue to be applied until <code>end</code> succeeds. Its result is discarded.</li>
 </ul>
 <h4 id="success">Success</h4>
 <ul>
-<li>Succeeds as long as <code>pend</code> succeeds before <code>p</code> fails. Returns the results of <code>p</code> as an array. If <code>pend</code> succeeds on the first attempt, <code>p</code> is never applied and the returned array is empty.</li>
+<li>Succeeds as long as <code>end</code> succeeds before <code>p</code> fails. Returns the results of <code>p</code> as an array. If <code>end</code> succeeds on the first attempt, <code>p</code> is never applied and the returned array is empty.</li>
 </ul>
 <h4 id="failure">Failure</h4>
 <ul>
-<li>Fails if <code>p</code> and <code>pend</code> both fail initially.</li>
-<li>Fails if <code>p</code> fails before <code>pend</code> succeeds and prior successes from <code>p</code> did not consume any input.</li>
+<li>Fails if <code>p</code> and <code>end</code> both fail initially.</li>
+<li>Fails if <code>p</code> fails before <code>end</code> succeeds and prior successes from <code>p</code> did not consume any input.</li>
 </ul>
 <h4 id="fatal-failure">Fatal Failure</h4>
 <ul>
-<li>Fails fatally if either <code>p</code> or <code>pend</code> fail fatally.</li>
-<li>Fails fatally if <code>p</code> fails before <code>pend</code> succeeds and prior successes from <code>p</code> consumed some input.</li>
+<li>Fails fatally if either <code>p</code> or <code>end</code> fail fatally.</li>
+<li>Fails fatally if <code>p</code> fails before <code>end</code> succeeds and prior successes from <code>p</code> consumed some input.</li>
 </ul>
 <h4 id="throws">Throws</h4>
 <ul>
-<li>Throws an error if either <code>p</code> or <code>pend</code> are not parsers.</li>
+<li>Throws an error if either <code>p</code> or <code>end</code> are not parsers.</li>
 </ul>
 <h4 id="see-also">See Also</h4>
 <ul>

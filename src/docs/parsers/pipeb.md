@@ -7,6 +7,16 @@
 
 > `pipeB(...ps, fn)`
 
+Applies some parsers in order, then returns the result of a function to which all of the parser results have been passed.
+
+`fn` will be passed one argument for every member of `ps`. JavaScript does not enforce that there has to be a parameter for each passed argument, but likely you will want to provide an `fn` that has an arity equal to the number of parsers in `ps`.
+
+If any of the parsers fail, then backtracking will return the state to where it was before the first parser was applied.
+
+`fn` can return anything, so this is one of the few combinators that can return something other than a string.
+
+#### Example
+
 ```javascript
 const parser = pipeB(upper, lower, (a, b) => a.toLowerCase() + b.toUpperCase())
 
@@ -37,13 +47,7 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
                         //   Expected a lowercase letter
 ```
 
-Applies some parsers in order, then returns the result of a function to which all of the parser results have been passed.
-
-`fn` will be passed one argument for every member of `ps`. JavaScript does not enforce that there has to be a parameter for each passed argument, but likely you will want to provide an `fn` that has an arity equal to the number of parsers in `ps`.
-
-If any of the parsers fail, then backtracking will return the state to where it was before the first parser was applied.
-
-`fn` can return anything, so this is one of the few combinators that can return something other than a string.
+See [`pipe`](pipe.md) for an explanation of this example. It's identical except for the final case failing fatally there and being backtracked and failing non-fatally here.
 
 #### Parameters
 

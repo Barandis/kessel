@@ -7,6 +7,12 @@
 
 > `letterU`
 
+Parses a Unicode letter.
+
+A character is a Unicode letter if it has the Unicode `Alphabetic` binary property.
+
+#### Example
+
 ```javascript
 const parser = letterU
 
@@ -22,10 +28,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Expected a Unicode letter
 ```
-
-Reads the next character and succeeds if that character is a Unicode letter.
-
-A character is a Unicode letter if it has the Unicode `Alphabetic` binary property.
 
 #### Success
 

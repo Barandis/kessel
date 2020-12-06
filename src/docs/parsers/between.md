@@ -7,6 +7,18 @@
 
 > `between(pre, post, p)`
 
+Applies a pre-parser, a content parser, and a post-parser in order, returning the value of the content parser.
+
+All three parsers must succeed for `between` to succeed. Take care to avoid parsing too far with `p`; e.g., if the example used `join(many(any))` as a content parser instead of what it does, it would also match the ending `"`. This would mean that `post` would never succeed because `p` already consumed its `"`, so `between` would never succeed.
+
+The first failure case in the example (`f`) is non-fatal failure, because no characters were consumed before the failure occurred. The second failure case (`t`) is fatal failure because, though `post` fails non-fatally, input was consumed before that failure happened.
+
+There is another version of this parser, [`betweenB`](betweenb.md), which backtracks and fails non-fatally if a non-fatal failure happens after input is consumed.
+
+`between(pre, post, p)` is an optimized implementation of `chain(chain(pre, () => p), x => value(post, x))`. (Using higher-level parsers, this can also be written `left(right(pre, p), post)`.)
+
+#### Example
+
 ```javascript
 const parser = between(char('"'), char('"'), join(many(noneOf('"'))))
 
@@ -31,16 +43,6 @@ console.log(failure(t)) // Parse error at (line 1, column 6):
                         // Expected '"'
                         // Note: failure occurred at the end of input
 ```
-
-Applies a pre-parser, a content parser, and a post-parser in order, returning the value of the content parser.
-
-All three parsers must succeed for `between` to succeed. Take care to avoid parsing too far with `p`; e.g., if the example used `join(many(any))` as a content parser instead of what it does, it would also match the ending `"`. This would mean that `post` would never succeed because `p` already consumed its `"`, so `between` would never succeed.
-
-The first failure case in the example (`f`) is non-fatal failure, because no characters were consumed before the failure occurred. The second failure case (`t`) is fatal failure because, though `post` fails non-fatally, input was consumed before that failure happened.
-
-There is another version of this parser, [`betweenB`](betweenb.md), which backtracks and fails non-fatally if a non-fatal failure happens after input is consumed.
-
-`between(pre, post, p)` is an optimized implementation of `chain(chain(pre, () => p), x => value(post, x))`. (Using higher-level parsers, this can also be written `left(right(pre, p), post)`.)
 
 #### Parameters
 

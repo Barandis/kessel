@@ -61,7 +61,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#parameters" class="md-skip">
+        <a href="#example" class="md-skip">
           Skip to content
         </a>
       
@@ -372,6 +372,30 @@
 
 
   <li class="md-nav__item">
+    <a href="../andthen/" class="md-nav__link">
+      andThen
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../andthenb/" class="md-nav__link">
+      andThenB
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
     <a href="../any/" class="md-nav__link">
       any
     </a>
@@ -468,8 +492,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../backlabel/" class="md-nav__link">
-      backLabel
+    <a href="../attemptm/" class="md-nav__link">
+      attemptM
     </a>
   </li>
 
@@ -518,30 +542,6 @@
   <li class="md-nav__item">
     <a href="../blockb/" class="md-nav__link">
       blockB
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../both/" class="md-nav__link">
-      both
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../bothb/" class="md-nav__link">
-      bothB
     </a>
   </li>
 
@@ -1032,6 +1032,18 @@
 
 
   <li class="md-nav__item">
+    <a href="../orelse/" class="md-nav__link">
+      orElse
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
     <a href="../orvalue/" class="md-nav__link">
       orValue
     </a>
@@ -1069,6 +1081,13 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#parameters" class="md-nav__link">
@@ -1523,6 +1542,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#parameters" class="md-nav__link">
     Parameters
   </a>
@@ -1589,6 +1615,13 @@
 <blockquote>
 <p><code>pipe(...ps, fn)</code></p>
 </blockquote>
+<p>Applies some parsers in order, then returns the result of a function to which all of the parser results have been passed.</p>
+<p><code>fn</code> will be passed one argument for every member of <code>ps</code>. JavaScript does not enforce that there has to be a parameter for each passed argument, but likely you will want to provide an <code>fn</code> that has an arity equal to the number of parsers in <code>ps</code>.</p>
+<p>Unlike <a href="../sequence/"><code>sequence</code></a>, <code>null</code> parser results are <em>not</em> discarded. This ensures that the same number of arguments will be passed to <code>fn</code> no matter the results of the parsers.</p>
+<p>There is another version of this parser (<a href="../pipeb/"><code>pipeB</code></a>) that fails non-fatally and backtracks if the parser that fails does so non-fatally.</p>
+<p><code>fn</code> can return anything, so this is one of the few combinators that can return something other than a string.</p>
+<p><code>pipe(p1, p2, fn)</code> is an optimized implementation of <code>chain(p1, a =&gt; chain(p2, b =&gt; always(fn(a, b))))</code>, <code>pipe(p1, p2, p3, fn)</code> is an optimized implementation of <code>chain(p1, a =&gt; chain(p2, b =&gt; chain(p3, c =&gt; always(fn(a, b, c)))))</code>, and so on.</p>
+<h4 id="example">Example</h4>
 <div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">pipe</span><span class="p">(</span><span class="nx">upper</span><span class="p">,</span> <span class="nx">lower</span><span class="p">,</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">a</span><span class="p">.</span><span class="nx">toLowerCase</span><span class="p">()</span> <span class="o">+</span> <span class="nx">b</span><span class="p">.</span><span class="nx">toUpperCase</span><span class="p">())</span>
 
 <span class="kr">const</span> <span class="nx">s</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;Abc&#39;</span><span class="p">)</span>
@@ -1611,13 +1644,7 @@
                         <span class="c1">//  ^</span>
                         <span class="c1">// Expected a lowercase letter</span>
 </code></pre></div>
-<p>Applies some parsers in order, then returns the result of a function to which all of the parser results have been passed.</p>
-<p><code>fn</code> will be passed one argument for every member of <code>ps</code>. JavaScript does not enforce that there has to be a parameter for each passed argument, but likely you will want to provide an <code>fn</code> that has an arity equal to the number of parsers in <code>ps</code>.</p>
-<p>In the example, the <code>upper</code> and <code>lower</code> parsers are applied, and the results of each are passed to an arity-2 function which lowercases the first argument and uppercases the second. The first failure example (<code>f</code>) shows non-fatal failure caused by the first parser failing non-fatally, but the second (<code>t</code>) shows a fatal failure caused by a parser (<code>upper</code> in this case) consuming a character before a later parser fails.</p>
-<p>Unlike <a href="../sequence/"><code>sequence</code></a>, <code>null</code> parser results are <em>not</em> discarded. This ensures that the same number of arguments will be passed to <code>fn</code> no matter the results of the parsers.</p>
-<p>There is another version of this parser (<a href="../pipeb/"><code>pipeB</code></a>) that fails non-fatally and backtracks if the parser that fails does so non-fatally.</p>
-<p><code>fn</code> can return anything, so this is one of the few combinators that can return something other than a string.</p>
-<p><code>pipe(p1, p2, fn)</code> is an optimized implementation of <code>chain(p1, a =&gt; chain(p2, b =&gt; always(fn(a, b))))</code>, <code>pipe(p1, p2, p3, fn)</code> is an optimized implementation of <code>chain(p1, a =&gt; chain(p2, b =&gt; chain(p3, c =&gt; always(fn(a, b, c)))))</code>, and so on.</p>
+<p>In this example, the <code>upper</code> and <code>lower</code> parsers are applied, and the results of each are passed to an arity-2 function which lowercases the first argument and uppercases the second. The first failure example (<code>f</code>) shows non-fatal failure caused by the first parser failing non-fatally, but the second (<code>t</code>) shows a fatal failure caused by a parser (<code>upper</code> in this case) consuming a character before a later parser fails.</p>
 <h4 id="parameters">Parameters</h4>
 <ul>
 <li><code>...ps</code> Zero or more parsers, each of which is applied to the input in order.</li>

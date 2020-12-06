@@ -7,6 +7,14 @@
 
 > `stringI(str)`
 
+Parses the string `str` case-insensitively.
+
+The number of characters read equals the number of characters in `str`. If there are not that many characters remaining in the input, the parser will automatically fail.
+
+If `str` is the empty string, the parser will automatically succeed and consume no input.
+
+#### Example
+
 ```javascript
 const parser = stringI('Test')
 
@@ -22,12 +30,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Expected 'Test'
 ```
-
-Reads a number of characters and succeeds if those characters equal `str`. This equality check is case-insensitive.
-
-The number of characters read equals the number of characters in `str`. If there are not that many characters remaining in the input, the parser will automatically fail.
-
-If `str` is the empty string, the parser will automatically succeed and consume no input.
 
 #### Parameters
 

@@ -7,6 +7,10 @@
 
 > `all`
 
+Parses the entire remaining input.
+
+#### Example
+
 ```javascript
 const parser = all
 
@@ -14,8 +18,6 @@ const s = parse(parser, 'content')
 console.log(status(s))  // Symbol(ok)
 console.log(success(s)) // "content"
 ```
-
-Reads and returns all remaining characters in the input.
 
 #### Success
 

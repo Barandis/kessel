@@ -171,7 +171,7 @@ In this documentation, we will talk about parsers *returning* values. In this ca
 | Parser | Description |
 |--------|-------------|
 | [`label`](parsers/label.md) | Applies a parser and replaces its errors with an expected error if that parser fails. |
-| [`backLabel`](parsers/backlabel.md) | Applies a parser and replaces its errors with an expected error if that parser fails. Backtracks to where the parser was applied and adds additional information to the error message if that parser consumes input. |
+| [`attemptM`](parsers/attemptm.md) | Applies a parser and replaces its errors with an expected error if that parser fails. Backtracks to where the parser was applied and adds additional information to the error message if that parser consumes input. |
 | [`notEmptyM`](parsers/notemptym.md) | Applies a parser and fails if the parser succeeds without consuming input. Overwrites the error message with a custom one on failure. |
 | [`followedByM`](parsers/followedbym.md) | Applies a parser and succeeds without consuming input if that parser succeeds. Overwrites the error message with a custom one on failure. |
 | [`notFollowedByM`](parsers/notfollowedbym.md) | Applies a parser and succeeds without consuming input if that parser fails. Overwrites the error message with a custom one on failure.  |

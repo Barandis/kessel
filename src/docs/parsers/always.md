@@ -7,6 +7,12 @@
 
 > `always(x)`
 
+Always succeeds and returns its passed value.
+
+This is the only parser that can return a value that is not a string. (Some combinators can also do this.)
+
+#### Example
+
 ```javascript
 const parser = always(3.14)
 
@@ -14,10 +20,6 @@ const s = parse(parser, 'abc')
 console.log(status(s))  // Symbol(ok)
 console.log(success(s)) // 3.14
 ```
-
-Always succeeds and returns its passed value.
-
-This is the only parser that can return a value that is not a string. (Some combinators can also do this.)
 
 #### Parameters
 

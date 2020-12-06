@@ -7,6 +7,12 @@
 
 > `newline`
 
+Parses an ASCII newline.
+
+ASCII newlines include `\r`, `\n`, and `\r\n`.
+
+#### Example
+
 ```javascript
 const parser = newline
 
@@ -22,10 +28,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Expected a newline
 ```
-
-Reads a character (or two, if the first character is `\r`) and succeeds if it is an ASCII newline.
-
-ASCII newlines include `\r`, `\n`, and `\r\n`.
 
 #### Success
 

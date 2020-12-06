@@ -5,7 +5,15 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `sepEndBy(p, psep)`
+> `sepEndBy(p, sep)`
+
+Parses zero or more occurrences of a content parser, separated and optionally ended by a separator parser.
+
+`sepEndBy` applies the content parser `p` zero or more times as long as both it and the preceding separator parser `sep` match. The operation of the parser in EBNF is `(p (sep p)* sep?)?`. Results of the separator parser are discarded, but results of the content parser are returned in an array.
+
+The content parser need not be the last to match. If the separator parser succeeds but the content parser fails after it, then the parser state is left at the location immediately after the last success of the separator parser.
+
+#### Example
 
 ```javascript
 const parser = sepEndBy(count(letter, 3), char(','))
@@ -23,16 +31,10 @@ console.log(failure(t)) // Parse error at (line 1, column 11):
                         // Expected a letter
 ```
 
-Parses zero or more occurrences of a content parser, separated and optionally ended by a separator parser.
-
-`sepEndBy` applies the content parser `p` zero or more times as long as both it and the preceding separator parser `psep` match. The operation of the parser in EBNF is `(p (psep p)* psep?)?`. Results of the separator parser are discarded, but results of the content parser are returned in an array.
-
-The content parser need not be the last to match. If the separator parser succeeds but the content parser fails after it, then the parser state is left at the location immediately after the last success of the separator parser.
-
 #### Parameters
 
 * `p` The content parser. The results of this parser are returned in an array.
-* `psep` The separator parser. The results of this parser are discarded.
+* `sep` The separator parser. The results of this parser are discarded.
 
 #### Success
 
@@ -44,7 +46,7 @@ The content parser need not be the last to match. If the separator parser succee
 
 #### Throws
 
-* Throws an error if either `p` or `psep` are not parsers.
+* Throws an error if either `p` or `sep` are not parsers.
 
 #### See Also
 

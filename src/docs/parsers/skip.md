@@ -7,6 +7,14 @@
 
 > `skip(p)`
 
+Applies a parser and discards its result on success.
+
+A good use for this parser is to null results in a [`sequence`](sequence.md) or [`many`](many.md) parser, as those exclude results that are `null` from their final results.
+
+`skip(p)` is an optimized implementation of `chain(p, () => always(null))`.
+
+#### Example
+
 ```javascript
 const parser = skip(letter)
 
@@ -22,10 +30,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Expected a letter
 ```
-
-Applies a parser and discards its result on success.
-
-`skip(p)` is an optimized implementation of `chain(p, () => always(null))`.
 
 #### Parameters
 

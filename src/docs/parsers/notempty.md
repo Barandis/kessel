@@ -7,6 +7,14 @@
 
 > `notEmpty(p)`
 
+Applies a parser and succeeds if that parser succeeds and returns a result. If the parser does not return a result, `notEmpty` will fail.
+
+This parser cannot produce a useful error message. To provide a custom message, either wrap the parser with [`label`](label.md) or use [`notEmptyM`](notemptym.md).
+
+`notEmpty` can be used to require at least one match from a parser. For example, [`many1(p)`](many1.md) could be naively implemented as `notEmpty(many(p))`, though it would not have a good error message.
+
+#### Example
+
 ```javascript
 const parser = notEmpty(optional(char('+')))
 
@@ -22,12 +30,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Unknown error(s)
 ```
-
-Applies a parser and succeeds if that parser succeeds and returns a result. If the parser does not return a result, `notEmpty` will fail.
-
-This parser cannot produce a useful error message. To provide a custom message, either wrap the parser with [`label`](label.md) or use [`notEmptyM`](notemptym.md).
-
-`notEmpty` can be used to require at least one match from a parser. For example, [`many1(p)`](many1.md) could be naively implemented as `notEmpty(many(p)).`, though it would not have a good error message.
 
 #### Parameters
 

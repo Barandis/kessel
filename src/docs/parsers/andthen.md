@@ -5,7 +5,19 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `andThen(p1, p2)`
+> `andThen(p, q)`
+
+Applies two parsers in order, returning their results in a tuple. 
+
+If either parser fails, then the entire `andThen` parser also fails. If input was consumed by either parser and one of them fails, then the failure is fatal (whether or not `p` or `q` failed fatally). In the examples, `f` represents a non-fatal failure because the first parser ([`letter`](letter.md)) failed without consuming, but `t` represents a fata failure because the first parser consumed a character before the second parser ([`digit`](digit.md)) failed non-fatally.
+
+This is the primitive combinator for sequencing parsers. In languages that have custom operators, it is often implemented as an operator like `.>>.` or `<*>`.
+
+There is another version of this parser ([`andThenB`](andthenb.md)) that will backtrack and fail non-fatally if `p` succeeds and `q` fails non-fatally.
+
+`andThen(p, q)` can be considered an optimized implementation of `chain(p, a => chain(q, b => always([a, b])))`.
+
+#### Example
 
 ```javascript
 const parser = andThen(letter, digit)
@@ -31,36 +43,28 @@ console.log(failure(t)) // Parse error at (line 1, column 2):
                         // Expected a digit
 ```
 
-Applies two parsers in order, returning their results in a tuple.
-
-If either parser fails, then the entire `andThen` parser also fails. If input was consumed by either parser and one of them fails, then the failure is fatal (whether or not `p1` or `p2` failed fatally). In the examples, `f` represents a non-fatal failure because the first parser ([`letter`](letter.md)) failed without consuming, but `t` represents a fata failure because the first parser consumed a character before the second parser ([`digit`](digit.md)) failed non-fatally.
-
-There is another version of this parser ([`andThenB`](andthenb.md)) that will backtrack and fail non-fatally if `p1` succeeds and `p2` fails non-fatally.
-
-`andThen(p1, p2)` is an optimized implementation of `chain(p1, a => chain(p2, b => always([a, b])))`.
-
 #### Parameters
 
-* `p1` The first parser to apply. If both parsers succeed, this parser's result will be the first element of `both`'s result.
-* `p2` The second parser to apply. If both parsers succeed, this parser's result will be the second element of `both`'s result.
+* `p` The first parser to apply. If both parsers succeed, this parser's result will be the first element of `andThen`'s result.
+* `q` The second parser to apply. If both parsers succeed, this parser's result will be the second element of `andThen`'s result.
 
 #### Success
 
-* Succeeds if both `p1` and `p2` succeed. Returns the result of `p1`.
+* Succeeds if both `p` and `q` succeed. Returns their results in a tuple.
 
 #### Failure
 
-* Fails if `p1` fails.
-* Fails if `p2` fails after `p1` succeeds but does not consume input.
+* Fails if `p` fails.
+* Fails if `q` fails after `p` succeeds but does not consume input.
 
 #### Fatal Failure
 
-* Fails fatally if either `p1` or `p2` fails fatally.
-* Fails fatally if `p2` fails after `p1` succeeds and consumes some input.
+* Fails fatally if either `p` or `q` fails fatally.
+* Fails fatally if `q` fails after `p` succeeds and consumes some input.
 
 #### Throws
 
-* Throws an error if either `p1` or `p2` are not parsers.
+* Throws an error if either `p` or `q` are not parsers.
 
 #### See Also
 

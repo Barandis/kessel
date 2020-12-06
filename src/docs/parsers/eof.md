@@ -7,6 +7,12 @@
 
 > `eof`
 
+Attempts to parse a character and succeeds if there is no character to parse.
+
+The only time that there is no character to read is at the end of input, so this parser checks specifically for that condition.
+
+#### Example
+
 ```javascript
 const parser = eof
 
@@ -22,10 +28,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // ^
                         // Expected end of input
 ```
-
-Attempts to read a character and succeeds if there is no character to read.
-
-The only time that there is no character to read is at the end of input, so this parser checks specifically for that condition.
 
 #### Success
 
