@@ -8,7 +8,7 @@ import { expect } from 'chai'
 import { attempt, choice } from 'kessel/combinators/alternative'
 import { right } from 'kessel/combinators/chaining'
 import { lookAhead } from 'kessel/combinators/conditional'
-import { label, backLabel } from 'kessel/combinators/message'
+import { label, attemptM } from 'kessel/combinators/message'
 import { sequence } from 'kessel/combinators/sequence'
 import { parse, Status } from 'kessel/core'
 import { char } from 'kessel/parsers/char'
@@ -55,42 +55,42 @@ describe('Message combinators', () => {
     })
   })
 
-  describe('backLabel', () => {
+  describe('attemptM', () => {
     it('throws if its first argument is not a parser', () => {
       error(
-        backLabel(0, 'test'),
+        attemptM(0, 'test'),
         '',
-        '[backLabel]: expected 1st argument to be a parser; found 0',
+        '[attemptM]: expected 1st argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a string', () => {
       error(
-        backLabel(char('a'), 0),
+        attemptM(char('a'), 0),
         '',
-        '[backLabel]: expected 2nd argument to be a string; found 0',
+        '[attemptM]: expected 2nd argument to be a string; found 0',
       )
     })
     it('does nothing if its parser succeeds', () => {
       const r1 = parse(char('a'), 'abc')
-      const r2 = parse(backLabel(char('a'), 'test'), 'abc')
+      const r2 = parse(attemptM(char('a'), 'test'), 'abc')
       expect(r1).to.deep.equal(r2)
     })
     it('changes the expected if its parser fails without consuming', () => {
       fail(char('a'), 'bcd', "'a'")
-      fail(backLabel(char('a'), 'letter a'), 'bcd', 'letter a')
+      fail(attemptM(char('a'), 'letter a'), 'bcd', 'letter a')
     })
     it('adds an error message on success without consuming', () => {
-      const [_, result] = parse(backLabel(lookAhead(char('a')), 'test'), 'a')
+      const [_, result] = parse(attemptM(lookAhead(char('a')), 'test'), 'a')
       expect(result.status).to.equal(Status.Ok)
       expect(result.errors[0].label).to.equal('test')
     })
     it('adds a compound error if its parser fails while consuming', () => {
       const [ctx, result] = parse(
-        backLabel(sequence(char('a'), char('b')), 'test'), 'a1',
+        attemptM(sequence(char('a'), char('b')), 'test'), 'a1',
       )
       const error = result.errors[0]
 
-      expect(result.status).to.equal(Status.Fatal)
+      expect(result.status).to.equal(Status.Error)
       expect(ctx.index).to.equal(0)
       expect(error.ctx.index).to.equal(1)
       expect(error.label).to.equal('test')
@@ -98,7 +98,7 @@ describe('Message combinators', () => {
     })
     it('collapses the nested error from backtracking', () => {
       const [ctx, result] = parse(
-        backLabel(attempt(right(char('a'), char('b'))), 'test'), 'a1',
+        attemptM(attempt(right(char('a'), char('b'))), 'test'), 'a1',
       )
       const error = result.errors[0]
 

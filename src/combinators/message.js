@@ -9,7 +9,7 @@ import {
   ordParFormatter,
   ordStrFormatter,
 } from 'kessel/assert'
-import { fatal, Parser, Status } from 'kessel/core'
+import { error, Parser, Status } from 'kessel/core'
 import { compound, ErrorType, expected } from 'kessel/error'
 import { twin } from 'kessel/util'
 
@@ -70,9 +70,9 @@ export const label = (p, msg) => Parser(ctx => {
  * @returns {Parser} A parser that applies `p` and changes the error
  *     as appropriate if `p` fails.
  */
-export const backLabel = (p, msg) => Parser(ctx => {
-  ASSERT && assertParser('backLabel', p, ordParFormatter('1st'))
-  ASSERT && assertString('backLabel', msg, ordStrFormatter('2nd'))
+export const attemptM = (p, msg) => Parser(ctx => {
+  ASSERT && assertParser('attemptM', p, ordParFormatter('1st'))
+  ASSERT && assertString('attemptM', msg, ordStrFormatter('2nd'))
 
   const index = ctx.index
   const [reply, [context, result]] = twin(p(ctx))
@@ -86,5 +86,5 @@ export const backLabel = (p, msg) => Parser(ctx => {
     }
     return pass(context, result, expected(msg))
   }
-  return fatal(ctx, compound(msg, context, result.errors))
+  return error(ctx, compound(msg, context, result.errors))
 })

@@ -100,7 +100,7 @@ export {
   notFollowedByM,
 } from './combinators/conditional'
 export {
-  backLabel,
+  attemptM,
   label,
 } from './combinators/message'
 export {
