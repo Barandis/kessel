@@ -39,6 +39,7 @@ nav:
       - anyOf: parsers/anyof.md
       - anyString: parsers/anystring.md
       - apply: parsers/apply.md
+      - applyB: parsers/applyb.md
       - assoc1L: parsers/assoc1l.md
       - assoc1R: parsers/assoc1r.md
       - assocL: parsers/assocl.md

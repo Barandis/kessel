@@ -67,6 +67,7 @@ export {
 } from './combinators/alternative'
 export {
   andThenB,
+  applyB,
   attempt,
   attemptM,
   betweenB,

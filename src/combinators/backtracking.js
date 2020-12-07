@@ -205,6 +205,40 @@ export const chainB = (p, fn) => Parser(ctx => {
 })
 
 /**
+ * A parser that applies the value returned by `q` to the function
+ * returned by `p`.
+ *
+ * If `p` succeeds and `q` fails, this parser will backtrack to the
+ * point where `p` was applied.
+ *
+ * @param {Parser} p A parser whose result will be passed to the
+ *     function returned by `q`.
+ * @param {Parser} q A parser which provides a function.
+ * @returns {Parser} A parser that applies `p` and `q` and results in
+ *     the return value of the function returned by `q` when the value
+ *     returned by `p` is passed into it.
+ */
+export const applyB = (p, q) => Parser(ctx => {
+  ASSERT && assertParser('applyB', p, ordParFormatter('1st'))
+  ASSERT && assertParser('applyB', q, ordParFormatter('2nd'))
+
+  const index = ctx.index
+
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  if (pres.status !== Ok) return prep
+
+  const [qrep, [qctx, qres]] = twin(q(pctx))
+  if (qres.status === Fatal) return qrep
+  if (qres.status === Fail) return fail(qctx, qres.errors, index)
+
+  const fn = qres.value
+  ASSERT && assertFunction(
+    'applyB', fn, formatter('2nd argument to return a function'),
+  )
+  return ok(qctx, fn(pres.value))
+})
+
+/**
  * Creates a parser that will apply the parsers `p` and `q` in
  * sequence and then return the result of `p`. If either `p` or `q`
  * fail, this parser will also fail.

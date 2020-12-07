@@ -5,20 +5,16 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `apply(p, f)`
+> `applyB(p, f)`
 
 Applies two parsers, the second of which must return a function. Returns the result of that function when the result of the other parser is passed to it.
 
-This parser is the applicative-style counterpart of the monadic-style [`chain`](chain.md). It corresponds to the `<*>` member of the `Applicative` type class in Haskell, which basically means that it's used for applying functions that are already "inside" a parser. As with `chain` it's not likely to see a lot of use, as none of the Kessel parsers are actually implemented in terms of it, but it's available should anyone feel the need to write parsers in an applicative style.
-
-As this parser requires that one of its parser return a function, [`always`](always.md) is often used to provide that parser.
-
-There is another version of this parser ([`applyB`](applyb.md)) that will backtrack and fail non-fatally if `f` fails non-fatally.
+If `p` succeeds but `f` fails, the parser will backtrack to the location where `p` was originally applied and `applyB` will fail non-fatally.
 
 #### Example
 
 ```javascript
-const parser = apply(left(letter, digit), always(c => c.toUpperCase()))
+const parser = applyB(left(letter, digit), always(c => c.toUpperCase()))
 
 const s = parse(parser, 'a1')
 console.log(status(s))  // Symbol(ok)
@@ -33,12 +29,18 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Expected a letter
 
 const t = parse(parser, 'abc')
-console.log(status(t))  // Symbol(fatal)
-console.log(failure(t)) // Parse error at (line 1, column 2):
+console.log(status(t))  // Symbol(fail)
+console.log(failure(t)) // Parse error at (line 1, column 1):
                         //
                         // abc
-                        //  ^
-                        // Expected 'a'
+                        // ^
+                        // The parser backtracked after:
+                        //
+                        //   Parse error at (line 1, column 2):
+                        //
+                        //   abc
+                        //    ^
+                        //   Expected 'a'
 ```
 
 #### Parameters
@@ -52,13 +54,11 @@ console.log(failure(t)) // Parse error at (line 1, column 2):
 
 #### Failure
 
-* Fails if `p` fails.
-* Fails if `f` fails after `p` succeeds without consuming any input.
+* Fails if `p` or `f` fails.
 
 #### Fatal Failure
 
 * Fails fatally if either `p` or `f` fails fatally.
-* Fails if `f` fails after `p` succeeds while consuming some input.
 
 #### Throws
 
@@ -68,6 +68,6 @@ console.log(failure(t)) // Parse error at (line 1, column 2):
 #### See Also
 
 * [`always`](always.md)
-* [`andThen`](andthen.md)
-* [`applyB`](applyb.md)
-* [`chain`](chain.md)
+* [`andThenB`](andthenb.md)
+* [`apply`](apply.md)
+* [`chainB`](chainb.md)

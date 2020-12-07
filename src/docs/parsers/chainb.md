@@ -7,39 +7,6 @@
 
 > `chainB(p, fn)`
 
-#### Example
-
-```javascript
-const parser = chainB(any, c => char(c))
-
-const s = parse(parser, 'aabbcc')
-console.log(status(s))  // Symbol(ok)
-console.log(success(s)) // "a"
-
-const f = parse(parser, '')
-console.log(status(f))  // Symbol(fail)
-console.log(failure(f)) // Parse error at (line 1, column 1):
-                        //
-                        // 
-                        // ^
-                        // Expected any character
-                        // Note: failure occurred at the end of input
-
-const t = parse(parser, 'abc')
-console.log(status(t))  // Symbol(fail)
-console.log(failure(t)) // Parse error at (line 1, column 1):
-                        //
-                        // abc
-                        // ^
-                        // The parser backtracked after:
-                        //
-                        //   Parse error at (line 1, column 2):
-                        //
-                        //   abc
-                        //    ^
-                        //   Expected 'a'
-```
-
 Applies a parser to the input, passes its result to a function, and then applies the parser that function returns to the input.
 
 If `p` succeeds but the parser that is returned by `fn` fails, the state will backtrack to the location where `p` was originally applied and `chainB` will fail non-fatally.

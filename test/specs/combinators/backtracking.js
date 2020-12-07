@@ -8,6 +8,7 @@ import { expect } from 'chai'
 import { choice, lookAhead } from 'kessel/combinators/alternative'
 import {
   andThenB,
+  applyB,
   attempt,
   attemptM,
   betweenB,
@@ -21,14 +22,14 @@ import {
   rightB,
   sequenceB,
 } from 'kessel/combinators/backtracking'
-import { many1, sequence } from 'kessel/combinators/sequence'
+import { left, many1, sequence } from 'kessel/combinators/sequence'
 import { parse, Status } from 'kessel/core'
 import { ErrorType } from 'kessel/error'
 import { any, char, digit, eof, letter, noneOf } from 'kessel/parsers/char'
 import { space } from 'kessel/parsers/regex'
 import { string } from 'kessel/parsers/string'
 import { terror, tfail, tpass } from 'test/helper'
-import { right } from 'kessel/index'
+import { always, right } from 'kessel/index'
 
 const { Fail, Fatal } = Status
 
@@ -250,6 +251,62 @@ describe('Backtracking and error handling combinators', () => {
         index: 2,
         status: Fatal,
       })
+    })
+  })
+
+  describe('applyB', () => {
+    it('throws if its first argument is not a parser', () => {
+      terror(
+        applyB(0, any),
+        '',
+        '[applyB]: expected 1st argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a parser', () => {
+      terror(
+        applyB(any, 0),
+        '',
+        '[applyB]: expected 2nd argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument fails to return a function', () => {
+      terror(
+        applyB(any, any),
+        'ab',
+        '[applyB]: expected 2nd argument to return a function; found "b"',
+      )
+    })
+    it('returns the result of the function when passed the other value', () => {
+      tpass(applyB(any, always(x => x.toUpperCase())), 'a', 'A')
+    })
+    it('fails without calling parser 2 if parser 1 fails', () => {
+      tfail(applyB(char('a'), any), 'b', { expected: "'a'", status: Fail })
+    })
+    it('backtracks if input is consumed before failure', () => {
+      tfail(applyB(char('a'), char('b')), 'ac', {
+        expected: "'b'",
+        index: 0,
+        status: Fail,
+      })
+    })
+    it('fails fatally if one of its parsers fails fatally', () => {
+      tfail(applyB(left(letter, letter), char('b')), 'a1b', {
+        expected: 'a letter',
+        index: 1,
+        status: Fatal,
+      })
+      tfail(applyB(char('a'), left(letter, letter)), 'ab1', {
+        expected: 'a letter',
+        index: 2,
+        status: Fatal,
+      })
+    })
+    it('can be used to implement sequencing', () => {
+      // Applicative style for `andThenB(char('a'), char('b'))`
+      const p = applyB(char('a'), applyB(char('b'), always(b => a => [a, b])))
+      tpass(p, 'ab', ['a', 'b'])
+      tfail(p, 'cd', { expected: "'a'", status: Fail })
+      tfail(p, 'ac', { expected: "'b'", status: Fail })
     })
   })
 
