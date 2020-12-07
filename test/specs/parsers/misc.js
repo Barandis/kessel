@@ -5,24 +5,15 @@
 
 import { Status } from 'kessel/core'
 import {
-  always,
   fail as pfail,
   failFatally,
   failUnexpected,
 } from 'kessel/parsers/misc'
-import { error, fail, pass } from 'test/helper'
+import { error, fail } from 'test/helper'
 
 const { Error, Fatal } = Status
 
 describe('Miscellaneous parsers', () => {
-  describe('always', () => {
-    it('succeeds with the passed-in value', () => {
-      pass(always('a'), '', 'a')
-      pass(always(23), '', { result: 23, index: 0 })
-      pass(always({ a: 1 }), '', { result: { a: 1 }, index: 0 })
-    })
-  })
-
   describe('fail', () => {
     it('throws if its argument is not a string', () => {
       error(pfail(0), '', '[fail]: expected a string; found 0')

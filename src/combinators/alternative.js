@@ -14,39 +14,13 @@ import {
   ordNumFormatter,
   ordParFormatter,
 } from 'kessel/assert'
-import { error, fatal, maybeFatal, ok, Parser, Status } from 'kessel/core'
+import { error, fatal, ok, Parser, Status } from 'kessel/core'
 import { merge, nested } from 'kessel/error'
 import { ordinal, range, stringify, twin } from 'kessel/util'
 
 const { Ok, Error, Fatal } = Status
 
 /** @typedef {import('kessel/core').Parser} Parser */
-
-/**
- * Creates a parser that tries to apply two parsers, returning the
- * result of the first that succeeds. If neither succeed, or if one
- * fails fatally, then the parser fails.
- *
- * @param {Parser} p The first parser to apply.
- * @param {Parser} q The second parser to apply.
- * @returns {Parser} A parser that applies the first parser and then
- *     if necessary the second parser, returning the result of the
- *     first to succeed.
- */
-export const orElse = (p, q) => Parser(ctx => {
-  ASSERT && assertParser('orElse', p, ordParFormatter('1st'))
-  ASSERT && assertParser('orElse', q, ordParFormatter('2nd'))
-
-  const [prep, [pctx, pres]] = twin(p(ctx))
-  if (pres.status !== Error) return prep
-
-  const [qrep, [qctx, qres]] = twin(q(pctx))
-  return qres.status === Ok ? qrep : maybeFatal(
-    qres.status === Fatal,
-    qctx,
-    merge(pres.errors, qres.errors),
-  )
-})
 
 /**
  * Creates a parser that implements alternatives. Each of the supplied

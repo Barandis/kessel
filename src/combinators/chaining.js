@@ -22,71 +22,6 @@ const { Ok } = Status
 /** @typedef {import('kessel/core').Parser} Parser */
 
 /**
- * Creates a parser that chains the result after applying its contained
- * parser to another parser returned by the supplied function. The
- * parser returns that result.
- *
- * If the initial parser fails, that failure is instead returned. If the
- * second parser (the return value of `fn`) fails and `p` consumed
- * input, the failure is fatal.
- *
- * @param {Parser} p The first parser to apply.
- * @param {function(*): Parser} fn A function that takes the result from
- *     the first parser's successful application as its sole argument.
- *     It uses this result to determine a second parser, which it
- *     returns.
- * @returns {Parser} A parser which will apply its contained parser,
- *     pass the result to the supplied function, and use that function's
- *     return value as a second parser to apply the input to.
- */
-export const chain = (p, fn) => Parser(ctx => {
-  ASSERT && assertParser('chain', p, ordParFormatter('1st'))
-  ASSERT && assertFunction('chain', fn, ordFnFormatter('2nd'))
-
-  const index = ctx.index
-
-  const [prep, [pctx, pres]] = twin(p(ctx))
-  if (pres.status !== Ok) return prep
-
-  const q = fn(pres.value)
-  ASSERT && assertParser(
-    'chain', q, formatter('the 2nd argument to return a parser'),
-  )
-
-  const [qrep, [qctx, qres]] = twin(q(pctx))
-  return qres.status === Ok ? qrep
-    : maybeFatal(qctx.index !== index, qctx, qres.errors)
-})
-
-/**
- * Creates a parser that applies the supplied parser and passes its
- * result to the provided function. The return value of that function
- * becomes the result of the created parser.
- *
- * If the contained parser fails, that failure is propagated out as the
- * failure of the returned parser.
- *
- * `map(p, fn)` is an optimized implementation of `chain(p, x =>
- * always(fn(x)))`. This also makes it a more efficient version of
- * `pipe(p, fn)` (a single-parser `pipe`).
- *
- * @param {Parser} p The parser to apply to the input.
- * @param {function(*):*} fn A mapping function that is passed the
- *     result of `p` and whose return value will be the result of the
- *     created parser.
- * @returns {Parser} A parser which will apply its contained parser,
- *     pass the result to the supplied function, and succeed with that
- *     return value as its result.
- */
-export const map = (p, fn) => Parser(ctx => {
-  ASSERT && assertParser('map', p, ordParFormatter('1st'))
-  ASSERT && assertFunction('map', fn, ordFnFormatter('2nd'))
-
-  const [prep, [pctx, pres]] = twin(p(ctx))
-  return pres.status === Ok ? ok(pctx, fn(pres.value)) : prep
-})
-
-/**
  * Creates a parser which applies the supplied parser. That parser is
  * expected to result in an array of strings, and if it succeeds, that
  * result's elements are joined together into a single string. This is
@@ -216,34 +151,6 @@ export const right = (p, q) => Parser(ctx => {
 
   const [qrep, [qctx, qres]] = twin(q(pctx))
   return qres.status === Ok ? qrep
-    : maybeFatal(qctx.index !== index, qctx, qres.errors)
-})
-
-/**
- * Creates a parser that will apply the parsers `p` and `q` in
- * sequence and then return the result of both in an array. If either
- * `p` or `q` fail, this parser will also fail, and the failure will
- * be fatal if any input had been consumed by either parser.
- *
- * `andThen(p, q)` is an optimized implementation of `chain(p, a =>
- * chain(q, b => always([a, b])))`.
- *
- * @param {Parser} p The first parser to apply.
- * @param {Parser} q The second parser to apply.
- * @returns {Parser} A parser that applies both contained parsers and
- *     results in the values of both parsers in an array.
- */
-export const andThen = (p, q) => Parser(ctx => {
-  ASSERT && assertParser('andThen', p, ordParFormatter('1st'))
-  ASSERT && assertParser('andThen', q, ordParFormatter('2nd'))
-
-  const index = ctx.index
-
-  const [prep, [pctx, pres]] = twin(p(ctx))
-  if (pres.status !== Ok) return prep
-
-  const [qctx, qres] = q(pctx)
-  return qres.status === Ok ? ok(qctx, [pres.value, qres.value])
     : maybeFatal(qctx.index !== index, qctx, qres.errors)
 })
 

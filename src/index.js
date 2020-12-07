@@ -25,7 +25,6 @@ export {
   upper,
 } from './parsers/char'
 export {
-  always,
   fail,
   failFatally,
   failUnexpected,
@@ -65,7 +64,6 @@ export {
   leftB,
   manyTillB,
   optional,
-  orElse,
   orValue,
   pipeB,
   repeatB,
@@ -73,15 +71,12 @@ export {
   sequenceB,
 } from './combinators/alternative'
 export {
-  andThen,
   between,
-  chain,
   fifth,
   first,
   fourth,
   join,
   left,
-  map,
   nth,
   pipe,
   right,
@@ -103,6 +98,15 @@ export {
   attemptM,
   label,
 } from './combinators/message'
+export {
+  always,
+  andThen,
+  apply,
+  chain,
+  empty,
+  map,
+  orElse,
+} from './combinators/primitive'
 export {
   assoc1L,
   assoc1R,

@@ -5,14 +5,11 @@
 
 import {
   between,
-  andThen,
-  chain,
   fifth,
   first,
   fourth,
   join,
   left,
-  map,
   nth,
   pipe,
   right,
@@ -21,6 +18,7 @@ import {
   third,
   value,
 } from 'kessel/combinators/chaining'
+import { map } from 'kessel/combinators/primitive'
 import { many, many1, sequence } from 'kessel/combinators/sequence'
 import { Status } from 'kessel/core'
 import { any, char, digit, eof, letter, noneOf } from 'kessel/parsers/char'
@@ -29,80 +27,6 @@ import { error, fail, pass } from 'test/helper'
 const { Error, Fatal } = Status
 
 describe('Chaining and piping combinators', () => {
-  describe('chain', () => {
-    it('throws if its first argument is not a parser', () => {
-      error(
-        chain(0, x => x),
-        '',
-        '[chain]: expected 1st argument to be a parser; found 0',
-      )
-    })
-    it('throws if its second argument is not a function', () => {
-      error(
-        chain(any, 0),
-        '',
-        '[chain]: expected 2nd argument to be a function; found 0',
-      )
-    })
-    it('throws if its second argument does not return a parser', () => {
-      error(
-        chain(any, x => x),
-        'a',
-        '[chain]: expected the 2nd argument to return a parser; found "a"',
-      )
-    })
-    it('passes successful result to function to get the next parser', () => {
-      pass(chain(any, c => char(c)), 'aa', { result: 'a', index: 2 })
-      fail(chain(any, c => char(c)), 'ab', "'a'")
-    })
-    it('fails if its parser fails without calling the second parser', () => {
-      fail(chain(char('a'), () => char('b')), 'bb', {
-        expected: "'a'",
-        index: 0,
-        status: Error,
-      })
-    })
-    it('fails fatally if the second fails after the first consumes', () => {
-      fail(chain(char('a'), () => char('b')), 'ac', {
-        expected: "'b'",
-        index: 1,
-        status: Fatal,
-      })
-    })
-  })
-
-  describe('map', () => {
-    it('throws if its first argument is not a parser', () => {
-      error(
-        map(0, x => x),
-        '',
-        '[map]: expected 1st argument to be a parser; found 0',
-      )
-    })
-    it('throws if its second argument is not a function', () => {
-      error(
-        map(any, 0),
-        '',
-        '[map]: expected 2nd argument to be a function; found 0',
-      )
-    })
-    it('succeeds with the return value of its function', () => {
-      pass(map(any, c => c.toUpperCase()), 'abc', 'A')
-      pass(map(sequence(letter, digit), cs => cs.join('')), 'a1', 'a1')
-    })
-    it('propagates failed state if its parser fails', () => {
-      fail(map(any, c => c.toUpperCase()), '', {
-        expected: 'any character',
-        status: Error,
-      })
-      fail(map(sequence(letter, digit), cs => cs.join('')), 'ab', {
-        expected: 'a digit',
-        status: Fatal,
-        index: 1,
-      })
-    })
-  })
-
   describe('join', () => {
     it('throws if its argument is not a parser', () => {
       error(join(0), '', '[join]: expected a parser; found 0')
@@ -228,48 +152,6 @@ describe('Chaining and piping combinators', () => {
         expected: 'a digit',
         index: 1,
         status: Fatal,
-      })
-    })
-  })
-
-  describe('andThen', () => {
-    it('throws if its first argument is not a parser', () => {
-      error(
-        andThen(0, any),
-        '',
-        '[andThen]: expected 1st argument to be a parser; found 0',
-      )
-    })
-    it('throws if its second argument is not a parser', () => {
-      error(
-        andThen(any, 0),
-        '',
-        '[andThen]: expected 2nd argument to be a parser; found 0',
-      )
-    })
-    it('returns the result of both parsers if both pass', () => {
-      pass(andThen(letter, digit), 'a1', ['a', '1'])
-    })
-    it('fails non-fatally if one parser fails and no input is consumed', () => {
-      fail(andThen(letter, digit), '1', {
-        expected: 'a letter',
-        status: Status.Error,
-      })
-      fail(andThen(eof, char('a')), '', {
-        expected: "'a'",
-        status: Status.Error,
-      })
-    })
-    it('fails fatally if any input is consumed on failure', () => {
-      fail(andThen(sequence(letter, letter), digit), 'a11', {
-        expected: 'a letter',
-        index: 1,
-        status: Status.Fatal,
-      })
-      fail(andThen(letter, digit), 'ab', {
-        expected: 'a digit',
-        index: 1,
-        status: Status.Fatal,
       })
     })
   })

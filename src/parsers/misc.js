@@ -4,19 +4,10 @@
 // https://opensource.org/licenses/MIT
 
 import { assertString } from 'kessel/assert'
-import { error, fatal, ok, Parser } from 'kessel/core'
+import { error, fatal, Parser } from 'kessel/core'
 import { generic, unexpected } from 'kessel/error'
 
 /** @typedef {import('kessel/core').Parser} Parser */
-
-/**
- * Creates a parser that always succeeds and results in the provided
- * value.
- *
- * @param {*} x The value that be the new parser's result.
- * @returns {Parser} A parser that always succeeds with `value`.
- */
-export const always = x => Parser(ctx => ok(ctx, x))
 
 /**
  * Creates a parser that fails without consuming input, setting the
