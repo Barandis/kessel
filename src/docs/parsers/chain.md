@@ -9,9 +9,11 @@
 
 Applies a parser to the input, passes its result to a function, and then applies the parser that function returns to the input.
 
-`chain` is not used that often itself, but it is a primitive combinator that provides the basis for numerous other parsers (including all of those in the "Chaining combinators" section of the [API summary](../api.md#table-5-chaining-combinators)).
+`chain` is not used that often itself, but it is a primitive combinator that provides the basis for numerous other parsers. It corresponds to the `bind` operation in the `Monad` type class in Haskell, which is often spelled `>>=`. It can therefore be used to implement sequencing in a monadic style, contrasting with the applicative style offered by [`apply`](apply.md).
 
- There is another version of this parser ([`chainB`](chainb.md)) that will backtrack and fail non-fatally if the parser returned by `fn` fails non-fatally.
+This parser is not expected to see a lot of use since none of the Kessels parsers are implemented in terms of it, but it is available in case someone wants to parse monadically without using `block`.
+
+There is another version of this parser ([`chainB`](chainb.md)) that will backtrack and fail non-fatally if the parser returned by `fn` fails non-fatally.
 
 #### Example
 
@@ -71,5 +73,7 @@ In the case of `f`, `chain` fails fatally. This is because a character was consu
 
 #### See Also
 
+* [`andThen`](andthen.md)
+* [`apply`](apply.md)
 * [`chainB`](chainb.md)
 * [`map`](map.md)

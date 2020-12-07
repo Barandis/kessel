@@ -11,7 +11,7 @@ Applies a parser and returns the value that a function returns when passed the p
 
 `fn` can return anything, so `map` is one of the few combinators that can return something other than a string.
 
-`map(p, fn)` is an optimized implementation of `chain(p, x => always(fn(x)))`.
+`map` corresponds to `fmap` in Haskell (often simply `map` in other languages), which is a member of the `Functor` type class. It is often written `<$>` in languages that support custom operators.
 
 #### Example
 

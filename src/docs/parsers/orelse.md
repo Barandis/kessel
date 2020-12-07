@@ -13,7 +13,7 @@ If one of the two parsers fails fatally, `orElse` will stop at that point and fa
 
 Because of the requirement that failure not be fatal for this parser to continue (input can't be consumed by one parser and there be hope for the other parser to succeed from a different starting point), it isn't unusual to use backtracking parsers or [`attempt`](#attempt) for either `p` or `q`.
 
-In parser packages in other languages that support custom operators, `orElse` is often implemented as an operator like `<|>` or `<+>`.
+In parser packages in other languages that support custom operators, `orElse` is often implemented as an operator like `<|>`. In Haskell this is a member of the `Alternative` type class.
 
 #### Example
 
@@ -71,3 +71,4 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 * [`andThen`](#andthen)
 * [`attempt`](#attempt)
 * [`choice`](#choice)
+* [`empty`](#empty)

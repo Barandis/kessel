@@ -1617,7 +1617,7 @@
 </blockquote>
 <p>Applies a parser and returns the value that a function returns when passed the parser's result.</p>
 <p><code>fn</code> can return anything, so <code>map</code> is one of the few combinators that can return something other than a string.</p>
-<p><code>map(p, fn)</code> is an optimized implementation of <code>chain(p, x =&gt; always(fn(x)))</code>.</p>
+<p><code>map</code> corresponds to <code>fmap</code> in Haskell (often simply <code>map</code> in other languages), which is a member of the <code>Functor</code> type class. It is often written <code>&lt;$&gt;</code> in languages that support custom operators.</p>
 <h4 id="example">Example</h4>
 <div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">map</span><span class="p">(</span><span class="nx">lower</span><span class="p">,</span> <span class="nx">c</span> <span class="p">=&gt;</span> <span class="nx">c</span><span class="p">.</span><span class="nx">toUpperCase</span><span class="p">())</span>
 

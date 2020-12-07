@@ -86,6 +86,8 @@ In this documentation, we will talk about parsers *returning* values. In this ca
 | Parser | Description |
 |--------|-------------|
 | [`always`](parsers/always.md) | Always succeeds and returns a value. |
+| [`empty`](parsers/empty.md) | Always succeeds and returns nothing. |
+| [`apply`](parsers/apply.md) | Parses content and a function, returning the result of the function when passed the content. |
 | [`fail`](parsers/fail.md) | Fails with an expected message. |
 | [`failUnexpected`](parsers/failunexpected.md) | Fails with an unexpected message. |
 | [`failFatally`](parsers/failfatally.md) | Fails fatally with an expected message. |

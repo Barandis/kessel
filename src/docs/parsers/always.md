@@ -31,4 +31,5 @@ console.log(success(s)) // 3.14
 
 #### See Also
 
+* [`apply`](apply.md)
 * [`value`](value.md)
