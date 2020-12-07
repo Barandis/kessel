@@ -54,37 +54,7 @@ export {
 // COMBINATORS
 
 export {
-  andThenB,
-  attempt,
-  betweenB,
-  blockB,
-  chainB,
   choice,
-  leftB,
-  manyTillB,
-  optional,
-  orValue,
-  pipeB,
-  repeatB,
-  rightB,
-  sequenceB,
-} from './combinators/alternative'
-export {
-  between,
-  fifth,
-  first,
-  fourth,
-  join,
-  left,
-  nth,
-  pipe,
-  right,
-  second,
-  skip,
-  third,
-  value,
-} from './combinators/chaining'
-export {
   followedBy,
   followedByM,
   lookAhead,
@@ -92,11 +62,34 @@ export {
   notEmptyM,
   notFollowedBy,
   notFollowedByM,
-} from './combinators/conditional'
+  optional,
+  orValue,
+} from './combinators/alternative'
 export {
+  andThenB,
+  attempt,
   attemptM,
+  betweenB,
+  blockB,
+  chainB,
   label,
-} from './combinators/message'
+  leftB,
+  manyTillB,
+  pipeB,
+  repeatB,
+  rightB,
+  sequenceB,
+} from './combinators/backtracking'
+export {
+  fifth,
+  first,
+  fourth,
+  join,
+  nth,
+  second,
+  third,
+  value,
+} from './combinators/misc'
 export {
   always,
   andThen,
@@ -111,16 +104,21 @@ export {
   assoc1R,
   assocL,
   assocR,
+  between,
   block,
+  left,
   many,
   many1,
   manyTill,
+  pipe,
   repeat,
+  right,
   sepBy,
   sepBy1,
   sepEndBy,
   sepEndBy1,
   sequence,
+  skip,
   skipMany,
   skipMany1,
 } from './combinators/sequence'

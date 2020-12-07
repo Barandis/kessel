@@ -4,28 +4,33 @@
 // https://opensource.org/licenses/MIT
 
 import { choice } from 'kessel/combinators/alternative'
-import { join, skip, value } from 'kessel/combinators/chaining'
+import { join, value } from 'kessel/combinators/misc'
 import { map } from 'kessel/combinators/primitive'
 import {
-  assocL,
   assoc1L,
-  assocR,
   assoc1R,
+  assocL,
+  assocR,
+  between,
   block,
+  left,
   many,
   many1,
   manyTill,
+  pipe,
   repeat,
+  right,
   sepBy,
   sepBy1,
   sepEndBy,
   sepEndBy1,
   sequence,
+  skip,
   skipMany,
   skipMany1,
 } from 'kessel/combinators/sequence'
 import { Status } from 'kessel/core'
-import { any, char, digit, eof, letter } from 'kessel/parsers/char'
+import { any, char, digit, eof, letter, noneOf } from 'kessel/parsers/char'
 import { space } from 'kessel/parsers/regex'
 import { string } from 'kessel/parsers/string'
 import { terror, tfail, tpass } from 'test/helper'
@@ -862,6 +867,168 @@ describe('Sequence combinators', () => {
       tfail(assoc1R(p, sequence(letter, letter)), '23a1', {
         expected: 'a letter',
         index: 3,
+        status: Fatal,
+      })
+    })
+  })
+
+  describe('left', () => {
+    it('throws if its first argument is not a parser', () => {
+      terror(
+        left(0, any),
+        '',
+        '[left]: expected 1st argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a parser', () => {
+      terror(
+        left(any, 0),
+        '',
+        '[left]: expected 2nd argument to be a parser; found 0',
+      )
+    })
+    it('returns the result of its left parser if both pass', () => {
+      tpass(left(letter, digit), 'a1', 'a')
+    })
+    it('fails non-fatally if one parser fails and no input is consumed', () => {
+      tfail(left(letter, digit), '1', {
+        expected: 'a letter',
+        status: Fail,
+      })
+      tfail(left(eof, char('a')), '', { expected: "'a'", status: Fail })
+    })
+    it('fails fatally if any input is consumed on failure', () => {
+      tfail(left(sequence(letter, letter), digit), 'a11', {
+        expected: 'a letter',
+        index: 1,
+        status: Status.Fatal,
+      })
+      tfail(left(letter, digit), 'ab', {
+        expected: 'a digit',
+        index: 1,
+        status: Status.Fatal,
+      })
+    })
+  })
+
+  describe('right', () => {
+    it('throws if its first argument is not a parser', () => {
+      terror(
+        right(0, any),
+        '',
+        '[right]: expected 1st argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a parser', () => {
+      terror(
+        right(any, 0),
+        '',
+        '[right]: expected 2nd argument to be a parser; found 0',
+      )
+    })
+    it('returns the result of its right parser if both pass', () => {
+      tpass(right(letter, digit), 'a1', '1')
+    })
+    it('fails non-fatally if one parser fails and no input is consumed', () => {
+      tfail(right(letter, digit), '1', { expected: 'a letter', status: Fail })
+      tfail(right(eof, char('a')), '', { expected: "'a'", status: Fail })
+    })
+    it('fails fatally if any input is consumed on failure', () => {
+      tfail(right(sequence(letter, letter), digit), 'a11', {
+        expected: 'a letter',
+        index: 1,
+        status: Fatal,
+      })
+      tfail(right(letter, digit), 'ab', {
+        expected: 'a digit',
+        index: 1,
+        status: Fatal,
+      })
+    })
+  })
+
+  describe('pipe', () => {
+    it('throws if its last argument is not a function', () => {
+      terror(
+        pipe(any, any, 0),
+        '',
+        '[pipe]: expected 3rd argument to be a function; found 0',
+      )
+      terror(
+        pipe(any, any, any, any),
+        '',
+        '[pipe]: expected 4th argument to be a function; found parser',
+      )
+    })
+    it('passes parser results to a single function', () => {
+      tpass(pipe(letter, a => a.toUpperCase()), 'a', 'A')
+      tpass(pipe(letter, digit, (a, b) => b + a), 'a1', '1a')
+      tpass(pipe(letter, digit, letter, (a, b, c) => c + b + a), 'a1b', 'b1a')
+    })
+    it('fails non-fatally if no input is consumed on failure', () => {
+      tfail(pipe(letter, a => a), '1', {
+        expected: 'a letter',
+        index: 0,
+        status: Fail,
+      })
+      tfail(pipe(eof, letter, (a, b) => b + a), '', {
+        expected: 'a letter',
+        index: 0,
+        status: Fail,
+      })
+    })
+    it('fails fatally if input was consumed on failure', () => {
+      tfail(pipe(letter, digit, (a, b) => b + a), 'aa', {
+        expected: 'a digit',
+        index: 1,
+        status: Fatal,
+      })
+    })
+  })
+
+  describe('between', () => {
+    const parser = between(char('('), char(')'), many(noneOf(')')))
+
+    it('throws if its first argument is not a parser', () => {
+      terror(
+        between(0, any, any),
+        '',
+        '[between]: expected 1st argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a parser', () => {
+      terror(
+        between(any, 0, any),
+        '',
+        '[between]: expected 2nd argument to be a parser; found 0',
+      )
+    })
+    it('throws if its third argument is not a parser', () => {
+      terror(
+        between(any, any, 0),
+        '',
+        '[between]: expected 3rd argument to be a parser; found 0',
+      )
+    })
+    it('succeeds with the result of its content parser', () => {
+      tpass(parser, '(abc)', ['a', 'b', 'c'])
+    })
+    it('fails non-fatally if no content is consumed', () => {
+      tfail(parser, 'abc)', {
+        expected: "'('",
+        index: 0,
+        status: Fail,
+      })
+    })
+    it('fails fatally if content is consumed', () => {
+      tfail(parser, '(abc', {
+        expected: "')'",
+        index: 4,
+        status: Fatal,
+      })
+      tfail(between(char('('), char(')'), sequence(letter, letter)), '(a)', {
+        expected: 'a letter',
+        index: 2,
         status: Fatal,
       })
     })

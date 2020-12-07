@@ -5,8 +5,7 @@
 
 import { expect } from 'chai'
 
-import { sequenceB } from 'kessel/combinators/alternative'
-import { attemptM } from 'kessel/combinators/message'
+import { attemptM, sequenceB } from 'kessel/combinators/backtracking'
 import { sequence } from 'kessel/combinators/sequence'
 import { Context, parse, Status } from 'kessel/core'
 import {

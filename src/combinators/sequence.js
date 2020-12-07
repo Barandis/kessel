@@ -9,6 +9,7 @@ import {
   assertNumber,
   assertParser,
   assertParsers,
+  ordFnFormatter,
   ordNumFormatter,
   ordParFormatter,
 } from 'kessel/assert'
@@ -57,6 +58,62 @@ export const sequence = (...ps) => Parser(ctx => {
     if (pres.value !== null) values.push(pres.value)
   }
   return ok(context, values)
+})
+
+/**
+ * Creates a parser that will apply the parsers `p` and `q` in
+ * sequence and then return the result of `p`. If either `p` or `q`
+ * fail, this parser will also fail, and the failure will be fatal if
+ * any input had been consumed by either parser.
+ *
+ * `left(p, q)` is an optimized implementation of `chain(p, x =>
+ * value(q, x))`.
+ *
+ * @param {Parser} p The first parser to apply.
+ * @param {Parser} q The second parser to apply.
+ * @returns {Parser} A parser that applies both contained parsers and
+ *     results in the value of the first.
+ */
+export const left = (p, q) => Parser(ctx => {
+  ASSERT && assertParser('left', p, ordParFormatter('1st'))
+  ASSERT && assertParser('left', q, ordParFormatter('2nd'))
+
+  const index = ctx.index
+
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  if (pres.status !== Ok) return prep
+
+  const [qctx, qres] = q(pctx)
+  return qres.status === Ok ? ok(qctx, pres.value)
+    : maybeFatal(qctx.index !== index, qctx, qres.errors)
+})
+
+/**
+ * Creates a parser that will apply the parsers `p` and `q` in
+ * sequence and then return the result of `q`. If either `p` or `q`
+ * fail, this parser will also fail, and the failure will be fatal if
+ * any input had been consumed by either parser.
+ *
+ * `right(p, q)` is an optimized implementation of `chain(p, () =>
+ * q)`.
+ *
+ * @param {Parser} p The first parser to apply.
+ * @param {Parser} q The second parser to apply.
+ * @returns {Parser} A parser that applies both contained parsers and
+ *     results in the value of the second.
+ */
+export const right = (p, q) => Parser(ctx => {
+  ASSERT && assertParser('right', p, ordParFormatter('1st'))
+  ASSERT && assertParser('right', q, ordParFormatter('2nd'))
+
+  const index = ctx.index
+
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  if (pres.status !== Status.Ok) return prep
+
+  const [qrep, [qctx, qres]] = twin(q(pctx))
+  return qres.status === Ok ? qrep
+    : maybeFatal(qctx.index !== index, qctx, qres.errors)
 })
 
 /**
@@ -172,6 +229,25 @@ export const many1 = p => Parser(ctx => {
     if (context.index >= context.view.byteLength) break
   }
   return ok(context, values)
+})
+
+/**
+ * Creates a parser that applies the supplied parser and discards any
+ * successful result while still consuming input. A failure will be
+ * propagated without modification.
+ *
+ * `skip(p)` is an optimized implementation of `chain(p, () =>
+ * always(null))`,
+ *
+ * @param {Parser} p The parser whose result is to be discarded.
+ * @returns {Parser} A parser that will consume input as its contained
+ *     parser does on success, but will produce no result.
+ */
+export const skip = p => Parser(ctx => {
+  ASSERT && assertParser('skip', p)
+
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  return pres.status === Ok ? ok(pctx, null) : prep
 })
 
 /**
@@ -472,6 +548,45 @@ export const repeat = (p, n) => Parser(ctx => {
 })
 
 /**
+ * Creates a parser which applies its before, content, and after parsers
+ * in order and results in the result of its content parser.
+ *
+ * Note that the content parser `p` is applied before the after parser
+ * `pafter`. This means that the content parser will have an opportunity
+ * to patch the "after" content before the after parser does, so take
+ * care that the parsers do not overlap in what they match.
+ *
+ * `between(pre, post, p)` is an optimized implementation of
+ * `left(right(pre, p), post)`.
+ *
+ * @param {Parser} pre The first parser to apply.
+ * @param {Parser} post The last parser to apply.
+ * @param {Parser} p The second parser to apply and whose result becomes
+ *     the result of the new parser.
+ * @returns {Parser} A parser which applies its parsers in the correct
+ *     order and then results in the result of its content parser.
+ */
+export const between = (pre, post, p) => Parser(ctx => {
+  ASSERT && assertParser('between', pre, ordParFormatter('1st'))
+  ASSERT && assertParser('between', post, ordParFormatter('2nd'))
+  ASSERT && assertParser('between', p, ordParFormatter('3rd'))
+
+  const index = ctx.index
+
+  const [prerep, [prectx, preres]] = twin(pre(ctx))
+  if (preres.status !== Ok) return prerep
+
+  const [pctx, pres] = p(prectx)
+  if (pres.status !== Ok) {
+    return maybeFatal(pctx.index !== index, pctx, pres.errors)
+  }
+
+  const [postctx, postres] = post(pctx)
+  return postres.status === Ok ? ok(postctx, pres.value)
+    : maybeFatal(postctx.index !== index, postctx, postres.errors)
+})
+
+/**
  * Creates a parser which applies its content parser zero or more times
  * until its end parser is successful. This parser results in an array
  * of all of the successful content parser results. The end parser is
@@ -519,6 +634,56 @@ export const manyTill = (p, end) => Parser(ctx => {
     if (pres.value !== null) values.push(pres.value)
   }
   return ok(context, values)
+})
+
+/**
+ * Creates a parser that applies its parsers in sequence and passes
+ * those results to a function of the same arity as the number of
+ * parsers to apply. The return value of that function becomes the
+ * parser's result.
+ *
+ * Note that, unlike `sequence`, `null` parser results are *not*
+ * discarded. This ensures that the same number of arguments are passed
+ * to `fn` no matter the results from the parsers.
+ *
+ * `pipe(p, q, fn)` is an optimized implementation of `chain(p, a =>
+ * chain(q, b => always(fn(a, b))))`, `pipe(p, q, r, fn)` is an
+ * optimized implementation of `chain(p, a => chain(q, b => chain(r,
+ * c => always(fn(a, b, c)))))`, and so on.
+ *
+ * If the array has one element, the parser becomes equivalent to `map`
+ * but less efficient.
+ *
+ * @param {...(Parser|function(...*):*)} ps An array of parsers to be
+ *     applied one at a time, in order, followed by a function which
+ *     will receive as parameters the results of each parser. Its return
+ *     value will become the result of the created parser. A single
+ *     function must be present and it must be the last parameter; all
+ *     other parameters must be parsers.
+ * @returns {Parser} A parser that will apply its parsers in sequence,
+ *     feed the results to its function, and result in the function's
+ *     return value.
+ */
+export const pipe = (...ps) => Parser(ctx => {
+  const fn = ps.pop()
+
+  ASSERT && assertParsers('pipe', ps)
+  ASSERT && assertFunction('pipe', fn, ordFnFormatter(ordinal(ps.length + 1)))
+
+  const index = ctx.index
+  const values = []
+  let context = ctx
+
+  for (const p of ps) {
+    const [pctx, pres] = p(context)
+    context = pctx
+
+    if (pres.status !== Ok) {
+      return maybeFatal(context.index !== index, context, pres.errors)
+    }
+    values.push(pres.value)
+  }
+  return ok(context, fn(...values))
 })
 
 /**

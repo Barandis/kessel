@@ -3,7 +3,6 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { left } from 'kessel/combinators/chaining'
 import {
   always,
   andThen,
@@ -13,6 +12,7 @@ import {
   map,
   orElse,
 } from 'kessel/combinators/primitive'
+import { left } from 'kessel/combinators/sequence'
 import { Status } from 'kessel/core'
 import { any, char, digit, eof, letter } from 'kessel/parsers/char'
 import { terror, tfail, tpass } from 'test/helper'
