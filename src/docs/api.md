@@ -15,7 +15,7 @@ A couple notes on terms you'll find in this API documentation.
 
 Everything in the Parser API Reference is referred to as a *parser*. This is not exactly accurate; in Kessel, a parser is a function that takes a context as an argument and returns a tuple of an updated context and a result. By that definition, the only parsers in here are things like [`any`](parsers/any.md) and [`letter`](parsers/letter.md) that don't take any additional parameters.
 
-A number of items in the reference are functions that *produce* parsers. Examples are [`char`](parsers/char.md) and [`string`](parsers/string.md). These require extra information to know what to parse - `char` needs to know *which* character it's looking for, for example - so they have parameters to let them accept that information. But these functions *return* parsers. In other words, `char` is not a parser, but `char('a')` is. Because of that, it's safe enough to refer to these functions as parsers as well.
+A number of items in the reference are functions that *produce* parsers. Examples are [`char`](parsers/char.md) and [`string`](parsers/string.md). These require extra information to know what to parse &mdash; `char` needs to know *which* character it's looking for, for example &mdash; so they have parameters to let them accept that information. But these functions *return* parsers. In other words, `char` is not a parser, but `char('a')` is. Because of that, it's safe enough to refer to these functions as parsers as well.
 
 The final class of object in the Parser API Reference is the *combinator*. A combinator is a function that takes one or more parsers as parameters, maybe with other parameters as well, and return another parser. ([`block`](/parsers/block.md) and [`blockB`](parsers/blockb.md) take generator functions instead of parsers, but since those generator functions can call parsers in their bodies, they can also be considered combinators.)
 
@@ -85,41 +85,32 @@ In this documentation, we will talk about parsers *returning* values. In this ca
 
 | Parser | Description |
 |--------|-------------|
-| [`always`](parsers/always.md) | Always succeeds and returns a value. |
-| [`empty`](parsers/empty.md) | Always succeeds and returns nothing. |
-| [`apply`](parsers/apply.md) | Parses content and a function, returning the result of the function when passed the content. |
 | [`failNormally`](parsers/failnormally.md) | Fails with a generic message. |
 | [`failFatally`](parsers/failfatally.md) | Fails fatally with a generic message. |
 
-### Table 5: Chaining combinators
+### Table 5: Primitive combinators
 
 | Parser | Description |
 |--------|-------------|
-| [`chain`](parsers/chain.md) | Applies a parser, then applies a function to the result, then applies the parser returned by the function. |
-| [`value`](parsers/value.md) | Applies a parser and returns a value. |
-| [`skip`](parsers/skip.md) | Applies a parser and discards the result. |
+| [`always`](parsers/always.md) | Always succeeds and returns a value. |
+| [`empty`](parsers/empty.md) | Always succeeds and returns nothing. |
 | [`map`](parsers/map.md) | Applies a parser, then applies a function to the result, then returns the result of that function. |
-| [`left`](parsers/left.md) | Applies two parsers in order and returns the result of the first one. |
-| [`right`](parsers/right.md) | Applies two parsers in order and returns the result of the second one. |
-| [`pipe`](parsers/pipe.md) | Applies a series of parsers in order, then passes the results as arguments to a function, then returns the result of that function. |
-| [`between`](parsers/between.md) | Applies a content parser between two other parsers, returning only the content parser's result. |
-| [`nth`](parsers/nth.md) | Applies a parser and returns the nth element of the resulting array. |
-| [`first`](parsers/first.md) | Applies a parser and returns the first element of the resulting array. |
-| [`second`](parsers/second.md) | Applies a parser and returns the second element of the resulting array. |
-| [`third`](parsers/third.md) | Applies a parser and returns the third element of the resulting array. |
-| [`fourth`](parsers/fourth.md) | Applies a parser and returns the fourth element of the resulting array. |
-| [`fifth`](parsers/fifth.md) | Applies a parser and returns the fifth element of the resulting array. |
-| [`join`](parsers/join.md) | Applies a parser and returns its resulting array elements joined together into a string. |
+| [`apply`](parsers/apply.md) | Parses content and a function, returning the result of the function when passed the content. |
+| [`chain`](parsers/chain.md) | Applies a parser, then applies a function to the result, then applies the parser returned by the function. |
+| [`orElse`](parsers/orelse.md) | Applies a parser and, if it fails, a second parser. |
+| [`andThen`](parsers/andthen.md) | Applies two parsers in order and returns their results in a tuple. |
 
 ### Table 6: Sequence combinators
 
 | Parser | Description |
 |--------|-------------|
-| [`andThen`](parsers/andthen.md) | Applies two parsers in order and returns their results in a tuple. |
+| [`left`](parsers/left.md) | Applies two parsers in order and returns the result of the first one. |
+| [`right`](parsers/right.md) | Applies two parsers in order and returns the result of the second one. |
 | [`sequence`](parsers/sequence.md) | Applies a series of parsers in order, returning their results in an array. |
 | [`block`](parsers/block.md) | Runs a generator function. The generator can `yield` parsers, whose results will be returned as the result of the `yield` expressions. Returns the result of the generator. |
 | [`many`](parsers/many.md) | Applies a parser zero or more times until it fails, returning all of the results in an array. |
 | [`many1`](parsers/many1.md) | Applies a parser one or more times until it fails, returning all of the results in an array. |
+| [`skip`](parsers/skip.md) | Applies a parser and discards the result. |
 | [`skipMany`](parsers/skipmany.md) | Applies a parser zero or more times until it fails, discarding the results. |
 | [`skipMany1`](parsers/skipmany1.md) | Applies a parser one or more times until it fails, discarding the results. |
 | [`sepBy`](parsers/sepby.md) | Applies a content parser zero or more times with an application of a separator parser between each. Returns the content parser results. |
@@ -127,26 +118,35 @@ In this documentation, we will talk about parsers *returning* values. In this ca
 | [`sepEndBy`](parsers/sependby.md) | Applies a content parser zero or more times with an application of a separator parser between each and optionally at the end. Returns the content parser results. |
 | [`sepEndBy1`](parsers/sependby1.md) | Applies a content parser one or more times with an application of a separator parser between each and optionally at the end. Returns the content parser results.  |
 | [`repeat`](parsers/repeat.md) | Applies a parser a certain number of times, returning the results in an array. |
+| [`pipe`](parsers/pipe.md) | Applies a series of parsers in order, then passes the results as arguments to a function, then returns the result of that function. |
+| [`between`](parsers/between.md) | Applies a content parser between two other parsers, returning only the content parser's result. |
 | [`manyTill`](parsers/manytill.md) | Applies a content parser zero or more times until an end parser succeeds. Returns the content parser's results. |
 | [`assocL`](parsers/assocl.md) | Applies a content parser zero or more times with an application of an operator parser between each. Returns the value obtained by left associative application of all functions returned by the operator parser to the results returned by the content parser. |
 | [`assoc1L`](parsers/assoc1l.md) | Applies a content parser one or more times with an application of an operator parser between each. Returns the value obtained by left associative application of all functions returned by the operator parser to the results returned by the content parser.|
 | [`assocR`](parsers/assocr.md) | Applies a content parser zero or more times with an application of an operator parser between each. Returns the value obtained by right associative application of all functions returned by the operator parser to the results returned by the content parser.|
 | [`assoc1R`](parsers/assoc1r.md) | Applies a content parser one or more times with an application of an operator parser between each. Returns the value obtained by right associative application of all functions returned by the operator parser to the results returned by the content parser. |
 
-### Table 7: Alternative combinators
+### Table 7: Alternative and conditional combinators
 
 | Parser | Description |
 |--------|-------------|
-| [`orElse`](parsers/orelse.md) | Applies a parser and, if it fails, a second parser. |
 | [`choice`](parsers/choice.md) | Applies a series of parsers one at a time until one succeeds. |
 | [`optional`](parsers/optional.md) | Applies a parser and returns its result on success. On failure, succeeds but returns nothing. |
 | [`orValue`](parsers/orvalue.md) | Applies a parser and returns either its result upon success or another value upon failure. |
+| [`lookAhead`](parsers/lookahead.md) | Applies a parser and returns its result without consuming input. |
+| [`notEmpty`](parsers/notempty.md) | Applies a parser and fails if the parser succeeds without consuming input. |
+| [`notEmptyM`](parsers/notemptym.md) | Applies a parser and fails if the parser succeeds without consuming input. Overwrites the error message with a custom one on failure. |
+| [`followedBy`](parsers/followedby.md) | Applies a parser and succeeds without consuming input if that parser succeeds. |
+| [`followedByM`](parsers/followedbym.md) | Applies a parser and succeeds without consuming input if that parser succeeds. Overwrites the error message with a custom one on failure. |
+| [`notFollowedBy`](parsers/notfollowedby.md) | Applies a parser and succeeds without consuming input if that parser fails. |
+| [`notFollowedByM`](parsers/notfollowedbym.md) | Applies a parser and succeeds without consuming input if that parser fails. Overwrites the error message with a custom one on failure.  |
 
 ### Table 8: Backtracking combinators
 
 | Parser | Description |
 |--------|-------------|
 | [`attempt`](parsers/attempt.md) | Applies a parser, backtracking to its original position if the parser fails and consumes input. |
+| [`attemptM`](parsers/attemptm.md) | Applies a parser and replaces its errors with an expected error if that parser fails. Backtracks to where the parser was applied and adds additional information to the error message if that parser consumes input. |
 | [`sequenceB`](parsers/sequenceb.md) | Applies a series of parsers in order, returning their results in an array. Backtracks to where the first parser was applied if any other of its parsers fails. |
 | [`blockB`](parsers/blockb.md) | Runs a generator function. The generator can `yield` parsers, whose results will be returned as the result of the `yield` expressions. Returns the result of the generator. Backtracks to where the first yielded parser was applied if any later parser fails. |
 | [`chainB`](parsers/chainb.md) | Applies a parser, then applies a function to the result, then applies the parser returned by the function. Backtracks to where the first parser was applied if the parser returned by the function fails. | [`applyB`](parsers/applyb.md) | Parses content and a function, returning the result of the function when passed the content. Backtracks to where the first parser was applied if the second parser fails. |
@@ -158,21 +158,16 @@ In this documentation, we will talk about parsers *returning* values. In this ca
 | [`manyTillB`](parsers/manytillb.md) | Applies a content parser zero or more times until an end parser succeeds. Returns the content parser's results. Backtracks to where the content parser was first applied if it fails before the end parser succeeds. |
 | [`betweenB`](parsers/betweenb.md) | Applies a content parser between two other parsers, returning only the content parser's result. Backtracks to where the first parser was applied if either other parser fails. |
 
-### Table 9: Conditional and lookahead combinators
-
-| Parser | Description |
-|--------|-------------|
-| [`lookAhead`](parsers/lookahead.md) | Applies a parser and returns its result without consuming input. |
-| [`notEmpty`](parsers/notempty.md) | Applies a parser and fails if the parser succeeds without consuming input. |
-| [`followedBy`](parsers/followedby.md) | Applies a parser and succeeds without consuming input if that parser succeeds. |
-| [`notFollowedBy`](parsers/notfollowedby.md) | Applies a parser and succeeds without consuming input if that parser fails. |
-
-### Table 10: Error message combinators
+### Table 9: Miscellaneous combinators
 
 | Parser | Description |
 |--------|-------------|
 | [`label`](parsers/label.md) | Applies a parser and replaces its errors with an expected error if that parser fails. |
-| [`attemptM`](parsers/attemptm.md) | Applies a parser and replaces its errors with an expected error if that parser fails. Backtracks to where the parser was applied and adds additional information to the error message if that parser consumes input. |
-| [`notEmptyM`](parsers/notemptym.md) | Applies a parser and fails if the parser succeeds without consuming input. Overwrites the error message with a custom one on failure. |
-| [`followedByM`](parsers/followedbym.md) | Applies a parser and succeeds without consuming input if that parser succeeds. Overwrites the error message with a custom one on failure. |
-| [`notFollowedByM`](parsers/notfollowedbym.md) | Applies a parser and succeeds without consuming input if that parser fails. Overwrites the error message with a custom one on failure.  |
+| [`value`](parsers/value.md) | Applies a parser and returns a value. |
+| [`nth`](parsers/nth.md) | Applies a parser and returns the nth element of the resulting array. |
+| [`first`](parsers/first.md) | Applies a parser and returns the first element of the resulting array. |
+| [`second`](parsers/second.md) | Applies a parser and returns the second element of the resulting array. |
+| [`third`](parsers/third.md) | Applies a parser and returns the third element of the resulting array. |
+| [`fourth`](parsers/fourth.md) | Applies a parser and returns the fourth element of the resulting array. |
+| [`fifth`](parsers/fifth.md) | Applies a parser and returns the fifth element of the resulting array. |
+| [`join`](parsers/join.md) | Applies a parser and returns its resulting array elements joined together into a string. |

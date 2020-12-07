@@ -13,7 +13,12 @@ The result of the first parser is discarded. If either parser fails, then the en
 
 There is another version of this parser ([`rightB`](rightb.md)) that will backtrack and fail non-fatally if `p` succeeds and `q` fails non-fatally.
 
-`right(p, q)` is an optimized implementation of `chain(p, () => q)`.
+`right(p, q)` is the equivalent of `p *> q` in the Haskell `Applicative` class and is written `>>.` in FParsec. It can be regarded as an optimized implementation of either of the following.
+
+```
+chain(p, () => q) // monadic style
+apply(p, apply(q, x => () => x)) // applicative style
+```
 
 #### Example
 

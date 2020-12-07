@@ -384,8 +384,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#table-5-chaining-combinators" class="md-nav__link">
-    Table 5: Chaining combinators
+  <a href="#table-5-primitive-combinators" class="md-nav__link">
+    Table 5: Primitive combinators
   </a>
   
 </li>
@@ -398,8 +398,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#table-7-alternative-combinators" class="md-nav__link">
-    Table 7: Alternative combinators
+  <a href="#table-7-alternative-and-conditional-combinators" class="md-nav__link">
+    Table 7: Alternative and conditional combinators
   </a>
   
 </li>
@@ -412,15 +412,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#table-9-conditional-and-lookahead-combinators" class="md-nav__link">
-    Table 9: Conditional and lookahead combinators
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#table-10-error-message-combinators" class="md-nav__link">
-    Table 10: Error message combinators
+  <a href="#table-9-miscellaneous-combinators" class="md-nav__link">
+    Table 9: Miscellaneous combinators
   </a>
   
 </li>
@@ -1694,8 +1687,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#table-5-chaining-combinators" class="md-nav__link">
-    Table 5: Chaining combinators
+  <a href="#table-5-primitive-combinators" class="md-nav__link">
+    Table 5: Primitive combinators
   </a>
   
 </li>
@@ -1708,8 +1701,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#table-7-alternative-combinators" class="md-nav__link">
-    Table 7: Alternative combinators
+  <a href="#table-7-alternative-and-conditional-combinators" class="md-nav__link">
+    Table 7: Alternative and conditional combinators
   </a>
   
 </li>
@@ -1722,15 +1715,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#table-9-conditional-and-lookahead-combinators" class="md-nav__link">
-    Table 9: Conditional and lookahead combinators
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#table-10-error-message-combinators" class="md-nav__link">
-    Table 10: Error message combinators
+  <a href="#table-9-miscellaneous-combinators" class="md-nav__link">
+    Table 9: Miscellaneous combinators
   </a>
   
 </li>
@@ -1765,7 +1751,7 @@
 <p>A couple notes on terms you'll find in this API documentation.</p>
 <h3 id="parser">Parser</h3>
 <p>Everything in the Parser API Reference is referred to as a <em>parser</em>. This is not exactly accurate; in Kessel, a parser is a function that takes a context as an argument and returns a tuple of an updated context and a result. By that definition, the only parsers in here are things like <a href="../parsers/any/"><code>any</code></a> and <a href="../parsers/letter/"><code>letter</code></a> that don't take any additional parameters.</p>
-<p>A number of items in the reference are functions that <em>produce</em> parsers. Examples are <a href="../parsers/char/"><code>char</code></a> and <a href="../parsers/string/"><code>string</code></a>. These require extra information to know what to parse - <code>char</code> needs to know <em>which</em> character it's looking for, for example - so they have parameters to let them accept that information. But these functions <em>return</em> parsers. In other words, <code>char</code> is not a parser, but <code>char('a')</code> is. Because of that, it's safe enough to refer to these functions as parsers as well.</p>
+<p>A number of items in the reference are functions that <em>produce</em> parsers. Examples are <a href="../parsers/char/"><code>char</code></a> and <a href="../parsers/string/"><code>string</code></a>. These require extra information to know what to parse &mdash; <code>char</code> needs to know <em>which</em> character it's looking for, for example &mdash; so they have parameters to let them accept that information. But these functions <em>return</em> parsers. In other words, <code>char</code> is not a parser, but <code>char('a')</code> is. Because of that, it's safe enough to refer to these functions as parsers as well.</p>
 <p>The final class of object in the Parser API Reference is the <em>combinator</em>. A combinator is a function that takes one or more parsers as parameters, maybe with other parameters as well, and return another parser. (<a href="/parsers/block.md"><code>block</code></a> and <a href="../parsers/blockb/"><code>blockB</code></a> take generator functions instead of parsers, but since those generator functions can call parsers in their bodies, they can also be considered combinators.)</p>
 <p>Combinators are a little different because they don't actually read text. Every parser or parser-producing function, at the core, is a function that reads one or more characters of text and either succeeds or fails depending on whether it read the character(s) it was expecting. Combinators don't do that; they modify or compose other parsers. For example, <a href="../parsers/many/"><code>many</code></a> doesn't read any text at all, but it tells the parser passed into it to read text zero or more times.</p>
 <p>But in the end it's all the same. <code>many</code> may not parse text directly, but it has a value passed to it which may be a parser itself. If it's not, then it must be a combinator that has a value passed to <em>it</em>. Eventually, there's going to be a parser, and it will read text. So <code>many</code> may not be a parser, and the same with <a href="../parsers/choice/"><code>choice</code></a> and <a href="../parsers/pipe/"><code>pipe</code></a> and <a href="../parsers/join/"><code>join</code></a>, but <code>pipe(choice(char('_'), letter), join(many(choice(char('_'), letter, digit))), (first, rest) =&gt; first + rest)</code> is definitely a parser. (One which does a pretty reasonable job of parsing a programming language identifier..md)</p>
@@ -1949,18 +1935,6 @@
 </thead>
 <tbody>
 <tr>
-<td><a href="../parsers/always/"><code>always</code></a></td>
-<td>Always succeeds and returns a value.</td>
-</tr>
-<tr>
-<td><a href="../parsers/empty/"><code>empty</code></a></td>
-<td>Always succeeds and returns nothing.</td>
-</tr>
-<tr>
-<td><a href="../parsers/apply/"><code>apply</code></a></td>
-<td>Parses content and a function, returning the result of the function when passed the content.</td>
-</tr>
-<tr>
 <td><a href="../parsers/failnormally/"><code>failNormally</code></a></td>
 <td>Fails with a generic message.</td>
 </tr>
@@ -1970,7 +1944,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="table-5-chaining-combinators">Table 5: Chaining combinators</h3>
+<h3 id="table-5-primitive-combinators">Table 5: Primitive combinators</h3>
 <table>
 <thead>
 <tr>
@@ -1980,64 +1954,32 @@
 </thead>
 <tbody>
 <tr>
-<td><a href="../parsers/chain/"><code>chain</code></a></td>
-<td>Applies a parser, then applies a function to the result, then applies the parser returned by the function.</td>
+<td><a href="../parsers/always/"><code>always</code></a></td>
+<td>Always succeeds and returns a value.</td>
 </tr>
 <tr>
-<td><a href="../parsers/value/"><code>value</code></a></td>
-<td>Applies a parser and returns a value.</td>
-</tr>
-<tr>
-<td><a href="../parsers/skip/"><code>skip</code></a></td>
-<td>Applies a parser and discards the result.</td>
+<td><a href="../parsers/empty/"><code>empty</code></a></td>
+<td>Always succeeds and returns nothing.</td>
 </tr>
 <tr>
 <td><a href="../parsers/map/"><code>map</code></a></td>
 <td>Applies a parser, then applies a function to the result, then returns the result of that function.</td>
 </tr>
 <tr>
-<td><a href="../parsers/left/"><code>left</code></a></td>
-<td>Applies two parsers in order and returns the result of the first one.</td>
+<td><a href="../parsers/apply/"><code>apply</code></a></td>
+<td>Parses content and a function, returning the result of the function when passed the content.</td>
 </tr>
 <tr>
-<td><a href="../parsers/right/"><code>right</code></a></td>
-<td>Applies two parsers in order and returns the result of the second one.</td>
+<td><a href="../parsers/chain/"><code>chain</code></a></td>
+<td>Applies a parser, then applies a function to the result, then applies the parser returned by the function.</td>
 </tr>
 <tr>
-<td><a href="../parsers/pipe/"><code>pipe</code></a></td>
-<td>Applies a series of parsers in order, then passes the results as arguments to a function, then returns the result of that function.</td>
+<td><a href="../parsers/orelse/"><code>orElse</code></a></td>
+<td>Applies a parser and, if it fails, a second parser.</td>
 </tr>
 <tr>
-<td><a href="../parsers/between/"><code>between</code></a></td>
-<td>Applies a content parser between two other parsers, returning only the content parser's result.</td>
-</tr>
-<tr>
-<td><a href="../parsers/nth/"><code>nth</code></a></td>
-<td>Applies a parser and returns the nth element of the resulting array.</td>
-</tr>
-<tr>
-<td><a href="../parsers/first/"><code>first</code></a></td>
-<td>Applies a parser and returns the first element of the resulting array.</td>
-</tr>
-<tr>
-<td><a href="../parsers/second/"><code>second</code></a></td>
-<td>Applies a parser and returns the second element of the resulting array.</td>
-</tr>
-<tr>
-<td><a href="../parsers/third/"><code>third</code></a></td>
-<td>Applies a parser and returns the third element of the resulting array.</td>
-</tr>
-<tr>
-<td><a href="../parsers/fourth/"><code>fourth</code></a></td>
-<td>Applies a parser and returns the fourth element of the resulting array.</td>
-</tr>
-<tr>
-<td><a href="../parsers/fifth/"><code>fifth</code></a></td>
-<td>Applies a parser and returns the fifth element of the resulting array.</td>
-</tr>
-<tr>
-<td><a href="../parsers/join/"><code>join</code></a></td>
-<td>Applies a parser and returns its resulting array elements joined together into a string.</td>
+<td><a href="../parsers/andthen/"><code>andThen</code></a></td>
+<td>Applies two parsers in order and returns their results in a tuple.</td>
 </tr>
 </tbody>
 </table>
@@ -2051,8 +1993,12 @@
 </thead>
 <tbody>
 <tr>
-<td><a href="../parsers/andthen/"><code>andThen</code></a></td>
-<td>Applies two parsers in order and returns their results in a tuple.</td>
+<td><a href="../parsers/left/"><code>left</code></a></td>
+<td>Applies two parsers in order and returns the result of the first one.</td>
+</tr>
+<tr>
+<td><a href="../parsers/right/"><code>right</code></a></td>
+<td>Applies two parsers in order and returns the result of the second one.</td>
 </tr>
 <tr>
 <td><a href="../parsers/sequence/"><code>sequence</code></a></td>
@@ -2069,6 +2015,10 @@
 <tr>
 <td><a href="../parsers/many1/"><code>many1</code></a></td>
 <td>Applies a parser one or more times until it fails, returning all of the results in an array.</td>
+</tr>
+<tr>
+<td><a href="../parsers/skip/"><code>skip</code></a></td>
+<td>Applies a parser and discards the result.</td>
 </tr>
 <tr>
 <td><a href="../parsers/skipmany/"><code>skipMany</code></a></td>
@@ -2099,6 +2049,14 @@
 <td>Applies a parser a certain number of times, returning the results in an array.</td>
 </tr>
 <tr>
+<td><a href="../parsers/pipe/"><code>pipe</code></a></td>
+<td>Applies a series of parsers in order, then passes the results as arguments to a function, then returns the result of that function.</td>
+</tr>
+<tr>
+<td><a href="../parsers/between/"><code>between</code></a></td>
+<td>Applies a content parser between two other parsers, returning only the content parser's result.</td>
+</tr>
+<tr>
 <td><a href="../parsers/manytill/"><code>manyTill</code></a></td>
 <td>Applies a content parser zero or more times until an end parser succeeds. Returns the content parser's results.</td>
 </tr>
@@ -2120,7 +2078,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="table-7-alternative-combinators">Table 7: Alternative combinators</h3>
+<h3 id="table-7-alternative-and-conditional-combinators">Table 7: Alternative and conditional combinators</h3>
 <table>
 <thead>
 <tr>
@@ -2129,10 +2087,6 @@
 </tr>
 </thead>
 <tbody>
-<tr>
-<td><a href="../parsers/orelse/"><code>orElse</code></a></td>
-<td>Applies a parser and, if it fails, a second parser.</td>
-</tr>
 <tr>
 <td><a href="../parsers/choice/"><code>choice</code></a></td>
 <td>Applies a series of parsers one at a time until one succeeds.</td>
@@ -2144,6 +2098,34 @@
 <tr>
 <td><a href="../parsers/orvalue/"><code>orValue</code></a></td>
 <td>Applies a parser and returns either its result upon success or another value upon failure.</td>
+</tr>
+<tr>
+<td><a href="../parsers/lookahead/"><code>lookAhead</code></a></td>
+<td>Applies a parser and returns its result without consuming input.</td>
+</tr>
+<tr>
+<td><a href="../parsers/notempty/"><code>notEmpty</code></a></td>
+<td>Applies a parser and fails if the parser succeeds without consuming input.</td>
+</tr>
+<tr>
+<td><a href="../parsers/notemptym/"><code>notEmptyM</code></a></td>
+<td>Applies a parser and fails if the parser succeeds without consuming input. Overwrites the error message with a custom one on failure.</td>
+</tr>
+<tr>
+<td><a href="../parsers/followedby/"><code>followedBy</code></a></td>
+<td>Applies a parser and succeeds without consuming input if that parser succeeds.</td>
+</tr>
+<tr>
+<td><a href="../parsers/followedbym/"><code>followedByM</code></a></td>
+<td>Applies a parser and succeeds without consuming input if that parser succeeds. Overwrites the error message with a custom one on failure.</td>
+</tr>
+<tr>
+<td><a href="../parsers/notfollowedby/"><code>notFollowedBy</code></a></td>
+<td>Applies a parser and succeeds without consuming input if that parser fails.</td>
+</tr>
+<tr>
+<td><a href="../parsers/notfollowedbym/"><code>notFollowedByM</code></a></td>
+<td>Applies a parser and succeeds without consuming input if that parser fails. Overwrites the error message with a custom one on failure.</td>
 </tr>
 </tbody>
 </table>
@@ -2159,6 +2141,10 @@
 <tr>
 <td><a href="../parsers/attempt/"><code>attempt</code></a></td>
 <td>Applies a parser, backtracking to its original position if the parser fails and consumes input.</td>
+</tr>
+<tr>
+<td><a href="../parsers/attemptm/"><code>attemptM</code></a></td>
+<td>Applies a parser and replaces its errors with an expected error if that parser fails. Backtracks to where the parser was applied and adds additional information to the error message if that parser consumes input.</td>
 </tr>
 <tr>
 <td><a href="../parsers/sequenceb/"><code>sequenceB</code></a></td>
@@ -2202,34 +2188,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="table-9-conditional-and-lookahead-combinators">Table 9: Conditional and lookahead combinators</h3>
-<table>
-<thead>
-<tr>
-<th>Parser</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="../parsers/lookahead/"><code>lookAhead</code></a></td>
-<td>Applies a parser and returns its result without consuming input.</td>
-</tr>
-<tr>
-<td><a href="../parsers/notempty/"><code>notEmpty</code></a></td>
-<td>Applies a parser and fails if the parser succeeds without consuming input.</td>
-</tr>
-<tr>
-<td><a href="../parsers/followedby/"><code>followedBy</code></a></td>
-<td>Applies a parser and succeeds without consuming input if that parser succeeds.</td>
-</tr>
-<tr>
-<td><a href="../parsers/notfollowedby/"><code>notFollowedBy</code></a></td>
-<td>Applies a parser and succeeds without consuming input if that parser fails.</td>
-</tr>
-</tbody>
-</table>
-<h3 id="table-10-error-message-combinators">Table 10: Error message combinators</h3>
+<h3 id="table-9-miscellaneous-combinators">Table 9: Miscellaneous combinators</h3>
 <table>
 <thead>
 <tr>
@@ -2243,20 +2202,36 @@
 <td>Applies a parser and replaces its errors with an expected error if that parser fails.</td>
 </tr>
 <tr>
-<td><a href="../parsers/attemptm/"><code>attemptM</code></a></td>
-<td>Applies a parser and replaces its errors with an expected error if that parser fails. Backtracks to where the parser was applied and adds additional information to the error message if that parser consumes input.</td>
+<td><a href="../parsers/value/"><code>value</code></a></td>
+<td>Applies a parser and returns a value.</td>
 </tr>
 <tr>
-<td><a href="../parsers/notemptym/"><code>notEmptyM</code></a></td>
-<td>Applies a parser and fails if the parser succeeds without consuming input. Overwrites the error message with a custom one on failure.</td>
+<td><a href="../parsers/nth/"><code>nth</code></a></td>
+<td>Applies a parser and returns the nth element of the resulting array.</td>
 </tr>
 <tr>
-<td><a href="../parsers/followedbym/"><code>followedByM</code></a></td>
-<td>Applies a parser and succeeds without consuming input if that parser succeeds. Overwrites the error message with a custom one on failure.</td>
+<td><a href="../parsers/first/"><code>first</code></a></td>
+<td>Applies a parser and returns the first element of the resulting array.</td>
 </tr>
 <tr>
-<td><a href="../parsers/notfollowedbym/"><code>notFollowedByM</code></a></td>
-<td>Applies a parser and succeeds without consuming input if that parser fails. Overwrites the error message with a custom one on failure.</td>
+<td><a href="../parsers/second/"><code>second</code></a></td>
+<td>Applies a parser and returns the second element of the resulting array.</td>
+</tr>
+<tr>
+<td><a href="../parsers/third/"><code>third</code></a></td>
+<td>Applies a parser and returns the third element of the resulting array.</td>
+</tr>
+<tr>
+<td><a href="../parsers/fourth/"><code>fourth</code></a></td>
+<td>Applies a parser and returns the fourth element of the resulting array.</td>
+</tr>
+<tr>
+<td><a href="../parsers/fifth/"><code>fifth</code></a></td>
+<td>Applies a parser and returns the fifth element of the resulting array.</td>
+</tr>
+<tr>
+<td><a href="../parsers/join/"><code>join</code></a></td>
+<td>Applies a parser and returns its resulting array elements joined together into a string.</td>
 </tr>
 </tbody>
 </table>

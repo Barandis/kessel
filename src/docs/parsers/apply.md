@@ -9,7 +9,7 @@
 
 Applies two parsers, the second of which must return a function. Returns the result of that function when the result of the other parser is passed to it.
 
-This parser is the applicative-style counterpart of the monadic-style [`chain`](chain.md). It corresponds to the `<*>` member of the `Applicative` type class in Haskell, which basically means that it's used for applying functions that are already "inside" a parser. As with `chain` it's not likely to see a lot of use, as none of the Kessel parsers are actually implemented in terms of it, but it's available should anyone feel the need to write parsers in an applicative style.
+This parser is the applicative-style counterpart of the monadic-style [`chain`](chain.md). It corresponds to the `<*>` member of the `Applicative` type class in Haskell, which basically means that it's used for applying functions that are already "inside" a parser. As with `chain` it's not likely to see a lot of use, as none of the Kessel parsers are actually implemented in terms of it, but it's available should anyone feel the need to write parsers in an applicative style (or the JavaScript equivalent, which is certainly not as intuitive).
 
 As this parser requires that one of its parser return a function, [`always`](always.md) is often used to provide that parser.
 

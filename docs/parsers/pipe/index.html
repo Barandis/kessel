@@ -1644,7 +1644,11 @@
 <p>Unlike <a href="../sequence/"><code>sequence</code></a>, <code>null</code> parser results are <em>not</em> discarded. This ensures that the same number of arguments will be passed to <code>fn</code> no matter the results of the parsers.</p>
 <p>There is another version of this parser (<a href="../pipeb/"><code>pipeB</code></a>) that fails non-fatally and backtracks if the parser that fails does so non-fatally.</p>
 <p><code>fn</code> can return anything, so this is one of the few combinators that can return something other than a string.</p>
-<p><code>pipe(p1, p2, fn)</code> is an optimized implementation of <code>chain(p1, a =&gt; chain(p2, b =&gt; always(fn(a, b))))</code>, <code>pipe(p1, p2, p3, fn)</code> is an optimized implementation of <code>chain(p1, a =&gt; chain(p2, b =&gt; chain(p3, c =&gt; always(fn(a, b, c)))))</code>, and so on.</p>
+<p><code>pipe</code> is functionally the same as applicative <code>lift</code> functions in Haskell. A two-parser <code>pipe</code> is the same as <code>liftA2</code>, a three-parser <code>pipe</code> is the same as <code>liftA3</code>, etc. A single-parser <code>pipe</code> is therefore the same as <a href="../map/"><code>map</code></a>.</p>
+<p><code>pipe(p, q, fn)</code> can be regarded as an optimized implementation of either of the following.</p>
+<div class="highlight"><pre><span></span><code>chain(p, a =&gt; chain(q, b =&gt; always(fn(a, b)))) // monadic style
+apply(p, apply(q, always(b =&gt; a =&gt; fn(a, b)))) // applicative style
+</code></pre></div>
 <h4 id="example">Example</h4>
 <div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">pipe</span><span class="p">(</span><span class="nx">upper</span><span class="p">,</span> <span class="nx">lower</span><span class="p">,</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="nx">a</span><span class="p">.</span><span class="nx">toLowerCase</span><span class="p">()</span> <span class="o">+</span> <span class="nx">b</span><span class="p">.</span><span class="nx">toUpperCase</span><span class="p">())</span>
 

@@ -1599,6 +1599,7 @@
 </blockquote>
 <p>Always succeeds and returns its passed value.</p>
 <p>This is the only parser that can return a value that is not a string. (Some combinators can also do this.)</p>
+<p>This parser serves both as the <code>pure</code> member of the <code>Applicative</code> type class and the <code>return</code> member of the <code>Monad</code> type class in Haskell. It can be used to lift arbitrary values into the context of a parser, particularly to lift functions to allow them to be used by <a href="../apply/"><code>apply</code></a> and to lift values that functions return to allow them to be used by <a href="../chain/"><code>chain</code></a>.</p>
 <h4 id="example">Example</h4>
 <div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">always</span><span class="p">(</span><span class="mf">3.14</span><span class="p">)</span>
 
@@ -1617,6 +1618,7 @@
 <h4 id="see-also">See Also</h4>
 <ul>
 <li><a href="../apply/"><code>apply</code></a></li>
+<li><a href="../chain/"><code>chain</code></a></li>
 <li><a href="../value/"><code>value</code></a></li>
 </ul>
                 

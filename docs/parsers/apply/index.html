@@ -1640,7 +1640,7 @@
 <p><code>apply(p, f)</code></p>
 </blockquote>
 <p>Applies two parsers, the second of which must return a function. Returns the result of that function when the result of the other parser is passed to it.</p>
-<p>This parser is the applicative-style counterpart of the monadic-style <a href="../chain/"><code>chain</code></a>. It corresponds to the <code>&lt;*&gt;</code> member of the <code>Applicative</code> type class in Haskell, which basically means that it's used for applying functions that are already "inside" a parser. As with <code>chain</code> it's not likely to see a lot of use, as none of the Kessel parsers are actually implemented in terms of it, but it's available should anyone feel the need to write parsers in an applicative style.</p>
+<p>This parser is the applicative-style counterpart of the monadic-style <a href="../chain/"><code>chain</code></a>. It corresponds to the <code>&lt;*&gt;</code> member of the <code>Applicative</code> type class in Haskell, which basically means that it's used for applying functions that are already "inside" a parser. As with <code>chain</code> it's not likely to see a lot of use, as none of the Kessel parsers are actually implemented in terms of it, but it's available should anyone feel the need to write parsers in an applicative style (or the JavaScript equivalent, which is certainly not as intuitive).</p>
 <p>As this parser requires that one of its parser return a function, <a href="../always/"><code>always</code></a> is often used to provide that parser.</p>
 <p>There is another version of this parser (<a href="../applyb/"><code>applyB</code></a>) that will backtrack and fail non-fatally if <code>f</code> fails non-fatally.</p>
 <h4 id="example">Example</h4>

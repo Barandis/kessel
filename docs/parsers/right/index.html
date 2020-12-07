@@ -1642,7 +1642,10 @@
 <p>Applies two parsers in order, returning the result of the second one.</p>
 <p>The result of the first parser is discarded. If either parser fails, then the entire <code>right</code> parser also fails. If input was consumed by either parser and one of them fails, then the failure is fatal (whether or not <code>p</code> or <code>q</code> failed fatally).</p>
 <p>There is another version of this parser (<a href="../rightb/"><code>rightB</code></a>) that will backtrack and fail non-fatally if <code>p</code> succeeds and <code>q</code> fails non-fatally.</p>
-<p><code>right(p, q)</code> is an optimized implementation of <code>chain(p, () =&gt; q)</code>.</p>
+<p><code>right(p, q)</code> is the equivalent of <code>p *&gt; q</code> in the Haskell <code>Applicative</code> class and is written <code>&gt;&gt;.</code> in FParsec. It can be regarded as an optimized implementation of either of the following.</p>
+<div class="highlight"><pre><span></span><code>chain(p, () =&gt; q) // monadic style
+apply(p, apply(q, x =&gt; () =&gt; x)) // applicative style
+</code></pre></div>
 <h4 id="example">Example</h4>
 <div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">right</span><span class="p">(</span><span class="nx">letter</span><span class="p">,</span> <span class="nx">digit</span><span class="p">)</span>
 

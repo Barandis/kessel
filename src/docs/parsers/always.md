@@ -11,6 +11,8 @@ Always succeeds and returns its passed value.
 
 This is the only parser that can return a value that is not a string. (Some combinators can also do this.)
 
+This parser serves both as the `pure` member of the `Applicative` type class and the `return` member of the `Monad` type class in Haskell. It can be used to lift arbitrary values into the context of a parser, particularly to lift functions to allow them to be used by [`apply`](apply.md) and to lift values that functions return to allow them to be used by [`chain`](chain.md).
+
 #### Example
 
 ```javascript
@@ -32,4 +34,5 @@ console.log(success(s)) // 3.14
 #### See Also
 
 * [`apply`](apply.md)
+* [`chain`](chain.md)
 * [`value`](value.md)

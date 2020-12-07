@@ -13,7 +13,12 @@ The result of the second parser is discarded. If either parser fails, then the e
 
 There is another version of this parser ([`leftB`](leftb.md)) that will backtrack and fail non-fatally if `p1` succeeds and `p2` fails non-fatally.
 
-`left(p, q)` is an optimized implementation of `chain(p, x => value(q, x))`.
+`left(p, q)` is the equivalent of `p <* q` in the Haskell `Applicative` class and is written `.>>` in FParsec. It can be regarded as an optimized implementation of either of the following.
+
+```
+chain(p, x => value(q, x)) // monadic style
+apply(p, value(q, x => x)) // applicative style
+```
 
 #### Example
 

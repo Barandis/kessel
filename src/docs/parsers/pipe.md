@@ -17,7 +17,14 @@ There is another version of this parser ([`pipeB`](pipeb.md)) that fails non-fat
 
 `fn` can return anything, so this is one of the few combinators that can return something other than a string.
 
-`pipe(p1, p2, fn)` is an optimized implementation of `chain(p1, a => chain(p2, b => always(fn(a, b))))`, `pipe(p1, p2, p3, fn)` is an optimized implementation of `chain(p1, a => chain(p2, b => chain(p3, c => always(fn(a, b, c)))))`, and so on.
+`pipe` is functionally the same as applicative `lift` functions in Haskell. A two-parser `pipe` is the same as `liftA2`, a three-parser `pipe` is the same as `liftA3`, etc. A single-parser `pipe` is therefore the same as [`map`](map.md).
+
+`pipe(p, q, fn)` can be regarded as an optimized implementation of either of the following.
+
+```
+chain(p, a => chain(q, b => always(fn(a, b)))) // monadic style
+apply(p, apply(q, always(b => a => fn(a, b)))) // applicative style
+```
 
 #### Example
 
