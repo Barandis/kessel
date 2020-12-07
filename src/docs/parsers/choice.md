@@ -37,7 +37,7 @@ console.log(status(p))  // Symbol(ok)
 console.log(success(p)) // " "
 
 const f = parse(parser, '-a')
-console.log(status(f))  // Symbol(error)
+console.log(status(f))  // Symbol(fail)
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // -a

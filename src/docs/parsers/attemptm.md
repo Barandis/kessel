@@ -25,7 +25,7 @@ console.log(status(s))  // Symbol(ok)
 console.log(success(s)) // "a"
 
 const f = parse(parser, '1a')
-console.log(status(f))  // Symbol(error)
+console.log(status(f))  // Symbol(fail)
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // 1a
@@ -33,7 +33,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Expected a letter and then a digit
 
 const t = parse(parser, 'ab')
-console.log(status(t))  // Symbol(error)
+console.log(status(t))  // Symbol(fail)
 console.log(failure(t)) // Parse error at (line 1, column 1):
                         //
                         // ab

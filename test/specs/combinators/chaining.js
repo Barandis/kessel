@@ -24,7 +24,7 @@ import { Status } from 'kessel/core'
 import { any, char, digit, eof, letter, noneOf } from 'kessel/parsers/char'
 import { terror, tfail, tpass } from 'test/helper'
 
-const { Error, Fatal } = Status
+const { Fail, Fatal } = Status
 
 describe('Chaining and piping combinators', () => {
   describe('join', () => {
@@ -45,7 +45,7 @@ describe('Chaining and piping combinators', () => {
     it('fails if its contained parser fails', () => {
       tfail(join(many1(any)), '', {
         expected: 'any character',
-        status: Error,
+        status: Fail,
       })
       tfail(join(sequence(letter, digit)), 'ab', {
         expected: 'a digit',
@@ -102,9 +102,9 @@ describe('Chaining and piping combinators', () => {
     it('fails non-fatally if one parser fails and no input is consumed', () => {
       tfail(left(letter, digit), '1', {
         expected: 'a letter',
-        status: Error,
+        status: Fail,
       })
-      tfail(left(eof, char('a')), '', { expected: "'a'", status: Error })
+      tfail(left(eof, char('a')), '', { expected: "'a'", status: Fail })
     })
     it('fails fatally if any input is consumed on failure', () => {
       tfail(left(sequence(letter, letter), digit), 'a11', {
@@ -139,8 +139,8 @@ describe('Chaining and piping combinators', () => {
       tpass(right(letter, digit), 'a1', '1')
     })
     it('fails non-fatally if one parser fails and no input is consumed', () => {
-      tfail(right(letter, digit), '1', { expected: 'a letter', status: Error })
-      tfail(right(eof, char('a')), '', { expected: "'a'", status: Error })
+      tfail(right(letter, digit), '1', { expected: 'a letter', status: Fail })
+      tfail(right(eof, char('a')), '', { expected: "'a'", status: Fail })
     })
     it('fails fatally if any input is consumed on failure', () => {
       tfail(right(sequence(letter, letter), digit), 'a11', {
@@ -178,12 +178,12 @@ describe('Chaining and piping combinators', () => {
       tfail(pipe(letter, a => a), '1', {
         expected: 'a letter',
         index: 0,
-        status: Error,
+        status: Fail,
       })
       tfail(pipe(eof, letter, (a, b) => b + a), '', {
         expected: 'a letter',
         index: 0,
-        status: Error,
+        status: Fail,
       })
     })
     it('fails fatally if input was consumed on failure', () => {
@@ -226,7 +226,7 @@ describe('Chaining and piping combinators', () => {
       tfail(parser, 'abc)', {
         expected: "'('",
         index: 0,
-        status: Error,
+        status: Fail,
       })
     })
     it('fails fatally if content is consumed', () => {

@@ -30,7 +30,7 @@ import { space } from 'kessel/parsers/regex'
 import { string } from 'kessel/parsers/string'
 import { terror, tfail, tpass } from 'test/helper'
 
-const { Error, Fatal } = Status
+const { Fail, Fatal } = Status
 
 describe('Sequence combinators', () => {
   describe('sequence', () => {
@@ -92,7 +92,7 @@ describe('Sequence combinators', () => {
       )
     })
     it('fails if any of its parsers fail', () => {
-      tfail(parser, 'abd', { expected: "'abc'", index: 0, status: Error })
+      tfail(parser, 'abd', { expected: "'abc'", index: 0, status: Fail })
       tfail(parser, 'abcd', {
         expected: 'a whitespace character',
         index: 3,
@@ -195,7 +195,7 @@ describe('Sequence combinators', () => {
       tpass(skip(many(letter)), 'abcdef123', { result: null, index: 6 })
     })
     it('propagates failures without modification', () => {
-      tfail(skip(char('a')), '123', { expected: "'a'", status: Error })
+      tfail(skip(char('a')), '123', { expected: "'a'", status: Fail })
       tfail(skip(sequence(string('ab'), string('cd'))), 'abce', {
         expected: "'cd'",
         status: Fatal,
@@ -345,7 +345,7 @@ describe('Sequence combinators', () => {
       tfail(parser, '1', {
         expected: 'a letter',
         index: 0,
-        status: Error,
+        status: Fail,
       })
     })
     it('fails if its content parser fails fatally', () => {
@@ -471,7 +471,7 @@ describe('Sequence combinators', () => {
       tfail(parser, '1', {
         expected: 'a letter',
         index: 0,
-        status: Error,
+        status: Fail,
       })
     })
     it('fails if its content parser fails fatally', () => {
@@ -527,7 +527,7 @@ describe('Sequence combinators', () => {
       tfail(repeat(letter, 5), '12345', {
         expected: 'a letter',
         index: 0,
-        status: Error,
+        status: Fail,
       })
     })
     it('fails fatally if the parser fails fatally', () => {
@@ -571,7 +571,7 @@ describe('Sequence combinators', () => {
       tfail(manyTill(digit, letter), '.123abc', {
         expected: 'a digit or a letter',
         index: 0,
-        status: Error,
+        status: Fail,
       })
     })
     it('fails fatally if input is consumed before content parser fails', () => {
@@ -698,7 +698,7 @@ describe('Sequence combinators', () => {
       tfail(assoc1L(p, op), '', {
         expected: 'a digit',
         index: 0,
-        status: Error,
+        status: Fail,
       })
     })
     it('succeeds with the first match if op never matches', () => {
@@ -831,7 +831,7 @@ describe('Sequence combinators', () => {
       tfail(assoc1R(p, op), '', {
         expected: 'a digit',
         index: 0,
-        status: Error,
+        status: Fail,
       })
     })
     it('succeeds with the first match if op never matches', () => {

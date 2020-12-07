@@ -23,7 +23,7 @@ console.log(status(s))  // Symbol(ok)
 console.log(success(s)) // "Test"
 
 const f = parse(parser, 'test')
-console.log(status(f))  // Symbol(error)
+console.log(status(f))  // Symbol(fail)
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // test

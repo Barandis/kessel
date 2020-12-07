@@ -14,6 +14,8 @@ import { maybeFatal, ok, Parser, Status } from 'kessel/core'
 import { merge } from 'kessel/error'
 import { twin } from 'kessel/util'
 
+const { Ok, Fail, Fatal } = Status
+
 // ====================================================================
 // Both Applicative and Monad
 
@@ -56,7 +58,7 @@ export const map = (p, fn) => Parser(ctx => {
   ASSERT && assertFunction('map', fn, ordFnFormatter('2nd'))
 
   const [prep, [pctx, pres]] = twin(p(ctx))
-  return pres.status === Status.Ok ? ok(pctx, fn(pres.value)) : prep
+  return pres.status === Ok ? ok(pctx, fn(pres.value)) : prep
 })
 
 /**
@@ -80,10 +82,10 @@ export const apply = (p, q) => Parser(ctx => {
   const index = ctx.index
 
   const [prep, [pctx, pres]] = twin(p(ctx))
-  if (pres.status !== Status.Ok) return prep
+  if (pres.status !== Ok) return prep
 
   const [qctx, qres] = q(pctx)
-  if (qres.status !== Status.Ok) {
+  if (qres.status !== Ok) {
     return maybeFatal(qctx.index !== index, qctx, qres.errors)
   }
 
@@ -121,7 +123,7 @@ export const chain = (p, fn) => Parser(ctx => {
   const index = ctx.index
 
   const [prep, [pctx, pres]] = twin(p(ctx))
-  if (pres.status !== Status.Ok) return prep
+  if (pres.status !== Ok) return prep
 
   const q = fn(pres.value)
   ASSERT && assertParser(
@@ -129,7 +131,7 @@ export const chain = (p, fn) => Parser(ctx => {
   )
 
   const [qrep, [qctx, qres]] = twin(q(pctx))
-  return qres.status === Status.Ok
+  return qres.status === Ok
     ? qrep
     : maybeFatal(qctx.index !== index, qctx, qres.errors)
 })
@@ -165,14 +167,12 @@ export const orElse = (p, q) => Parser(ctx => {
   ASSERT && assertParser('orElse', q, ordParFormatter('2nd'))
 
   const [prep, [pctx, pres]] = twin(p(ctx))
-  if (pres.status !== Status.Error) return prep
+  if (pres.status !== Fail) return prep
 
   const [qrep, [qctx, qres]] = twin(q(pctx))
-  return qres.status === Status.Ok ? qrep : maybeFatal(
-    qres.status === Status.Fatal,
-    qctx,
-    merge(pres.errors, qres.errors),
-  )
+  return qres.status === Ok
+    ? qrep
+    : maybeFatal(qres.status === Fatal, qctx, merge(pres.errors, qres.errors))
 })
 
 // ====================================================================
@@ -205,10 +205,10 @@ export const andThen = (p, q) => Parser(ctx => {
   const index = ctx.index
 
   const [prep, [pctx, pres]] = twin(p(ctx))
-  if (pres.status !== Status.Ok) return prep
+  if (pres.status !== Ok) return prep
 
   const [qctx, qres] = q(pctx)
-  return qres.status === Status.Ok
+  return qres.status === Ok
     ? ok(qctx, [pres.value, qres.value])
     : maybeFatal(qctx.index !== index, qctx, qres.errors)
 })

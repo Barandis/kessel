@@ -15,7 +15,7 @@ Fails automatically with a custom generic error message.
 const parser = failNormally('a letter, please?')
 
 const f = parse(parser, '123')
-console.log(status(f))  // Symbol(error)
+console.log(status(f))  // Symbol(fail)
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // 123

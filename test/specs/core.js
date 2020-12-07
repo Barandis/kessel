@@ -136,7 +136,7 @@ describe('Core functionality', () => {
       })
       it('can set non-fatal state with a test', () => {
         const [_, result] = nonFatal
-        expect(result.status).to.equal(Status.Error)
+        expect(result.status).to.equal(Status.Fail)
       })
     })
   })
@@ -152,7 +152,7 @@ describe('Core functionality', () => {
     it('evaluates failures', () => {
       const reply = parse(char('a'), 'b')
       expect(succeeded(reply)).to.be.false
-      expect(status(reply)).to.equal(Status.Error)
+      expect(status(reply)).to.equal(Status.Fail)
       expect(success(reply)).to.be.null
       expect(failure(reply)).to.equal(
         "Parse error at (line 1, column 1):\n\nb\n^\nExpected 'a'\n\n",

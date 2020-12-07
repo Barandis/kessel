@@ -79,7 +79,7 @@ describe('Message combinators', () => {
       )
       const error = result.errors[0]
 
-      expect(result.status).to.equal(Status.Error)
+      expect(result.status).to.equal(Status.Fail)
       expect(ctx.index).to.equal(0)
       expect(error.ctx.index).to.equal(1)
       expect(error.label).to.equal('test')
@@ -91,7 +91,7 @@ describe('Message combinators', () => {
       )
       const error = result.errors[0]
 
-      expect(result.status).to.equal(Status.Error)
+      expect(result.status).to.equal(Status.Fail)
       expect(ctx.index).to.equal(0)
       expect(error.ctx.index).to.equal(1)
       expect(error.label).to.equal('test')

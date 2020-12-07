@@ -17,7 +17,7 @@ import { Status } from 'kessel/core'
 import { any, char, digit, eof, letter } from 'kessel/parsers/char'
 import { terror, tfail, tpass } from 'test/helper'
 
-const { Error, Fatal } = Status
+const { Fail, Fatal } = Status
 
 describe('Primitive combinators', () => {
   describe('always', () => {
@@ -50,7 +50,7 @@ describe('Primitive combinators', () => {
     it('propagates failed state if its parser fails', () => {
       tfail(map(any, c => c.toUpperCase()), '', {
         expected: 'any character',
-        status: Error,
+        status: Fail,
       })
       tfail(map(andThen(letter, digit), cs => cs.join('')), 'ab', {
         expected: 'a digit',
@@ -86,7 +86,7 @@ describe('Primitive combinators', () => {
       tpass(apply(any, always(x => x.toUpperCase())), 'a', 'A')
     })
     it('fails without calling parser 2 if parser 1 fails', () => {
-      tfail(apply(char('a'), any), 'b', { expected: "'a'", status: Error })
+      tfail(apply(char('a'), any), 'b', { expected: "'a'", status: Fail })
     })
     it('fails fatally if input is consumed before failure', () => {
       tfail(apply(char('a'), char('b')), 'ac', {
@@ -98,7 +98,7 @@ describe('Primitive combinators', () => {
       // Applicative style for `andThen(char('a'), char('b'))`
       const p = apply(char('a'), apply(char('b'), always(b => a => [a, b])))
       tpass(p, 'ab', ['a', 'b'])
-      tfail(p, 'cd', { expected: "'a'", status: Error })
+      tfail(p, 'cd', { expected: "'a'", status: Fail })
       tfail(p, 'ac', { expected: "'b'", status: Fatal })
     })
   })
@@ -133,7 +133,7 @@ describe('Primitive combinators', () => {
       tfail(chain(char('a'), () => char('b')), 'bb', {
         expected: "'a'",
         index: 0,
-        status: Error,
+        status: Fail,
       })
     })
     it('fails fatally if the second fails after the first consumes', () => {
@@ -147,7 +147,7 @@ describe('Primitive combinators', () => {
       // Monadic style for `andThen(char('a'), char('b'))`
       const p = chain(char('a'), a => chain(char('b'), b => always([a, b])))
       tpass(p, 'ab', ['a', 'b'])
-      tfail(p, 'cd', { expected: "'a'", status: Error })
+      tfail(p, 'cd', { expected: "'a'", status: Fail })
       tfail(p, 'ac', { expected: "'b'", status: Fatal })
     })
   })
@@ -210,11 +210,11 @@ describe('Primitive combinators', () => {
     it('fails non-fatally if one parser fails and no input is consumed', () => {
       tfail(andThen(letter, digit), '1', {
         expected: 'a letter',
-        status: Status.Error,
+        status: Status.Fail,
       })
       tfail(andThen(eof, char('a')), '', {
         expected: "'a'",
-        status: Status.Error,
+        status: Status.Fail,
       })
     })
     it('fails fatally if any input is consumed on failure', () => {

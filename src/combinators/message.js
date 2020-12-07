@@ -13,7 +13,7 @@ import { error, Parser, Status } from 'kessel/core'
 import { compound, ErrorType, expected } from 'kessel/error'
 import { twin } from 'kessel/util'
 
-const { Ok, Error } = Status
+const { Ok, Fail } = Status
 const { Nested } = ErrorType
 
 /** @typedef {import('kessel/core').Parser} Parser */
@@ -42,7 +42,7 @@ export const label = (p, msg) => Parser(ctx => {
   ASSERT && assertString('label', msg, ordStrFormatter('2nd'))
 
   const [prep, [pctx, pres]] = twin(p(ctx))
-  return pres.status === Error ? pass(pctx, pres, expected(msg)) : prep
+  return pres.status === Fail ? pass(pctx, pres, expected(msg)) : prep
 })
 
 /**
@@ -72,7 +72,7 @@ export const attemptM = (p, msg) => Parser(ctx => {
 
   const [prep, [pctx, pres]] = twin(p(ctx))
   if (pres.status === Ok) return prep
-  if (pres.status === Error) {
+  if (pres.status === Fail) {
     if (pres.errors.length === 1 && pres.errors[0].type === Nested) {
       const { ctx, errors } = pres.errors[0]
       return pass(pctx, pres, compound(msg, ctx, errors))

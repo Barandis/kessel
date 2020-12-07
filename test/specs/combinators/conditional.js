@@ -18,7 +18,7 @@ import { digit, letter } from 'kessel/parsers/char'
 import { string } from 'kessel/parsers/string'
 import { terror, tfail, tpass } from 'test/helper'
 
-const { Error, Fatal } = Status
+const { Fail, Fatal } = Status
 
 describe('Conditional and look-ahead combinators', () => {
   describe('lookAhead', () => {
@@ -43,7 +43,7 @@ describe('Conditional and look-ahead combinators', () => {
       tfail(notEmpty(many(letter)), '123', {
         expected: '',
         index: 0,
-        status: Error,
+        status: Fail,
       })
     })
     it('succeeds if its parser succeeds and consumed input', () => {
@@ -53,7 +53,7 @@ describe('Conditional and look-ahead combinators', () => {
       tfail(notEmpty(letter), '123', {
         expected: 'a letter',
         index: 0,
-        status: Error,
+        status: Fail,
       })
       tfail(notEmpty(sequence(letter, letter)), 'a1', {
         expected: 'a letter',
@@ -82,7 +82,7 @@ describe('Conditional and look-ahead combinators', () => {
       tfail(notEmptyM(many(letter), 'a letter'), '123', {
         expected: 'a letter',
         index: 0,
-        status: Error,
+        status: Fail,
       })
     })
     it('succeeds if its parser succeeds and consumed input', () => {
@@ -92,7 +92,7 @@ describe('Conditional and look-ahead combinators', () => {
       tfail(notEmptyM(letter, 'at least one letter'), '123', {
         expected: 'a letter',
         index: 0,
-        status: Error,
+        status: Fail,
       })
       tfail(notEmptyM(sequence(letter, letter), 'a1 or something'), 'a1', {
         expected: 'a letter',
@@ -110,10 +110,10 @@ describe('Conditional and look-ahead combinators', () => {
       tpass(followedBy(letter), 'abc', { result: null, index: 0 })
     })
     it('fails without changing state if its parser fails', () => {
-      tfail(followedBy(letter), '123', { index: 0, status: Error })
+      tfail(followedBy(letter), '123', { index: 0, status: Fail })
       tfail(followedBy(sequence(letter, digit)), 'abc', {
         index: 0,
-        status: Error,
+        status: Fail,
       })
     })
   })
@@ -140,14 +140,14 @@ describe('Conditional and look-ahead combinators', () => {
       tfail(followedByM(letter, 'one single letter'), '123', {
         expected: 'one single letter',
         index: 0,
-        status: Error,
+        status: Fail,
       })
       tfail(followedByM(
         sequence(letter, digit), 'a letter, then a digit',
       ), 'abc', {
         expected: 'a letter, then a digit',
         index: 0,
-        status: Error,
+        status: Fail,
       })
     })
   })
@@ -159,7 +159,7 @@ describe('Conditional and look-ahead combinators', () => {
       )
     })
     it('fails without changing state if its parser succeeds', () => {
-      tfail(notFollowedBy(letter), 'abc', { index: 0, status: Error })
+      tfail(notFollowedBy(letter), 'abc', { index: 0, status: Fail })
     })
     it('succeeds without changing state if its parser fails', () => {
       tpass(notFollowedBy(letter), '123', { result: null, index: 0 })
@@ -188,7 +188,7 @@ describe('Conditional and look-ahead combinators', () => {
       tfail(notFollowedByM(letter, 'something other than a letter'), 'abc', {
         expected: 'something other than a letter',
         index: 0,
-        status: Error,
+        status: Fail,
       })
     })
     it('succeeds without changing state if its parser fails', () => {

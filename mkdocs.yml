@@ -38,6 +38,7 @@ nav:
       - any: parsers/any.md
       - anyOf: parsers/anyof.md
       - anyString: parsers/anystring.md
+      - apply: parsers/apply.md
       - assoc1L: parsers/assoc1l.md
       - assoc1R: parsers/assoc1r.md
       - assocL: parsers/assocl.md
@@ -54,6 +55,7 @@ nav:
       - charI: parsers/chari.md
       - choice: parsers/choice.md
       - digit: parsers/digit.md
+      - empty: parsers/empty.md
       - eof: parsers/eof.md
       - failFatally: parsers/failfatally.md
       - failNormally: parsers/failnormally.md

@@ -25,7 +25,7 @@ console.log(status(s))  // Symbol(ok)
 console.log(success(s)) // "aB"
 
 const f = parse(parser, 'abc')
-console.log(status(f))  // Symbol(error)
+console.log(status(f))  // Symbol(fail)
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // abc
@@ -33,7 +33,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Expected an uppercase letter
 
 const t = parse(parser, 'ABC')
-console.log(status(t))  // Symbol(error)
+console.log(status(t))  // Symbol(fail)
 console.log(failure(t)) // Parse error at (line 1, column 1):
                         //
                         // ABC

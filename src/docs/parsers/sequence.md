@@ -27,7 +27,7 @@ console.log(status(s))  // Symbol(ok)
 console.log(success(s)) // ["a", "1", "b"]
 
 const f = parse(parser, '11b')
-console.log(status(f))  // Symbol(error)
+console.log(status(f))  // Symbol(fail)
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // 11b

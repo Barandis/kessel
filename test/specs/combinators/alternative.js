@@ -30,7 +30,7 @@ import { space } from 'kessel/parsers/regex'
 import { string } from 'kessel/parsers/string'
 import { terror, tfail, tpass } from 'test/helper'
 
-const { Error, Fatal } = Status
+const { Fail, Fatal } = Status
 
 describe('Alternative and error recovery combinators', () => {
   describe('choice', () => {
@@ -103,7 +103,7 @@ describe('Alternative and error recovery combinators', () => {
     it('resets the index if its parser fails with consuming input', () => {
       const parser = sequence(string('te'), string('st'))
       tfail(parser, 'tesl', { index: 2, status: Fatal })
-      tfail(attempt(parser), 'tesl', { index: 0, status: Error })
+      tfail(attempt(parser), 'tesl', { index: 0, status: Fail })
     })
     it('creates a nested error if it fails while consuming input', () => {
       const parser = sequence(string('te'), string('st'))
@@ -209,14 +209,14 @@ describe('Alternative and error recovery combinators', () => {
       tfail(chainB(char('a'), () => char('b')), 'bb', {
         expected: "'a'",
         index: 0,
-        status: Error,
+        status: Fail,
       })
     })
     it('fails when the second fails without the first consuming', () => {
       tfail(chainB(lookAhead(char('a')), () => char('b')), 'a', {
         expected: "'b'",
         index: 0,
-        status: Error,
+        status: Fail,
       })
     })
     it('fails non-fatally if the second fails after the first consumes', () => {
@@ -225,7 +225,7 @@ describe('Alternative and error recovery combinators', () => {
       const err = result.errors[0]
 
       expect(ctx.index).to.equal(0)
-      expect(result.status).to.equal(Error)
+      expect(result.status).to.equal(Fail)
       expect(err.ctx.index).to.equal(1)
       expect(err.errors[0].label).to.equal("'b'")
     })
@@ -262,15 +262,15 @@ describe('Alternative and error recovery combinators', () => {
       tpass(leftB(letter, digit), 'a1', 'a')
     })
     it('fails non-fatally if one parser fails and no input is consumed', () => {
-      tfail(leftB(letter, digit), '1', { expected: 'a letter', status: Error })
-      tfail(leftB(eof, char('a')), '', { expected: "'a'", status: Error })
+      tfail(leftB(letter, digit), '1', { expected: 'a letter', status: Fail })
+      tfail(leftB(eof, char('a')), '', { expected: "'a'", status: Fail })
     })
     it('fails non-fatally on non-fatal errors after consumption', () => {
       const [ctx, result] = parse(leftB(letter, digit), 'aa')
       const err = result.errors[0]
 
       expect(ctx.index).to.equal(0)
-      expect(result.status).to.equal(Error)
+      expect(result.status).to.equal(Fail)
       expect(err.ctx.index).to.equal(1)
       expect(err.errors[0].label).to.equal('a digit')
     })
@@ -307,15 +307,15 @@ describe('Alternative and error recovery combinators', () => {
       tpass(rightB(letter, digit), 'a1', '1')
     })
     it('fails non-fatally if one parser fails and no input is consumed', () => {
-      tfail(rightB(letter, digit), '1', { expected: 'a letter', status: Error })
-      tfail(rightB(eof, char('a')), '', { expected: "'a'", status: Error })
+      tfail(rightB(letter, digit), '1', { expected: 'a letter', status: Fail })
+      tfail(rightB(eof, char('a')), '', { expected: "'a'", status: Fail })
     })
     it('fails non-fatally on non-fatal errors after consumption', () => {
       const [ctx, result] = parse(rightB(letter, digit), 'aa')
       const err = result.errors[0]
 
       expect(ctx.index).to.equal(0)
-      expect(result.status).to.equal(Error)
+      expect(result.status).to.equal(Fail)
       expect(err.ctx.index).to.equal(1)
       expect(err.errors[0].label).to.equal('a digit')
     })
@@ -354,16 +354,16 @@ describe('Alternative and error recovery combinators', () => {
     it('fails non-fatally if one parser fails and no input is consumed', () => {
       tfail(andThenB(letter, digit), '1', {
         expected: 'a letter',
-        status: Error,
+        status: Fail,
       })
-      tfail(andThenB(eof, char('a')), '', { expected: "'a'", status: Error })
+      tfail(andThenB(eof, char('a')), '', { expected: "'a'", status: Fail })
     })
     it('fails non-fatally on non-fatal errors after consumption', () => {
       const [ctx, result] = parse(andThenB(letter, digit), 'aa')
       const err = result.errors[0]
 
       expect(ctx.index).to.equal(0)
-      expect(result.status).to.equal(Error)
+      expect(result.status).to.equal(Fail)
       expect(err.ctx.index).to.equal(1)
       expect(err.errors[0].label).to.equal('a digit')
     })
@@ -405,7 +405,7 @@ describe('Alternative and error recovery combinators', () => {
       tfail(repeatB(letter, 5), '12345', {
         expected: 'a letter',
         index: 0,
-        status: Error,
+        status: Fail,
       })
     })
     it('fails fatally if the parser fails fatally', () => {
@@ -420,7 +420,7 @@ describe('Alternative and error recovery combinators', () => {
       const err = result.errors[0]
 
       expect(ctx.index).to.equal(0)
-      expect(result.status).to.equal(Error)
+      expect(result.status).to.equal(Fail)
       expect(err.ctx.index).to.equal(3)
       expect(err.errors[0].label).to.equal('a letter')
     })
@@ -451,7 +451,7 @@ describe('Alternative and error recovery combinators', () => {
       tfail(manyTillB(digit, letter), '.123abc', {
         expected: 'a digit or a letter',
         index: 0,
-        status: Error,
+        status: Fail,
       })
     })
     it('backtracks if input is consumed before content parser fails', () => {
@@ -459,7 +459,7 @@ describe('Alternative and error recovery combinators', () => {
       const err = result.errors[0]
 
       expect(ctx.index).to.equal(0)
-      expect(result.status).to.equal(Error)
+      expect(result.status).to.equal(Fail)
       expect(err.ctx.index).to.equal(3)
       expect(err.errors[0].label).to.equal('a digit')
       expect(err.errors[1].label).to.equal('a letter')
@@ -513,17 +513,17 @@ describe('Alternative and error recovery combinators', () => {
       tfail(parser, 'abcd', {
         expected: 'a whitespace character',
         index: 0,
-        status: Error,
+        status: Fail,
       })
       tfail(parser, 'abc ', {
         expected: 'any character',
         index: 0,
-        status: Error,
+        status: Fail,
       })
       tfail(parser, 'abc de', {
         expected: 'a whitespace character',
         index: 0,
-        status: Error,
+        status: Fail,
       })
     })
     it('succeeds with its return value if all parsers succeed', () => {
@@ -553,19 +553,19 @@ describe('Alternative and error recovery combinators', () => {
       tfail(pipeB(letter, a => a), '1', {
         expected: 'a letter',
         index: 0,
-        status: Error,
+        status: Fail,
       })
       tfail(pipeB(eof, letter, (a, b) => b + a), '', {
         expected: 'a letter',
         index: 0,
-        status: Error,
+        status: Fail,
       })
     })
     it('fails non-fatally if input was consumed on non-fatal failure', () => {
       tfail(pipeB(letter, digit, (a, b) => b + a), 'aa', {
         expected: 'a digit',
         index: 0,
-        status: Error,
+        status: Fail,
       })
     })
     it('fails fatally if one of its parsers fails fatally', () => {
@@ -608,19 +608,19 @@ describe('Alternative and error recovery combinators', () => {
       tfail(parser, 'abc)', {
         expected: "'('",
         index: 0,
-        status: Error,
+        status: Fail,
       })
     })
     it('fails non-fatally if input is consumed on a non-fatal failure', () => {
       tfail(parser, '()', {
         expected: "none of ')'",
         index: 0,
-        status: Error,
+        status: Fail,
       })
       tfail(parser, '(abc', {
         expected: "')'",
         index: 0,
-        status: Error,
+        status: Fail,
       })
     })
     it('fails fatally if one of its parsers fails fatally', () => {

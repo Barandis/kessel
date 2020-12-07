@@ -35,7 +35,7 @@ export const Status = {
   /** Indicates that the last parse was successful. */
   Ok: Symbol('ok'),
   /** Indicates that the last parse failed without consuming input. */
-  Error: Symbol('error'),
+  Fail: Symbol('fail'),
   /** Indicates that the last parse failed and consumed input. */
   Fatal: Symbol('fatal'),
 }
@@ -172,7 +172,7 @@ export function ok(ctx, value = null, index = ctx.index) {
  *     after the latest parser failed.
  */
 export function error(ctx, errors = [], index = ctx.index) {
-  return [{ ...ctx, index }, { status: Status.Error, errors }]
+  return [{ ...ctx, index }, { status: Status.Fail, errors }]
 }
 
 /**
@@ -209,7 +209,7 @@ export function fatal(ctx, errors = [], index = ctx.index) {
 export function maybeFatal(test, ctx, errors = [], index = ctx.index) {
   return [
     { ...ctx, index },
-    { status: test ? Status.Fatal : Status.Error, errors },
+    { status: test ? Status.Fatal : Status.Fail, errors },
   ]
 }
 

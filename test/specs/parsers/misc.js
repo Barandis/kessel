@@ -7,7 +7,7 @@ import { Status } from 'kessel/core'
 import { failNormally, failFatally } from 'kessel/parsers/misc'
 import { terror, tfail } from 'test/helper'
 
-const { Error, Fatal } = Status
+const { Fail, Fatal } = Status
 
 describe('Miscellaneous parsers', () => {
   describe('failNormally', () => {
@@ -18,7 +18,7 @@ describe('Miscellaneous parsers', () => {
       tfail(failNormally('test message'), '', {
         generic: 'test message',
         index: 0,
-        status: Error,
+        status: Fail,
       })
     })
   })

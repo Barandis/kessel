@@ -645,7 +645,7 @@ describe('Parse errors', () => {
       state.index = 4
       const result = {
         errors: expected('a digit'),
-        status: Status.Error,
+        status: Status.Fail,
       }
 
       it('formats errors using default settings', () => {

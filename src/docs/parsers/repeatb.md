@@ -21,7 +21,7 @@ console.log(status(s))  // Symbol(ok)
 console.log(success(s)) // ["a", "b", "c"]
 
 const f = parse(parser, '123')
-console.log(status(f))  // Symbol(error)
+console.log(status(f))  // Symbol(fail)
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // 123
@@ -29,7 +29,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Expected a letter
 
 const t = parse(parser, 'ab3')
-console.log(status(t))  // Symbol(error)
+console.log(status(t))  // Symbol(fail)
 console.log(failure(t)) // Parse error at (line 1, column 1):
                         //
                         // ab3
