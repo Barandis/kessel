@@ -27,19 +27,17 @@ function loopMessage(name) {
 }
 
 /**
- * Creates a parser that implements a sequence. Each supplied parser is
- * executed in order until either they all succeed or the first one
- * fails. In the former case, all results are merged into an array that
- * becomes the returned parser's result.
+ * A parser that implements a sequence. Each supplied parser is executed
+ * in order until either they all succeed or the first one fails. In the
+ * former case, all results are merged into an array that becomes the
+ * returned parser's result.
  *
- * The returned parser may fail fatally even if the unsuccessful
- * contained parser fails non-fatally. This will happen if any previous
- * parser succeeded and consumed input. Essentially, if the returned
- * parser consumes anything and then fails, it will fail fatally.
+ * This parser will fail fatally if any input was consumed before any of
+ * its parsers fail, even if that failure itself was non-fatal.
  *
- * @param {...Parser} ps The parsers to be applied.
- * @returns {Parser} A parser that applies the supplied parsers one at a
- *     time, in order, and fails if any of those parsers fail.
+ * @param {...Parser} ps The parsers to be executed.
+ * @returns {Parser} A parser that executes the supplied parsers one at
+ *     a time, in order, and fails if any of those parsers fail.
  */
 export const sequence = (...ps) => Parser(ctx => {
   ASSERT && assertParsers('sequence', ps)
@@ -61,18 +59,17 @@ export const sequence = (...ps) => Parser(ctx => {
 })
 
 /**
- * Creates a parser that will apply the parsers `p` and `q` in
- * sequence and then return the result of `p`. If either `p` or `q`
- * fail, this parser will also fail, and the failure will be fatal if
- * any input had been consumed by either parser.
+ * A parser that executes the parsers `p` and `q` in order and returns
+ * the result of `p`. This is the same operation as the applicative `<*`
+ * in Haskell.
  *
- * `left(p, q)` is an optimized implementation of `chain(p, x =>
- * value(q, x))`.
+ * This parser will fail fatally if `q` fails after `p` consumes input,
+ * even if `q`'s failure was non-fatal.
  *
- * @param {Parser} p The first parser to apply.
- * @param {Parser} q The second parser to apply.
- * @returns {Parser} A parser that applies both contained parsers and
- *     results in the value of the first.
+ * @param {Parser} p The first parser to execute.
+ * @param {Parser} q The second parser to execute.
+ * @returns {Parser} A parser that executes `p` and `q` and returns the
+ *     result of `p`.
  */
 export const left = (p, q) => Parser(ctx => {
   ASSERT && assertParser('left', p, ordParFormatter('1st'))
@@ -89,17 +86,16 @@ export const left = (p, q) => Parser(ctx => {
 })
 
 /**
- * Creates a parser that will apply the parsers `p` and `q` in
- * sequence and then return the result of `q`. If either `p` or `q`
- * fail, this parser will also fail, and the failure will be fatal if
- * any input had been consumed by either parser.
+ * A parser that executes the parsers `p` and `q` in order and returns
+ * the result of `q`. This is the same operation as the applicative `*>`
+ * in Haskell.
  *
- * `right(p, q)` is an optimized implementation of `chain(p, () =>
- * q)`.
+ * This parser will fail fatally if `q` fails after `p` consumes input,
+ * even if `q`'s failure was non-fatal.
  *
- * @param {Parser} p The first parser to apply.
- * @param {Parser} q The second parser to apply.
- * @returns {Parser} A parser that applies both contained parsers and
+ * @param {Parser} p The first parser to execute.
+ * @param {Parser} q The second parser to execute.
+ * @returns {Parser} A parser that executes both contained parsers and
  *     results in the value of the second.
  */
 export const right = (p, q) => Parser(ctx => {
@@ -117,27 +113,27 @@ export const right = (p, q) => Parser(ctx => {
 })
 
 /**
- * Creates a parser that executes a block of code in the form of a
- * generator function. Inside that function, parsers that are `yield`ed
- * will be executed and will evaluate to their results (which can then
- * be assigned to variables, etc.). If any of these parsers fail,
- * `block` will also fail with that failure. This failure will be fatal
- * if any input was consumed.
+ * A parser that executes a block of code in the form of a generator
+ * function. Inside that function, parsers that are `yield`ed will be
+ * executed and will evaluate to their results (which can then be
+ * assigned to variables, etc.).
  *
  * If all parsers in the block succeed, `block` will succeed with the
  * value that the generator function returned.
  *
+ * If any yielded parser fails after another yielded parser has consumed
+ * input, this parser will fail fatally.
+ *
  * Only parsers may be yielded in a block. Yielding anything else will
- * cause undefined behavior.
+ * cause an error to be thrown.
  *
  * @param {function():*} genFn A generator function that takes no
  *     arguments and returns whatever should be used as the returned
  *     parser's result. This generator function can `yield` only
- *     `Parser`s; yielding anything else will cause incorrect behavior
- *     depending on what exactly is yielded.
+ *     `Parser`s; otherwise an error is thrown.
  * @returns {Parser} A parser that executes the generator function,
- *     applies parsers as they are yielded, and results (if all parsers
- *     succeed) in the return value of the generator.
+ *     executes parsers as they are yielded, and results in the return
+ *     value of the generator.
  */
 export const block = genFn => Parser(ctx => {
   ASSERT && assertGeneratorFunction('block', genFn)
@@ -168,14 +164,14 @@ export const block = genFn => Parser(ctx => {
 })
 
 /**
- * Creates a parser that applies the supplied parser until it fails,
- * collecting all of the successful non-null results into an array and
- * providing that as its own result. The returned parser only fails if
- * the supplied parser consumes input when it fails. Otherwise, it
- * succeeds even if the supplied parser doesn't succeed even once.
+ * A parser that executes `p` zero or more times until it fails,
+ * collecting the results into an array that is returned.
  *
- * @param {Parser} p A parser to be applied zero or more times.
- * @returns {Parser} A parser that applies the supplied parser
+ * This parser cannot fail non-fatally; however, if `p` ever fails
+ * fatally, then so will this parser.
+ *
+ * @param {Parser} p A parser to be executed zero or more times.
+ * @returns {Parser} A parser that executes the supplied parser
  *     repeatedly until it fails. Its result will be an array of the
  *     successful results from the contained parser.
  */
@@ -198,15 +194,14 @@ export const many = p => Parser(ctx => {
 })
 
 /**
- * Creates a parser that applies the supplied parser until it fails,
- * collecting all of the successful non-null results into an array and
- * providing that as its own result. The contained parser must succeed
- * at least once, or the returned parser will fail. Otherwise, the
- * returned parser only fails if the supplied parser consumes input when
- * it fails.
+ * A parser that executes `p` one or more times until it fails,
+ * collecting the results into an array that is returned.
  *
- * @param {Parser} p A parser to be applied one or more times.
- * @returns {Parser} A parser that applies the supplied parser
+ * This parser can fail non-fatally if `p` does not succeed at least
+ * once. It can fail fatally if `p` ever fails fatally.
+ *
+ * @param {Parser} p A parser to be executed one or more times.
+ * @returns {Parser} A parser that executes the supplied parser
  *     repeatedly until it fails. Its result will be an array of the
  *     successful results from the contained parser.
  */
@@ -232,16 +227,12 @@ export const many1 = p => Parser(ctx => {
 })
 
 /**
- * Creates a parser that applies the supplied parser and discards any
- * successful result while still consuming input. A failure will be
- * propagated without modification.
- *
- * `skip(p)` is an optimized implementation of `chain(p, () =>
- * always(null))`,
+ * A parser that executes `p` and discards any successful result while
+ * still consuming input.
  *
  * @param {Parser} p The parser whose result is to be discarded.
- * @returns {Parser} A parser that will consume input as its contained
- *     parser does on success, but will produce no result.
+ * @returns {Parser} A parser that will consume input as `p`  does on
+ *     success, but will produce no result.
  */
 export const skip = p => Parser(ctx => {
   ASSERT && assertParser('skip', p)
@@ -251,10 +242,11 @@ export const skip = p => Parser(ctx => {
 })
 
 /**
- * Creates a parser that applies the supplied parser until it fails,
- * discarding all of the successful results. The returned parser only
- * fails if the supplied parser consumes input when it fails. Otherwise,
- * it succeeds even if the supplied parser doesn't succeed even once.
+ * A parser that executes `p` zero or more times until it fails,
+ * discarding the results.
+ *
+ * This parser cannot fail non-fatally; however, if `p` ever fails
+ * fatally, then so will this parser.
  *
  * @param {Parser} p A parser to be applied zero or more times.
  * @returns {Parser} A parser that applies the supplied parser
@@ -277,11 +269,11 @@ export const skipMany = p => Parser(ctx => {
 })
 
 /**
- * Creates a parser that applies the supplied parser until it fails,
- * discarding all of the successful results. The contained parser must
- * succeed at least once, or the returned parser will fail. Otherwise,
- * the returned parser only fails if the supplied parser consumes input
- * when it fails.
+ * A parser that executes `p` one or more times until it fails,
+ * discarding the results.
+ *
+ * This parser can fail non-fatally if `p` does not succeed at least
+ * once. It can fail fatally if `p` ever fails fatally.
  *
  * @param {Parser} p A parser to be applied one or more times.
  * @returns {Parser} A parser that applies the supplied parser
@@ -307,18 +299,15 @@ export const skipMany1 = p => Parser(ctx => {
 })
 
 /**
- * Creates a parser that gathers values from a content parser,
- * interspersing applications of a separator parser in between. The
- * content parser can match zero times, so the only way for this parser
- * to fail is for one of its parsers to fail fatally.
+ * A parser that executes `p` zero or more times, executing `sep` in
+ * between each. The results of `p` are gathered into an array and
+ * returned.
  *
- * Content parser results are gathered into an array, which becomes the
- * result for the returned parser. The results of the separator parser
- * are discarded.
+ * This parser will not fail non-fatally, as matching `p` zero times is
+ * valid. It can fail fatally if either `p` or `sep` ever fail fatally.
  *
- * If the separator and content parsers both pass without consuming
- * content, that would cause an infinite loop. In this case, an
- * exception is thrown instead.
+ * If `p` and `sep` both succeed without consuming content, that would
+ * cause an infinite loop. In this case, an exception is thrown instead.
  *
  * @param {Parser} p A parser that will match the desired content when
  *     applied to the input.
@@ -359,19 +348,15 @@ export const sepBy = (p, sep) => Parser(ctx => {
 })
 
 /**
- * Creates a parser that gathers values from a content parser,
- * interspersing applications of a separator parser in between. The
- * content parser must succeed at leeast once or a non-fatal failure
- * will occur. Otherwise, the parser can only fail if one of its parsers
- * fails fatally.
+ * A parser that executes `p` one or more times, executing `sep` in
+ * between each. The results of `p` are gathered into an array and
+ * returned.
  *
- * Content parser results are gathered into an array, which becomes the
- * result for the returned parser. The results of the separator parser
- * are discarded.
+ * This parser will not fail if `p` doesn't succeed at least once. It
+ * will fail fatally if either `p` or `sep` ever fail fatally.
  *
- * If the separator and content parsers both pass without consuming
- * content, that would cause an infinite loop. In this case, an
- * exception is thrown instead.
+ * If `p` and `sep` both succeed without consuming content, that would
+ * cause an infinite loop. In this case, an exception is thrown instead.
  *
  * @param {Parser} p A parser that will match the desired content when
  *     applied to the input.
@@ -411,19 +396,15 @@ export const sepBy1 = (p, sep) => Parser(ctx => {
 })
 
 /**
- * Creates a parser that gathers values from a content parser,
- * interspersing applications of a separator parser in between and
- * optionally at the end. The content parser can match zero times, so
- * the only way for this parser to fail is for one of its parsers to
- * fail fatally.
+ * A parser that executes `p` zero or more times, executing `sep` in
+ * between each and optionally after the last match of `p`. The results
+ * of `p` are gathered into an array and returned.
  *
- * Content parser results are gathered into an array, which becomes the
- * result for the returned parser. The results of the separator parser
- * are discarded.
+ * This parser will not fail non-fatally, as matching `p` zero times is
+ * valid. It can fail fatally if either `p` or `sep` ever fail fatally.
  *
- * If the separator and content parsers both pass without consuming
- * content, that would cause an infinite loop. In this case, an
- * exception is thrown instead.
+ * If `p` and `sep` both succeed without consuming content, that would
+ * cause an infinite loop. In this case, an exception is thrown instead.
  *
  * @param {Parser} p A parser that will match the desired content when
  *     applied to the input.
@@ -465,19 +446,15 @@ export const sepEndBy = (p, sep) => Parser(ctx => {
 })
 
 /**
- * Creates a parser that gathers values from a content parser,
- * interspersing applications of a separator parser in between and
- * optionally at the end. The content parser must succeed at leeast once
- * or a non-fatal failure will occur. Otherwise, the parser can only
- * fail if one of its parsers fails fatally.
+ * A parser that executes `p` one or more times, executing `sep` in
+ * between each and optionally after the last match of `p`. The results
+ * of `p` are gathered into an array and returned.
  *
- * Content parser results are gathered into an array, which becomes the
- * result for the returned parser. The results of the separator parser
- * are discarded.
+ * This parser will not fail if `p` doesn't succeed at least once. It
+ * will fail fatally if either `p` or `sep` ever fail fatally.
  *
- * If the separator and content parsers both pass without consuming
- * content, that would cause an infinite loop. In this case, an
- * exception is thrown instead.
+ * If `p` and `sep` both succeed without consuming content, that would
+ * cause an infinite loop. In this case, an exception is thrown instead.
  *
  * @param {Parser} p A parser that will match the desired content when
  *     applied to the input.
@@ -518,14 +495,15 @@ export const sepEndBy1 = (p, sep) => Parser(ctx => {
 })
 
 /**
- * Creates a parser that applies the supplied parser `n` times,
- * collecting the successful results into an array. If any application
- * fails, the overall parser will fail; if input is consumed before or
- * during that failure, the failure will be fatal.
+ * A parser that executes the supplied parser `n` times, collecting the
+ * successful results into an array.
  *
- * @param {Parser} p A parser to apply multiple times.
- * @param {number} n The number of times to apply the parser.
- * @returns {Parser} A parser that applies `p` `n` times and results in
+ * If `p` fails after any input has been consumed by a prior execution
+ * of `p`, this parser will fail fatally.
+ *
+ * @param {Parser} p A parser to execute multiple times.
+ * @param {number} n The number of times to execute the parser.
+ * @returns {Parser} A parser that executes `p` `n` times and results in
  *     an array of all of the successful results of `p`.
  */
 export const repeat = (p, n) => Parser(ctx => {
@@ -548,16 +526,11 @@ export const repeat = (p, n) => Parser(ctx => {
 })
 
 /**
- * Creates a parser which applies its before, content, and after parsers
- * in order and results in the result of its content parser.
+ * A parser which executes its pre, content, and post parsers in order
+ * and results in the result of its content parser.
  *
- * Note that the content parser `p` is applied before the after parser
- * `pafter`. This means that the content parser will have an opportunity
- * to patch the "after" content before the after parser does, so take
- * care that the parsers do not overlap in what they match.
- *
- * `between(pre, post, p)` is an optimized implementation of
- * `left(right(pre, p), post)`.
+ * If either `p` or `post` fails after a prior parser has consumed
+ * input, this parser will fail fatally.
  *
  * @param {Parser} pre The first parser to apply.
  * @param {Parser} post The last parser to apply.
@@ -587,27 +560,20 @@ export const between = (pre, post, p) => Parser(ctx => {
 })
 
 /**
- * Creates a parser which applies its content parser zero or more times
- * until its end parser is successful. This parser results in an array
- * of all of the successful content parser results. The end parser is
- * applied *first*, so it's fine to have the two parsers overlap. For
- * example, `manyTill(any, letter)` will work fine, because `letter`
- * will be tried first on each character (contrast with `between(letter,
- * any, letter)`, which will never succeed becuase the `any` is applied
- * before the final `letter` and will therefore consume a letter before
- * the `letter` parser gets to see it).
+ * A parser which executes a content parser zero or more times until an
+ * end parser is successful. This parser results in an array of all of
+ * the successful content parser results. The end parser is executed
+ * *first*, so the results of the two parsers will not overlap.
  *
- * If the content parser fails before the end parser does, the overall
- * parser will fail (fatally if input had already been consumed). A
- * fatal error by either parser will result in a fatal error for the
- * overall parser.
+ * If `p` fails before `end` succeeds but after prior executions of `p`
+ * have consumed input, this parser will fail fatally.
  *
  * @param {Parser} p The content parser. Its results are pushed into an
  *     array and become the returned parser's result.
  * @param {Parser} end The end parser. Parsing ends when this parser
  *     succeeds. Its result is discarded.
- * @returns {Parser} A parser which will apply the content zero or more
- *     times until the end parser succeeds.
+ * @returns {Parser} A parser which will execute `p` zero or more times
+ *     until `end` succeeds.
  */
 export const manyTill = (p, end) => Parser(ctx => {
   ASSERT && assertParser('manyTill', p, ordParFormatter('1st'))
@@ -637,30 +603,30 @@ export const manyTill = (p, end) => Parser(ctx => {
 })
 
 /**
- * Creates a parser that applies its parsers in sequence and passes
- * those results to a function of the same arity as the number of
- * parsers to apply. The return value of that function becomes the
- * parser's result.
+ * A parser that executes its parsers in sequence and passes those
+ * results to a function of the same arity as the number of parsers to
+ * execute. The return value of that function becomes this parser's
+ * result.
  *
  * Note that, unlike `sequence`, `null` parser results are *not*
  * discarded. This ensures that the same number of arguments are passed
  * to `fn` no matter the results from the parsers.
  *
- * `pipe(p, q, fn)` is an optimized implementation of `chain(p, a =>
- * chain(q, b => always(fn(a, b))))`, `pipe(p, q, r, fn)` is an
- * optimized implementation of `chain(p, a => chain(q, b => chain(r,
- * c => always(fn(a, b, c)))))`, and so on.
+ * If one of the parsers fails after prior parsers have consumed input,
+ * this parser will fail fatally.
  *
- * If the array has one element, the parser becomes equivalent to `map`
- * but less efficient.
+ * This parser is equivalent to the applicative lift operation, lifting
+ * multi-parameter functions into the context of a parser. It acts like
+ * `liftA2` if two parsers are passed in, `liftA3` if three are passed
+ * in, etc.
  *
  * @param {...(Parser|function(...*):*)} ps An array of parsers to be
- *     applied one at a time, in order, followed by a function which
+ *     executed one at a time, in order, followed by a function which
  *     will receive as parameters the results of each parser. Its return
- *     value will become the result of the created parser. A single
- *     function must be present and it must be the last parameter; all
- *     other parameters must be parsers.
- * @returns {Parser} A parser that will apply its parsers in sequence,
+ *     value will become the result of this parser. A single function
+ *     must be present and it must be the last parameter; all other
+ *     parameters must be parsers.
+ * @returns {Parser} A parser that will execute its parsers in order,
  *     feed the results to its function, and result in the function's
  *     return value.
  */
@@ -701,18 +667,17 @@ function opFormatter(ord) {
 }
 
 /**
- * Creates a parser that parses zero or more applications of `p`
- * separated by `op`. It results in the value obtained by left
- * associative application of the functions that are the `op` results to
- * the results of `p`.
+ * A parser that parses zero or more applications of `p`, each separated
+ * by `op`. It results in the value obtained by left associative
+ * application of the functions that are the `op` results to the results
+ * of `p`.
  *
  * The parser does not fail unless one of its two parsers fails fatally.
  * If there are zero matches of `p`, then the default value `x` becomes
  * the result. If there is one match of `p` but no matches of `op`, then
  * that result of `p` becomes the overall result.
  *
- * If any result of `op` is not a function, an exception will be thrown
- * when this parser tries to call that result as a function.
+ * If any result of `op` is not a function, an error will be thrown.
  *
  * @param {Parser} p The content parser to match zero or more times.
  * @param {Parser} op The operation parser to match in between each
@@ -766,18 +731,16 @@ export const assocL = (p, op, x) => Parser(ctx => {
 })
 
 /**
- * Creates a parser that parses one or more applications of `p`
- * separated by `op`. It results in the value obtained by left
- * associative application of the functions that are the `op` results to
- * the results of `p`.
+ * A parser that parses one or more applications of `p`, each separated
+ * by `op`. It results in the value obtained by left associative
+ * application of the functions that are the `op` results to the results
+ * of `p`.
  *
- * The parser does not fail unless either one of its two parsers fails
- * fatally or the content parser does not succeed at least once. If
- * there is one match of `p` but no matches of `op`, then that result of
- * `p` becomes the overall result.
+ * This parser will fail non-fatally if `p` doesn't succeed at least
+ * once. Otherwise it can only fail fatally if `p` or `op` fails
+ * fatally.
  *
- * If any result of `op` is not a function, an exception will be thrown
- * when this parser tries to call that result as a function.
+ * If any result of `op` is not a function, an error will be thrown.
  *
  * @param {Parser} p The content parser to match zero or more times.
  * @param {Parser} op The operation parser to match in between each
@@ -829,18 +792,17 @@ export const assoc1L = (p, op) => Parser(ctx => {
 })
 
 /**
- * Creates a parser that parses zero or more applications of `p`
- * separated by `op`. It results in the value obtained by right
- * associative application of the functions that are the `op` results to
- * the results of `p`.
+ * A parser that parses zero or more applications of `p`, each separated
+ * by `op`. It results in the value obtained by right associative
+ * application of the functions that are the `op` results to the results
+ * of `p`.
  *
  * The parser does not fail unless one of its two parsers fails fatally.
  * If there are zero matches of `p`, then the default value `x` becomes
  * the result. If there is one match of `p` but no matches of `op`, then
  * that result of `p` becomes the overall result.
  *
- * If any result of `op` is not a function, an exception will be thrown
- * when this parser tries to call that result as a function.
+ * If any result of `op` is not a function, an error will be thrown.
  *
  * @param {Parser} p The content parser to match zero or more times.
  * @param {Parser} op The operation parser to match in between each
@@ -894,18 +856,16 @@ export const assocR = (p, op, x) => Parser(ctx => {
 })
 
 /**
- * Creates a parser that parses one or more applications of `p`
- * separated by `op`. It results in the value obtained by right
- * associative application of the functions that are the `op` results to
- * the results of `p`.
+ * A parser that parses one or more applications of `p`, each separated
+ * by `op`. It results in the value obtained by right associative
+ * application of the functions that are the `op` results to the results
+ * of `p`.
  *
- * The parser does not fail unless either one of its two parsers fails
- * fatally or the content parser does not succeed at least once. If
- * there is one match of `p` but no matches of `op`, then that result of
- * `p` becomes the overall result.
+ * This parser will fail non-fatally if `p` doesn't succeed at least
+ * once. Otherwise it can only fail fatally if `p` or `op` fails
+ * fatally.
  *
- * If any result of `op` is not a function, an exception will be thrown
- * when this parser tries to call that result as a function.
+ * If any result of `op` is not a function, an error will be thrown.
  *
  * @param {Parser} p The content parser to match zero or more times.
  * @param {Parser} op The operation parser to match in between each

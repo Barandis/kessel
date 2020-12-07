@@ -29,18 +29,14 @@ function pass(ctx, result, errors) {
 }
 
 /**
- * Creates a parser that applies the supplied parser. If that parser
- * consumes input, nothing additional happens. Otherwise, the original
- * parser's result is retained but the error is overwritten by the
- * supplied message as an expected error.
+ * A parser that passes through the result of its embedded parser,
+ * except that it will change that parser's expected error message to
+ * the one provided.
  *
- * This can be used to provide better error messages in cases where the
- * automatically generated error messages are insufficient.
- *
- * @param {Parser} p The parser to be applied.
- * @param {string} msg The new `Expected` error message if `p` fails.
- * @returns {Parser} A parser that applies `p` and passes its results
- *     through except for changing its `Expected` error message upon
+ * @param {Parser} p The parser to be executed.
+ * @param {string} msg The new expected error message if `p` fails.
+ * @returns {Parser} A parser that executes `p` and passes its results
+ *     through except for changing its expected error message upon
  *     failure.
  */
 export const label = (p, msg) => Parser(ctx => {
@@ -52,15 +48,13 @@ export const label = (p, msg) => Parser(ctx => {
 })
 
 /**
- * Creates a parser that transforms a fatal failure into a non-fatal
- * failure. It applies the supplied parser; if that parser fails
- * fatally, the context is set back to what it was *before* that parser
- * is applied and the fatal failure is returned as a non-fatal failure.
- * If the parser has any other result, it is passed through without
- * modification.
+ * A parser that backtracks when its contained parser fails fatally and
+ * transforms that fatal failure into a non-fatal one.
  *
- * This parser allows the user to cause a non-backtracking parser to
- * backtrack upon failure.
+ * This is the only way (along with the similar `attemptM`) to cause a
+ * contained parser to backtrack after a fatal failure. All of the `B`
+ * backtracking parsers backtrack only if the fatal failure was caused
+ * by a contained parser's non-fatal failure.
  *
  * @param {Parser} p The parser whose fatal failures will be converted
  *     into non-fatal failures.
@@ -79,25 +73,23 @@ export const attempt = p => Parser(ctx => {
 })
 
 /**
- * Creates a parser that applies the supplied parser. If that parser
- * succeeds, that success is passed through, though if it didn't consume
- * any input, the provided string will be used to create an expected
- * error message.
+ * A parser that backtracks when its contained parser fails fatally and
+ * transforms that fatal failure into a non-fatal one. The error message
+ * is then replaced with the supplied one.
  *
- * If the original parser fails, what happens depends on whether that
- * failure consumed input. If it did not, the supplied message
- * overwrites the original error message just as with `label`. If it
- * *did* consume input, the context is reset to the context before the
- * parser was applied, the error is set to a compound error using the
- * supplied message (with the nested error being the original error that
- * came from the failure point), and failure happens.
+ * If the contained parser fails non-fatally, this acts just like
+ * `label` and simply replaces the expected error message. If that
+ * parser fails fatally however, this parser will backtrack to the point
+ * where that parser was executed and will use the supplied error
+ * message as a header to a nested error message detailing the
+ * backtracking.
  *
  * @param {Parser} p The parser to be applied.
- * @param {string} msg The new error message to be used. This will be
- *     an `Expected` error if no input was consumed, or a `Compound`
- *     error if it was.
- * @returns {Parser} A parser that applies `p` and changes the error
- *     as appropriate if `p` fails.
+ * @param {string} msg The new error message to be used. This will be an
+ *     `Expected` error if no input was consumed, or a `Compound` error
+ *     if it was.
+ * @returns {Parser} A parser that applies `p` and changes the error as
+ *     appropriate if `p` fails.
  */
 export const attemptM = (p, msg) => Parser(ctx => {
   ASSERT && assertParser('attemptM', p, ordParFormatter('1st'))
@@ -116,25 +108,18 @@ export const attemptM = (p, msg) => Parser(ctx => {
 })
 
 /**
- * Creates a parser that implements a sequence. Each supplied parser is
- * executed in order until either they all succeed or the first one
- * fails. In the former case, all results are merged into an array that
- * becomes the returned parser's result.
+ * A parser that implements a sequence. Each supplied parser is executed
+ * in order until either they all succeed or the first one fails. In the
+ * former case, all results are merged into an array that becomes the
+ * returned parser's result.
  *
- * If one of the parsers fails non-fatally, the entire parser will also
- * fail non-fatally, reverting the context to what it was before the
- * first parser was applied, even if previous parsers have consumed
- * input. A fatal error from one of the contained parsers will still
- * result in an overall fatal error.
+ * If one of the parsers fails non-fatally after all of the earlier
+ * parsers succeeded, this parser will backtrack to the point where the
+ * very first parser was executed and will fail non-fatally.
  *
- * Note that `sequenceB(ps)` is not the same as
- * `attempt(sequence(ps))`, as the former will fail fatally if one of
- * `ps` fails fatally, while the latter will fail non-fatally in that
- * case.
- *
- * @param {...Parser} ps The parsers to be applied.
- * @returns {Parser} A parser that applies the supplied parsers one at a
- *     time, in order, and fails if any of those parsers fail.
+ * @param {...Parser} ps The parsers to be executed.
+ * @returns {Parser} A parser that executes the supplied parsers one at
+ *     a time, in order, and fails if any of those parsers fail.
  */
 export const sequenceB = (...ps) => Parser(ctx => {
   ASSERT && assertParsers('sequenceB', ps)
@@ -160,28 +145,22 @@ export const sequenceB = (...ps) => Parser(ctx => {
 })
 
 /**
- * Creates a parser that chains the context after applying its contained
- * parser to another parser returned by the supplied function. The
- * parser returns that resulting context.
+ * A parser that chains the result after applying its contained parser
+ * to another parser returned by the supplied function. The parser
+ * returns that result.
  *
- * If the second parser (the one provided by `fn`) fails non-fatally,
- * the entire parser will also fail non-fatally, reverting the context
- * to what it was before the first parser was applied, even if the first
- * parser consumed input. A fatal error from either parser will still
- * result in an overall fatal error.
+ * If the parser returned by `fn` fails non-fatally after `p` succeeds,
+ * this parser will backtrack to the point where `p` was executed and
+ * will fail non-fatally.
  *
- * Note that `chainB(p, fn)` is not the same as `attempt(chain(p,
- * fn))`, as the former will fail fatally if one of its parsers fails
- * fatally, while the latter will fail non-fatally in that case.
- *
- * @param {Parser} p The first parser to apply.
+ * @param {Parser} p The first parser to execute.
  * @param {function(*): Parser} fn A function that takes the result from
  *     the first parser's successful application as its sole argument.
  *     It uses this result to determine a second parser, which it
  *     returns.
- * @returns {Parser} A parser which will apply its contained parser,
- *     pass the result to the supplied function, and use that function's
- *     return value as a second parser to apply the input to.
+ * @returns {Parser} A parser which will execute `p`, pass the result to
+ *     the supplied function, and use that function's return value as a
+ *     second parser to execute.
  */
 export const chainB = (p, fn) => Parser(ctx => {
   ASSERT && assertParser('chainB', p, ordParFormatter('1st'))
@@ -209,12 +188,12 @@ export const chainB = (p, fn) => Parser(ctx => {
  * returned by `p`.
  *
  * If `p` succeeds and `q` fails, this parser will backtrack to the
- * point where `p` was applied.
+ * point where `p` was applied and fail non-fatally.
  *
  * @param {Parser} p A parser whose result will be passed to the
  *     function returned by `q`.
  * @param {Parser} q A parser which provides a function.
- * @returns {Parser} A parser that applies `p` and `q` and results in
+ * @returns {Parser} A parser that executes `p` and `q` and results in
  *     the return value of the function returned by `q` when the value
  *     returned by `p` is passed into it.
  */
@@ -239,23 +218,16 @@ export const applyB = (p, q) => Parser(ctx => {
 })
 
 /**
- * Creates a parser that will apply the parsers `p` and `q` in
- * sequence and then return the result of `p`. If either `p` or `q`
- * fail, this parser will also fail.
+ * A parser that will apply the parsers `p` and `q` in order and then
+ * return the result of `p`.
  *
- * If `q` fails non-fatally, the entire parser will also fail
- * non-fatally, reverting the context to what it was before the first
- * parser was applied, even if the first parser consumed input. A fatal
- * error from either parser will still result in an overall fatal error.
+ * If `p` succeeds and `q` fails, this parser will backtrack to the
+ * point where `p` was applied and fail non-fatally.
  *
- * Note that `leftB(p, q)` is not the same as `attempt(left(p,
- * q))`, as the former will fail fatally if one of its parsers fails
- * fatally, while the latter will fail non-fatally in that case.
- *
- * @param {Parser} p The first parser to apply.
- * @param {Parser} q The second parser to apply.
- * @returns {Parser} A parser that applies both contained parsers and
- *     results in the value of the first.
+ * @param {Parser} p The first parser to execute.
+ * @param {Parser} q The second parser to execute.
+ * @returns {Parser} A parser that executes `p` and `q` and returns the
+ *     result of the first.
  */
 export const leftB = (p, q) => Parser(ctx => {
   ASSERT && assertParser('leftB', p, ordParFormatter('1st'))
@@ -275,23 +247,16 @@ export const leftB = (p, q) => Parser(ctx => {
 })
 
 /**
- * Creates a parser that will apply the parsers `p` and `q` in
- * sequence and then return the result of `q`. If either `p` or `q`
- * fail, this parser will also fail.
+ * A parser that will apply the parsers `p` and `q` in order and then
+ * return the result of `q`.
  *
- * If `q` fails non-fatally, the entire parser will also fail
- * non-fatally, reverting the context to what it was before the first
- * parser was applied, even if the first parser consumed input. A fatal
- * error from either parser will still result in an overall fatal error.
+ * If `p` succeeds and `q` fails, this parser will backtrack to the
+ * point where `p` was applied and fail non-fatally.
  *
- * Note that `rightB(p, q)` is not the same as `attempt(right(p,
- * q))`, as the former will fail fatally if one of its parsers fails
- * fatally, while the latter will fail non-fatally in that case.
- *
- * @param {Parser} p The first parser to apply.
- * @param {Parser} q The second parser to apply.
- * @returns {Parser} A parser that applies both contained parsers and
- *     results in the value of the second.
+ * @param {Parser} p The first parser to execute.
+ * @param {Parser} q The second parser to execute.
+ * @returns {Parser} A parser that executes `p` and `q` and returns the
+ *     result of the second.
  */
 export const rightB = (p, q) => Parser(ctx => {
   ASSERT && assertParser('rightB', p, ordParFormatter('1st'))
@@ -310,23 +275,16 @@ export const rightB = (p, q) => Parser(ctx => {
 })
 
 /**
- * Creates a parser that will apply the parsers `p` and `q` in
- * sequence and then return the result of both in an array. If either
- * `p` or `q` fail, this parser will also fail.
+ * A parser that will execute the parsers `p` and `q` in sequence and
+ * then return the result of both in an array.
  *
- * If `q` fails non-fatally, the entire parser will also fail
- * non-fatally, reverting the context to what it was before the first
- * parser was applied, even if the first parser consumed input. A fatal
- * error from either parser will still result in an overall fatal error.
+ * If `p` succeeds and `q` fails, this parser will backtrack to the
+ * point where `p` was executed and fail non-fatally.
  *
- * Note that `andThenB(p, q)` is not the same as `attempt(andThen(p,
- * q))`, as the former will fail fatally if one of its parsers fails
- * fatally, while the latter will fail non-fatally in that case.
- *
- * @param {Parser} p The first parser to apply.
- * @param {Parser} q The second parser to apply.
- * @returns {Parser} A parser that applies both contained parsers and
- *     results in the values of both parsers in an array.
+ * @param {Parser} p The first parser to execute.
+ * @param {Parser} q The second parser to execute.
+ * @returns {Parser} A parser that executes both `p` and `q` and returns
+ *     the results of both parsers in an array.
  */
 export const andThenB = (p, q) => Parser(ctx => {
   ASSERT && assertParser('andThenB', p, ordParFormatter('1st'))
@@ -346,18 +304,16 @@ export const andThenB = (p, q) => Parser(ctx => {
 })
 
 /**
- * Creates a parser that applies the supplied parser `n` times,
- * collecting the successful results into an array. If any application
- * fails, the overall parser will fail; if that failure is fatal, the
- * overall failure will also be fatal.
+ * A parser that executes the supplied parser `n` times, collecting the
+ * successful results into an array.
  *
- * The parser will fail non-fatally if the underlying error was
- * non-fatal, even if input was consumed (backtracking will happen in
- * this case).
+ * If `p` fails after initially succeeding once or more, this parser
+ * will backtrack to the point where `p` was executed the first time and
+ * will fail non-fatally.
  *
- * @param {Parser} p A parser to apply multiple times.
- * @param {number} n The number of times to apply the parser.
- * @returns {Parser} A parser that applies `p` `n` times and results in
+ * @param {Parser} p A parser to execute multiple times.
+ * @param {number} n The number of times to execute the parser.
+ * @returns {Parser} A parser that executes `p` `n` times and results in
  *     an array of all of the successful results of `p`.
  */
 export const repeatB = (p, n) => Parser(ctx => {
@@ -384,27 +340,21 @@ export const repeatB = (p, n) => Parser(ctx => {
 })
 
 /**
- * Creates a parser which applies its content parser zero or more times
- * until its end parser is successful. This parser results in an array
- * of all of the successful content parser results. The end parser is
- * applied *first*, so it's fine to have the two parsers overlap. For
- * example, `manyTill(any, letter)` will work fine, because `letter`
- * will be tried first on each character (contrast with `between(letter,
- * any, letter)`, which will never succeed becuase the `any` is applied
- * before the final `letter` and will therefore consume a letter before
- * the `letter` parser gets to see it).
+ * A parser which executes a content parser zero or more times until an
+ * end parser is successful. This parser results in an array of all of
+ * the successful content parser results. The end parser is executed
+ * *first*, so the results of the two parsers will not overlap.
  *
- * If the content parser fails non-fatally before the end parser does,
- * the overall parser will fail (backtracking if input had already been
- * consumed). A fatal error by either parser will result in a fatal
- * error for the overall parser.
+ * If `p` fails non-fatally before `end` succeeds, this parser will
+ * backtrack to the point where `p` was executed the first time and will
+ * fail non-fatally.
  *
  * @param {Parser} p The content parser. Its results are pushed into an
  *     array and become the returned parser's result.
  * @param {Parser} end The end parser. Parsing ends when this parser
  *     succeeds. Its result is discarded.
- * @returns {Parser} A parser which will apply the content zero or more
- *     times until the end parser succeeds.
+ * @returns {Parser} A parser which will execute `end` and then `p` zero
+ *     or more times until `end` succeeds.
  */
 export const manyTillB = (p, end) => Parser(ctx => {
   ASSERT && assertParser('manyTillB', p, ordParFormatter('1st'))
@@ -435,29 +385,22 @@ export const manyTillB = (p, end) => Parser(ctx => {
 })
 
 /**
- * Creates a parser that executes a block of code in the form of a
- * generator function. Inside that function, parsers that are `yield`ed
- * will be executed and will evaluate to their results (which can then
- * be assigned to variables, etc.).
+ * A parser that executes a block of code in the form of a generator
+ * function. Inside that function, parsers that are `yield`ed will be
+ * executed and will evaluate to their results (which can then be
+ * assigned to variables, etc.).
  *
- * If any of these parsers fail, the `block` parser will also fail. If
- * that failure is non-fatal, backtracking will reset the index to where
- * it was at the beginning of the `block` parser application.
- *
- * If all parsers in the block succeed, `block` will succeed with the
- * value that the generator function returned.
- *
- * Only parsers may be yielded in a block. Yielding anything else will
- * cause undefined behavior.
+ * If any of the yielded parsers fail,  this parser will backtrack to
+ * the point where the first parser was executed and will fail
+ * non-fatally.
  *
  * @param {function():*} genFn A generator function that takes no
  *     arguments and returns whatever should be used as the returned
  *     parser's result. This generator function can `yield` only
- *     `Parser`s; yielding anything else will cause incorrect behavior
- *     depending on what exactly is yielded.
+ *     `Parser`s; otherwise an error is thrown.
  * @returns {Parser} A parser that executes the generator function,
- *     applies parsers as they are yielded, and results (if all parsers
- *     succeed) in the return value of the generator.
+ *     executes parsers as they are yielded, and results in the return
+ *     value of the generator.
  */
 export const blockB = genFn => Parser(ctx => {
   ASSERT && assertGeneratorFunction('blockB', genFn)
@@ -487,28 +430,22 @@ export const blockB = genFn => Parser(ctx => {
 })
 
 /**
- * Creates a parser that applies its parsers in sequence and passes
- * those results to a function of the same arity as the number of
- * parsers to apply. The return value of that function becomes the
- * parser's result.
+ * A parser that executes its parsers in sequence and passes those
+ * results to a function of the same arity as the number of parsers to
+ * execute. The return value of that function becomes this parser's
+ * result.
  *
- * Note that, unlike `sequence`, `null` parser results are *not*
- * discarded. This ensures that the same number of arguments are passed
- * to `fn` no matter the results from the parsers.
- *
- * If one of the parsers fails non-fatally, the overall parser will
- * backtrack to where the first parser was applied and fail non-fatally.
- *
- * If the array has one element, the parser becomes equivalent to `map`
- * but less efficient.
+ * If one of the parsers fails non-fatally after all of the earlier
+ * parsers succeeded, this parser will backtrack to the point where the
+ * very first parser was executed and will fail non-fatally.
  *
  * @param {...(Parser|function(...*):*)} ps An array of parsers to be
- *     applied one at a time, in order, followed by a function which
+ *     executed one at a time, in order, followed by a function which
  *     will receive as parameters the results of each parser. Its return
- *     value will become the result of the created parser. A single
- *     function must be present and it must be the last parameter; all
- *     other parameters must be parsers.
- * @returns {Parser} A parser that will apply its parsers in sequence,
+ *     value will become the result of this parser. A single function
+ *     must be present and it must be the last parameter; all other
+ *     parameters must be parsers.
+ * @returns {Parser} A parser that will execute its parsers in sequence,
  *     feed the results to its function, and result in the function's
  *     return value.
  */
@@ -534,23 +471,18 @@ export const pipeB = (...ps) => Parser(ctx => {
 })
 
 /**
- * Creates a parser which applies its pre, content, and post parsers in
- * order and results in the result of its content parser.
+ * A parser which executes its pre, content, and post parsers in order
+ * and results in the result of its content parser.
  *
- * Note that the content parser `p` is applied before the after parser
- * `post`. This means that the content parser will have an opportunity
- * to patch the "post" content before the post parser does, so take care
- * that the parsers do not overlap in what they match.
+ * If any parser fails non-fatally, this parser will backtrack to where
+ * `pre` was executed and fail non-fatally.
  *
- * If any parser fails non-fatally, the `betweenB` parser will backtrack
- * to where `pre` was applied and fail non-fatally.
- *
- * @param {Parser} pre The first parser to apply.
- * @param {Parser} post The last parser to apply.
- * @param {Parser} p The second parser to apply and whose result becomes
- *     the result of the new parser.
- * @returns {Parser} A parser which applies its parsers in the correct
- *     order and then results in the result of its content parser.
+ * @param {Parser} pre The first parser to execute.
+ * @param {Parser} post The last parser to execute.
+ * @param {Parser} p The second parser to execute and whose result
+ *     becomes the result of the new parser.
+ * @returns {Parser} A parser which executes `pre`, `p`, and `post` in
+ *     order and then returns the result of `p`.
  */
 export const betweenB = (pre, post, p) => Parser(ctx => {
   ASSERT && assertParser('betweenB', pre, ordParFormatter('1st'))

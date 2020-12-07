@@ -13,9 +13,9 @@ const { Ok } = Status
 /** @typedef {import('kessel/core').Parser} Parser */
 
 /**
- * Creates a parser that attempts to match a particular string from the
- * current position in the text. A string of characters equal in length
- * to `length` is read from input and passed to `fn`; if `fn` returns
+ * A parser that attempts to match a particular string from the current
+ * position in the text. A string of characters equal in length to
+ * `length` is read from input and passed to `fn`; if `fn` returns
  * `true`, then the parser succeeds.
  *
  * This parser always fails if there are less than `length` characters
@@ -42,10 +42,10 @@ const StringParser = (length, fn) => Parser(ctx => {
 })
 
 /**
- * Creates a parser that reads a string from the current location in the
- * input and matches it against its supplied string. The string match
- * must be exact (it is case-sensitive), and all UTF-8 characters are
- * recognized properly.
+ * A parser that reads a string from the current location in the input
+ * and matches it against its supplied string. The string match must be
+ * exact (it is case-sensitive), and all UTF-8 characters are recognized
+ * properly.
  *
  * If `str` is empty, the parser will automatically succeed. If it is
  * longer than the remaining input, the parser will automatically fail.
@@ -65,12 +65,9 @@ export const string = str => Parser(ctx => {
 })
 
 /**
- * Creates a parser that reads a string from the current location in the
- * input and matches it against its supplied string. This match is *not*
- * case-sensitive. However, there is a limitation based on the
- * JavaScript understanding of pairs of upper- and lowercase letters. It
- * cannot be assumed that 3- and 4-byte characters will recognize case-
- * insensitive counterparts.
+ * A parser that reads a string from the current location in the input
+ * and matches it against its supplied string. This match is *not*
+ * case-sensitive.
  *
  * If `str` is empty, the parser will automatically succeed. If it is
  * longer than the remaining input, the parser will automatically fail.
@@ -100,9 +97,9 @@ export const all = Parser(ctx => {
 })
 
 /**
- * Creates a parser that reads a certain number of characters, using
- * them (as a string) as its result. The parser will fail if there are
- * not that many characters left to read.
+ * A parser that reads a certain number of characters, using them (as a
+ * string) as its result. The parser will fail if there are not that
+ * many characters left to read.
  *
  * @param {number} n The number of characters to read.
  * @returns {Parser} A parser that reads that many characters and joins

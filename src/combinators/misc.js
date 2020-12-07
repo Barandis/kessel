@@ -19,30 +19,15 @@ const { Ok } = Status
 /** @typedef {import('kessel/core').Parser} Parser */
 
 /**
- * Creates a parser which applies the supplied parser. That parser is
- * expected to result in an array of strings, and if it succeeds, that
- * result's elements are joined together into a single string. This is
- * useful because JavaScript does not share the characteristic of some
- * functional languages where a string is the same as a list of
- * characters. JavaScript needs explicit conversion between the two, so
- * this parser will turn an array of characters into a string.
+ * A parser which will execute `p` and return `p`'s results joined
+ * together into a single string. This requires that `p` returns an
+ * array of strings; an error will be thrown if it does not.
  *
- * If the supplied parser fails, the created parser will also fail with
- * the same error type.
- *
- * `join(p)` is an optimized implementation of `chain(p, x =>
- * always(x.join('')))` or `apply(p, always(x => x.join('')))`.
- *
- * If the supplied parser does not result in an array, an exception will
- * be thrown because an attempt will be made to call `join` on the
- * result. If it results in an array of something other than strings,
- * those elements will be coerced into strings and then joined.
- *
- * @param {Parser} p A parser that is expected to result in an array of
+ * @param {Parser} p A parser that is expected to return an array of
  *     strings.
- * @returns {Parser} A parser that applies its contained parser and
- *     results in a single string made from joining the elements of the
- *     array of strings.
+ * @returns {Parser} A parser that executes `p` and returns a single
+ *     string made from joining the elements of the array of strings
+ *     returned by `p`.
  */
 export const join = p => Parser(ctx => {
   ASSERT && assertParser('join', p)
@@ -57,11 +42,7 @@ export const join = p => Parser(ctx => {
 })
 
 /**
- * Creates a parser that will run the supplied parser but, on success,
- * result in the supplied value instead.
- *
- * `value(p, x)` is an optimized implemenation of `chain(p, () =>
- * always(x))`.
+ * A parser that executes `p` but, on success, returns `x` instead.
  *
  * @param {Parser} p The parser to apply. Its result is ignored.
  * @param {*} x The value that the new parser will result in if `p`
@@ -77,11 +58,8 @@ export const value = (p, x) => Parser(ctx => {
 })
 
 /**
- * Returns the nth element of the result of a parser that produces an
- * array. If the parser fails, that failure will be passed through.
- *
- * `nth(p, n)` is an optimized implementation of `chain(p, x =>
- * always(x[n]))`.
+ * A parser that returns the `n`th element of array-producing parser
+ * `p`.
  *
  * @param {Parser} p A parser that results in an array.
  * @param {number} n The 0-based index of the result element to return.
@@ -102,11 +80,8 @@ export const nth = (p, n) => Parser(ctx => {
 })
 
 /**
- * Returns the first element of a parser result that is an array. If the
- * parser fails, that failure is passed through.
- *
- * `first(p)` is an optimized implementation of `chain(p, x =>
- * always(x[0]))`.
+ * A parser that returns the first element of array-producing parser
+ * `p`.
  *
  * @param {Parser} p A parser whose result is an array.
  * @returns {Parser} A parser whose result is the first element of the
@@ -125,11 +100,8 @@ export const first = p => Parser(ctx => {
 })
 
 /**
- * Returns the second element of a parser result that is an array. If
- * the parser fails, that failure is passed through.
- *
- * `second(p)` is an optimized implementation of `chain(p, x =>
- * always(x[1]))`.
+ * A parser that returns the second element of array-producing parser
+ * `p`.
  *
  * @param {Parser} p A parser whose result is an array.
  * @returns {Parser} A parser whose result is the second element of the
@@ -148,11 +120,8 @@ export const second = p => Parser(ctx => {
 })
 
 /**
- * Returns the third element of a parser result that is an array. If the
- * parser fails, that failure is passed through.
- *
- * `third(p)` is an optimized implementation of `chain(p, x =>
- * always(x[2]))`.
+ * A parser that returns the third element of array-producing parser
+ * `p`.
  *
  * @param {Parser} p A parser whose result is an array.
  * @returns {Parser} A parser whose result is the third element of the
@@ -171,11 +140,8 @@ export const third = p => Parser(ctx => {
 })
 
 /**
- * Returns the fourth element of a parser result that is an array. If
- * the parser fails, that failure is passed through.
- *
- * `fourth(p)` is an optimized implementation of `chain(p, x =>
- * always(x[3]))`.
+ * A parser that returns the fourth element of array-producing parser
+ * `p`.
  *
  * @param {Parser} p A parser whose result is an array.
  * @returns {Parser} A parser whose result is the fourth element of the
@@ -194,11 +160,8 @@ export const fourth = p => Parser(ctx => {
 })
 
 /**
- * Returns the fifth element of a parser result that is an array. If the
- * parser fails, that failure is passed through.
- *
- * `fifth(p)` is an optimized implementation of `chain(p, x =>
- * always(x[4]))`.
+ * A parser that returns the fifth element of array-producing parser
+ * `p`.
  *
  * @param {Parser} p A parser whose result is an array.
  * @returns {Parser} A parser whose result is the fifth element of the

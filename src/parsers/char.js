@@ -46,13 +46,12 @@ const CharParser = fn => Parser(ctx => {
 })
 
 /**
- * Creates a parser that reads a single character from input and
- * succeeds if that character is `c`. Upon failure, this parser does not
- * consume input.
+ * A parser that reads a single character from input and succeeds if
+ * that character is `c`.
  *
  * @param {string} c The character to compare the next character in the
  *     input to. If `c` is more than one character, this parser will
- *     always fail.
+ *     throw an error.
  * @returns {Parser} A parser that will succeed if `c` is the next
  *     character in the input.
  */
@@ -64,14 +63,13 @@ export const char = c => Parser(ctx => {
 })
 
 /**
- * Creates a parser that reads a single character from input and
- * succeeds if that character is `c`. This differs from `char` in that
- * the comparison done by this parser is case-insensitive. Upon failure,
- * this parser does not consume input.
+ * A parser that reads a single character from input and succeeds if
+ * that character is `c`. This differs from `char` in that the
+ * comparison done by this parser is case-insensitive.
  *
  * @param {string} c The character to compare the next character in the
  *     input to. If `c` is more than one character, this parser will
- *     always fail.
+ *     throw an error.
  * @returns {Parser} A parser that will succeed if `c` (or its
  *     other-cased counterpart) is the next character in the input.
  */
@@ -85,10 +83,10 @@ export const charI = c => Parser(ctx => {
 })
 
 /**
- * Creates a parser that reads a single character and passes it to the
- * provided function. If the function returns `true`, this parser
- * succeeds with that character as the result. If the function returns
- * `false`, this parser fails and consumes no input.
+ * A parser that reads a single character and passes it to the provided
+ * function. If the function returns `true`, this parser succeeds with
+ * that character as the result. If the function returns `false`, this
+ * parser fails and consumes no input.
  *
  * This parser cannot determine the cause for an error since it's not
  * feasible to have it analyze the function to see what it expects to
@@ -108,14 +106,11 @@ export const satisfy = fn => Parser(ctx => {
 })
 
 /**
- * Creates a parser that reads a single character and passes it to the
- * provided function. If the function returns `true`, this parser
- * succeeds with that character as the result. If the function returns
- * `false`, this parser fails and consumes no input and signals an error
- * with the provided message.
- *
- * `satisfyM(fn, message)` is an optimized implementation of
- * `label(satisfy(fn), message)`.
+ * A parser that reads a single character and passes it to the provided
+ * function. If the function returns `true`, this parser succeeds with
+ * that character as the result. If the function returns `false`, this
+ * parser fails and consumes no input and signals an error with the
+ * provided message.
  *
  * @param {function(string):boolean} fn A function to which the next
  *     character is passed; if it returns `true`, the parser succeeds
@@ -133,26 +128,18 @@ export const satisfyM = (fn, message) => Parser(ctx => {
 })
 
 /**
- * Creates a parser that reads a single character and determines whether
- * it is between the provided start and end characters (inclusive). If
- * it is, the read character is the successful result, and if it is not,
- * the parser fails without consuming input.
+ * A parser that reads a single character and determines whether it is
+ * between (according to code points) characters `s` and `e`
+ * (inclusive). If it is, the read character is the successful result,
+ * and if it is not, the parser fails without consuming input.
  *
- * `start` and `end` are expected to be single characters. If they are
- * not, the full strings are compared against the next character, which
- * may cause unexpected behavior.
+ * `s` and `e` are expected to be single characters. An error will be
+ * thrown if they are not.
  *
- * "Between" is defined according to code points. This is fine in most
- * cases, but it can get weird with higher code points. For example,
- * there is no `h` in the set of mathematical lowercase italic symbols.
- * The `h` would instead be the Planck's Constant character, which is in
- * a completely different part of the Unicode spectrum and therefore is
- * not "between" `a` and `z`. Take care with non-ascii characters.
- *
- * @param {string} s The character that defines the start of the
- *     range of characters to match. It is included in that range.
- * @param {string} e The character that defines the end of the range
+ * @param {string} s The character that defines the start of the range
  *     of characters to match. It is included in that range.
+ * @param {string} e The character that defines the end of the range of
+ *     characters to match. It is included in that range.
  * @returns {Parser} A parser that will succeed if the next input
  *     character is between `start` and `end` (inclusive).
  */
@@ -188,10 +175,9 @@ export const eof = Parser(ctx => {
 })
 
 /**
- * Creates a parser that reads a character and compares it against each
- * of the characters in the provided string or array (if the array has
- * multi-character strings, they cannot match and will essentially be
- * ignored). If the read character is among those characters, the parser
+ * A parser that reads a character and compares it against each of the
+ * characters in `cs`, which is either an array of characters or a
+ * string. If the read character is among those characters, the parser
  * will succeed.
  *
  * @param {(string|string[])} cs The characters, either in an array or a
@@ -213,10 +199,9 @@ export const anyOf = cs => Parser(ctx => {
 })
 
 /**
- * Creates a parser that reads a character and compares it against each
- * of the characters in the provided string or array (if the array has
- * multi-character strings, they cannot match and will essentially be
- * ignored). If the read character is *not* among those characters, the
+ * A parser that reads a character and compares it against each of the
+ * characters in `cs`, which is either an array of characters or a
+ * string. If the read character is *not* among those characters, the
  * parser will succeed.
  *
  * @param {(string|string[])} cs The characters, either in an array or a
@@ -239,9 +224,7 @@ export const noneOf = cs => Parser(ctx => {
 
 /**
  * A parser that reads a character and succeeds with that character if
- * it is a digit. Note that this is not a Unicode decimal digit; for
- * that, use `regex(/\p{Nd}/)`. This parser succeeds only for the
- * literal characters `0-9`.
+ * it is an ASCII digit.
  */
 export const digit = Parser(ctx => {
   const fn = c => c >= '0' && c <= '9'
@@ -273,8 +256,7 @@ export const octal = Parser(ctx => {
 
 /**
  * A parser that reads a character and succeeds with that character if
- * it is a letter. This parser is only for ASCII characters; `uletter`
- * is a Unicode letter parser.
+ * it is an ASCII letter.
  */
 export const letter = Parser(ctx => {
   const fn = c => c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z'
@@ -284,8 +266,7 @@ export const letter = Parser(ctx => {
 
 /**
  * A parser that reads a character and succeeds with that character if
- * it is an alphanumeric character. This parser is only for ASCII
- * characters; `ualpha` is a Unicode alphanumeric parser.
+ * it is an ASCII alphanumeric character.
  */
 export const alpha = Parser(ctx => {
   const fn = c => c >= 'a' && c <= 'z'
@@ -297,8 +278,7 @@ export const alpha = Parser(ctx => {
 
 /**
  * A parser that reads a character and succeeds with that character if
- * it is an uppercase letter. This parser is only for ASCII characters;
- * `uupper` is a Unicode uppercase letter parser.
+ * it is an ASCII uppercase letter.
  */
 export const upper = Parser(ctx => {
   const fn = c => c >= 'A' && c <= 'Z'
@@ -308,8 +288,7 @@ export const upper = Parser(ctx => {
 
 /**
  * A parser that reads a character and succeeds with that character if
- * it is a lowercase letter. This parser is only for ASCII characters;
- * `ulower` is a Unicode letter parser.
+ * it is an ASCII lowercase letter.
  */
 export const lower = Parser(ctx => {
   const fn = c => c >= 'a' && c <= 'z'

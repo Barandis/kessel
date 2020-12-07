@@ -65,6 +65,9 @@ export const map = (p, fn) => Parser(ctx => {
  * A parser that applies the value returned by `q` to the function
  * returned by `p`.
  *
+ * This parser will fail fatally if `q` fails after `p` consumes input,
+ * even if `q`'s failure was non-fatal.
+ *
  * This is the same operation as `<*>` from Haskell's `Applicative`
  * class.
  *
@@ -103,6 +106,10 @@ export const apply = (p, q) => Parser(ctx => {
  * A parser that chains the result after applying its contained parser
  * to another parser returned by the supplied function. The parser
  * returns that result.
+ *
+ * This parser will fail fatally if the function-provided parser fails
+ * after the other parser consumes input, even if that failure is
+ * non-fatal.
  *
  * This is the same operation as the `Monad` class's `bind` operation
  * (generally written `>>=` in Haskell).
@@ -180,9 +187,11 @@ export const orElse = (p, q) => Parser(ctx => {
 
 /**
  * A parser that applies the parsers `p` and `q` in sequence and then
- * return the result of both in a 2-element array. If either `p` or `q`
- * fail, this parser will also fail, and the failure will be fatal if
- * any input had been consumed by either parser.
+ * return the result of both in a 2-element array.
+ *
+ * If either `p` or `q` fail, this parser will also fail, and the
+ * failure will be fatal if any input had been consumed by either
+ * parser.
  *
  * This is the most primitive sequencing parser. It can be regarded as
  * an optimized implementation of either, in the monadic and applicative

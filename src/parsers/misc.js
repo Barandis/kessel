@@ -10,8 +10,8 @@ import { generic } from 'kessel/error'
 /** @typedef {import('kessel/core').Parser} Parser */
 
 /**
- * Creates a parser that fails without consuming input, setting the
- * generic error message to whatever is passed in.
+ * A parser that fails without consuming input, setting the generic
+ * error message to whatever is passed in.
  *
  * @param {string} msg The message used to create the generic error.
  * @returns {Parser} A parser that automatically fails with the supplied
@@ -23,9 +23,9 @@ export const failNormally = msg => Parser(ctx => {
 })
 
 /**
- * Creates a parser that fails without consuming input, setting the
- * generic error message to whatever is passed in. This signifies a
- * fatal error, one that cannot be recovered from without backtracking.
+ * A parser that fails without consuming input, setting the generic
+ * error message to whatever is passed in. This signifies a fatal error,
+ * one that cannot be recovered from without backtracking.
  *
  * @param {string} msg The message used to create the generic error.
  * @returns {Parser} A parser that automatically fails fatally with the

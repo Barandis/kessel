@@ -42,8 +42,8 @@ const reNewline = /^(?:\r\n|\r|\n)/
 const reUnewline = /^(?:\r\n|[\r\n\u0085\u2028\u2029])/u
 
 /**
- * Creates a parser that takes a regular expression object and matches
- * it as far as it can against the input at its current position.
+ * A parser that takes a regular expression object and matches it as far
+ * as it can against the input at its current position.
  *
  * It is assumed that the regex begins with a `^` . The `g` flag is
  * ignored in that only the first match is processed and returned. This
@@ -67,10 +67,10 @@ const RegexParser = re => Parser(ctx => {
 })
 
 /**
- * Creates a parser that attempts to match the supplied regular
- * expression to the input text at the current location. If there is a
- * match, any matching text is returned as a successful result. No text
- * is consumed upon failure.
+ * A parser that attempts to match the supplied regular expression to
+ * the input text at the current location. If there is a match, any
+ * matching text is returned as a successful result. No text is consumed
+ * upon failure.
  *
  * A string can be passed to this parser. If one is, it is converted
  * into a regular expression without flags.
@@ -81,8 +81,8 @@ const RegexParser = re => Parser(ctx => {
  * match is only attempted at the beginning of the current text.
  *
  * @param {(string|RegExp)} re The regular expression to match against
- *     the input text. If this is a string, it will be converted into
- *     a regular expression with no flags.
+ *     the input text. If this is a string, it will be converted into a
+ *     regular expression with no flags.
  * @returns {Parser} A parser that attempts to match the regular
  *     expression against the input at its current position and succeeds
  *     if a match is found.
