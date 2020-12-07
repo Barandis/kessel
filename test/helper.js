@@ -63,7 +63,7 @@ const all = (errors, type) => commaSeparate(errors
  *     that the parser returns. Otherwise it is deeply compared to the
  *     state itself.
  */
-export function pass(parser, test, value) {
+export function tpass(parser, test, value) {
   const [state, result] = parse(parser, test)
 
   if (!result.status === Status.Ok) {
@@ -114,7 +114,7 @@ export function pass(parser, test, value) {
  *     containing one or more properties that can be tested against the
  *     parser state.
  */
-export function fail(parser, test, error = {}) {
+export function tfail(parser, test, error = {}) {
   const [state, result] = parse(parser, test)
 
   if (result.status === Status.Ok) {
@@ -150,6 +150,6 @@ export function fail(parser, test, error = {}) {
  * @param {string} test The test string to which the parser is applied.
  * @param {string} message The expected message of the thrown exception.
  */
-export function error(parser, test, message) {
+export function terror(parser, test, message) {
   expect(() => parse(parser, test)).to.throw(message)
 }

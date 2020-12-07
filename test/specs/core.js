@@ -23,7 +23,7 @@ import { ErrorType, merge, unexpected } from 'kessel/error'
 import { char } from 'kessel/parsers/char'
 import { string } from 'kessel/parsers/string'
 import { stringToView } from 'kessel/util'
-import { error as perror, pass } from 'test/helper'
+import { terror, tpass } from 'test/helper'
 
 const encoder = new TextEncoder()
 
@@ -31,19 +31,19 @@ describe('Core functionality', () => {
   describe('parser state', () => {
     context('input type', () => {
       it('parses strings', () => {
-        pass(string('abc'), 'abc', 'abc')
+        tpass(string('abc'), 'abc', 'abc')
       })
       it('parses array buffers', () => {
-        pass(string('abc'), encoder.encode('abc').buffer, 'abc')
+        tpass(string('abc'), encoder.encode('abc').buffer, 'abc')
       })
       it('parses typed arrays', () => {
-        pass(string('abc'), encoder.encode('abc'), 'abc')
+        tpass(string('abc'), encoder.encode('abc'), 'abc')
       })
       it('parses data views', () => {
-        pass(string('abc'), new DataView(encoder.encode('abc').buffer), 'abc')
+        tpass(string('abc'), new DataView(encoder.encode('abc').buffer), 'abc')
       })
       it('throws an error if anything else is passed', () => {
-        perror(
+        terror(
           string('123'),
           123,
           'Parser input must be a string, a typed array, an array buffer, or '
