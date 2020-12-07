@@ -14,7 +14,7 @@ import {
   ordNumFormatter,
   ordParFormatter,
 } from 'kessel/assert'
-import { error, fatal, ok, Parser, Status } from 'kessel/core'
+import { fail, fatal, ok, Parser, Status } from 'kessel/core'
 import { merge, nested } from 'kessel/error'
 import { ordinal, range, stringify, twin } from 'kessel/util'
 
@@ -50,7 +50,7 @@ export const choice = (...ps) => Parser(ctx => {
     errors = merge(errors, pres.errors)
     if (pres.status === Fatal) return fatal(pctx, errors)
   }
-  return error(ctx, errors)
+  return fail(ctx, errors)
 })
 
 /**
@@ -119,7 +119,7 @@ export const attempt = p => Parser(ctx => {
   if (pres.status === Ok) return prep
 
   const err = index === pctx.index ? pres.errors : nested(pctx, pres.errors)
-  return error(pctx, err, index)
+  return fail(pctx, err, index)
 })
 
 /**
@@ -159,7 +159,7 @@ export const sequenceB = (...ps) => Parser(ctx => {
       const err = index === context.index
         ? pres.errors
         : nested(context, pres.errors)
-      return error(context, err, index)
+      return fail(context, err, index)
     }
     if (pres.value !== null) values.push(pres.value)
   }
@@ -208,7 +208,7 @@ export const chainB = (p, fn) => Parser(ctx => {
   if (qres.status !== Fail) return qrep
 
   const err = index === qctx.index ? qres.errors : nested(qctx, qres.errors)
-  return error(qctx, err, index)
+  return fail(qctx, err, index)
 })
 
 /**
@@ -244,7 +244,7 @@ export const leftB = (p, q) => Parser(ctx => {
   if (qres.status === Ok) return ok(qctx, pres.value)
 
   const err = index === qctx.index ? qres.errors : nested(qctx, qres.errors)
-  return error(qctx, err, index)
+  return fail(qctx, err, index)
 })
 
 /**
@@ -279,7 +279,7 @@ export const rightB = (p, q) => Parser(ctx => {
   if (qres.status !== Fail) return qrep
 
   const err = index === qctx.index ? qres.errors : nested(qctx, qres.errors)
-  return error(qctx, err, index)
+  return fail(qctx, err, index)
 })
 
 /**
@@ -315,7 +315,7 @@ export const andThenB = (p, q) => Parser(ctx => {
   if (qres.status === Ok) return ok(qctx, [pres.value, qres.value])
 
   const err = index === qctx.index ? qres.errors : nested(qctx, qres.errors)
-  return error(qctx, err, index)
+  return fail(qctx, err, index)
 })
 
 /**
@@ -349,7 +349,7 @@ export const repeatB = (p, n) => Parser(ctx => {
       const err = index === context.index
         ? pres.errors
         : nested(context, pres.errors)
-      return error(context, err, index)
+      return fail(context, err, index)
     }
     values.push(pres.value)
   }
@@ -400,7 +400,7 @@ export const manyTillB = (p, end) => Parser(ctx => {
       const err = index === pctx.index
         ? merge(pres.errors, endres.errors)
         : nested(pctx, merge(pres.errors, endres.errors))
-      return error(pctx, err, index)
+      return fail(pctx, err, index)
     }
     values.push(pres.value)
   }
@@ -453,7 +453,7 @@ export const blockB = genFn => Parser(ctx => {
     context = pctx
 
     if (pres.status === Fatal) return prep
-    if (pres.status === Fail) return error(pctx, pres.errors, index)
+    if (pres.status === Fail) return fail(pctx, pres.errors, index)
     nextValue = pres.value
     i++
   }
@@ -500,7 +500,7 @@ export const pipeB = (...ps) => Parser(ctx => {
     context = pctx
 
     if (pres.status === Fatal) return prep
-    if (pres.status === Fail) return error(context, pres.errors, index)
+    if (pres.status === Fail) return fail(context, pres.errors, index)
     values.push(pres.value)
   }
   return ok(context, fn(...values))
@@ -537,10 +537,10 @@ export const betweenB = (pre, post, p) => Parser(ctx => {
 
   const [prep, [pctx, pres]] = twin(p(prectx))
   if (pres.status === Fatal) return prep
-  if (pres.status === Fail) return error(pctx, pres.errors, index)
+  if (pres.status === Fail) return fail(pctx, pres.errors, index)
 
   const [postrep, [postctx, postres]] = twin(post(pctx))
   if (postres.status === Fatal) return postrep
-  if (postres.status === Fail) return error(postctx, postres.errors, index)
+  if (postres.status === Fail) return fail(postctx, postres.errors, index)
   return ok(postctx, pres.value)
 })

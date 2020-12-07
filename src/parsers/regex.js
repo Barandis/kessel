@@ -4,7 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import { assertStringOrRegExp } from 'kessel/assert'
-import { error, ok, Parser, Status } from 'kessel/core'
+import { fail, ok, Parser, Status } from 'kessel/core'
 import { expecteds } from 'kessel/messages'
 import { stringToView, twin, viewToString } from 'kessel/util'
 
@@ -63,7 +63,7 @@ const RegexParser = re => Parser(ctx => {
   const match = rest.match(re)
   return match
     ? ok(ctx, match[0], index + stringToView(match[0]).byteLength)
-    : error(ctx)
+    : fail(ctx)
 })
 
 /**
@@ -102,7 +102,7 @@ export const regex = re => Parser(ctx => {
   }
 
   const [rprep, [rpctx, rpres]] = twin(RegexParser(regex)(ctx))
-  return rpres.status === Ok ? rprep : error(rpctx, expecteds.regex(regex))
+  return rpres.status === Ok ? rprep : fail(rpctx, expecteds.regex(regex))
 })
 
 /**
@@ -112,7 +112,7 @@ export const regex = re => Parser(ctx => {
  */
 export const letterU = Parser(ctx => {
   const [rprep, [rpctx, rpres]] = twin(RegexParser(reLetter)(ctx))
-  return rpres.status === Ok ? rprep : error(rpctx, expecteds.letterU)
+  return rpres.status === Ok ? rprep : fail(rpctx, expecteds.letterU)
 })
 
 /**
@@ -122,7 +122,7 @@ export const letterU = Parser(ctx => {
  */
 export const alphaU = Parser(ctx => {
   const [rprep, [rpctx, rpres]] = twin(RegexParser(reAlpha)(ctx))
-  return rpres.status === Ok ? rprep : error(rpctx, expecteds.alphaU)
+  return rpres.status === Ok ? rprep : fail(rpctx, expecteds.alphaU)
 })
 
 /**
@@ -133,7 +133,7 @@ export const alphaU = Parser(ctx => {
  */
 export const upperU = Parser(ctx => {
   const [rprep, [rpctx, rpres]] = twin(RegexParser(reUpper)(ctx))
-  return rpres.status === Ok ? rprep : error(rpctx, expecteds.upperU)
+  return rpres.status === Ok ? rprep : fail(rpctx, expecteds.upperU)
 })
 
 /**
@@ -143,7 +143,7 @@ export const upperU = Parser(ctx => {
  */
 export const lowerU = Parser(ctx => {
   const [rprep, [rpctx, rpres]] = twin(RegexParser(reLower)(ctx))
-  return rpres.status === Ok ? rprep : error(rpctx, expecteds.lowerU)
+  return rpres.status === Ok ? rprep : fail(rpctx, expecteds.lowerU)
 })
 
 /**
@@ -154,7 +154,7 @@ export const lowerU = Parser(ctx => {
  */
 export const space = Parser(ctx => {
   const [rprep, [rpctx, rpres]] = twin(RegexParser(reSpace)(ctx))
-  return rpres.status === Ok ? rprep : error(rpctx, expecteds.space)
+  return rpres.status === Ok ? rprep : fail(rpctx, expecteds.space)
 })
 
 /**
@@ -167,7 +167,7 @@ export const space = Parser(ctx => {
  */
 export const spaceU = Parser(ctx => {
   const [rprep, [rpctx, rpres]] = twin(RegexParser(reUspace)(ctx))
-  return rpres.status === Ok ? rprep : error(rpctx, expecteds.spaceU)
+  return rpres.status === Ok ? rprep : fail(rpctx, expecteds.spaceU)
 })
 
 /**
@@ -202,7 +202,7 @@ export const spacesU = Parser(ctx => {
  */
 export const spaces1 = Parser(ctx => {
   const [rpctx, rpres] = RegexParser(reSpaces1)(ctx)
-  return rpres.status === Ok ? ok(rpctx, null) : error(rpctx, expecteds.spaces1)
+  return rpres.status === Ok ? ok(rpctx, null) : fail(rpctx, expecteds.spaces1)
 })
 
 /**
@@ -215,7 +215,7 @@ export const spaces1U = Parser(ctx => {
   const [rpctx, rpres] = RegexParser(reUspaces1)(ctx)
   return rpres.status === Ok
     ? ok(rpctx, null)
-    : error(rpctx, expecteds.spaces1U)
+    : fail(rpctx, expecteds.spaces1U)
 })
 
 /**
@@ -234,7 +234,7 @@ export const spaces1U = Parser(ctx => {
  */
 export const newline = Parser(ctx => {
   const [rprep, [rpctx, rpres]] = twin(RegexParser(reNewline)(ctx))
-  return rpres.status === Ok ? rprep : error(rpctx, expecteds.newline)
+  return rpres.status === Ok ? rprep : fail(rpctx, expecteds.newline)
 })
 
 /**
@@ -258,5 +258,5 @@ export const newline = Parser(ctx => {
  */
 export const newlineU = Parser(ctx => {
   const [rprep, [rpctx, rpres]] = twin(RegexParser(reUnewline)(ctx))
-  return rpres.status === Ok ? rprep : error(rpctx, expecteds.newlineU)
+  return rpres.status === Ok ? rprep : fail(rpctx, expecteds.newlineU)
 })

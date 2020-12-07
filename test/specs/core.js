@@ -7,7 +7,7 @@ import { expect } from 'chai'
 
 import { sequence } from 'kessel/combinators/sequence'
 import {
-  error,
+  fail,
   failure,
   fatal,
   maybeFatal,
@@ -72,16 +72,16 @@ describe('Core functionality', () => {
     describe('updated failure parser state', () => {
       it('creates a new object', () => {
         const [state, result] = parse(string('123'), 'abc')
-        const [ustate, uresult] = error(state, result.errors)
+        const [ustate, uresult] = fail(state, result.errors)
         expect(state).to.not.equal(ustate)
         expect(result).to.deep.equal(uresult)
       })
       it('can update errors and/or index properties', () => {
         const [state, result] = parse(string('123'), 'abc')
-        const [ustate1, uresult1] = error(state, merge(
+        const [ustate1, uresult1] = fail(state, merge(
           result.errors, unexpected("'z'"),
         ))
-        const [ustate2, uresult2] = error(state)
+        const [ustate2, uresult2] = fail(state)
 
         expect(result.errors).to.deep.equal([
           { type: ErrorType.Expected, label: "'123'" },

@@ -9,7 +9,7 @@ import {
   ordParFormatter,
   ordStrFormatter,
 } from 'kessel/assert'
-import { error, Parser, Status } from 'kessel/core'
+import { fail, Parser, Status } from 'kessel/core'
 import { compound, ErrorType, expected } from 'kessel/error'
 import { twin } from 'kessel/util'
 
@@ -79,5 +79,5 @@ export const attemptM = (p, msg) => Parser(ctx => {
     }
     return pass(pctx, pres, expected(msg))
   }
-  return error(ctx, compound(msg, pctx, pres.errors))
+  return fail(ctx, compound(msg, pctx, pres.errors))
 })

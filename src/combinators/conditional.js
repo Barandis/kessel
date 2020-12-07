@@ -9,7 +9,7 @@ import {
   ordParFormatter,
   ordStrFormatter,
 } from 'kessel/assert'
-import { error, ok, Parser, Status } from 'kessel/core'
+import { fail, ok, Parser, Status } from 'kessel/core'
 import { expected } from 'kessel/error'
 import { twin } from 'kessel/util'
 
@@ -37,7 +37,7 @@ export const lookAhead = p => Parser(ctx => {
   const index = ctx.index
   const [pctx, pres] = p(ctx)
   return pres.status === Ok ? ok(pctx, pres.value, index)
-    : error(pctx, pres.errors, index)
+    : fail(pctx, pres.errors, index)
 })
 
 /**
@@ -62,7 +62,7 @@ export const notEmpty = p => Parser(ctx => {
 
   const index = ctx.index
   const [prep, [pctx, pres]] = twin(p(ctx))
-  return pres.status !== Ok || pctx.index !== index ? prep : error(pctx)
+  return pres.status !== Ok || pctx.index !== index ? prep : fail(pctx)
 })
 
 /**
@@ -91,7 +91,7 @@ export const notEmptyM = (p, msg) => Parser(ctx => {
   const [prep, [pctx, pres]] = twin(p(ctx))
   return pres.status !== Ok || pctx.index !== index
     ? prep
-    : error(pctx, expected(msg))
+    : fail(pctx, expected(msg))
 })
 
 /**
@@ -113,7 +113,7 @@ export const followedBy = p => Parser(ctx => {
   const index = ctx.index
   const [pctx, pres] = p(ctx)
   return pres.status === Ok ? ok(pctx, null, index)
-    : error(pctx, undefined, index)
+    : fail(pctx, undefined, index)
 })
 
 /**
@@ -138,7 +138,7 @@ export const followedByM = (p, msg) => Parser(ctx => {
   const [pctx, pres] = p(ctx)
   return pres.status === Ok
     ? ok(pctx, null, index)
-    : error(pctx, expected(msg), index)
+    : fail(pctx, expected(msg), index)
 })
 
 /**
@@ -161,7 +161,7 @@ export const notFollowedBy = p => Parser(ctx => {
   const index = ctx.index
   const [pctx, pres] = p(ctx)
   return pres.status === Ok
-    ? error(pctx, undefined, index)
+    ? fail(pctx, undefined, index)
     : ok(pctx, null, index)
 })
 
@@ -187,6 +187,6 @@ export const notFollowedByM = (p, msg) => Parser(ctx => {
   const index = ctx.index
   const [pctx, pres] = p(ctx)
   return pres.status === Ok
-    ? error(pctx, expected(msg), index)
+    ? fail(pctx, expected(msg), index)
     : ok(pctx, null, index)
 })

@@ -12,7 +12,7 @@ import {
   ordFnFormatter,
   ordStrFormatter,
 } from 'kessel/assert'
-import { error, ok, Parser, Status } from 'kessel/core'
+import { fail, ok, Parser, Status } from 'kessel/core'
 import { expected } from 'kessel/error'
 import { expecteds } from 'kessel/messages'
 import { nextChar, twin } from 'kessel/util'
@@ -39,10 +39,10 @@ const { Ok } = Status
  */
 const CharParser = fn => Parser(ctx => {
   const { index, view } = ctx
-  if (index >= view.byteLength) return error(ctx)
+  if (index >= view.byteLength) return fail(ctx)
 
   const { width, next } = nextChar(index, view)
-  return fn(next) ? ok(ctx, next, index + width) : error(ctx)
+  return fn(next) ? ok(ctx, next, index + width) : fail(ctx)
 })
 
 /**
@@ -60,7 +60,7 @@ export const char = c => Parser(ctx => {
   ASSERT && assertChar('char', c)
 
   const [cprep, [cpctx, cpres]] = twin(CharParser(ch => c === ch)(ctx))
-  return cpres.status === Ok ? cprep : error(cpctx, expecteds.char(c))
+  return cpres.status === Ok ? cprep : fail(cpctx, expecteds.char(c))
 })
 
 /**
@@ -81,7 +81,7 @@ export const charI = c => Parser(ctx => {
   const [cprep, [cpctx, cpres]] = twin(CharParser(
     ch => c.toLowerCase() === ch.toLowerCase(),
   )(ctx))
-  return cpres.status === Ok ? cprep : error(cpctx, expecteds.charI(c))
+  return cpres.status === Ok ? cprep : fail(cpctx, expecteds.charI(c))
 })
 
 /**
@@ -129,7 +129,7 @@ export const satisfyM = (fn, message) => Parser(ctx => {
   ASSERT && assertString('satisfyM', message, ordStrFormatter('2nd'))
 
   const [cprep, [cpctx, cpres]] = twin(CharParser(fn)(ctx))
-  return cpres.status === Ok ? cprep : error(cpctx, expected(message))
+  return cpres.status === Ok ? cprep : fail(cpctx, expected(message))
 })
 
 /**
@@ -162,7 +162,7 @@ export const range = (s, e) => Parser(ctx => {
 
   const fn = c => c >= s && c <= e
   const [cprep, [cpctx, cpres]] = twin(CharParser(fn)(ctx))
-  return cpres.status === Ok ? cprep : error(cpctx, expecteds.range(s, e))
+  return cpres.status === Ok ? cprep : fail(cpctx, expecteds.range(s, e))
 })
 
 /**
@@ -171,7 +171,7 @@ export const range = (s, e) => Parser(ctx => {
  */
 export const any = Parser(ctx => {
   const { index, view } = ctx
-  if (index >= view.byteLength) return error(ctx, expecteds.any)
+  if (index >= view.byteLength) return fail(ctx, expecteds.any)
 
   const { width, next } = nextChar(index, view)
   return ok(ctx, next, index + width)
@@ -184,7 +184,7 @@ export const any = Parser(ctx => {
  */
 export const eof = Parser(ctx => {
   const { index, view } = ctx
-  return index >= view.byteLength ? ok(ctx, null) : error(ctx, expecteds.eof)
+  return index >= view.byteLength ? ok(ctx, null) : fail(ctx, expecteds.eof)
 })
 
 /**
@@ -209,7 +209,7 @@ export const anyOf = cs => Parser(ctx => {
 
   return arr.includes(next)
     ? ok(ctx, next, index + width)
-    : error(ctx, expecteds.anyOf(arr))
+    : fail(ctx, expecteds.anyOf(arr))
 })
 
 /**
@@ -233,7 +233,7 @@ export const noneOf = cs => Parser(ctx => {
   const arr = [...cs]
 
   return arr.includes(next)
-    ? error(ctx, expecteds.noneOf(arr))
+    ? fail(ctx, expecteds.noneOf(arr))
     : ok(ctx, next, index + width)
 })
 
@@ -246,7 +246,7 @@ export const noneOf = cs => Parser(ctx => {
 export const digit = Parser(ctx => {
   const fn = c => c >= '0' && c <= '9'
   const [cprep, [cpctx, cpres]] = twin(CharParser(fn)(ctx))
-  return cpres.status === Ok ? cprep : error(cpctx, expecteds.digit)
+  return cpres.status === Ok ? cprep : fail(cpctx, expecteds.digit)
 })
 
 /**
@@ -258,7 +258,7 @@ export const hex = Parser(ctx => {
     || c >= 'a' && c <= 'f'
     || c >= 'A' && c <= 'F'
   const [cprep, [cpctx, cpres]] = twin(CharParser(fn)(ctx))
-  return cpres.status === Ok ? cprep : error(cpctx, expecteds.hex)
+  return cpres.status === Ok ? cprep : fail(cpctx, expecteds.hex)
 })
 
 /**
@@ -268,7 +268,7 @@ export const hex = Parser(ctx => {
 export const octal = Parser(ctx => {
   const fn = c => c >= '0' && c <= '7'
   const [cprep, [cpctx, cpres]] = twin(CharParser(fn)(ctx))
-  return cpres.status === Ok ? cprep : error(cpctx, expecteds.octal)
+  return cpres.status === Ok ? cprep : fail(cpctx, expecteds.octal)
 })
 
 /**
@@ -279,7 +279,7 @@ export const octal = Parser(ctx => {
 export const letter = Parser(ctx => {
   const fn = c => c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z'
   const [cprep, [cpctx, cpres]] = twin(CharParser(fn)(ctx))
-  return cpres.status === Ok ? cprep : error(cpctx, expecteds.letter)
+  return cpres.status === Ok ? cprep : fail(cpctx, expecteds.letter)
 })
 
 /**
@@ -292,7 +292,7 @@ export const alpha = Parser(ctx => {
     || c >= 'A' && c <= 'Z'
     || c >= '0' && c <= '9'
   const [cprep, [cpctx, cpres]] = twin(CharParser(fn)(ctx))
-  return cpres.status === Ok ? cprep : error(cpctx, expecteds.alpha)
+  return cpres.status === Ok ? cprep : fail(cpctx, expecteds.alpha)
 })
 
 /**
@@ -303,7 +303,7 @@ export const alpha = Parser(ctx => {
 export const upper = Parser(ctx => {
   const fn = c => c >= 'A' && c <= 'Z'
   const [cprep, [cpctx, cpres]] = twin(CharParser(fn)(ctx))
-  return cpres.status === Ok ? cprep : error(cpctx, expecteds.upper)
+  return cpres.status === Ok ? cprep : fail(cpctx, expecteds.upper)
 })
 
 /**
@@ -314,5 +314,5 @@ export const upper = Parser(ctx => {
 export const lower = Parser(ctx => {
   const fn = c => c >= 'a' && c <= 'z'
   const [cprep, [cpctx, cpres]] = twin(CharParser(fn)(ctx))
-  return cpres.status === Ok ? cprep : error(cpctx, expecteds.lower)
+  return cpres.status === Ok ? cprep : fail(cpctx, expecteds.lower)
 })

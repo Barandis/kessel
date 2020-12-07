@@ -4,7 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import { assertNumber, assertString } from 'kessel/assert'
-import { error, ok, Parser, Status } from 'kessel/core'
+import { fail, ok, Parser, Status } from 'kessel/core'
 import { expecteds } from 'kessel/messages'
 import { charLength, nextChars, twin, viewToString } from 'kessel/util'
 
@@ -33,11 +33,11 @@ const StringParser = (length, fn) => Parser(ctx => {
   if (length < 1) return ok(ctx, '')
 
   const { index, view } = ctx
-  if (index >= view.byteLength) return error(ctx)
+  if (index >= view.byteLength) return fail(ctx)
 
   const { width, next } = nextChars(index, view, length)
   return charLength(next) !== length || !fn(next)
-    ? error(ctx)
+    ? fail(ctx)
     : ok(ctx, next, index + width)
 })
 
@@ -61,7 +61,7 @@ export const string = str => Parser(ctx => {
   const [sprep, [spctx, spres]] = twin(StringParser(
     charLength(str), chars => str === chars,
   )(ctx))
-  return spres.status === Ok ? sprep : error(spctx, expecteds.string(str))
+  return spres.status === Ok ? sprep : fail(spctx, expecteds.string(str))
 })
 
 /**
@@ -86,7 +86,7 @@ export const stringI = str => Parser(ctx => {
   const [sprep, [spctx, spres]] = twin(StringParser(
     charLength(str), chars => str.toLowerCase() === chars.toLowerCase(),
   )(ctx))
-  return spres.status === Ok ? sprep : error(spctx, expecteds.stringI(str))
+  return spres.status === Ok ? sprep : fail(spctx, expecteds.stringI(str))
 })
 
 /**
@@ -112,5 +112,5 @@ export const anyString = n => Parser(ctx => {
   ASSERT && assertNumber('anyString', n)
 
   const [sprep, [spctx, spres]] = twin(StringParser(n, () => true)(ctx))
-  return spres.status === Ok ? sprep : error(spctx, expecteds.anyString(n))
+  return spres.status === Ok ? sprep : fail(spctx, expecteds.anyString(n))
 })

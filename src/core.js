@@ -171,7 +171,7 @@ export function ok(ctx, value = null, index = ctx.index) {
  * @returns {Reply} A new object representing the context and result
  *     after the latest parser failed.
  */
-export function error(ctx, errors = [], index = ctx.index) {
+export function fail(ctx, errors = [], index = ctx.index) {
   return [{ ...ctx, index }, { status: Status.Fail, errors }]
 }
 

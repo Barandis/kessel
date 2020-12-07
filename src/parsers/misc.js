@@ -4,7 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import { assertString } from 'kessel/assert'
-import { error, fatal, Parser } from 'kessel/core'
+import { fail, fatal, Parser } from 'kessel/core'
 import { generic } from 'kessel/error'
 
 /** @typedef {import('kessel/core').Parser} Parser */
@@ -19,7 +19,7 @@ import { generic } from 'kessel/error'
  */
 export const failNormally = msg => Parser(ctx => {
   ASSERT && assertString('failNormally', msg)
-  return error(ctx, generic(msg))
+  return fail(ctx, generic(msg))
 })
 
 /**

@@ -131,7 +131,7 @@ export {
 export {
   Parser,
   Status,
-  error,
+  fail,
   failure,
   fatal,
   maybeFatal,
