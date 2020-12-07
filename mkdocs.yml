@@ -55,9 +55,8 @@ nav:
       - choice: parsers/choice.md
       - digit: parsers/digit.md
       - eof: parsers/eof.md
-      - fail: parsers/fail.md
       - failFatally: parsers/failfatally.md
-      - failUnexpected: parsers/failunexpected.md
+      - failNormally: parsers/failnormally.md
       - fifth: parsers/fifth.md
       - first: parsers/first.md
       - followedBy: parsers/followedby.md

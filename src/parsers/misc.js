@@ -5,7 +5,7 @@
 
 import { assertString } from 'kessel/assert'
 import { error, fatal, Parser } from 'kessel/core'
-import { generic, unexpected } from 'kessel/error'
+import { generic } from 'kessel/error'
 
 /** @typedef {import('kessel/core').Parser} Parser */
 
@@ -17,8 +17,8 @@ import { generic, unexpected } from 'kessel/error'
  * @returns {Parser} A parser that automatically fails with the supplied
  *     error message.
  */
-export const fail = msg => Parser(ctx => {
-  ASSERT && assertString('fail', msg)
+export const failNormally = msg => Parser(ctx => {
+  ASSERT && assertString('failNormally', msg)
   return error(ctx, generic(msg))
 })
 
@@ -34,18 +34,4 @@ export const fail = msg => Parser(ctx => {
 export const failFatally = msg => Parser(ctx => {
   ASSERT && assertString('failFatally', msg)
   return fatal(ctx, generic(msg))
-})
-
-/**
- * Creates a parser that fails without consuming input, setting the
- * unexpected error message to whatever is passed in.
- *
- * @param {string} msg The message used to create the unexpected
- *     error.
- * @returns {Parser} A parser that automatically fails with the supplied
- *     error message.
- */
-export const failUnexpected = msg => Parser(ctx => {
-  ASSERT && assertString('failUnexpected', msg)
-  return error(ctx, unexpected(msg))
 })

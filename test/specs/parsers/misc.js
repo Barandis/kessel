@@ -4,22 +4,18 @@
 // https://opensource.org/licenses/MIT
 
 import { Status } from 'kessel/core'
-import {
-  fail,
-  failFatally,
-  failUnexpected,
-} from 'kessel/parsers/misc'
+import { failNormally, failFatally } from 'kessel/parsers/misc'
 import { terror, tfail } from 'test/helper'
 
 const { Error, Fatal } = Status
 
 describe('Miscellaneous parsers', () => {
-  describe('fail', () => {
+  describe('failNormally', () => {
     it('throws if its argument is not a string', () => {
-      terror(fail(0), '', '[fail]: expected a string; found 0')
+      terror(failNormally(0), '', '[failNormally]: expected a string; found 0')
     })
     it('fails with the supplied generic message', () => {
-      tfail(fail('test message'), '', {
+      tfail(failNormally('test message'), '', {
         generic: 'test message',
         index: 0,
         status: Error,
@@ -36,21 +32,6 @@ describe('Miscellaneous parsers', () => {
         generic: 'test message',
         index: 0,
         status: Fatal,
-      })
-    })
-  })
-
-  describe('failUnexpected', () => {
-    it('throws if its argument is not a string', () => {
-      terror(
-        failUnexpected(0), '', '[failUnexpected]: expected a string; found 0',
-      )
-    })
-    it('fails with the supplied unexpected message', () => {
-      tfail(failUnexpected('test message'), '', {
-        unexpected: 'test message',
-        index: 0,
-        status: Error,
       })
     })
   })

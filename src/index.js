@@ -25,9 +25,8 @@ export {
   upper,
 } from './parsers/char'
 export {
-  fail,
+  failNormally,
   failFatally,
-  failUnexpected,
 } from './parsers/misc'
 export {
   alphaU,

@@ -5,16 +5,14 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `failUnexpected(msg)`
+> `failNormally(msg)`
 
-Fails automatically with a custom unexpected error message.
-
-This is the only current parser that adds an unexpected error message.
+Fails automatically with a custom generic error message.
 
 #### Example
 
 ```javascript
-const parser = failUnexpected('digit')
+const parser = failNormally('a letter, please?')
 
 const f = parse(parser, '123')
 console.log(status(f))  // Symbol(error)
@@ -22,16 +20,16 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // 123
                         // ^
-                        // Unexpected digit
+                        // a letter, please?
 ```
 
 #### Parameters
 
-* `msg` The unexpected error message to apply.
+* `msg` The generic error message to apply.
 
 #### Failure
 
-* Always fails. The failure message will be [`unexpected(msg)`](../tools/unexpected.md).
+* Always fails. The failure message will be [`generic(msg)`](../tools/generic.md).
 
 #### Throws
 
@@ -39,5 +37,4 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### See Also
 
-* [`fail`](fail.md)
 * [`failFatally`](failfatally.md)
