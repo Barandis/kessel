@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `notEmptyM(p, msg)`
+> `notEmptyM(p: Parser<T>, msg: string): Parser<null>`
 
 Applies a parser and succeeds if that parser succeeds and returns a result. If the parser does not return a result, `notEmpty` will fail.
 

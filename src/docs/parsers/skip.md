@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `skip(p)`
+> `skip(p: Parser<T>): Parser<null>`
 
 Applies a parser and discards its result on success.
 

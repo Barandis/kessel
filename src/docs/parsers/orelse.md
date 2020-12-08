@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `orElse(p, q)`
+> `orElse(p: Parser<T>, q: Parser<U>): Parser<T | U>`
 
 The primitive combinator for alternatives. `orElse` will apply its two parsers one after another until one of the two succeeds.
 

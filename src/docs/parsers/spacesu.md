@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `spacesU`
+> `spacesU: Parser<null>`
 
 Parses zero or more Unicode whitespace characters and discards them.
 

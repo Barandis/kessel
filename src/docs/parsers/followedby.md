@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `followedBy(p)`
+> `followedBy(p: Parser<T>): Parser<null>`
 
 Applies a parser and succeeds without consuming input if that parser succeeds.
 

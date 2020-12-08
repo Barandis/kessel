@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `noneOf(cs)`
+> `noneOf(cs: string | string[]): Parser<string>`
 
 Parses a character if that character is not included in `cs`.
 

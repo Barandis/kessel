@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `satisfyM(fn, msg)`
+> `satisfyM(fn: (arg: string) => boolean, msg: string): Parser<string>`
 
 Parses a character for which predicate `fn` returns `true` when passed that character. If the parser fails, `msg` is used as the expected error message.
 

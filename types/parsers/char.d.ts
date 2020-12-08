@@ -1,7 +1,7 @@
 export function char(c: string): Parser<string>;
 export function charI(c: string): Parser<string>;
-export function satisfy(fn: (arg0: string) => boolean): Parser<string>;
-export function satisfyM(fn: (arg0: string) => boolean, message: string): Parser<string>;
+export function satisfy(fn: (arg: string) => boolean): Parser<string>;
+export function satisfyM(fn: (arg: string) => boolean, message: string): Parser<string>;
 export function range(s: string, e: string): Parser<string>;
 export const any: Parser<string>;
 export const eof: Parser<string>;

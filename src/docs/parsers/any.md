@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `any`
+> `any: Parser<string>`
 
 Parses any single character.
 

@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `chainB(p, fn)`
+> `chainB<T>(p: Parser<T>, fn: (arg: T) => Parser<U>): Parser<U>`
 
 Applies a parser to the input, passes its result to a function, and then applies the parser that function returns to the input.
 

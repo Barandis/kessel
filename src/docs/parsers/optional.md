@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `optional(p)`
+> `optional(p: Parser<T>): Parser<T | null>`
 
 Optionally matches a parser. If this parser succeeds, its result is returned. If it fails, `null` is returned.
 

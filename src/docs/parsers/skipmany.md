@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `skipMany(p)`
+> `skipMany(p: Parser<T>): Parser<null>`
 
 Applies a parser as many times as possible until it fails, discarding all of the parser's results.
 

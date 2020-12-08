@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `stringI(str)`
+> `stringI(str: string): Parser<string>`
 
 Parses the string `str` case-insensitively.
 

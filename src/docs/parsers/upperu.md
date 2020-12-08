@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `upperU`
+> `upperU: Parser<string>`
 
 Parses either a Unicode uppercase letter or a Unicode titlecase character.
 

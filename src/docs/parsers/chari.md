@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `charI(c)`
+> `charI(c: string): Parser<string>`
 
 Parses the character `c` or its opposite case equivalent. In other words, this is a case-insensitive version of [`char`](#char).
 

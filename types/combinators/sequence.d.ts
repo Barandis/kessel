@@ -1,7 +1,7 @@
-export function sequence(...ps: Parser[]): Parser<any>;
+export function sequence(...ps: Parser[]): Parser<any[]>;
 export function left(p: Parser<T>, q: Parser<U>): Parser<T>;
 export function right(p: Parser<T>, q: Parser<U>): Parser<U>;
-export function block(genFn: Iterator<Parser<T>, U, T>): Parser<U>;
+export function block(genFn: Iterator<Parser<any>, T, any>): Parser<T>;
 export function many(p: Parser<T>): Parser<[T]>;
 export function many1(p: Parser<T>): Parser<[T]>;
 export function skip(p: Parser<T>): Parser<null>;
@@ -15,9 +15,9 @@ export function repeat(p: Parser<T>, n: number): Parser<[T]>;
 export function between(pre: Parser<U>, post: Parser<V>, p: Parser<T>): Parser<T>;
 export function manyTill(p: Parser<T>, end: Parser<U>): Parser<[T]>;
 export function pipe<T>(...ps: (Parser | ((...args: any[]) => T))[]): Parser<T>;
-export function assocL<T, U>(p: Parser<T>, op: Parser<(a: T, b: T) => U>, x: U): Parser<U>;
-export function assoc1L<T, U>(p: Parser<T>, op: Parser<(a: T, b: T) => U>): Parser<U>;
-export function assocR<T, U>(p: Parser<T>, op: Parser<(a: T, b: T) => U>, x: U): Parser<U>;
-export function assoc1R<T, U>(p: Parser<T>, op: Parser<(a: T, b: T) => U>): Parser<U>;
+export function assocL<T>(p: Parser<T>, op: Parser<(a: T, b: T) => T>, x: T): Parser<T>;
+export function assoc1L<T>(p: Parser<T>, op: Parser<(a: T, b: T) => T>): Parser<T>;
+export function assocR<T>(p: Parser<T>, op: Parser<(a: T, b: T) => T>, x: T): Parser<T>;
+export function assoc1R<T>(p: Parser<T>, op: Parser<(a: T, b: T) => T>): Parser<T>;
 
 type Parser<T> = import("../core").Parser<T>;

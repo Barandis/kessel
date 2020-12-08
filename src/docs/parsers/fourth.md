@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `fourth(p)`
+> `fourth(p: Parser<[T]>): Parser<T>`
 
 Applies a parser and returns the fourth element of the resulting array.
 

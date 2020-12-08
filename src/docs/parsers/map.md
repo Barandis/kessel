@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `map(p, fn)`
+> `map(p: Parser<T>, fn: (arg: T) => U): Parser<U>`
 
 Applies a parser and returns the value that a function returns when passed the parser's result.
 

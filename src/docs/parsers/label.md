@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `label(p, msg)`
+> `label(p: Parser<T>, msg: string): Parser<T>`
 
 Applies a parser and overwrites its error message on failure.
 

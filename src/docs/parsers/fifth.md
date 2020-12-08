@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `fifth(p)`
+> `fifth(p: Parser<[T]>): Parser<T>`
 
 Applies a parser and returns the fifth element of the resulting array.
 

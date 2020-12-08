@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `string(str)`
+> `string(str: string): Parser<string>`
 
 Parses the string `str`.
 

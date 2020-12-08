@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `attempt(p)`
+> `attempt(p: Parser<T>): Parser<T>`
 
 Applies a parser and, if it fails after consuming input, backtracks to the original location and fails non-fatally.
 

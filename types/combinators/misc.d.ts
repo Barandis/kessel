@@ -1,5 +1,5 @@
 export function join(p: Parser<[string]>): Parser<string>;
-export function value<T>(p: Parser<any>, x: T): Parser<T>;
+export function value<U>(p: Parser<T>, x: U): Parser<U>;
 export function nth(p: Parser<[T]>, n: number): Parser<T>;
 export function first(p: Parser<[T]>): Parser<T>;
 export function second(p: Parser<[T]>): Parser<T>;

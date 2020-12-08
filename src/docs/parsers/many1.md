@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `many1(p)`
+> `many1(p: Parser<T>): Parser<[T]>`
 
 Applies a parser as many times as possible until it fails, collecting the results into a resulting array.
 

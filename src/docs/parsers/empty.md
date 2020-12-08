@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `empty`
+> `empty: Parser<null>`
 
 A parser that always succeeds with no result.
 

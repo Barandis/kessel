@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `alphaU`
+> `alphaU: Parser<string>`
 
 Parses a Unicode alphanumeric character.
 

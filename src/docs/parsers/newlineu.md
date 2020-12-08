@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `newlineU`
+> `newlineU: Parser<string>`
 
 Parses a Unicode newline.
 

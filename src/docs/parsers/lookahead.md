@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `lookAhead(p)`
+> `lookAhead(p: Parser<T>): Parser<T>`
 
 Applies a parser and returns its result on success, but does not consume input.
 

@@ -7,31 +7,23 @@
 
 # Summary
 
-## Terminology
+### A Note about Types
 
-A couple notes on terms you'll find in this API documentation.
+Types are given in the descriptions for each of the parsers and functions listed below. These are contained in TypeScript definition files in the project that can be used either for writing TypeScript programs that use Kessel or just in providing signature information for your IDE.
 
-### Parser
+It should however be noted that some of the type information is incomplete because TypeScript leaves no way to express complete information. There are notes to that effect in [`choice`](parsers/choice.md), [`pipe`](parsers/pipe.md), [`pipeB`](parsers/pipeb.md), [`sequence`](parsers/sequence.md), and [`sequenceB`](parsers/sequenceb.md).
 
-Everything in the Parser API Reference is referred to as a *parser*. This is not exactly accurate; in Kessel, a parser is a function that takes a context as an argument and returns a tuple of an updated context and a result. By that definition, the only parsers in here are things like [`any`](parsers/any.md) and [`letter`](parsers/letter.md) that don't take any additional parameters.
+However, there are shortcomings in other parsers that are not explicity marked. For example, TypeScript has no way to say that a string should be one character long, or that an array of strings should have elements that are all one character long. This affects the parameters in [`anyOf`](parsers/anyof.md), [`char`](parsers/char.md), [`charI`](parsers/chari.md), [`noneOf`](parsers/noneof.md), and [`range`](parsers/range.md).
 
-A number of items in the reference are functions that *produce* parsers. Examples are [`char`](parsers/char.md) and [`string`](parsers/string.md). These require extra information to know what to parse &mdash; `char` needs to know *which* character it's looking for, for example &mdash; so they have parameters to let them accept that information. But these functions *return* parsers. In other words, `char` is not a parser, but `char('a')` is. Because of that, it's safe enough to refer to these functions as parsers as well.
+A best effort is given to give useful types for documentation, but there's no way to make them perfect.
 
-The final class of object in the Parser API Reference is the *combinator*. A combinator is a function that takes one or more parsers as parameters, maybe with other parameters as well, and return another parser. ([`block`](/parsers/block.md) and [`blockB`](parsers/blockb.md) take generator functions instead of parsers, but since those generator functions can call parsers in their bodies, they can also be considered combinators.)
-
-Combinators are a little different because they don't actually read text. Every parser or parser-producing function, at the core, is a function that reads one or more characters of text and either succeeds or fails depending on whether it read the character(s) it was expecting. Combinators don't do that; they modify or compose other parsers. For example, [`many`](parsers/many.md) doesn't read any text at all, but it tells the parser passed into it to read text zero or more times.
-
-But in the end it's all the same. `many` may not parse text directly, but it has a value passed to it which may be a parser itself. If it's not, then it must be a combinator that has a value passed to *it*. Eventually, there's going to be a parser, and it will read text. So `many` may not be a parser, and the same with [`choice`](parsers/choice.md) and [`pipe`](parsers/pipe.md) and [`join`](parsers/join.md), but `pipe(choice(char('_'), letter), join(many(choice(char('_'), letter, digit))), (first, rest) => first + rest)` is definitely a parser. (One which does a pretty reasonable job of parsing a programming language identifier..md)
-
-In summary, every entry in the Parser API Reference either *is* a function that takes a context and returns a tuple of a context and a result, or it *produces* one. And directly or indirectly, every entry reads text. So unless there needs to be some distinction between these three different kinds of objects, it's safe to just call them all *parsers*.
-
-### Return
-
-As has already been stated way more times than is necessary, a parser returns a tuple of a context and a result. But as is also very clear, that's way too many words to use too many times.
-
-In this documentation, we will talk about parsers *returning* values. In this case, "this parser returns a string" means "this parser returns a tuple of a context and a result, and upon success, the value of that result is a string." I think we can all agree that one is more fun to read (and write) than the other.
+Assertions in the library do take care of most of the problem. If a 3-character string gets passed to [`char`](parsers/char.md), for example, an error will be thrown whether or not the type system can express that.
 
 ## Parsers
+
+There are three kinds of entries in these tables: parsers, functions that produce parsers, and combinators. Since each of these either is or produces a parser, they are all referred to as parsers unless there is reason to differentiate.
+
+Additionally, parsers are often said to *return* a value or to have a value as a *result*. Parsers all return `Reply` objects, but when *return* or *result* is used, it's meant to refer to the value held by the `Result` object inside that `Reply` object. It should be unambiguous.
 
 ### Table 1: Single character parsers
 
@@ -174,6 +166,8 @@ In this documentation, we will talk about parsers *returning* values. In this ca
 
 ## Tools
 
+Tools provide ways to run parsers and ways to write new parsers (if [`block`](parsers/block.md) isn't good enough). Regular users will use the functions in Table 10, but those in Tables 11 and 12 are going to be of interest only to parser authors.
+
 ### Table 10: Running parsers
 
 | Function | Description |
@@ -203,7 +197,7 @@ In this documentation, we will talk about parsers *returning* values. In this ca
 
 | Function | Description |
 |----------|-------------|
-| [`Parser`](tools/parser.md) | Creates a new parser. |
+| [`parser`](tools/parser.md) | Creates a new parser. |
 | [`ok`](tools/ok.md) | Generates a reply representing a success. |
 | [`fail`](tools/fail.md) | Generates a reply representing a failure. |
 | [`fatal`](tools/fatal.md) | Generates a reply representing a fatal failure. |

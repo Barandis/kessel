@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `char(c)`
+> `char(c: string): Parser<string>`
 
 Parses the character `c`.
 

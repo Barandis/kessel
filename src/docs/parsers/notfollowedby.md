@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `notFollowedBy(p)`
+> `notFollowedBy(p: Parser<T>): Parser<null>`
 
 Applies a parser and succeeds without consuming input if that parser fails.
 

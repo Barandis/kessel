@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `spaceU`
+> `spaceU: Parser<string>`
 
 Parse a Unicode whitespace character.
 

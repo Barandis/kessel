@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `orValue(p, x)`
+> `orValue<U>(p: Parser<T>, x: U): Parser<T | U>`
 
 Applies a parser and returns its result on success or an arbitrary value on failure.
 

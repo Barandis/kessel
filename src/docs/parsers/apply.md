@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `apply(p, f)`
+> `apply<T, U>(p: Parser<T>, f: Parser<(arg: T) => U>): Parser<U>`
 
 Applies two parsers, the second of which must return a function. Returns the result of that function when the result of the other parser is passed to it.
 

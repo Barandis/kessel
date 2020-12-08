@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `lowerU`
+> `lowerU: Parser<string>`
 
 Parses a Unicode lowercase letter.
 

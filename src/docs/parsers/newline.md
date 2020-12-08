@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `newline`
+> `newline: Parser<string>`
 
 Parses an ASCII newline.
 

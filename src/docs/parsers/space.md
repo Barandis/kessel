@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `space`
+> `space: Parser<string>`
 
 Parses an ASCII whitespace character.
 

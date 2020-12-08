@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `followedByM(p, msg)`
+> `followedByM(p: Parser<T>, msg: string): Parser<null>`
 
 Applies a parser and succeeds without consuming input if that parser succeeds.
 

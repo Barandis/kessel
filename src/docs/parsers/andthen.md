@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `andThen(p, q)`
+> `andThen(p: Parser<T>, q: Parser<U>): Parser<[T, U]>`
 
 Applies two parsers in order, returning their results in a tuple. 
 

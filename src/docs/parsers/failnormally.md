@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `failNormally(msg)`
+> `failNormally(msg: string): Parser<null>`
 
 Fails automatically with a custom generic error message.
 

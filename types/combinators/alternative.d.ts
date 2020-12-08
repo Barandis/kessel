@@ -1,6 +1,6 @@
 export function choice(...ps: Parser[]): Parser<any>;
 export function optional(p: Parser<T>): Parser<T | null>;
-export function orValue(p: Parser<T>, x: T): Parser<T>;
+export function orValue<U>(p: Parser<T>, x: U): Parser<T | U>;
 export function lookAhead(p: Parser<T>): Parser<T>;
 export function notEmpty(p: Parser<T>): Parser<null>;
 export function notEmptyM(p: Parser<T>, msg: string): Parser<null>;

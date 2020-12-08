@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `sepBy1(p, sep)`
+> `sepBy1(p: Parser<T>, sep: Parser<U>): Parser<[T]>`
 
 Parses one or more occurrences of a content parser, separated by a separator parser.
 

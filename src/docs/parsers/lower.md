@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `lower`
+> `lower: Parser<string>`
 
 Parses an ASCII lowercase letter (`a-z`).
 

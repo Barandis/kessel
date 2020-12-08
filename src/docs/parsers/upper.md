@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `upper`
+> `upper: Parser<string>`
 
 Parses an ASCII uppercase letter (`A-Z`).
 

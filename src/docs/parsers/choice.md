@@ -5,7 +5,12 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `choice(...ps)`
+> `choice(...ps: Parser[]): Parser<any>`
+
+!!! warning "Inexpressive type"
+    TypeScript cannot express as much information in this type as would be useful. Namely, the parsers in `ps` can all have different generic parameters, and the generic parameter of the return value is the union of all of the generic parameters from `ps`.
+
+    We could express a two-argument `choice` with `choice(p: Parser<T>, q: Parser<U>): Parser<T | U>`. Three arguments would have a signature of `choice(p: Parser<T>, q: Parser<U>, r: Parser<V>): Parser<T | U | V>`. Unfortunately it's impossible to write a type with a variable number of arguments.
 
 Applies each of its parsers, one at a time, until the first one succeeds, the first one fails fatally, or they all fail.
 

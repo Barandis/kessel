@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `letterU`
+> `letterU: Parser<string>`
 
 Parses a Unicode letter.
 

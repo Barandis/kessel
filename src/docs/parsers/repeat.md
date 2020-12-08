@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `repeat(p, n)`
+> `repeat(p: Parser<T>, n: number): Parser<[T]>`
 
 Applies a parser a certain number of times, collecting the results into an array to return.
 

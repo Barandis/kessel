@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `all`
+> `all: Parser<string>`
 
 Parses the entire remaining input.
 

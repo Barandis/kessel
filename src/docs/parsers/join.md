@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `join(p)`
+> `join(p: Parser<[string]>): Parser<string>`
 
 Applies a parser and returns the elements of the resulting array into a string.
 

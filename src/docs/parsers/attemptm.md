@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `attemptM(p, msg)`
+> `attemptM(p: Parser<T>, msg: string): Parser<T>`
 
 Applies a parser, backtracks if necessary, and overwrites its error message on failure.
 

@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `anyOf(cs)`
+> `anyOf(cs: string | string[]): Parser<string>`
 
 Parses a character if that character is included in `cs`.
 

@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `eof`
+> `eof: Parser<null>`
 
 Attempts to parse a character and succeeds if there is no character to parse.
 

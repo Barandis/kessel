@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `range(s, e)`
+> `range(s: string, e: string): Parser<string>`
 
 Parses a character between `s` and `e` (inclusive).
 

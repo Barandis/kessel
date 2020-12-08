@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `block(genFn)`
+> `block(genFn: Iterator<Parser<any>, T, any>): Parser<T>`
 
 Executes a generator function that can yield to parsers in its body.
 

@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `first(p)`
+> `first(p: Parser<[T]>): Parser<T>`
 
 Applies a parser and returns the first element of the resulting array.
 

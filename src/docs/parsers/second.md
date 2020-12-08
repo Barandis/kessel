@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `second(p)`
+> `second(p: Parser<[T]>): Parser<T>`
 
 Applies a parser and returns the second element of the resulting array.
 

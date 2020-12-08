@@ -5,11 +5,11 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `blockB(genFn)`
+> `block(genFn: Iterator<Parser<any>, T, any>): Parser<T>`
 
 Executes a generator function that can yield to parsers in its body.
 
-This is a backtracking version of the [`block`](#block) parser. It operates in exactly the same manner, except that if one of its parsers fail non-fatally after other of its parsers have consumed some input, it will backtrack to the position it was at the beginning of the `blockB` parser and report a non-fatal failure (`block` in this case would not backtrack and its failure would be fatal).
+This is a backtracking version of the [`block`](block) parser. It operates in exactly the same manner, except that if one of its parsers fail non-fatally after other of its parsers have consumed some input, it will backtrack to the position it was at the beginning of the `blockB` parser and report a non-fatal failure (`block` in this case would not backtrack and its failure would be fatal).
 
 The same caveats also apply; `blockB` can implement any other parser, but it's best to use a more specific one if it suits.
 

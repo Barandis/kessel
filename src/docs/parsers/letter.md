@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `letter`
+> `letter: Parser<string>`
 
 Parses an ASCII letter (`a-z` or `A-Z`).
 

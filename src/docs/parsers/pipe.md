@@ -5,7 +5,15 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `pipe(...ps, fn)`
+> `pipe<T>(...ps: (Parser<any> | ((...args: any[]) => T))[]): Parser<T>`
+
+!!! warning "Inexpressive type"
+    TypeScript cannot express as much information in this type as would be useful. This type signature suffers from two unexpressable ideas.
+
+    1. The last argument is always a function, while the rest are always parsers.
+    2. The arguments to the function match the generic parameters of the parsers in both number and type.
+
+    In the description below, `ps` refers to the parsers (all arguments but the last) and `fn` to the function (the last argument).
 
 Applies some parsers in order, then returns the result of a function to which all of the parser results have been passed.
 

@@ -5,7 +5,12 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `sequenceB(...ps)`
+> `sequenceB(...ps: Parser[]): Parser<any[]>`
+
+!!! warning "Inexpressive type"
+    TypeScript cannot express as much information in this type as would be useful. Namely, the parsers in `ps` can all have different generic parameters, and the generic parameter of the return value is an array with each of those types in order, potentially missing members that are `null`.
+
+    Unfortunately it's impossible to write a signature that can handle a variable number of arguments of variable generic types, and it's also impossible to write a signature that allows for a member of an array type to be non-existent in some cases.
 
 Applies a series of parsers in order, returning an array that contains each parser's result.
 

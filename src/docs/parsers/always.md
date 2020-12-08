@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `always(x)`
+> `always<T>(x: T): Parser<T>`
 
 Always succeeds and returns its passed value.
 

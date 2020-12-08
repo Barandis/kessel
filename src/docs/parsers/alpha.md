@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `alpha`
+> `alpha: Parser<string>`
 
 Parses an ASCII alphanumeric character (`0-9`, `a-z`, or `A-Z`).
 

@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `sepEndBy(p, sep)`
+> `sepEndBy(p: Parser<T>, sep: Parser<U>): Parser<[T]>`
 
 Parses zero or more occurrences of a content parser, separated and optionally ended by a separator parser.
 

@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `spaces`
+> `spaces: Parser<null>`
 
 Parses zero or more ASCII whitespace characters and discards them.
 

@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `assoc1R(p, op)`
+> `assoc1R<T>(p: Parser<T>, op: Parser<(a: T, b: T) => T>): Parser<T>`
 
 Parses one or more occurrences of a content parser, separated by an operation parser, then applies the operations to the content right-associatively.
 

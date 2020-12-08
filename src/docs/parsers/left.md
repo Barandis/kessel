@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `left(p, q)`
+> `left(p: Parser<T>, q: Parser<U>): Parser<T>`
 
 Applies two parsers in order, returning the result of the first one.
 

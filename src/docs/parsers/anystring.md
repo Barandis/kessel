@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `anyString(n)`
+> `anyString(n: number): Parser<string>`
 
 Parses a string that is `n` characters long.
 

@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `octal`
+> `octal: Parser<string>`
 
 Parses an octal digit (`0-7`).
 

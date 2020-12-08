@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `satisfy(fn)`
+> `satisfy(fn: (arg: string) => boolean): Parser<string>`
 
 Parses a character for which the predicate `fn` returns `true` when passed that character.
 

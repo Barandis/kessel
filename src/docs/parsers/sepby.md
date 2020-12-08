@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `sepBy(p, sep)`
+> `sepBy(p: Parser<T>, sep: Parser<U>): Parser<[T]>`
 
 Parses zero or more occurrences of a content parser, separated by a separator parser.
 

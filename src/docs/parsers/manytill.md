@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `manyTill(p, end)`
+> `manyTill(p: Parser<T>, end: Parser<U>): Parser<[T]>`
 
 Applies a content parser zero or more times as long as an end parser continues to fail. Once the end parser succeeds, the content parser's successes are collected into an array and returned.
 

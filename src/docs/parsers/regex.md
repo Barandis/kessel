@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `regex(pattern)`
+> `regex(pattern: string | RegExp): Parser<string>`
 
 Matches the current input location against a regular expression pattern.
 

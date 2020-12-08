@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `digit`
+> `digit: Parser<string>`
 
 Parses a decimal digit (`0-9`).
 

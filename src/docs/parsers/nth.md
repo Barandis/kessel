@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `nth(p, n)`
+> `nth(p: Parser<[T]>, n: number): Parser<T>`
 
 Applies a parser and returns a given element of the resulting array.
 

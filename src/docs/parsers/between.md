@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `between(pre, post, p)`
+> `between(pre: Parser<U>, post: Parser<V>, p: Parser<T>): Parser<T>`
 
 Applies a pre-parser, a content parser, and a post-parser in order, returning the value of the content parser.
 

@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `hex`
+> `hex: Parser<string>`
 
 Parses a hexadecimal digit (`0-9`, `a-f`, or `A-F`).
 
