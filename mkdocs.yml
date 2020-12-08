@@ -124,3 +124,34 @@ nav:
       - upper: parsers/upper.md
       - upperU: parsers/upperu.md
       - value: parsers/value.md
+    - Tools:
+      - compound: tools/compound.md
+      - expected: tools/expected.md
+      - fail: tools/fail.md
+      - failure: tools/failure.md
+      - fatal: tools/fatal.md
+      - formatErrors: tools/formaterrors.md
+      - generic: tools/generic.md
+      - getPosition: tools/getposition.md
+      - maybeFatal: tools/maybefatal.md
+      - merge: tools/merge.md
+      - nested: tools/nested.md
+      - ok: tools/ok.md
+      - other: tools/other.md
+      - parse: tools/parse.md
+      - Parser: tools/parser.md
+      - run: tools/run.md
+      - status: tools/status.md
+      - succeeded: tools/succeeded.md
+      - success: tools/success.md
+      - unexpected: tools/unexpected.md
+    - Types:
+      - Context: types/context.md
+      - Error: types/error.md
+      - ErrorList: types/errorlist.md
+      - ErrorType: types/errortype.md
+      - Input: types/input.md
+      - Parser: types/parser.md
+      - Reply: types/reply.md
+      - Result: types/result.md
+      - Status: types/status.md
