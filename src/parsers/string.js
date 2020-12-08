@@ -4,7 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import { assertNumber, assertString } from 'kessel/assert'
-import { fail, ok, Parser, Status } from 'kessel/core'
+import { fail, ok, parser, Status } from 'kessel/core'
 import { expecteds } from 'kessel/messages'
 import { charLength, nextChars, twin, viewToString } from 'kessel/util'
 
@@ -29,7 +29,7 @@ const { Ok } = Status
  * @returns {Parser} A parser that succeeds if the read string passes
  *     the predicate function.
  */
-const StringParser = (length, fn) => Parser(ctx => {
+const stringParser = (length, fn) => parser(ctx => {
   if (length < 1) return ok(ctx, '')
 
   const { index, view } = ctx
@@ -55,10 +55,10 @@ const StringParser = (length, fn) => Parser(ctx => {
  * @returns {Parser} A parser that will succeed if the supplied string
  *     matches the next characters in the input.
  */
-export const string = str => Parser(ctx => {
+export const string = str => parser(ctx => {
   ASSERT && assertString('string', str)
 
-  const [sprep, [spctx, spres]] = twin(StringParser(
+  const [sprep, [spctx, spres]] = twin(stringParser(
     charLength(str), chars => str === chars,
   )(ctx))
   return spres.status === Ok ? sprep : fail(spctx, expecteds.string(str))
@@ -77,10 +77,10 @@ export const string = str => Parser(ctx => {
  * @returns {Parser} A parser that will succeed if the supplied string
  *     case-insensitively matches the next characters in the input.
  */
-export const stringI = str => Parser(ctx => {
+export const stringI = str => parser(ctx => {
   ASSERT && assertString('stringI', str)
 
-  const [sprep, [spctx, spres]] = twin(StringParser(
+  const [sprep, [spctx, spres]] = twin(stringParser(
     charLength(str), chars => str.toLowerCase() === chars.toLowerCase(),
   )(ctx))
   return spres.status === Ok ? sprep : fail(spctx, expecteds.stringI(str))
@@ -89,8 +89,10 @@ export const stringI = str => Parser(ctx => {
 /**
  * A parser that reads the remainder of the input text and results in
  * that text. Succeeds if already at EOF, resulting in an empty string.
+ *
+ * @type {Parser}
  */
-export const all = Parser(ctx => {
+export const all = parser(ctx => {
   const { index, view } = ctx
   const width = view.byteLength - index
   return ok(ctx, viewToString(index, width, view), index + width)
@@ -105,9 +107,9 @@ export const all = Parser(ctx => {
  * @returns {Parser} A parser that reads that many characters and joins
  *     them into a string for its result.
  */
-export const anyString = n => Parser(ctx => {
+export const anyString = n => parser(ctx => {
   ASSERT && assertNumber('anyString', n)
 
-  const [sprep, [spctx, spres]] = twin(StringParser(n, () => true)(ctx))
+  const [sprep, [spctx, spres]] = twin(stringParser(n, () => true)(ctx))
   return spres.status === Ok ? sprep : fail(spctx, expecteds.anyString(n))
 })

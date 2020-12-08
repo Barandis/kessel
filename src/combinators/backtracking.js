@@ -16,7 +16,7 @@ import {
   ordParFormatter,
   ordStrFormatter,
 } from 'kessel/assert'
-import { fail, ok, Parser, Status } from 'kessel/core'
+import { fail, ok, parser, Status } from 'kessel/core'
 import { compound, ErrorType, expected, merge, nested } from 'kessel/error'
 import { ordinal, range, stringify, twin } from 'kessel/util'
 
@@ -39,7 +39,7 @@ function pass(ctx, result, errors) {
  *     through except for changing its expected error message upon
  *     failure.
  */
-export const label = (p, msg) => Parser(ctx => {
+export const label = (p, msg) => parser(ctx => {
   ASSERT && assertParser('label', p, ordParFormatter('1st'))
   ASSERT && assertString('label', msg, ordStrFormatter('2nd'))
 
@@ -61,7 +61,7 @@ export const label = (p, msg) => Parser(ctx => {
  * @returns {Parser} A parser that cannot fail fatally. If its contained
  *     parser fails fatally, this one will instead fail non-fatally.
  */
-export const attempt = p => Parser(ctx => {
+export const attempt = p => parser(ctx => {
   ASSERT && assertParser('attempt', p)
 
   const index = ctx.index
@@ -91,7 +91,7 @@ export const attempt = p => Parser(ctx => {
  * @returns {Parser} A parser that applies `p` and changes the error as
  *     appropriate if `p` fails.
  */
-export const attemptM = (p, msg) => Parser(ctx => {
+export const attemptM = (p, msg) => parser(ctx => {
   ASSERT && assertParser('attemptM', p, ordParFormatter('1st'))
   ASSERT && assertString('attemptM', msg, ordStrFormatter('2nd'))
 
@@ -121,7 +121,7 @@ export const attemptM = (p, msg) => Parser(ctx => {
  * @returns {Parser} A parser that executes the supplied parsers one at
  *     a time, in order, and fails if any of those parsers fail.
  */
-export const sequenceB = (...ps) => Parser(ctx => {
+export const sequenceB = (...ps) => parser(ctx => {
   ASSERT && assertParsers('sequenceB', ps)
 
   const values = []
@@ -162,7 +162,7 @@ export const sequenceB = (...ps) => Parser(ctx => {
  *     the supplied function, and use that function's return value as a
  *     second parser to execute.
  */
-export const chainB = (p, fn) => Parser(ctx => {
+export const chainB = (p, fn) => parser(ctx => {
   ASSERT && assertParser('chainB', p, ordParFormatter('1st'))
   ASSERT && assertFunction('chainB', fn, ordFnFormatter('2nd'))
 
@@ -197,7 +197,7 @@ export const chainB = (p, fn) => Parser(ctx => {
  *     the return value of the function returned by `q` when the value
  *     returned by `p` is passed into it.
  */
-export const applyB = (p, q) => Parser(ctx => {
+export const applyB = (p, q) => parser(ctx => {
   ASSERT && assertParser('applyB', p, ordParFormatter('1st'))
   ASSERT && assertParser('applyB', q, ordParFormatter('2nd'))
 
@@ -229,7 +229,7 @@ export const applyB = (p, q) => Parser(ctx => {
  * @returns {Parser} A parser that executes `p` and `q` and returns the
  *     result of the first.
  */
-export const leftB = (p, q) => Parser(ctx => {
+export const leftB = (p, q) => parser(ctx => {
   ASSERT && assertParser('leftB', p, ordParFormatter('1st'))
   ASSERT && assertParser('leftB', q, ordParFormatter('2nd'))
 
@@ -258,7 +258,7 @@ export const leftB = (p, q) => Parser(ctx => {
  * @returns {Parser} A parser that executes `p` and `q` and returns the
  *     result of the second.
  */
-export const rightB = (p, q) => Parser(ctx => {
+export const rightB = (p, q) => parser(ctx => {
   ASSERT && assertParser('rightB', p, ordParFormatter('1st'))
   ASSERT && assertParser('rightB', q, ordParFormatter('2nd'))
 
@@ -286,7 +286,7 @@ export const rightB = (p, q) => Parser(ctx => {
  * @returns {Parser} A parser that executes both `p` and `q` and returns
  *     the results of both parsers in an array.
  */
-export const andThenB = (p, q) => Parser(ctx => {
+export const andThenB = (p, q) => parser(ctx => {
   ASSERT && assertParser('andThenB', p, ordParFormatter('1st'))
   ASSERT && assertParser('andThenB', q, ordParFormatter('2nd'))
 
@@ -316,7 +316,7 @@ export const andThenB = (p, q) => Parser(ctx => {
  * @returns {Parser} A parser that executes `p` `n` times and results in
  *     an array of all of the successful results of `p`.
  */
-export const repeatB = (p, n) => Parser(ctx => {
+export const repeatB = (p, n) => parser(ctx => {
   ASSERT && assertParser('repeatB', p, ordParFormatter('1st'))
   ASSERT && assertNumber('repeatB', n, ordNumFormatter('2nd'))
 
@@ -356,7 +356,7 @@ export const repeatB = (p, n) => Parser(ctx => {
  * @returns {Parser} A parser which will execute `end` and then `p` zero
  *     or more times until `end` succeeds.
  */
-export const manyTillB = (p, end) => Parser(ctx => {
+export const manyTillB = (p, end) => parser(ctx => {
   ASSERT && assertParser('manyTillB', p, ordParFormatter('1st'))
   ASSERT && assertParser('manyTillB', end, ordParFormatter('2nd'))
 
@@ -402,7 +402,7 @@ export const manyTillB = (p, end) => Parser(ctx => {
  *     executes parsers as they are yielded, and results in the return
  *     value of the generator.
  */
-export const blockB = genFn => Parser(ctx => {
+export const blockB = genFn => parser(ctx => {
   ASSERT && assertGeneratorFunction('blockB', genFn)
 
   const gen = genFn()
@@ -449,7 +449,7 @@ export const blockB = genFn => Parser(ctx => {
  *     feed the results to its function, and result in the function's
  *     return value.
  */
-export const pipeB = (...ps) => Parser(ctx => {
+export const pipeB = (...ps) => parser(ctx => {
   const fn = ps.pop()
 
   ASSERT && assertParsers('pipeB', ps)
@@ -484,7 +484,7 @@ export const pipeB = (...ps) => Parser(ctx => {
  * @returns {Parser} A parser which executes `pre`, `p`, and `post` in
  *     order and then returns the result of `p`.
  */
-export const betweenB = (pre, post, p) => Parser(ctx => {
+export const betweenB = (pre, post, p) => parser(ctx => {
   ASSERT && assertParser('betweenB', pre, ordParFormatter('1st'))
   ASSERT && assertParser('betweenB', post, ordParFormatter('2nd'))
   ASSERT && assertParser('betweenB', p, ordParFormatter('3rd'))

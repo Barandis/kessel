@@ -11,7 +11,7 @@ import {
   ordNumFormatter,
   ordParFormatter,
 } from 'kessel/assert'
-import { ok, Parser, Status } from 'kessel/core'
+import { ok, parser, Status } from 'kessel/core'
 import { twin } from 'kessel/util'
 
 const { Ok } = Status
@@ -29,7 +29,7 @@ const { Ok } = Status
  *     string made from joining the elements of the array of strings
  *     returned by `p`.
  */
-export const join = p => Parser(ctx => {
+export const join = p => parser(ctx => {
   ASSERT && assertParser('join', p)
 
   const [prep, [pctx, pres]] = twin(p(ctx))
@@ -50,7 +50,7 @@ export const join = p => Parser(ctx => {
  * @returns {Parser} A parser that will apply `p` but return `x` on
  *     success.
  */
-export const value = (p, x) => Parser(ctx => {
+export const value = (p, x) => parser(ctx => {
   ASSERT && assertParser('value', p, ordParFormatter('1st'))
 
   const [prep, [pctx, pres]] = twin(p(ctx))
@@ -66,7 +66,7 @@ export const value = (p, x) => Parser(ctx => {
  * @returns {Parser} A parser whose result is the `n`th element of the
  *     result of `p`.
  */
-export const nth = (p, n) => Parser(ctx => {
+export const nth = (p, n) => parser(ctx => {
   ASSERT && assertParser('nth', p, ordParFormatter('1st'))
   ASSERT && assertNumber('nth', n, ordNumFormatter('2nd'))
 
@@ -87,7 +87,7 @@ export const nth = (p, n) => Parser(ctx => {
  * @returns {Parser} A parser whose result is the first element of the
  *     result of `p`.
  */
-export const first = p => Parser(ctx => {
+export const first = p => parser(ctx => {
   ASSERT && assertParser('first', p)
 
   const [prep, [pctx, pres]] = twin(p(ctx))
@@ -107,7 +107,7 @@ export const first = p => Parser(ctx => {
  * @returns {Parser} A parser whose result is the second element of the
  *     result of `p`.
  */
-export const second = p => Parser(ctx => {
+export const second = p => parser(ctx => {
   ASSERT && assertParser('second', p)
 
   const [prep, [pctx, pres]] = twin(p(ctx))
@@ -127,7 +127,7 @@ export const second = p => Parser(ctx => {
  * @returns {Parser} A parser whose result is the third element of the
  *     result of `p`.
  */
-export const third = p => Parser(ctx => {
+export const third = p => parser(ctx => {
   ASSERT && assertParser('third', p)
 
   const [prep, [pctx, pres]] = twin(p(ctx))
@@ -147,7 +147,7 @@ export const third = p => Parser(ctx => {
  * @returns {Parser} A parser whose result is the fourth element of the
  *     result of `p`.
  */
-export const fourth = p => Parser(ctx => {
+export const fourth = p => parser(ctx => {
   ASSERT && assertParser('fourth', p)
 
   const [prep, [pctx, pres]] = twin(p(ctx))
@@ -167,7 +167,7 @@ export const fourth = p => Parser(ctx => {
  * @returns {Parser} A parser whose result is the fifth element of the
  *     result of `p`.
  */
-export const fifth = p => Parser(ctx => {
+export const fifth = p => parser(ctx => {
   ASSERT && assertParser('fifth', p)
 
   const [prep, [pctx, pres]] = twin(p(ctx))

@@ -4,7 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import { assertStringOrRegExp } from 'kessel/assert'
-import { fail, ok, Parser, Status } from 'kessel/core'
+import { fail, ok, parser, Status } from 'kessel/core'
 import { expecteds } from 'kessel/messages'
 import { stringToView, twin, viewToString } from 'kessel/util'
 
@@ -56,7 +56,7 @@ const reUnewline = /^(?:\r\n|[\r\n\u0085\u2028\u2029])/u
  *     expression against the input at its current position and succeeds
  *     if a match is found.
  */
-const RegexParser = re => Parser(ctx => {
+const regexParser = re => parser(ctx => {
   const { index, view } = ctx
   const rest = viewToString(index, view.byteLength - index, view)
 
@@ -87,7 +87,7 @@ const RegexParser = re => Parser(ctx => {
  *     expression against the input at its current position and succeeds
  *     if a match is found.
  */
-export const regex = re => Parser(ctx => {
+export const regex = re => parser(ctx => {
   ASSERT && assertStringOrRegExp('regex', re)
 
   // First, convert to a regular expression if it's a string
@@ -101,7 +101,7 @@ export const regex = re => Parser(ctx => {
     regex = new RegExp(newSource, flags)
   }
 
-  const [rprep, [rpctx, rpres]] = twin(RegexParser(regex)(ctx))
+  const [rprep, [rpctx, rpres]] = twin(regexParser(regex)(ctx))
   return rpres.status === Ok ? rprep : fail(rpctx, expecteds.regex(regex))
 })
 
@@ -109,9 +109,11 @@ export const regex = re => Parser(ctx => {
  * A parser that reads a character and succeeds with that character if
  * it is a letter. A letter for this purpose is any character with the
  * Unicode `Alphabetic` property.
+ *
+ * @type {Parser}
  */
-export const letterU = Parser(ctx => {
-  const [rprep, [rpctx, rpres]] = twin(RegexParser(reLetter)(ctx))
+export const letterU = parser(ctx => {
+  const [rprep, [rpctx, rpres]] = twin(regexParser(reLetter)(ctx))
   return rpres.status === Ok ? rprep : fail(rpctx, expecteds.letterU)
 })
 
@@ -119,9 +121,11 @@ export const letterU = Parser(ctx => {
  * A parser that reads a character and succeeds with that character if
  * it is alphanumeric. A character is alphanumeric if it has either the
  * Unicode `Alphabetic` property or the Unicode `Number` property.
+ *
+ * @type {Parser}
  */
-export const alphaU = Parser(ctx => {
-  const [rprep, [rpctx, rpres]] = twin(RegexParser(reAlpha)(ctx))
+export const alphaU = parser(ctx => {
+  const [rprep, [rpctx, rpres]] = twin(regexParser(reAlpha)(ctx))
   return rpres.status === Ok ? rprep : fail(rpctx, expecteds.alphaU)
 })
 
@@ -130,9 +134,11 @@ export const alphaU = Parser(ctx => {
  * it is either an uppercase or titlecase letter. A character is
  * uppercase if it has the Unicode `Uppercase` property and is titlecase
  * if it has the Unicode `Letter, Titlecase` property.
+ *
+ * @type {Parser}
  */
-export const upperU = Parser(ctx => {
-  const [rprep, [rpctx, rpres]] = twin(RegexParser(reUpper)(ctx))
+export const upperU = parser(ctx => {
+  const [rprep, [rpctx, rpres]] = twin(regexParser(reUpper)(ctx))
   return rpres.status === Ok ? rprep : fail(rpctx, expecteds.upperU)
 })
 
@@ -140,9 +146,11 @@ export const upperU = Parser(ctx => {
  * A parser that reads a character and succeeds with that character if
  * it is a lowercase letter. A character is lowercase if it has the
  * Unicode `Lowercase` property.
+ *
+ * @type {Parser}
  */
-export const lowerU = Parser(ctx => {
-  const [rprep, [rpctx, rpres]] = twin(RegexParser(reLower)(ctx))
+export const lowerU = parser(ctx => {
+  const [rprep, [rpctx, rpres]] = twin(regexParser(reLower)(ctx))
   return rpres.status === Ok ? rprep : fail(rpctx, expecteds.lowerU)
 })
 
@@ -151,9 +159,11 @@ export const lowerU = Parser(ctx => {
  * it is a whitespace character. Whitespace characters this parser
  * recognizes are space, tab, and any conventional newline (`\r`, `\n`,
  * or `\r\n`).
+ *
+ * @type {Parser}
  */
-export const space = Parser(ctx => {
-  const [rprep, [rpctx, rpres]] = twin(RegexParser(reSpace)(ctx))
+export const space = parser(ctx => {
+  const [rprep, [rpctx, rpres]] = twin(regexParser(reSpace)(ctx))
   return rpres.status === Ok ? rprep : fail(rpctx, expecteds.space)
 })
 
@@ -164,9 +174,11 @@ export const space = Parser(ctx => {
  *
  * This parser will also recognize the two-character combination `\r\n`
  * as a single instance of whitespace.
+ *
+ * @type {Parser}
  */
-export const spaceU = Parser(ctx => {
-  const [rprep, [rpctx, rpres]] = twin(RegexParser(reUspace)(ctx))
+export const spaceU = parser(ctx => {
+  const [rprep, [rpctx, rpres]] = twin(regexParser(reUspace)(ctx))
   return rpres.status === Ok ? rprep : fail(rpctx, expecteds.spaceU)
 })
 
@@ -176,9 +188,11 @@ export const spaceU = Parser(ctx => {
  * always succeeds; even zero whitespaces is enough to make it succeed,
  * though it will not move the index in that case. This parser skips the
  * whitespace and does not produde a result.
+ *
+ * @type {Parser}
  */
-export const spaces = Parser(ctx => {
-  const [rpctx, _] = RegexParser(reSpaces)(ctx)
+export const spaces = parser(ctx => {
+  const [rpctx, _] = regexParser(reSpaces)(ctx)
   return ok(rpctx, null)
 })
 
@@ -188,9 +202,11 @@ export const spaces = Parser(ctx => {
  * whitespaces is enough to make it succeed, though it will not move the
  * index in that case. This parser skips the whitespace and does not
  * produde a result.
+ *
+ * @type {Parser}
  */
-export const spacesU = Parser(ctx => {
-  const [rpctx, _] = RegexParser(reUspaces)(ctx)
+export const spacesU = parser(ctx => {
+  const [rpctx, _] = regexParser(reUspaces)(ctx)
   return ok(rpctx, null)
 })
 
@@ -199,9 +215,11 @@ export const spacesU = Parser(ctx => {
  * `\r`, or `\n`) at the current position in the input. This parser will
  * only fail if there is not at least one whitespace character read. On
  * success, it skips the whitespace and does not produde a result.
+ *
+ * @type {Parser}
  */
-export const spaces1 = Parser(ctx => {
-  const [rpctx, rpres] = RegexParser(reSpaces1)(ctx)
+export const spaces1 = parser(ctx => {
+  const [rpctx, rpres] = regexParser(reSpaces1)(ctx)
   return rpres.status === Ok ? ok(rpctx, null) : fail(rpctx, expecteds.spaces1)
 })
 
@@ -210,9 +228,11 @@ export const spaces1 = Parser(ctx => {
  * current position in the input. This parser will only fail if there is
  * not at least one whitespace character read. On success, it skips the
  * whitespace and does not produde a result.
+ *
+ * @type {Parser}
  */
-export const spaces1U = Parser(ctx => {
-  const [rpctx, rpres] = RegexParser(reUspaces1)(ctx)
+export const spaces1U = parser(ctx => {
+  const [rpctx, rpres] = regexParser(reUspaces1)(ctx)
   return rpres.status === Ok
     ? ok(rpctx, null)
     : fail(rpctx, expecteds.spaces1U)
@@ -231,9 +251,11 @@ export const spaces1U = Parser(ctx => {
  *
  * No characters will be consumed on failure, even in the case of
  * `\r\n`.
+ *
+ * @type {Parser}
  */
-export const newline = Parser(ctx => {
-  const [rprep, [rpctx, rpres]] = twin(RegexParser(reNewline)(ctx))
+export const newline = parser(ctx => {
+  const [rprep, [rpctx, rpres]] = twin(regexParser(reNewline)(ctx))
   return rpres.status === Ok ? rprep : fail(rpctx, expecteds.newline)
 })
 
@@ -255,8 +277,10 @@ export const newline = Parser(ctx => {
  *
  * No characters will be consumed on failure, even in the case of
  * `\r\n`.
+ *
+ * @type {Parser}
  */
-export const newlineU = Parser(ctx => {
-  const [rprep, [rpctx, rpres]] = twin(RegexParser(reUnewline)(ctx))
+export const newlineU = parser(ctx => {
+  const [rprep, [rpctx, rpres]] = twin(regexParser(reUnewline)(ctx))
   return rpres.status === Ok ? rprep : fail(rpctx, expecteds.newlineU)
 })

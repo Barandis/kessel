@@ -12,7 +12,7 @@ import {
   ordFnFormatter,
   ordStrFormatter,
 } from 'kessel/assert'
-import { fail, ok, Parser, Status } from 'kessel/core'
+import { fail, ok, parser, Status } from 'kessel/core'
 import { expected } from 'kessel/error'
 import { expecteds } from 'kessel/messages'
 import { nextChar, twin } from 'kessel/util'
@@ -37,7 +37,7 @@ const { Ok } = Status
  * @returns {Parser} A parser that reads a character and executes `fn`
  *     on it when applied to input.
  */
-const CharParser = fn => Parser(ctx => {
+const charParser = fn => parser(ctx => {
   const { index, view } = ctx
   if (index >= view.byteLength) return fail(ctx)
 
@@ -55,10 +55,10 @@ const CharParser = fn => Parser(ctx => {
  * @returns {Parser} A parser that will succeed if `c` is the next
  *     character in the input.
  */
-export const char = c => Parser(ctx => {
+export const char = c => parser(ctx => {
   ASSERT && assertChar('char', c)
 
-  const [cprep, [cpctx, cpres]] = twin(CharParser(ch => c === ch)(ctx))
+  const [cprep, [cpctx, cpres]] = twin(charParser(ch => c === ch)(ctx))
   return cpres.status === Ok ? cprep : fail(cpctx, expecteds.char(c))
 })
 
@@ -73,10 +73,10 @@ export const char = c => Parser(ctx => {
  * @returns {Parser} A parser that will succeed if `c` (or its
  *     other-cased counterpart) is the next character in the input.
  */
-export const charI = c => Parser(ctx => {
+export const charI = c => parser(ctx => {
   ASSERT && assertChar('charI', c)
 
-  const [cprep, [cpctx, cpres]] = twin(CharParser(
+  const [cprep, [cpctx, cpres]] = twin(charParser(
     ch => c.toLowerCase() === ch.toLowerCase(),
   )(ctx))
   return cpres.status === Ok ? cprep : fail(cpctx, expecteds.charI(c))
@@ -100,9 +100,9 @@ export const charI = c => Parser(ctx => {
  * @returns {Parser} A parser that reads a character and executes `fn`
  *     on it when applied to input.
  */
-export const satisfy = fn => Parser(ctx => {
+export const satisfy = fn => parser(ctx => {
   ASSERT && assertFunction('satisfy', fn)
-  return CharParser(fn)(ctx)
+  return charParser(fn)(ctx)
 })
 
 /**
@@ -119,11 +119,11 @@ export const satisfy = fn => Parser(ctx => {
  * @returns {Parser} A parser that reads a character and executes `fn`
  *     on it when applied to input.
  */
-export const satisfyM = (fn, message) => Parser(ctx => {
+export const satisfyM = (fn, message) => parser(ctx => {
   ASSERT && assertFunction('satisfyM', fn, ordFnFormatter('1st'))
   ASSERT && assertString('satisfyM', message, ordStrFormatter('2nd'))
 
-  const [cprep, [cpctx, cpres]] = twin(CharParser(fn)(ctx))
+  const [cprep, [cpctx, cpres]] = twin(charParser(fn)(ctx))
   return cpres.status === Ok ? cprep : fail(cpctx, expected(message))
 })
 
@@ -143,20 +143,22 @@ export const satisfyM = (fn, message) => Parser(ctx => {
  * @returns {Parser} A parser that will succeed if the next input
  *     character is between `start` and `end` (inclusive).
  */
-export const range = (s, e) => Parser(ctx => {
+export const range = (s, e) => parser(ctx => {
   ASSERT && assertChar('range', s, ordCharFormatter('1st'))
   ASSERT && assertChar('range', e, ordCharFormatter('2nd'))
 
   const fn = c => c >= s && c <= e
-  const [cprep, [cpctx, cpres]] = twin(CharParser(fn)(ctx))
+  const [cprep, [cpctx, cpres]] = twin(charParser(fn)(ctx))
   return cpres.status === Ok ? cprep : fail(cpctx, expecteds.range(s, e))
 })
 
 /**
  * A parser that reads a single input character and then succeeds with
  * that character. Fails only if there is no input left to read.
+ *
+ * @type {Parser}
  */
-export const any = Parser(ctx => {
+export const any = parser(ctx => {
   const { index, view } = ctx
   if (index >= view.byteLength) return fail(ctx, expecteds.any)
 
@@ -168,8 +170,10 @@ export const any = Parser(ctx => {
  * A parser that reads one character and succeeds if that character does
  * not exist (i.e., if the index is already at the end of the input).
  * Consumes nothing on either success or failure.
+ *
+ * @type {Parser}
  */
-export const eof = Parser(ctx => {
+export const eof = parser(ctx => {
   const { index, view } = ctx
   return index >= view.byteLength ? ok(ctx, null) : fail(ctx, expecteds.eof)
 })
@@ -186,7 +190,7 @@ export const eof = Parser(ctx => {
  * @returns {Parser} A parser that succeeds if the next character is one
  *     of the characters in `chars`.
  */
-export const anyOf = cs => Parser(ctx => {
+export const anyOf = cs => parser(ctx => {
   ASSERT && assertStringOrArray('anyOf', cs)
 
   const { index, view } = ctx
@@ -210,7 +214,7 @@ export const anyOf = cs => Parser(ctx => {
  * @returns {Parser} A parser that succeeds if the next character is not
  *     one of the characters in `chars`.
  */
-export const noneOf = cs => Parser(ctx => {
+export const noneOf = cs => parser(ctx => {
   ASSERT && assertStringOrArray('noneOf', cs)
 
   const { index, view } = ctx
@@ -225,73 +229,87 @@ export const noneOf = cs => Parser(ctx => {
 /**
  * A parser that reads a character and succeeds with that character if
  * it is an ASCII digit.
+ *
+ * @type {Parser}
  */
-export const digit = Parser(ctx => {
+export const digit = parser(ctx => {
   const fn = c => c >= '0' && c <= '9'
-  const [cprep, [cpctx, cpres]] = twin(CharParser(fn)(ctx))
+  const [cprep, [cpctx, cpres]] = twin(charParser(fn)(ctx))
   return cpres.status === Ok ? cprep : fail(cpctx, expecteds.digit)
 })
 
 /**
  * A parser that reads a character and succeeds with that character if
  * it is a hexadecimal digit. This parser is not case sensitive.
+ *
+ * @type {Parser}
  */
-export const hex = Parser(ctx => {
+export const hex = parser(ctx => {
   const fn = c => c >= '0' && c <= '9'
     || c >= 'a' && c <= 'f'
     || c >= 'A' && c <= 'F'
-  const [cprep, [cpctx, cpres]] = twin(CharParser(fn)(ctx))
+  const [cprep, [cpctx, cpres]] = twin(charParser(fn)(ctx))
   return cpres.status === Ok ? cprep : fail(cpctx, expecteds.hex)
 })
 
 /**
  * A parser that reads a character and succeeds with that character if
  * it is an octal digit.
+ *
+ * @type {Parser}
  */
-export const octal = Parser(ctx => {
+export const octal = parser(ctx => {
   const fn = c => c >= '0' && c <= '7'
-  const [cprep, [cpctx, cpres]] = twin(CharParser(fn)(ctx))
+  const [cprep, [cpctx, cpres]] = twin(charParser(fn)(ctx))
   return cpres.status === Ok ? cprep : fail(cpctx, expecteds.octal)
 })
 
 /**
  * A parser that reads a character and succeeds with that character if
  * it is an ASCII letter.
+ *
+ * @type {Parser}
  */
-export const letter = Parser(ctx => {
+export const letter = parser(ctx => {
   const fn = c => c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z'
-  const [cprep, [cpctx, cpres]] = twin(CharParser(fn)(ctx))
+  const [cprep, [cpctx, cpres]] = twin(charParser(fn)(ctx))
   return cpres.status === Ok ? cprep : fail(cpctx, expecteds.letter)
 })
 
 /**
  * A parser that reads a character and succeeds with that character if
  * it is an ASCII alphanumeric character.
+ *
+ * @type {Parser}
  */
-export const alpha = Parser(ctx => {
+export const alpha = parser(ctx => {
   const fn = c => c >= 'a' && c <= 'z'
     || c >= 'A' && c <= 'Z'
     || c >= '0' && c <= '9'
-  const [cprep, [cpctx, cpres]] = twin(CharParser(fn)(ctx))
+  const [cprep, [cpctx, cpres]] = twin(charParser(fn)(ctx))
   return cpres.status === Ok ? cprep : fail(cpctx, expecteds.alpha)
 })
 
 /**
  * A parser that reads a character and succeeds with that character if
  * it is an ASCII uppercase letter.
+ *
+ * @type {Parser}
  */
-export const upper = Parser(ctx => {
+export const upper = parser(ctx => {
   const fn = c => c >= 'A' && c <= 'Z'
-  const [cprep, [cpctx, cpres]] = twin(CharParser(fn)(ctx))
+  const [cprep, [cpctx, cpres]] = twin(charParser(fn)(ctx))
   return cpres.status === Ok ? cprep : fail(cpctx, expecteds.upper)
 })
 
 /**
  * A parser that reads a character and succeeds with that character if
  * it is an ASCII lowercase letter.
+ *
+ * @type {Parser}
  */
-export const lower = Parser(ctx => {
+export const lower = parser(ctx => {
   const fn = c => c >= 'a' && c <= 'z'
-  const [cprep, [cpctx, cpres]] = twin(CharParser(fn)(ctx))
+  const [cprep, [cpctx, cpres]] = twin(charParser(fn)(ctx))
   return cpres.status === Ok ? cprep : fail(cpctx, expecteds.lower)
 })

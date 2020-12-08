@@ -128,7 +128,6 @@ export {
 // PARSER TOOLS AND UTILITIES
 
 export {
-  Parser,
   Status,
   fail,
   failure,
@@ -136,6 +135,7 @@ export {
   maybeFatal,
   ok,
   parse,
+  parser,
   run,
   status,
   succeeded,

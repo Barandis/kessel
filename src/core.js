@@ -71,10 +71,17 @@ export const Status = {
  */
 
 /**
- * @typedef {(
- *   Uint8Array|Uint8ClampedArray|Uint16Array|Uint32Array|Int8Array|
- *   Int16Array|Int32Array|Float32Array|Float64Array
- * )} TypedArray
+ * A typed array of any built-in kind.
+ *
+ * @typedef
+ *   {(Uint8Array|Uint8ClampedArray|Uint16Array|Uint32Array|Int8Array|
+ *   Int16Array|Int32Array|Float32Array|Float64Array)} TypedArray
+ */
+
+/**
+ * Input text to be parsed.
+ *
+ * @typedef {(string|ArrayBuffer|TypedArray|DataView)} Input
  */
 
 /**
@@ -83,11 +90,10 @@ export const Status = {
  * Any further contexts are derived from the context using {@link ok},
  * {@link error}, or {@link fatal}.
  *
- * @param {(string|ArrayBuffer|TypedArray|DataView)} input The input
- *     text.
+ * @param {Input} input The input text.
  * @returns {Context} An empty parser context.
  */
-export function Context(input) {
+export function context(input) {
   const message = 'Parser input must be a string, a typed array, an array '
     + `buffer, or a data view; parser input was ${typeof input}`
 
@@ -142,7 +148,7 @@ export function Context(input) {
  * @param {Parser} fn A parser function.
  * @returns {Parser} The same parser function.
  */
-export const Parser = track(fn => fn)
+export const parser = track(fn => fn)
 
 /**
  * Produces a new `Result` indicating that a parse succeeded, as well as
@@ -164,7 +170,7 @@ export function ok(ctx, value = null, index = ctx.index) {
  * consuming input, as well as a copy of `Context`.
  *
  * @param {Context} ctx The context prior to the parser being applied.
- * @param {ParseError[]} [errors=[]] The errors associated with the
+ * @param {ErrorList} [errors=[]] The errors associated with the
  *     context after the latest parser was applied.
  * @param {number} [index=ctx.index] The updated index after the latest
  *     parser was applied.
@@ -180,7 +186,7 @@ export function fail(ctx, errors = [], index = ctx.index) {
  * consuming input, as well as a new `Context` with an updated `index`.
  *
  * @param {Context} ctx The context prior to the parser being applied.
- * @param {ParseError[]} [errors=[] The errors associated with the
+ * @param {ErrorList} [errors=[] The errors associated with the
  *     context after the latest parser was applied.
  * @param {number} [index=ctx.index] The updated index after the latest
  *     parser was applied.
@@ -199,7 +205,7 @@ export function fatal(ctx, errors = [], index = ctx.index) {
  * @param {boolean} test Used to determine whether the produced result
  *     represents a fatal error (`true`) or not (`false`).
  * @param {Context} ctx The context prior to the parser being applied.
- * @param {ParseError[]} [errors=[] The errors associated with the
+ * @param {ErrorList} [errors=[] The errors associated with the
  *     context after the latest parser was applied.
  * @param {number} [index=ctx.index] The updated index after the latest
  *     parser was applied.
@@ -221,13 +227,12 @@ export function maybeFatal(test, ctx, errors = [], index = ctx.index) {
  * @param {Parser} parser The parser to be applied to the input. This
  *     can, as always, be a composition of an arbitrary number of
  *     parsers and combinators.
- * @param {(string|ArrayBuffer|TypedArray|DataView)} input The input
- *     text.
+ * @param {Input} input The input text.
  * @returns {Reply} The final context after all parsers have been
  *     applied and the result of the final parser application.
  */
 export function parse(parser, input) {
-  return parser(Context(input))
+  return parser(context(input))
 }
 
 /**
@@ -288,15 +293,14 @@ export function failure(reply) {
  * @param {Parser} parser The parser to be applied to the input. This
  *     can, as always, be a composition of an arbitrary number of
  *     parsers and combinators.
- * @param {(string|ArrayBuffer|TypedArray|DataView)} input The input
- *     text.
+ * @param {Input} input The input text.
  * @returns {*} The result from the parser application, if the parser
  *     succeeds.
  * @throws {Error} If the parser fails. The error message will be a
  *     detailed record of where the error occurred.
  */
 export function run(parser, input) {
-  const [ctx, result] = parser(Context(input))
+  const [ctx, result] = parser(context(input))
   if (result.status === Status.Ok) {
     return result.value
   }

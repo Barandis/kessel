@@ -10,11 +10,13 @@ import {
   ordFnFormatter,
   ordParFormatter,
 } from 'kessel/assert'
-import { maybeFatal, ok, Parser, Status } from 'kessel/core'
+import { maybeFatal, ok, parser, Status } from 'kessel/core'
 import { merge } from 'kessel/error'
 import { twin } from 'kessel/util'
 
 const { Ok, Fail, Fatal } = Status
+
+/** @typedef {import('kessel/core').Parser} Parser */
 
 // ====================================================================
 // Both Applicative and Monad
@@ -32,7 +34,7 @@ const { Ok, Fail, Fatal } = Status
  * @param {*} x The value will result when this parser is applied.
  * @returns {Parser} A parser that always succeeds with `value`.
  */
-export const always = x => Parser(ctx => ok(ctx, x))
+export const always = x => parser(ctx => ok(ctx, x))
 
 // ====================================================================
 // Applicative
@@ -53,7 +55,7 @@ export const always = x => Parser(ctx => ok(ctx, x))
  *     pass the result to the supplied function, and succeed with that
  *     return value as its result.
  */
-export const map = (p, fn) => Parser(ctx => {
+export const map = (p, fn) => parser(ctx => {
   ASSERT && assertParser('map', p, ordParFormatter('1st'))
   ASSERT && assertFunction('map', fn, ordFnFormatter('2nd'))
 
@@ -78,7 +80,7 @@ export const map = (p, fn) => Parser(ctx => {
  *     the return value of the function returned by `q` when the value
  *     returned by `p` is passed into it.
  */
-export const apply = (p, q) => Parser(ctx => {
+export const apply = (p, q) => parser(ctx => {
   ASSERT && assertParser('apply', p, ordParFormatter('1st'))
   ASSERT && assertParser('apply', q, ordParFormatter('2nd'))
 
@@ -123,7 +125,7 @@ export const apply = (p, q) => Parser(ctx => {
  *     pass the result to the supplied function, and use that function's
  *     return value as a second parser to apply the input to.
  */
-export const chain = (p, fn) => Parser(ctx => {
+export const chain = (p, fn) => parser(ctx => {
   ASSERT && assertParser('chain', p, ordParFormatter('1st'))
   ASSERT && assertFunction('chain', fn, ordFnFormatter('2nd'))
 
@@ -151,9 +153,10 @@ export const chain = (p, fn) => Parser(ctx => {
  *
  * This represents the `empty` operation from Haskell's `Alternative`
  * class.
+ *
  * @type {Parser}
  */
-export const empty = Parser(ctx => ok(ctx))
+export const empty = parser(ctx => ok(ctx))
 
 /**
  * A parser that first applies `p` and, if that fails, applies `q`. The
@@ -169,7 +172,7 @@ export const empty = Parser(ctx => ok(ctx))
  *     necessary the second parser, returning the result of the first to
  *     succeed.
  */
-export const orElse = (p, q) => Parser(ctx => {
+export const orElse = (p, q) => parser(ctx => {
   ASSERT && assertParser('orElse', p, ordParFormatter('1st'))
   ASSERT && assertParser('orElse', q, ordParFormatter('2nd'))
 
@@ -207,7 +210,7 @@ export const orElse = (p, q) => Parser(ctx => {
  * @returns {Parser} A parser that applies both contained parsers and
  *     results in the values of both parsers in an array.
  */
-export const andThen = (p, q) => Parser(ctx => {
+export const andThen = (p, q) => parser(ctx => {
   ASSERT && assertParser('andThen', p, ordParFormatter('1st'))
   ASSERT && assertParser('andThen', q, ordParFormatter('2nd'))
 

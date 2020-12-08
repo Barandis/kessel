@@ -135,7 +135,7 @@ export function unexpected(label) {
  * be displayed by the default formatter.
  *
  * @param {string} label The generic error's message.
- * @returns {ErrorMessage} A new error message of the generic type.
+ * @returns {[LocalError]} A new error message of the generic type.
  */
 export function generic(label) {
   return [{ type: ErrorType.Generic, label }]
@@ -146,7 +146,7 @@ export function generic(label) {
  * formatter at all and are only useful for custom formatters.
  *
  * @param {string} label The other error's message.
- * @returns {ErrorMessage} A new parse error of the other type.
+ * @returns {[LocalError]} A new parse error of the other type.
  */
 export function other(label) {
   return [{ type: ErrorType.Other, label }]
@@ -162,7 +162,7 @@ export function other(label) {
  *     occurred.
  * @param {ErrorList} errors The list of errors that occurred at the
  *     position pointed to by the given context.
- * @returns {NestedError} A new nested error.
+ * @returns {[NestedError]} A new nested error.
  */
 export function nested(ctx, errors) {
   return errors.length === 1 && errors[0].type === ErrorType.Nested
@@ -181,7 +181,7 @@ export function nested(ctx, errors) {
  *     error occurred.
  * @param {ErrorList} errors The list of errors that occurred at the
  *     position pointed to by the given context.
- * @returns {CompoundError} A new compound error.
+ * @returns {[CompoundError]} A new compound error.
  */
 export function compound(label, ctx, errors) {
   return errors.length === 1 && errors[0].type === ErrorType.Nested
@@ -284,7 +284,7 @@ export function merge(errors1, errors2) {
  * desired.
  *
  * @callback Formatter
- * @param {ParseError[]} errors The errors being used to generate the
+ * @param {ErrorList} errors The errors being used to generate the
  *     error message.
  * @param {number} index The index within `view` of the byte where the
  *     error occurred.

@@ -13,7 +13,7 @@ import {
   ordNumFormatter,
   ordParFormatter,
 } from 'kessel/assert'
-import { ok, Parser, Status, maybeFatal } from 'kessel/core'
+import { maybeFatal, ok, parser, Status } from 'kessel/core'
 import { merge } from 'kessel/error'
 import { ordinal, range, stringify, twin } from 'kessel/util'
 
@@ -39,7 +39,7 @@ function loopMessage(name) {
  * @returns {Parser} A parser that executes the supplied parsers one at
  *     a time, in order, and fails if any of those parsers fail.
  */
-export const sequence = (...ps) => Parser(ctx => {
+export const sequence = (...ps) => parser(ctx => {
   ASSERT && assertParsers('sequence', ps)
 
   const values = []
@@ -71,7 +71,7 @@ export const sequence = (...ps) => Parser(ctx => {
  * @returns {Parser} A parser that executes `p` and `q` and returns the
  *     result of `p`.
  */
-export const left = (p, q) => Parser(ctx => {
+export const left = (p, q) => parser(ctx => {
   ASSERT && assertParser('left', p, ordParFormatter('1st'))
   ASSERT && assertParser('left', q, ordParFormatter('2nd'))
 
@@ -98,7 +98,7 @@ export const left = (p, q) => Parser(ctx => {
  * @returns {Parser} A parser that executes both contained parsers and
  *     results in the value of the second.
  */
-export const right = (p, q) => Parser(ctx => {
+export const right = (p, q) => parser(ctx => {
   ASSERT && assertParser('right', p, ordParFormatter('1st'))
   ASSERT && assertParser('right', q, ordParFormatter('2nd'))
 
@@ -135,7 +135,7 @@ export const right = (p, q) => Parser(ctx => {
  *     executes parsers as they are yielded, and results in the return
  *     value of the generator.
  */
-export const block = genFn => Parser(ctx => {
+export const block = genFn => parser(ctx => {
   ASSERT && assertGeneratorFunction('block', genFn)
 
   const gen = genFn()
@@ -175,7 +175,7 @@ export const block = genFn => Parser(ctx => {
  *     repeatedly until it fails. Its result will be an array of the
  *     successful results from the contained parser.
  */
-export const many = p => Parser(ctx => {
+export const many = p => parser(ctx => {
   ASSERT && assertParser('many', p)
 
   const values = []
@@ -205,7 +205,7 @@ export const many = p => Parser(ctx => {
  *     repeatedly until it fails. Its result will be an array of the
  *     successful results from the contained parser.
  */
-export const many1 = p => Parser(ctx => {
+export const many1 = p => parser(ctx => {
   ASSERT && assertParser('many1', p)
 
   const [prep, [pctx, pres]] = twin(p(ctx))
@@ -234,7 +234,7 @@ export const many1 = p => Parser(ctx => {
  * @returns {Parser} A parser that will consume input as `p`  does on
  *     success, but will produce no result.
  */
-export const skip = p => Parser(ctx => {
+export const skip = p => parser(ctx => {
   ASSERT && assertParser('skip', p)
 
   const [prep, [pctx, pres]] = twin(p(ctx))
@@ -252,7 +252,7 @@ export const skip = p => Parser(ctx => {
  * @returns {Parser} A parser that applies the supplied parser
  *     repeatedly until it fails. Successful results are discarded.
  */
-export const skipMany = p => Parser(ctx => {
+export const skipMany = p => parser(ctx => {
   ASSERT && assertParser('skipMany', p)
 
   let context = ctx
@@ -279,7 +279,7 @@ export const skipMany = p => Parser(ctx => {
  * @returns {Parser} A parser that applies the supplied parser
  *     repeatedly until it fails. Successful results are discarded.
  */
-export const skipMany1 = p => Parser(ctx => {
+export const skipMany1 = p => parser(ctx => {
   ASSERT && assertParser('skipMany1', p)
 
   const [prep, [pctx, pres]] = twin(p(ctx))
@@ -316,7 +316,7 @@ export const skipMany1 = p => Parser(ctx => {
  * @returns {Parser} A parser that results in an array of all of the
  *     content parser results, discarding the separator parser results.
  */
-export const sepBy = (p, sep) => Parser(ctx => {
+export const sepBy = (p, sep) => parser(ctx => {
   ASSERT && assertParser('sepBy', p, ordParFormatter('1st'))
   ASSERT && assertParser('sepBy', sep, ordParFormatter('2nd'))
 
@@ -365,7 +365,7 @@ export const sepBy = (p, sep) => Parser(ctx => {
  * @returns {Parser} A parser that results in an array of all of the
  *     content parser results, discarding the separator parser results.
  */
-export const sepBy1 = (p, sep) => Parser(ctx => {
+export const sepBy1 = (p, sep) => parser(ctx => {
   ASSERT && assertParser('sepBy1', p, ordParFormatter('1st'))
   ASSERT && assertParser('sepBy1', sep, ordParFormatter('2nd'))
 
@@ -413,7 +413,7 @@ export const sepBy1 = (p, sep) => Parser(ctx => {
  * @returns {Parser} A parser that results in an array of all of the
  *     content parser results, discarding the separator parser results.
  */
-export const sepEndBy = (p, sep) => Parser(ctx => {
+export const sepEndBy = (p, sep) => parser(ctx => {
   ASSERT && assertParser('sepEndBy', p, ordParFormatter('1st'))
   ASSERT && assertParser('sepEndBy', sep, ordParFormatter('2nd'))
 
@@ -463,7 +463,7 @@ export const sepEndBy = (p, sep) => Parser(ctx => {
  * @returns {Parser} A parser that results in an array of all of the
  *     content parser results, discarding the separator parser results.
  */
-export const sepEndBy1 = (p, sep) => Parser(ctx => {
+export const sepEndBy1 = (p, sep) => parser(ctx => {
   ASSERT && assertParser('sepEndBy1', p, ordParFormatter('1st'))
   ASSERT && assertParser('sepEndBy1', sep, ordParFormatter('2nd'))
 
@@ -506,7 +506,7 @@ export const sepEndBy1 = (p, sep) => Parser(ctx => {
  * @returns {Parser} A parser that executes `p` `n` times and results in
  *     an array of all of the successful results of `p`.
  */
-export const repeat = (p, n) => Parser(ctx => {
+export const repeat = (p, n) => parser(ctx => {
   ASSERT && assertParser('repeat', p, ordParFormatter('1st'))
   ASSERT && assertNumber('repeat', n, ordNumFormatter('2nd'))
 
@@ -539,7 +539,7 @@ export const repeat = (p, n) => Parser(ctx => {
  * @returns {Parser} A parser which applies its parsers in the correct
  *     order and then results in the result of its content parser.
  */
-export const between = (pre, post, p) => Parser(ctx => {
+export const between = (pre, post, p) => parser(ctx => {
   ASSERT && assertParser('between', pre, ordParFormatter('1st'))
   ASSERT && assertParser('between', post, ordParFormatter('2nd'))
   ASSERT && assertParser('between', p, ordParFormatter('3rd'))
@@ -575,7 +575,7 @@ export const between = (pre, post, p) => Parser(ctx => {
  * @returns {Parser} A parser which will execute `p` zero or more times
  *     until `end` succeeds.
  */
-export const manyTill = (p, end) => Parser(ctx => {
+export const manyTill = (p, end) => parser(ctx => {
   ASSERT && assertParser('manyTill', p, ordParFormatter('1st'))
   ASSERT && assertParser('manyTill', end, ordParFormatter('2nd'))
 
@@ -630,7 +630,7 @@ export const manyTill = (p, end) => Parser(ctx => {
  *     feed the results to its function, and result in the function's
  *     return value.
  */
-export const pipe = (...ps) => Parser(ctx => {
+export const pipe = (...ps) => parser(ctx => {
   const fn = ps.pop()
 
   ASSERT && assertParsers('pipe', ps)
@@ -688,7 +688,7 @@ function opFormatter(ord) {
  *     applying the functions from `op` left associtively to the values
  *     that result from `p`.
  */
-export const assocL = (p, op, x) => Parser(ctx => {
+export const assocL = (p, op, x) => parser(ctx => {
   ASSERT && assertParser('assocL', p, ordParFormatter('1st'))
   ASSERT && assertParser('assocL', op, ordParFormatter('2nd'))
 
@@ -750,7 +750,7 @@ export const assocL = (p, op, x) => Parser(ctx => {
  *     applying the functions from `op` left associtively to the values
  *     that result from `p`.
  */
-export const assoc1L = (p, op) => Parser(ctx => {
+export const assoc1L = (p, op) => parser(ctx => {
   ASSERT && assertParser('assoc1L', p, ordParFormatter('1st'))
   ASSERT && assertParser('assoc1L', op, ordParFormatter('2nd'))
 
@@ -813,7 +813,7 @@ export const assoc1L = (p, op) => Parser(ctx => {
  *     applying the functions from `op` right associtively to the values
  *     that result from `p`.
  */
-export const assocR = (p, op, x) => Parser(ctx => {
+export const assocR = (p, op, x) => parser(ctx => {
   ASSERT && assertParser('assocR', p, ordParFormatter('1st'))
   ASSERT && assertParser('assocR', op, ordParFormatter('2nd'))
 
@@ -875,7 +875,7 @@ export const assocR = (p, op, x) => Parser(ctx => {
  *     applying the functions from `op` right associtively to the values
  *     that result from `p`.
  */
-export const assoc1R = (p, op) => Parser(ctx => {
+export const assoc1R = (p, op) => parser(ctx => {
   ASSERT && assertParser('assoc1R', p, ordParFormatter('1st'))
   ASSERT && assertParser('assoc1R', op, ordParFormatter('2nd'))
 

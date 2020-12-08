@@ -18,7 +18,7 @@ import { commaSeparate } from 'kessel/util'
 /**
  * Returns the message string of the first error of the provided type.
  *
- * @param {ParseError[]} errors The array of errors to search for the
+ * @param {ErrorList} errors The array of errors to search for the
  *     first of the given type.
  * @param {ErrorType} type The type of error to search for.
  * @returns {string} The message of the first error of the supplied type
@@ -30,7 +30,7 @@ const first = (errors, type) =>
 /**
  * Returns all of the message strings of errors of the provided type.
  *
- * @param {ParseError[]} errors The array of errors to search for errors
+ * @param {ErrorList} errors The array of errors to search for errors
  *     of the given type.
  * @param {ErrorType} type The type of error to search for.
  * @returns {string} A comma-separated string of all of the messages of

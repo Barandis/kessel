@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Parsec-style parser combinator library in vanilla JavaScript",
   "main": "lib/kessel.js",
+  "types": "types/index.d.ts",
   "scripts": {
     "clean": "rimraf dist",
     "build": "npm run clean && npm run bundle",

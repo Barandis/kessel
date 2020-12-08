@@ -1,0 +1,17 @@
+export function assertChar(name: string, value: any, formatter?: (arg: any) => string): void;
+export function assertFunction(name: string, value: any, formatter?: (arg: any) => string): void;
+export function assertGeneratorFunction(name: string, value: any, formatter?: (arg0: any) => string): void;
+export function assertString(name: string, value: any, formatter?: (arg: any) => string): void;
+export function assertArray(name: string, value: any, formatter?: (arg: any) => string): void;
+export function assertStringOrArray(name: string, value: any, formatter?: (arg: any) => string): void;
+export function assertStringOrRegExp(name: string, value: any, formatter?: (arg: any) => string): void;
+export function assertNumber(name: string, value: any, formatter?: (arg: any) => string): void;
+export function assertParser(name: string, value: any, formatter?: (arg: any) => string): void;
+export function assertParsers(name: string, values: any[]): void;
+export function formatter(type: string): (arg: any) => string;
+export function ordFormatter(type: string, ord: string): (arg: any) => string;
+export function ordCharFormatter(ord: string): (arg: any) => string;
+export function ordFnFormatter(ord: string): (arg: any) => string;
+export function ordNumFormatter(ord: string): (arg: any) => string;
+export function ordParFormatter(ord: string): (arg: any) => string;
+export function ordStrFormatter(ord: string): (arg: any) => string;

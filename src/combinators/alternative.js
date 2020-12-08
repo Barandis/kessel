@@ -10,7 +10,7 @@ import {
   ordParFormatter,
   ordStrFormatter,
 } from 'kessel/assert'
-import { fail, fatal, ok, Parser, Status } from 'kessel/core'
+import { fail, fatal, ok, parser, Status } from 'kessel/core'
 import { expected, merge } from 'kessel/error'
 import { twin } from 'kessel/util'
 
@@ -29,7 +29,7 @@ const { Ok, Fail, Fatal } = Status
  * @returns {Parser} A parser that applies its contained parsers until
  *     one succeeds.
  */
-export const choice = (...ps) => Parser(ctx => {
+export const choice = (...ps) => parser(ctx => {
   ASSERT && assertParsers('choice', ps)
 
   let errors = []
@@ -55,7 +55,7 @@ export const choice = (...ps) => Parser(ctx => {
  *     contained parser fails fatally. This parser consumes text only
  *     if its contained parser succeeds.
  */
-export const optional = p => Parser(ctx => {
+export const optional = p => parser(ctx => {
   ASSERT && assertParser('optional', p)
 
   const [prep, [pctx, pres]] = twin(p(ctx))
@@ -74,7 +74,7 @@ export const optional = p => Parser(ctx => {
  * @returns {Parser} A parser which results in either its contained
  *     parser's successful result or the provided value.
  */
-export const orValue = (p, x) => Parser(ctx => {
+export const orValue = (p, x) => parser(ctx => {
   ASSERT && assertParser('orValue', p, ordParFormatter('1st'))
 
   const [prep, [pctx, pres]] = twin(p(ctx))
@@ -90,7 +90,7 @@ export const orValue = (p, x) => Parser(ctx => {
  * @returns {Parser} A parser that applies `p` and succeeds or fails
  *     with it, but which consumes no input either way.
  */
-export const lookAhead = p => Parser(ctx => {
+export const lookAhead = p => parser(ctx => {
   ASSERT && assertParser('lookAhead', p)
 
   const index = ctx.index
@@ -112,7 +112,7 @@ export const lookAhead = p => Parser(ctx => {
  * @returns {Parser} A parser which fails if `p` passes but doesn't
  *     consume any input, or otherwise passes the result through.
  */
-export const notEmpty = p => Parser(ctx => {
+export const notEmpty = p => parser(ctx => {
   ASSERT && assertParser('notEmpty', p)
 
   const index = ctx.index
@@ -133,7 +133,7 @@ export const notEmpty = p => Parser(ctx => {
  * @returns {Parser} A parser which fails if `p` passes but doesn't
  *     consume any input, or otherwise passes the result through.
  */
-export const notEmptyM = (p, msg) => Parser(ctx => {
+export const notEmptyM = (p, msg) => parser(ctx => {
   ASSERT && assertParser('notEmptyM', p, ordParFormatter('1st'))
   ASSERT && assertString('notEmptyM', msg, ordStrFormatter('2nd'))
 
@@ -157,7 +157,7 @@ export const notEmptyM = (p, msg) => Parser(ctx => {
  * @returns {Parser} A parser that applies `p` but does not change the
  *     parser context, whether or not `p` succeeds.
  */
-export const followedBy = p => Parser(ctx => {
+export const followedBy = p => parser(ctx => {
   ASSERT && assertParser('followedBy', p)
 
   const index = ctx.index
@@ -178,7 +178,7 @@ export const followedBy = p => Parser(ctx => {
  * @returns {Parser} A parser that applies `p` but does not change the
  *     parser context, whether or not `p` succeeds.
  */
-export const followedByM = (p, msg) => Parser(ctx => {
+export const followedByM = (p, msg) => parser(ctx => {
   ASSERT && assertParser('followedByM', p, ordParFormatter('1st'))
   ASSERT && assertString('followedByM', msg, ordStrFormatter('2nd'))
 
@@ -202,7 +202,7 @@ export const followedByM = (p, msg) => Parser(ctx => {
  *     fails, but does not change the parser context, whether or not `p`
  *     succeeds.
  */
-export const notFollowedBy = p => Parser(ctx => {
+export const notFollowedBy = p => parser(ctx => {
   ASSERT && assertParser('notFollowedBy', p)
 
   const index = ctx.index
@@ -224,7 +224,7 @@ export const notFollowedBy = p => Parser(ctx => {
  * @returns {Parser} A parser that applies `p` but does not change the
  *     parser context, whether or not `p` succeeds.
  */
-export const notFollowedByM = (p, msg) => Parser(ctx => {
+export const notFollowedByM = (p, msg) => parser(ctx => {
   ASSERT && assertParser('notFollowedByM', p, ordParFormatter('1st'))
   ASSERT && assertString('notFollowedByM', msg, ordStrFormatter('2nd'))
 
