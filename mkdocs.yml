@@ -146,7 +146,7 @@ nav:
       - success: tools/success.md
       - unexpected: tools/unexpected.md
     - Types:
-      - CompoundError: types.compounderror.md
+      - CompoundError: types/compounderror.md
       - Context: types/context.md
       - ErrorList: types/errorlist.md
       - ErrorType: types/errortype.md

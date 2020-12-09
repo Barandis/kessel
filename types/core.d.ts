@@ -18,9 +18,9 @@ export type Context = {
 };
 export type Status = symbol;
 export namespace Status {
-  const Ok: any;
-  const Fail: any;
-  const Fatal: any;
+  const Ok: symbol;
+  const Fail: symbol;
+  const Fatal: symbol;
 }
 export type Result<T> = {
   status: Status;

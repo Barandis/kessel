@@ -17,12 +17,12 @@ export function getPosition(ctx: Context, tabSize?: number): { line: number, col
 
 export type ErrorType = symbol;
 export namespace ErrorType {
-  const Expected: any;
-  const Unexpected: any;
-  const Generic: any;
-  const Nested: any;
-  const Compound: any;
-  const Other: any;
+  const Expected: symbol;
+  const Unexpected: symbol;
+  const Generic: symbol;
+  const Nested: symbol;
+  const Compound: symbol;
+  const Other: symbol;
 }
 export type ErrorList = (NestedError | CompoundError | LocalError)[];
 export type LocalError = {
