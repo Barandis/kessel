@@ -664,16 +664,18 @@ function ensureNewlines(text, count) {
  * @param {ErrorList} errors The list of errors to be formatted.
  * @param {number} index The index in the view where the error occurred.
  * @param {DataView} view The data view containing the input text.
- * @param {number} tabSize A number whose multiples determine where tab
- *     stops lay.
- * @param {number} maxWidth The maximum width of the line being
+ * @param {number} [tabSize=8] A number whose multiples determine where
+ *     tab stops lay.
+ * @param {number} [maxWidth=72] The maximum width of the line being
  *     displayed. If the line is longer than this, it will be truncated
  *     with ellipses added before and/or after as appropriate.
  * @param {number} [indent=0] The number of spaces the message should be
  *     indented. This should be 0 and increased only for nested errors.
  * @returns {string} The formatted error message.
  */
-export function format(errors, index, view, tabSize, maxWidth, indent = 0) {
+export function format(
+  errors, index, view, tabSize = 8, maxWidth = 72, indent = 0,
+) {
   const { start, end, lineno } = getLineIndexes(index, view)
   const charIndex = getCharIndex(index, view, start)
   const sp = ' '.repeat(indent)
@@ -719,21 +721,21 @@ export function format(errors, index, view, tabSize, maxWidth, indent = 0) {
  *
  * A default formatter is provided but an alternate one can be passed
  * in. The same goes for tab size (used to expand tabs in parsed text;
- * defaults to 8) and max width (for the error message itself; defaults
- * to 72).
+ * defaults to 8 in the default formatter) and max width (for the error
+ * message itself; defaults to 72 in the default formatter).
  *
  * @param {Context} ctx The parser's context when the error happened.
  * @param {Result} result The result produced when the error happened.
- * @param {number} [tabSize=8] A number whose multiples define where
- *     tabs stop.
- * @param {number} [maxWidth=72] The maximum width of the line being
+ * @param {number} [tabSize] A number whose multiples define where tabs
+ *     stop.
+ * @param {number} [maxWidth] The maximum width of the line being
  *     displayed. If the line is longer than this, it will be truncated
  *     with ellipses added before and/or after as appropriate.
  * @param {Formatter} [formatter=format] The function to which the
  *     actual formatting is delegated.
  */
 export function formatErrors(
-  ctx, result, tabSize = 8, maxWidth = 72, formatter = format,
+  ctx, result, tabSize, maxWidth, formatter = format,
 ) {
   const { index, view } = ctx
   return formatter(result.errors, index, view, tabSize, maxWidth)

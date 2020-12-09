@@ -669,7 +669,7 @@ describe('Parse errors', () => {
         expect(formatErrors(state, result, 4, 15)).to.equal(exp)
       })
       it('formats errors using a custom formatting function', () => {
-        const fn = (errors, index, view, tabSize, maxWidth) =>
+        const fn = (errors, index, view, tabSize = 8, maxWidth = 72) =>
           `${errors[0].label}\n${index}\n${
             view.byteLength
           }\n${tabSize}\n${maxWidth}`
