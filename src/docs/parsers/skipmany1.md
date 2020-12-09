@@ -41,7 +41,7 @@ console.log(failure(t)) // Parse error at (line 1, column 2):
 
 #### Parameters
 
-* `p` The parser to apply repeatedly until it fails.
+* `p`: The parser to apply repeatedly until it fails.
 
 #### Success
 
@@ -61,5 +61,6 @@ console.log(failure(t)) // Parse error at (line 1, column 2):
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`many1`](many1.md)
 * [`skipMany`](skipmany.md)

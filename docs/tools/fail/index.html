@@ -2022,9 +2022,9 @@
 <p>This function should always be used to create a failing reply, since it will always create both a new context and result, ensuring that older contexts aren't accidentally overwritten.</p>
 <h4 id="parameters">Parameters</h4>
 <ul>
-<li><code>ctx</code> The context for the newly created reply.</li>
-<li><code>errors</code> The error list detailing errors that hapopened at the context's location. Defaults to an empty array.</li>
-<li><code>index</code> The index into the context's input. This is used just to change that index if necessary (in backtracking, for example). Defaults to the context's current index.</li>
+<li><code>ctx</code>: The context for the newly created reply.</li>
+<li><code>errors</code>: The error list detailing errors that hapopened at the context's location. Defaults to an empty array.</li>
+<li><code>index</code>: The index into the context's input. This is used just to change that index if necessary (in backtracking, for example). Defaults to the context's current index.</li>
 </ul>
 <h4 id="returns">Returns</h4>
 <ul>
@@ -2032,6 +2032,8 @@
 </ul>
 <h4 id="see-also">See Also</h4>
 <ul>
+<li><a href="../../types/context/"><code>Context</code></a></li>
+<li><a href="../../types/errorlist/"><code>ErrorList</code></a></li>
 <li><a href="../fatal/"><code>fatal</code></a></li>
 <li><a href="../maybefatal/"><code>maybeFatal</code></a></li>
 <li><a href="../ok/"><code>ok</code></a></li>

@@ -13,7 +13,7 @@ The status indicates whether the parse succeeded (`Status.Ok`), failed (`Status.
 
 #### Parameters
 
-* `reply` A parse reply, presumably the return value of a call to [`parse`](parse.md).
+* `reply`: A parse reply, presumably the return value of a call to [`parse`](parse.md).
 
 #### Returns
 
@@ -21,5 +21,7 @@ The status indicates whether the parse succeeded (`Status.Ok`), failed (`Status.
 
 #### See Also
 
+* [`Reply`](../types/reply.md)
+* [`Status`](../types/status.md)
 * [`parse`](parse.md)
 * [`succeeded`](succeeded.md)

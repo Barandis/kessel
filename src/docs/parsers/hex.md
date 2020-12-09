@@ -37,5 +37,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`digit`](digit.md)
 * [`octal`](octal.md)

@@ -32,7 +32,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### Parameters
 
-* `fn` The predicate function that the next character must pass in order for the parser to succeed.
+* `fn`: The predicate function that the next character must pass in order for the parser to succeed.
 
 #### Success
 
@@ -48,6 +48,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`label`](label.md)
 * [`range`](range.md)
 * [`regex`](regex.md)

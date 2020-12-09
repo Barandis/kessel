@@ -31,8 +31,8 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### Parameters
 
-* `s` The character representing the lower bound of the range. The next character's code point must be greater than or equal to `s`'s code point for the parser to succeed.
-* `e` The character representing the upper bound of the range. The next character's code point must be less than or equal to `e`'s code point for the parser to succeed.
+* `s`: The character representing the lower bound of the range. The next character's code point must be greater than or equal to `s`'s code point for the parser to succeed.
+* `e`: The character representing the upper bound of the range. The next character's code point must be less than or equal to `e`'s code point for the parser to succeed.
 
 #### Success
 
@@ -48,6 +48,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`any`](any.md)
 * [`char`](char.md)
 * [`regex`](regex.md)

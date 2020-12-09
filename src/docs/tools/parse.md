@@ -20,8 +20,8 @@ For the purpose of supporting UTF-8, the input is stored internally as a `DataVi
 
 #### Parameters
 
-* `p` The parser to execute.
-* `input` The text to execute `p` against.
+* `p`: The parser to execute.
+* `input`: The text to execute `p` against.
 
 #### Returns
 
@@ -33,6 +33,9 @@ For the purpose of supporting UTF-8, the input is stored internally as a `DataVi
 
 #### See Also
 
+* [`Input`](../types/input.md)
+* [`Parser`](../types/parser.md)
+* [`Reply`](../types/reply.md)
 * [`failure`](failure.md)
 * [`run`](run.md)
 * [`status`](status.md)

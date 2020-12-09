@@ -29,7 +29,7 @@ console.log(success(f)) // null
 
 #### Parameters
 
-* `p` The parser to apply without consuming input. If `p` succeeds, its result will be returned.
+* `p`: The parser to apply without consuming input. If `p` succeeds, its result will be returned.
 
 #### Success
 
@@ -45,5 +45,6 @@ console.log(success(f)) // null
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`block`](block.md)
 * [`optional`](optional.md)

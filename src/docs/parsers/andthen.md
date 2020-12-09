@@ -55,8 +55,8 @@ console.log(failure(t)) // Parse error at (line 1, column 2):
 
 #### Parameters
 
-* `p` The first parser to apply. If both parsers succeed, this parser's result will be the first element of `andThen`'s result.
-* `q` The second parser to apply. If both parsers succeed, this parser's result will be the second element of `andThen`'s result.
+* `p`: The first parser to apply. If both parsers succeed, this parser's result will be the first element of `andThen`'s result.
+* `q`: The second parser to apply. If both parsers succeed, this parser's result will be the second element of `andThen`'s result.
 
 #### Success
 
@@ -78,6 +78,7 @@ console.log(failure(t)) // Parse error at (line 1, column 2):
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`andThenB`](andthenb.md)
 * [`apply`](apply.md)
 * [`chain`](chain.md)

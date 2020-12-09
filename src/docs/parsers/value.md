@@ -35,8 +35,8 @@ In this example, if the parser `string('""')` succeeds, then `value` returns a s
 
 #### Parameters
 
-* `p` The parser that gets applied to the input.
-* `x` The value for `value` to return if `p` succeeds.
+* `p`: The parser that gets applied to the input.
+* `x`: The value for `value` to return if `p` succeeds.
 
 #### Success
 
@@ -56,4 +56,5 @@ In this example, if the parser `string('""')` succeeds, then `value` returns a s
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`always`](always.md)

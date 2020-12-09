@@ -45,8 +45,8 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 
 #### Parameters
 
-* `p` The first parser to apply. If both parsers succeed, this parser's result will be `leftB`'s result.
-* `q` The second parser to apply. This parser's result will be discarded.
+* `p`: The first parser to apply. If both parsers succeed, this parser's result will be `leftB`'s result.
+* `q`: The second parser to apply. This parser's result will be discarded.
 
 #### Success
 
@@ -66,6 +66,7 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`andThenB`](andthenb.md)
 * [`left`](left.md)
 * [`rightB`](rightb.md)

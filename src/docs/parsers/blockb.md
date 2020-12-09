@@ -57,7 +57,7 @@ See [`block`](#block) for a detailed breakdown of the example. That example work
 
 #### Parameters
 
-* `genFn` A generator function that provides the body of the `blockB` parser. This generator function can `yield` parsers, which will have those parsers' results fed back into the function when it's restarted (so that they can be assigned to variables, used in calculations, etc.). The return value of this generator function becomes the result of the `blockB` parser.
+* `genFn`: A generator function that provides the body of the `blockB` parser. This generator function can `yield` parsers, which will have those parsers' results fed back into the function when it's restarted (so that they can be assigned to variables, used in calculations, etc.). The return value of this generator function becomes the result of the `blockB` parser.
 
 #### Success
 
@@ -78,5 +78,6 @@ See [`block`](#block) for a detailed breakdown of the example. That example work
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`block`](block.md)
 * [`sequenceB`](sequenceb.md)

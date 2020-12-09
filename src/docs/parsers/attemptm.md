@@ -49,8 +49,8 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 
 #### Parameters
 
-* `p` The parser to apply. If it fails, its error message will be changed.
-* `msg` The error message for when `p` does not consume input or as a header for backtracking information if `p` does consume input.
+* `p`: The parser to apply. If it fails, its error message will be changed.
+* `msg`: The error message for when `p` does not consume input or as a header for backtracking information if `p` does consume input.
 
 #### Success
 
@@ -68,5 +68,7 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 
 #### See Also
 
+* [`CompoundError`](../types/compounderror.md)
+* [`Parser`](../types/parser.md)
 * [`attempt`](attempt.md)
 * [`label`](label.md)

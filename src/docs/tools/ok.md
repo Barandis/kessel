@@ -15,9 +15,9 @@ This function should always be used to create a successful reply, since it will 
 
 #### Parameters
 
-* `ctx` The context for the newly created reply.
-* `value` The value that represents the result of the parse. Defaults to `null`.
-* `index` The index into the context's input. This is used just to change that index if necessary (in backtracking, for example). Defaults to the context's current index.
+* `ctx`: The context for the newly created reply.
+* `value`: The value that represents the result of the parse. Defaults to `null`.
+* `index`: The index into the context's input. This is used just to change that index if necessary (in backtracking, for example). Defaults to the context's current index.
 
 #### Returns
 
@@ -25,6 +25,8 @@ This function should always be used to create a successful reply, since it will 
 
 #### See Also
 
+* [`Context`](../types/context.md)
+* [`Reply`](../types/reply.md)
 * [`fail`](fail.md)
 * [`fatal`](fatal.md)
 * [`maybeFatal`](maybefatal.md)

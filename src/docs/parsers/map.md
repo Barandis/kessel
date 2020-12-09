@@ -35,8 +35,8 @@ In this example, a `lower` parser is used to read a lowercase letter. That chara
 
 #### Parameters
 
-* `p` A parser to apply to the input.
-* `fn` A function of one argument which gets passed the result of `p`. Its return value becomes `map`'s result.
+* `p`: A parser to apply to the input.
+* `fn`: A function of one argument which gets passed the result of `p`. Its return value becomes `map`'s result.
 
 #### Success
 
@@ -57,6 +57,7 @@ In this example, a `lower` parser is used to read a lowercase letter. That chara
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`chain`](chain.md)
 * [`join`](join.md)
 * [`pipe`](pipe.md)

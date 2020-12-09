@@ -2079,7 +2079,7 @@
 <p>The failure case in this example shows the only way that <code>skipMany</code> can fail: its underlying <code>right</code> parser fails fatally because it consumed input before failing, and that fatal failure causes <code>skipMany</code> to fail. <code>skipMany</code> does not fail from non-fatal failures of its parser.</p>
 <h4 id="parameters">Parameters</h4>
 <ul>
-<li><code>p</code> The parser to apply repeatedly until it fails.</li>
+<li><code>p</code>: The parser to apply repeatedly until it fails.</li>
 </ul>
 <h4 id="success">Success</h4>
 <ul>
@@ -2095,6 +2095,7 @@
 </ul>
 <h4 id="see-also">See Also</h4>
 <ul>
+<li><a href="../../types/parser/"><code>Parser</code></a></li>
 <li><a href="../many/"><code>many</code></a></li>
 <li><a href="../skipmany1/"><code>skipMany1</code></a></li>
 </ul>

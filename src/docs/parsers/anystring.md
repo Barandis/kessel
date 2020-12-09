@@ -29,7 +29,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### Parameters
 
-* `n` The number of characters to read.
+* `n`: The number of characters to read.
 
 #### Success
 
@@ -45,5 +45,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`all`](all.md)
 * [`any`](any.md)

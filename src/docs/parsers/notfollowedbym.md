@@ -31,8 +31,8 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### Parameters
 
-* `p` The parser to apply. If it fails, `notFollowedBy` succeeds.
-* `msg` The expected error message to use on failure.
+* `p`: The parser to apply. If it fails, `notFollowedBy` succeeds.
+* `msg`: The expected error message to use on failure.
 
 #### Success
 
@@ -49,6 +49,8 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
+* [`expected`](../tools/expected.md)
 * [`followedByM`](followedbym.md)
 * [`notEmptyM`](notemptym.md)
 * [`notFollowedBy`](notfollowedby.md)

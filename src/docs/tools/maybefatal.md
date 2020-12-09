@@ -15,10 +15,10 @@ Once this determination of the type is made, this function works in all respects
 
 #### Parameters
 
-* `test` A boolean telling whether this reply should represent a fatal failure.
-* `ctx` The context for the newly created reply.
-* `errors` The error list detailing errors that hapopened at the context's location. Defaults to an empty array.
-* `index` The index into the context's input. This is used just to change that index if necessary (in backtracking, for example). Defaults to the context's current index.
+* `test`: A boolean telling whether this reply should represent a fatal failure.
+* `ctx`: The context for the newly created reply.
+* `errors`: The error list detailing errors that hapopened at the context's location. Defaults to an empty array.
+* `index`: The index into the context's input. This is used just to change that index if necessary (in backtracking, for example). Defaults to the context's current index.
 
 #### Returns
 
@@ -26,6 +26,9 @@ Once this determination of the type is made, this function works in all respects
 
 #### See Also
 
+* [`Context`](../types/context.md)
+* [`ErrorList`](../types/errorlist.md)
+* [`Reply`](../types/reply.md)
 * [`fail`](fail.md)
 * [`fatal`](fatal.md)
 * [`ok`](ok.md)

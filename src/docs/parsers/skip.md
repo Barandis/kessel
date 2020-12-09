@@ -33,7 +33,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### Parameters
 
-* `p` The parser to apply to the input.
+* `p`: The parser to apply to the input.
 
 #### Success
 
@@ -53,6 +53,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`optional`](optional.md)
 * [`skipMany`](skipmany.md)
 * [`skipMany1`](skipmany1.md)

@@ -30,8 +30,8 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### Parameters
 
-* `fn` The predicate function that the next character must pass in order for the parser to succeed.
-* `msg` The text of the error message generated if the parser fails.
+* `fn`: The predicate function that the next character must pass in order for the parser to succeed.
+* `msg`: The text of the error message generated if the parser fails.
 
 #### Success
 
@@ -48,5 +48,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`label`](label.md)
 * [`satisfy`](satisfy.md)

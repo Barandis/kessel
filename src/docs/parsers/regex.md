@@ -29,7 +29,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### Parameters
 
-* `pattern` The regular expression pattern to match against the current input location. This pattern can be either a `RegExp` object or a string (which is automatically converted into a `RegExp` object without flags). It will have an `^` anchor added to it if it doesn't already have one; all `regex` matches are done against the beginning of the input (based on its current state). No flags are removed, but the `g` flag is ignored because there can be only one match because of the `^` anchor.
+* `pattern`: The regular expression pattern to match against the current input location. This pattern can be either a `RegExp` object or a string (which is automatically converted into a `RegExp` object without flags). It will have an `^` anchor added to it if it doesn't already have one; all `regex` matches are done against the beginning of the input (based on its current state). No flags are removed, but the `g` flag is ignored because there can be only one match because of the `^` anchor.
 
 #### Success
 
@@ -46,5 +46,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`satisfy`](satisfy.md)
 * [`string`](string.md)

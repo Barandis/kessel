@@ -13,7 +13,7 @@ This utility function simply reads the [`status`](status.md) from the reply and 
 
 #### Parameters
 
-* `reply` A parse reply, presumably the return value of a call to [`parse`](parse.md).
+* `reply`: A parse reply, presumably the return value of a call to [`parse`](parse.md).
 
 #### Returns
 
@@ -21,5 +21,6 @@ This utility function simply reads the [`status`](status.md) from the reply and 
 
 #### See Also
 
+* [`Reply`](../types/reply.md)
 * [`parse`](parse.md)
 * [`status`](status.md)

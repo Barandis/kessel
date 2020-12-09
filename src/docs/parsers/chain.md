@@ -48,8 +48,8 @@ In the case of `f`, `chain` fails fatally. This is because a character was consu
 
 #### Parameters
 
-* `p` The parser which is applied first and whose result is passed into `fn`.
-* `fn` A function which, when passed the result of `p`, should return a second parser to be applied to the input.
+* `p`: The parser which is applied first and whose result is passed into `fn`.
+* `fn`: A function which, when passed the result of `p`, should return a second parser to be applied to the input.
 
 #### Success
 
@@ -73,6 +73,7 @@ In the case of `f`, `chain` fails fatally. This is because a character was consu
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`andThen`](andthen.md)
 * [`apply`](apply.md)
 * [`chainB`](chainb.md)

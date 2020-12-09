@@ -61,7 +61,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#see-also" class="md-skip">
+        <a href="#parameters" class="md-skip">
           Skip to content
         </a>
       
@@ -1877,6 +1877,20 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#parameters" class="md-nav__link">
+    Parameters
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#returns" class="md-nav__link">
+    Returns
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#see-also" class="md-nav__link">
     See Also
   </a>
@@ -1958,6 +1972,20 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#parameters" class="md-nav__link">
+    Parameters
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#returns" class="md-nav__link">
+    Returns
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#see-also" class="md-nav__link">
     See Also
   </a>
@@ -1992,6 +2020,14 @@
 <p>The type for a parsing function. This is, unsurprisingly, the most important type in Kessel.</p>
 <p>The parameter <code>T</code> refers to the type of the parser's result. <a href="../../parsers/any/"><code>any</code></a> is of type <code>Parser&lt;string&gt;</code>, for example, because that parser produces a single character (which is, of course, a string).</p>
 <p>Since <a href="../reply/"><code>Reply</code></a> is a tuple of a <a href="../context/"><code>Context</code></a> and a <a href="../result/"><code>Result</code></a>, a <code>Parser</code> is just a function that accepts a context and returns an updated context and a result.</p>
+<h4 id="parameters">Parameters</h4>
+<ul>
+<li><code>ctx</code>: The context passed to the parser detailing the input and the current location in that input.</li>
+</ul>
+<h4 id="returns">Returns</h4>
+<ul>
+<li>Returns a tuple of an updated, post-parse context and the result that the parse produced.</li>
+</ul>
 <h4 id="see-also">See Also</h4>
 <ul>
 <li><a href="../context/"><code>Context</code></a></li>

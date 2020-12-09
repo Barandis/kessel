@@ -27,7 +27,7 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 
 #### Parameters
 
-* `msg` The generic error message to apply.
+* `msg`: The generic error message to apply.
 
 #### Fatal Failure
 
@@ -39,4 +39,6 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`failNormally`](failnormally.md)
+* [`generic`](../tools/generic.md)

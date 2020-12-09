@@ -2009,8 +2009,8 @@
 <p>Contexts should be created using the functions <a href="../../tools/ok/"><code>ok</code></a>, <a href="../../tools/fail/"><code>fail</code></a>, <a href="../../tools/fatal/"><code>fatal</code></a>, and <a href="../../tools/maybefatal/"><code>maybeFatal</code></a> because they ensure that no older contexts are overwritten (which can become important in nested and compound errors, which keep multiple contexts).</p>
 <h4 id="properties">Properties</h4>
 <ul>
-<li><code>view</code> A <code>DataView</code> representing the input text. This view is created by the parsing functions <a href="../../tools/parse/"><code>parse</code></a> and <a href="../../tools/run/"><code>run</code></a> from any of the legal types of input.</li>
-<li><code>index</code> A pointer that marks the current location in the view. The next byte read by a parser will be the byte at that location.</li>
+<li><code>view</code>: A <code>DataView</code> representing the input text. This view is created by the parsing functions <a href="../../tools/parse/"><code>parse</code></a> and <a href="../../tools/run/"><code>run</code></a> from any of the legal types of input.</li>
+<li><code>index</code>: A pointer that marks the current location in the view. The next byte read by a parser will be the byte at that location.</li>
 </ul>
 <h4 id="see-also">See Also</h4>
 <ul>

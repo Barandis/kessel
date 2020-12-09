@@ -2116,7 +2116,7 @@
 <p>See <a href="#block"><code>block</code></a> for a detailed breakdown of the example. That example works exactly the same as this one except with regard to the third case. With <code>block</code>, this case is a fatal error, but <code>blockB</code> backtracks and converts the error to a non-fatal one.</p>
 <h4 id="parameters">Parameters</h4>
 <ul>
-<li><code>genFn</code> A generator function that provides the body of the <code>blockB</code> parser. This generator function can <code>yield</code> parsers, which will have those parsers' results fed back into the function when it's restarted (so that they can be assigned to variables, used in calculations, etc.). The return value of this generator function becomes the result of the <code>blockB</code> parser.</li>
+<li><code>genFn</code>: A generator function that provides the body of the <code>blockB</code> parser. This generator function can <code>yield</code> parsers, which will have those parsers' results fed back into the function when it's restarted (so that they can be assigned to variables, used in calculations, etc.). The return value of this generator function becomes the result of the <code>blockB</code> parser.</li>
 </ul>
 <h4 id="success">Success</h4>
 <ul>
@@ -2137,6 +2137,7 @@
 </ul>
 <h4 id="see-also">See Also</h4>
 <ul>
+<li><a href="../../types/parser/"><code>Parser</code></a></li>
 <li><a href="../block/"><code>block</code></a></li>
 <li><a href="../sequenceb/"><code>sequenceB</code></a></li>
 </ul>

@@ -54,7 +54,7 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 
 #### Parameters
 
-* `...ps` A series of parsers to apply to the input, one at a time, in order.
+* `...ps`: A series of parsers to apply to the input, one at a time, in order.
 
 #### Success
 
@@ -74,6 +74,7 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`andThenB`](andthenb.md)
 * [`blockB`](blockb.md)
 * [`leftB`](leftb.md)

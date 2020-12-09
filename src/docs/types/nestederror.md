@@ -31,3 +31,4 @@ The [`attempt`](../parsers/attempt.md) parser produces nested errors when it bac
 * [`ErrorType`](errortype.md)
 * [`LocalError`](localerror.md)
 * [`attempt`](../parsers/attempt.md)
+* [`nested`](../tools/nested.md)

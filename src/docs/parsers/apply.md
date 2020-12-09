@@ -43,8 +43,8 @@ console.log(failure(t)) // Parse error at (line 1, column 2):
 
 #### Parameters
 
-* `p` A parser whose result is passed to the function that results from `f`.
-* `f` A parser that returns a function.
+* `p`: A parser whose result is passed to the function that results from `f`.
+* `f`: A parser that returns a function.
 
 #### Success
 
@@ -67,6 +67,7 @@ console.log(failure(t)) // Parse error at (line 1, column 2):
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`always`](always.md)
 * [`andThen`](andthen.md)
 * [`applyB`](applyb.md)

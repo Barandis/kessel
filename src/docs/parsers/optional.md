@@ -37,7 +37,7 @@ console.log(failure(t)) // Parse error at (line 1, column 2):
 
 #### Parameters
 
-* `p` The parser that gets applied.
+* `p`: The parser that gets applied.
 
 #### Success
 
@@ -53,6 +53,7 @@ console.log(failure(t)) // Parse error at (line 1, column 2):
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`lookAhead`](lookahead.md)
 * [`orValue`](orvalue.md)
 * [`skip`](skip.md)

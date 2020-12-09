@@ -2077,7 +2077,7 @@
 </code></pre></div>
 <h4 id="parameters">Parameters</h4>
 <ul>
-<li><code>pattern</code> The regular expression pattern to match against the current input location. This pattern can be either a <code>RegExp</code> object or a string (which is automatically converted into a <code>RegExp</code> object without flags). It will have an <code>^</code> anchor added to it if it doesn't already have one; all <code>regex</code> matches are done against the beginning of the input (based on its current state). No flags are removed, but the <code>g</code> flag is ignored because there can be only one match because of the <code>^</code> anchor.</li>
+<li><code>pattern</code>: The regular expression pattern to match against the current input location. This pattern can be either a <code>RegExp</code> object or a string (which is automatically converted into a <code>RegExp</code> object without flags). It will have an <code>^</code> anchor added to it if it doesn't already have one; all <code>regex</code> matches are done against the beginning of the input (based on its current state). No flags are removed, but the <code>g</code> flag is ignored because there can be only one match because of the <code>^</code> anchor.</li>
 </ul>
 <h4 id="success">Success</h4>
 <ul>
@@ -2094,6 +2094,7 @@
 </ul>
 <h4 id="see-also">See Also</h4>
 <ul>
+<li><a href="../../types/parser/"><code>Parser</code></a></li>
 <li><a href="../satisfy/"><code>satisfy</code></a></li>
 <li><a href="../string/"><code>string</code></a></li>
 </ul>

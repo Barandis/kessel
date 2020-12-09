@@ -15,9 +15,9 @@ This function should always be used to create a failing reply, since it will alw
 
 #### Parameters
 
-* `ctx` The context for the newly created reply.
-* `errors` The error list detailing errors that hapopened at the context's location. Defaults to an empty array.
-* `index` The index into the context's input. This is used just to change that index if necessary (in backtracking, for example). Defaults to the context's current index.
+* `ctx`: The context for the newly created reply.
+* `errors`: The error list detailing errors that hapopened at the context's location. Defaults to an empty array.
+* `index`: The index into the context's input. This is used just to change that index if necessary (in backtracking, for example). Defaults to the context's current index.
 
 #### Returns
 
@@ -25,6 +25,8 @@ This function should always be used to create a failing reply, since it will alw
 
 #### See Also
 
+* [`Context`](../types/context.md)
+* [`ErrorList`](../types/errorlist.md)
 * [`fatal`](fatal.md)
 * [`maybeFatal`](maybefatal.md)
 * [`ok`](ok.md)

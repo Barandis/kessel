@@ -47,7 +47,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### Parameters
 
-* `p` The parser that is applied and backtracked over if it fails fatally.
+* `p`: The parser that is applied and backtracked over if it fails fatally.
 
 #### Success
 
@@ -64,6 +64,8 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### See Also
 
+* [`NestedError`](../types/nestederror.md)
+* [`Parser`](../types/parser.md)
 * [`attemptM`](attemptm.md)
 * [`choice`](choice.md)
 * [`optional`](optional.md)

@@ -62,7 +62,7 @@ The example shows *three* success cases, `s`, `r`, and `p`, one for each parser 
 
 #### Parameters
 
-* `...ps` The parsers to apply one at a time until one succeeds.
+* `...ps`: The parsers to apply one at a time until one succeeds.
 
 #### Success
 
@@ -82,6 +82,7 @@ The example shows *three* success cases, `s`, `r`, and `p`, one for each parser 
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`attempt`](attempt.md)
 * [`orElse`](orelse.md)
 * [`sequence`](sequence.md)

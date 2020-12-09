@@ -2022,10 +2022,10 @@
 <p>Once this determination of the type is made, this function works in all respects exactly like <a href="../fatal/"><code>fatal</code></a> or <a href="../fail/"><code>fail</code></a>.</p>
 <h4 id="parameters">Parameters</h4>
 <ul>
-<li><code>test</code> A boolean telling whether this reply should represent a fatal failure.</li>
-<li><code>ctx</code> The context for the newly created reply.</li>
-<li><code>errors</code> The error list detailing errors that hapopened at the context's location. Defaults to an empty array.</li>
-<li><code>index</code> The index into the context's input. This is used just to change that index if necessary (in backtracking, for example). Defaults to the context's current index.</li>
+<li><code>test</code>: A boolean telling whether this reply should represent a fatal failure.</li>
+<li><code>ctx</code>: The context for the newly created reply.</li>
+<li><code>errors</code>: The error list detailing errors that hapopened at the context's location. Defaults to an empty array.</li>
+<li><code>index</code>: The index into the context's input. This is used just to change that index if necessary (in backtracking, for example). Defaults to the context's current index.</li>
 </ul>
 <h4 id="returns">Returns</h4>
 <ul>
@@ -2033,6 +2033,9 @@
 </ul>
 <h4 id="see-also">See Also</h4>
 <ul>
+<li><a href="../../types/context/"><code>Context</code></a></li>
+<li><a href="../../types/errorlist/"><code>ErrorList</code></a></li>
+<li><a href="../../types/reply/"><code>Reply</code></a></li>
 <li><a href="../fail/"><code>fail</code></a></li>
 <li><a href="../fatal/"><code>fatal</code></a></li>
 <li><a href="../ok/"><code>ok</code></a></li>

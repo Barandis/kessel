@@ -33,7 +33,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### Parameters
 
-* `p` The parser to apply. If it succeeds, `followedBy` succeeds.
+* `p`: The parser to apply. If it succeeds, `followedBy` succeeds.
 
 #### Success
 
@@ -49,6 +49,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`followedByM`](followedbym.md)
 * [`label`](label.md)
 * [`lookAhead`](lookahead.md)

@@ -50,8 +50,8 @@ In this example, `f` represents a non-fatal failure because the first parser (`l
 
 #### Parameters
 
-* `p` The first parser to apply. If both parsers succeed, this parser's result will be `left`'s result.
-* `q` The second parser to apply. This parser's result will be discarded.
+* `p`: The first parser to apply. If both parsers succeed, this parser's result will be `left`'s result.
+* `q`: The second parser to apply. This parser's result will be discarded.
 
 #### Success
 
@@ -73,6 +73,7 @@ In this example, `f` represents a non-fatal failure because the first parser (`l
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`andThen`](andthen.md)
 * [`leftB`](leftb.md)
 * [`right`](right.md)

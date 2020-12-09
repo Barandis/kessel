@@ -34,7 +34,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### Parameters
 
-* `p` The parser to apply. This parser should return an array.
+* `p`: The parser to apply. This parser should return an array.
 
 #### Success
 
@@ -55,6 +55,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`first`](first.md)
 * [`fourth`](fourth.md)
 * [`nth`](nth.md)

@@ -15,8 +15,8 @@ If `p` succeeds, its result is returned directly from `run`, rather than returni
 
 #### Parameters
 
-* `p` The parser to execute.
-* `input` The text to execute `p` against.
+* `p`: The parser to execute.
+* `input`: The text to execute `p` against.
 
 #### Returns
 
@@ -29,4 +29,6 @@ If `p` succeeds, its result is returned directly from `run`, rather than returni
 
 #### See Also
 
+* [`Input`](../types/input.md)
+* [`Parser`](../types/parser.md)
 * [`parse`](parse.md)

@@ -31,7 +31,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### Parameters
 
-* `c` The character that the next input character must be in order to succeed.
+* `c`: The character that the next input character must be in order to succeed.
 
 #### Success 
 
@@ -47,6 +47,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`any`](any.md)
 * [`charI`](chari.md)
 * [`range`](range.md)

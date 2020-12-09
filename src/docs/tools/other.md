@@ -15,7 +15,7 @@ Error messages created by `other` are not displayed by the default formatter for
 
 #### Parameters
 
-* `msg` The error message.
+* `msg`: The error message.
 
 #### Returns
 
@@ -23,5 +23,7 @@ Error messages created by `other` are not displayed by the default formatter for
 
 #### See Also
 
+* [`ErrorList`](../types/errorlist.md)
+* [`LocalError`](../types/localerror.md)
 * [`formatErrors`](formaterrors.md)
 * [`merge`](merge.md)

@@ -15,9 +15,9 @@ This kind of emulates a `Either` type from Haskell by using `status` to determin
 
 #### Properties
 
-* `status` The status of the parse result. This indicates whether the parse succeeded, failed, or failed fatally.
-* `value` The value returned by the parser on a successful parse.
-* `errors` The error list returned by the parser on an unsuccessful parse.
+* `status`: The status of the parse result. This indicates whether the parse succeeded, failed, or failed fatally.
+* `value`: The value returned by the parser on a successful parse.
+* `errors`: The error list returned by the parser on an unsuccessful parse.
 
 #### See Also
 

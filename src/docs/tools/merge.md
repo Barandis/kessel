@@ -13,9 +13,13 @@ This currently simply concatenates the lists; it does not remove any member of e
 
 #### Parameters
 
-* `errors1` The first error list to merge.
-* `errors2` The second error list to merge.
+* `errors1`: The first error list to merge.
+* `errors2`: The second error list to merge.
 
 #### Returns
 
 * Returns both lists concatenated into a new list.
+
+#### See Also
+
+* [`ErrorList`](../types/errorlist.md)

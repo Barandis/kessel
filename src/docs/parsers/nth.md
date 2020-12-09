@@ -34,8 +34,8 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### Parameters
 
-* `p` The parser to apply. This parser should return an array.
-* `n` The 0-based index of the element from `p`'s result that should be returned.
+* `p`: The parser to apply. This parser should return an array.
+* `n`: The 0-based index of the element from `p`'s result that should be returned.
 
 #### Success
 
@@ -57,6 +57,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`fifth`](fifth.md)
 * [`first`](first.md)
 * [`fourth`](fourth.md)

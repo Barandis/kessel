@@ -13,7 +13,7 @@ If the reply is not, in fact, successful, this function returns `null`.
 
 #### Parameters
 
-* `reply` A parse reply, presumably the return value of a call to [`parse`](parse.md).
+* `reply`: A parse reply, presumably the return value of a call to [`parse`](parse.md).
 
 #### Returns
 
@@ -21,5 +21,6 @@ If the reply is not, in fact, successful, this function returns `null`.
 
 #### See Also
 
+* [`Reply`](../types/reply.md)
 * [`failure`](failure.md)
 * [`parse`](parse.md)

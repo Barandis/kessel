@@ -33,7 +33,7 @@ The failure case in this example shows the only way that `skipMany` can fail: it
 
 #### Parameters
 
-* `p` The parser to apply repeatedly until it fails.
+* `p`: The parser to apply repeatedly until it fails.
 
 #### Success
 
@@ -49,5 +49,6 @@ The failure case in this example shows the only way that `skipMany` can fail: it
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`many`](many.md)
 * [`skipMany1`](skipmany1.md)

@@ -71,7 +71,7 @@ The third case (`t`) fails because, while the whitespace was ignored and the opt
 
 #### Parameters
 
-* `genFn` A generator function that provides the body of the `block` parser. This generator function can `yield` parsers, which will have those parsers' results fed back into the function when it's restarted (so that they can be assigned to variables, used in calculations, etc.). The return value of this generator function becomes the result of the `block` parser.
+* `genFn`: A generator function that provides the body of the `block` parser. This generator function can `yield` parsers, which will have those parsers' results fed back into the function when it's restarted (so that they can be assigned to variables, used in calculations, etc.). The return value of this generator function becomes the result of the `block` parser.
 
 #### Success
 
@@ -93,5 +93,6 @@ The third case (`t`) fails because, while the whitespace was ignored and the opt
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`blockB`](blockb.md)
 * [`sequence`](sequence.md)

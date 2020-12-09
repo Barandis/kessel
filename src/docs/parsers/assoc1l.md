@@ -42,8 +42,8 @@ See [`assocL`](assocl.md) for an explanation  of the example. That example works
 
 #### Parameters
 
-* `p` The content parser.
-* `op` The operation parser. This parser must return a function.
+* `p`: The content parser.
+* `op`: The operation parser. This parser must return a function.
 
 #### Success
 
@@ -64,5 +64,6 @@ See [`assocL`](assocl.md) for an explanation  of the example. That example works
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`assocL`](assocl.md)
 * [`assoc1R`](assoc1r.md)

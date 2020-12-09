@@ -47,8 +47,8 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 
 #### Parameters
 
-* `p` The first parser to apply.
-* `q` The second parser to apply. This parser will only be applied if `p` fails; if `p` either succeeds or fails fatally, there is no need to apply `q` to know what the result will be.
+* `p`: The first parser to apply.
+* `q`: The second parser to apply. This parser will only be applied if `p` fails; if `p` either succeeds or fails fatally, there is no need to apply `q` to know what the result will be.
 
 #### Success
 
@@ -68,6 +68,7 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`andThen`](#andthen)
 * [`attempt`](#attempt)
 * [`choice`](#choice)

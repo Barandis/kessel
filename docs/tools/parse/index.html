@@ -2042,8 +2042,8 @@
 <p><code>p</code>, which can be any parser but likely is a combinator composed of many parsers, is executed against this text, and the reply that is returned provides all of the information about how well it worked. The utility functions <a href="../status/"><code>status</code></a>, <a href="../succeeded/"><code>succeeded</code></a>, <a href="../success/"><code>success</code></a>, and <a href="../failure/"><code>failure</code></a> can be used to extract that information from the reply.</p>
 <h4 id="parameters">Parameters</h4>
 <ul>
-<li><code>p</code> The parser to execute.</li>
-<li><code>input</code> The text to execute <code>p</code> against.</li>
+<li><code>p</code>: The parser to execute.</li>
+<li><code>input</code>: The text to execute <code>p</code> against.</li>
 </ul>
 <h4 id="returns">Returns</h4>
 <ul>
@@ -2055,6 +2055,9 @@
 </ul>
 <h4 id="see-also">See Also</h4>
 <ul>
+<li><a href="../../types/input/"><code>Input</code></a></li>
+<li><a href="../../types/parser/"><code>Parser</code></a></li>
+<li><a href="../../types/reply/"><code>Reply</code></a></li>
 <li><a href="../failure/"><code>failure</code></a></li>
 <li><a href="../run/"><code>run</code></a></li>
 <li><a href="../status/"><code>status</code></a></li>

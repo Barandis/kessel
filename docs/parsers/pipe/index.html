@@ -2118,8 +2118,8 @@ apply(p, apply(q, always(b =&gt; a =&gt; fn(a, b)))) // applicative style
 <p>In this example, the <code>upper</code> and <code>lower</code> parsers are applied, and the results of each are passed to an arity-2 function which lowercases the first argument and uppercases the second. The first failure example (<code>f</code>) shows non-fatal failure caused by the first parser failing non-fatally, but the second (<code>t</code>) shows a fatal failure caused by a parser (<code>upper</code> in this case) consuming a character before a later parser fails.</p>
 <h4 id="parameters">Parameters</h4>
 <ul>
-<li><code>...ps</code> Zero or more parsers, each of which is applied to the input in order.</li>
-<li><code>fn</code> A function which receives the results of all of the parsers in <code>ps</code> if they all succeed. Its return value becomes the result of <code>pipe</code>.</li>
+<li><code>...ps</code>: Zero or more parsers, each of which is applied to the input in order.</li>
+<li><code>fn</code>: A function which receives the results of all of the parsers in <code>ps</code> if they all succeed. Its return value becomes the result of <code>pipe</code>.</li>
 </ul>
 <h4 id="success">Success</h4>
 <ul>
@@ -2142,6 +2142,7 @@ apply(p, apply(q, always(b =&gt; a =&gt; fn(a, b)))) // applicative style
 </ul>
 <h4 id="see-also">See Also</h4>
 <ul>
+<li><a href="../../types/parser/"><code>Parser</code></a></li>
 <li><a href="../map/"><code>map</code></a></li>
 <li><a href="../pipeb/"><code>pipeB</code></a></li>
 </ul>

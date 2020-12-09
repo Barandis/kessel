@@ -25,7 +25,7 @@ console.log(success(s)) // 3.14
 
 #### Parameters
 
-* `x` An arbitrary value that this parser always returns.
+* `x`: An arbitrary value that this parser always returns.
 
 #### Success
 
@@ -33,6 +33,7 @@ console.log(success(s)) // 3.14
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`apply`](apply.md)
 * [`chain`](chain.md)
 * [`value`](value.md)

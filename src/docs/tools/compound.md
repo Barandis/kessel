@@ -13,9 +13,9 @@ The `errors` parameter will become the error list for the new compound error. Ho
 
 #### Parameters
 
-* `msg` A message describing the context or the error.
-* `ctx` The context where the nested error(s) happened.
-* `errors` The error(s) that happened in that location.
+* `msg`: A message describing the context or the error.
+* `ctx`: The context where the nested error(s) happened.
+* `errors`: The error(s) that happened in that location.
 
 #### Returns
 
@@ -23,4 +23,6 @@ The `errors` parameter will become the error list for the new compound error. Ho
 
 #### See Also
 
+* [`CompoundError`](../types/compounderror.md)
+* [`ErrorList`](../types/errorlist.md)
 * [`compound`](compound.md)

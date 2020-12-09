@@ -13,8 +13,8 @@ The `errors` parameter will become the error list for the new nested error. Howe
 
 #### Parameters
 
-* `ctx` The context where the nested error(s) happened.
-* `errors` The error(s) that happened in that location.
+* `ctx`: The context where the nested error(s) happened.
+* `errors`: The error(s) that happened in that location.
 
 #### Returns
 
@@ -22,4 +22,7 @@ The `errors` parameter will become the error list for the new nested error. Howe
 
 #### See Also
 
+* [`Context`](../types/context.md)
+* [`ErrorList`](../types/errorlist.md)
+* [`NestedError`](../types/nestederror.md)
 * [`compound`](compound.md)

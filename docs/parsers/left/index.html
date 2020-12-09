@@ -2106,8 +2106,8 @@ apply(p, value(q, x =&gt; x)) // applicative style
 <p>In this example, <code>f</code> represents a non-fatal failure because the first parser (<code>letter</code>) failed without consuming, but <code>t</code> represents a fatal failure because the first parser consumed a character before the second parser (<code>digit</code>) failed non-fatally.</p>
 <h4 id="parameters">Parameters</h4>
 <ul>
-<li><code>p</code> The first parser to apply. If both parsers succeed, this parser's result will be <code>left</code>'s result.</li>
-<li><code>q</code> The second parser to apply. This parser's result will be discarded.</li>
+<li><code>p</code>: The first parser to apply. If both parsers succeed, this parser's result will be <code>left</code>'s result.</li>
+<li><code>q</code>: The second parser to apply. This parser's result will be discarded.</li>
 </ul>
 <h4 id="success">Success</h4>
 <ul>
@@ -2129,6 +2129,7 @@ apply(p, value(q, x =&gt; x)) // applicative style
 </ul>
 <h4 id="see-also">See Also</h4>
 <ul>
+<li><a href="../../types/parser/"><code>Parser</code></a></li>
 <li><a href="../andthen/"><code>andThen</code></a></li>
 <li><a href="../leftb/"><code>leftB</code></a></li>
 <li><a href="../right/"><code>right</code></a></li>

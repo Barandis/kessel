@@ -37,8 +37,8 @@ console.log(failure(t)) // Parse error at (line 1, column 2):
 
 #### Parameters
 
-* `p` The parser that gets applied. If it succeeds, its result is returned.
-* `x` An arbitrary value that is returned if `p` fails.
+* `p`: The parser that gets applied. If it succeeds, its result is returned.
+* `x`: An arbitrary value that is returned if `p` fails.
 
 #### Success
 
@@ -54,5 +54,6 @@ console.log(failure(t)) // Parse error at (line 1, column 2):
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`attempt`](attempt.md)
 * [`optional`](optional.md)

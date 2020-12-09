@@ -33,7 +33,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### Parameters
 
-* `str` The string to match against the input at its current location.
+* `str`: The string to match against the input at its current location.
 
 #### Success
 
@@ -50,6 +50,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`char`](char.md)
 * [`regex`](regex.md)
 * [`stringI`](stringi.md)

@@ -31,7 +31,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### Parameters
 
-* `p` The parser to apply. If it fails, `notFollowedBy` succeeds.
+* `p`: The parser to apply. If it fails, `notFollowedBy` succeeds.
 
 #### Success
 
@@ -47,6 +47,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`followedBy`](followedby.md)
 * [`label`](label.md)
 * [`notEmpty`](notempty.md)

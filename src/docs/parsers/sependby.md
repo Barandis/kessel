@@ -33,8 +33,8 @@ console.log(failure(t)) // Parse error at (line 1, column 11):
 
 #### Parameters
 
-* `p` The content parser. The results of this parser are returned in an array.
-* `sep` The separator parser. The results of this parser are discarded.
+* `p`: The content parser. The results of this parser are returned in an array.
+* `sep`: The separator parser. The results of this parser are discarded.
 
 #### Success
 
@@ -50,5 +50,6 @@ console.log(failure(t)) // Parse error at (line 1, column 11):
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`sepBy`](sepby.md)
 * [`sepEndBy1`](sependby1.md)

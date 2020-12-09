@@ -33,7 +33,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### Parameters
 
-* `p` The parser that is applied, which must return an array.
+* `p`: The parser that is applied, which must return an array.
 
 #### Success
 
@@ -54,4 +54,5 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`map`](map.md)

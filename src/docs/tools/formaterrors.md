@@ -17,12 +17,18 @@ To use a custom formatter, a new function that conforms to the [`Formatter`](../
 
 #### Parameters
 
-* `ctx` The context defining the location where the error(s) to be formatted occurred. In the default formatter, this is used to calculate the line and column in the text where the error happened, as well as to provide the text around that location.
-* `result` The result object holding the error(s) that occurred at the context location.
-* `tabSize` The size of tab stops, used to determine how tab characters (`'\t'`) are formatted. In the default formatter, this does not define the size of the tab; it and its multiples become the column numbers where tabs terminate. The default tab size in the default formatter is 8.
-* `maxWidth` The maximum width of a line that is displayed in the error message. This controls only whether the line is truncated in the error message. The default max width in the default formatter is 72.
-* `formatter` A formatting function that actually performs the formatting. The default formatter is a function not provided through the API, but the presence of this parameter allows an alternate formatting function to be used instead.
+* `ctx`: The context defining the location where the error(s) to be formatted occurred. In the default formatter, this is used to calculate the line and column in the text where the error happened, as well as to provide the text around that location.
+* `result`: The result object holding the error(s) that occurred at the context location.
+* `tabSize`: The size of tab stops, used to determine how tab characters (`'\t'`) are formatted. In the default formatter, this does not define the size of the tab; it and its multiples become the column numbers where tabs terminate. The default tab size in the default formatter is 8.
+* `maxWidth`: The maximum width of a line that is displayed in the error message. This controls only whether the line is truncated in the error message. The default max width in the default formatter is 72.
+* `formatter`: A formatting function that actually performs the formatting. The default formatter is a function not provided through the API, but the presence of this parameter allows an alternate formatting function to be used instead.
 
 #### Returns
 
 * Returns a formatted error message.
+
+#### See Also
+
+* [`Context`](../types/context.md)
+* [`Formatter`](../types/formatter.md)
+* [`getPosition`](getposition.md)

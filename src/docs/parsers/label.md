@@ -33,8 +33,8 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### Parameters
 
-* `p` The parser to apply. If it does not consume any input, its error message will be changed.
-* `msg` The error message for when `p` does not consume input.
+* `p`: The parser to apply. If it does not consume any input, its error message will be changed.
+* `msg`: The error message for when `p` does not consume input.
 
 #### Success
 
@@ -55,6 +55,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`attemptM`](attemptm.md)
 * [`choice`](choice.md)
 * [`followedBy`](followedby.md)

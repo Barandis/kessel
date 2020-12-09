@@ -1589,6 +1589,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    See Also
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1978,6 +1985,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    See Also
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2009,15 +2023,21 @@
 <p>To use a custom formatter, a new function that conforms to the <a href="../../types/formatter/"><code>Formatter</code></a> should be passed in as the <code>formatter</code> parameter. This function is responsible for both formatting and for the setting of default values for <code>tabSize</code> and <code>maxWidth</code>.</p>
 <h4 id="parameters">Parameters</h4>
 <ul>
-<li><code>ctx</code> The context defining the location where the error(s) to be formatted occurred. In the default formatter, this is used to calculate the line and column in the text where the error happened, as well as to provide the text around that location.</li>
-<li><code>result</code> The result object holding the error(s) that occurred at the context location.</li>
-<li><code>tabSize</code> The size of tab stops, used to determine how tab characters (<code>'\t'</code>) are formatted. In the default formatter, this does not define the size of the tab; it and its multiples become the column numbers where tabs terminate. The default tab size in the default formatter is 8.</li>
-<li><code>maxWidth</code> The maximum width of a line that is displayed in the error message. This controls only whether the line is truncated in the error message. The default max width in the default formatter is 72.</li>
-<li><code>formatter</code> A formatting function that actually performs the formatting. The default formatter is a function not provided through the API, but the presence of this parameter allows an alternate formatting function to be used instead.</li>
+<li><code>ctx</code>: The context defining the location where the error(s) to be formatted occurred. In the default formatter, this is used to calculate the line and column in the text where the error happened, as well as to provide the text around that location.</li>
+<li><code>result</code>: The result object holding the error(s) that occurred at the context location.</li>
+<li><code>tabSize</code>: The size of tab stops, used to determine how tab characters (<code>'\t'</code>) are formatted. In the default formatter, this does not define the size of the tab; it and its multiples become the column numbers where tabs terminate. The default tab size in the default formatter is 8.</li>
+<li><code>maxWidth</code>: The maximum width of a line that is displayed in the error message. This controls only whether the line is truncated in the error message. The default max width in the default formatter is 72.</li>
+<li><code>formatter</code>: A formatting function that actually performs the formatting. The default formatter is a function not provided through the API, but the presence of this parameter allows an alternate formatting function to be used instead.</li>
 </ul>
 <h4 id="returns">Returns</h4>
 <ul>
 <li>Returns a formatted error message.</li>
+</ul>
+<h4 id="see-also">See Also</h4>
+<ul>
+<li><a href="../../types/context/"><code>Context</code></a></li>
+<li><a href="../../types/formatter/"><code>Formatter</code></a></li>
+<li><a href="../getposition/"><code>getPosition</code></a></li>
 </ul>
                 
               

@@ -2118,7 +2118,7 @@
 <p>The example shows <em>three</em> success cases, <code>s</code>, <code>r</code>, and <code>p</code>, one for each parser passed to <code>choice</code>. If all of these fail, as in the first failure case (<code>f</code>), then failure is the result. In the second failure case (<code>t</code>), the first parser fails but consumes input as it does so, so <code>choice</code> is halted at that point without applying its second or third parsers. Fatal failure is the result.</p>
 <h4 id="parameters">Parameters</h4>
 <ul>
-<li><code>...ps</code> The parsers to apply one at a time until one succeeds.</li>
+<li><code>...ps</code>: The parsers to apply one at a time until one succeeds.</li>
 </ul>
 <h4 id="success">Success</h4>
 <ul>
@@ -2138,6 +2138,7 @@
 </ul>
 <h4 id="see-also">See Also</h4>
 <ul>
+<li><a href="../../types/parser/"><code>Parser</code></a></li>
 <li><a href="../attempt/"><code>attempt</code></a></li>
 <li><a href="../orelse/"><code>orElse</code></a></li>
 <li><a href="../sequence/"><code>sequence</code></a></li>

@@ -48,9 +48,9 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 
 #### Parameters
 
-* `pre` The parser that is applied first. Its result is discarded.
-* `post` The parser that is applied last. Its result is discarded.
-* `p` The parser that is applied after `pre` and before `post`. Its result is returned by `between` itself.
+* `pre`: The parser that is applied first. Its result is discarded.
+* `post`: The parser that is applied last. Its result is discarded.
+* `p`: The parser that is applied after `pre` and before `post`. Its result is returned by `between` itself.
 
 #### Success
 
@@ -70,5 +70,6 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`between`](between.md)
 * [`manyTillB`](manytillb.md)

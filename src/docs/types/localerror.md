@@ -23,3 +23,7 @@ Local errors can be of any kind other than `ErrorType.Nested` and `ErrorType.Com
 * [`CompoundError`](compounderror.md)
 * [`ErrorType`](errortype.md)
 * [`NestedError`](nestederror.md)
+* [`expected`](../tools/expected.md)
+* [`generic`](../tools/generic.md)
+* [`other`](../tools/other.md)
+* [`unexpected`](../tools/unexpected.md)

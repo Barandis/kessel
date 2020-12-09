@@ -64,8 +64,8 @@ In this example, the `upper` and `lower` parsers are applied, and the results of
 
 #### Parameters
 
-* `...ps` Zero or more parsers, each of which is applied to the input in order.
-* `fn` A function which receives the results of all of the parsers in `ps` if they all succeed. Its return value becomes the result of `pipe`.
+* `...ps`: Zero or more parsers, each of which is applied to the input in order.
+* `fn`: A function which receives the results of all of the parsers in `ps` if they all succeed. Its return value becomes the result of `pipe`.
 
 #### Success
 
@@ -88,5 +88,6 @@ In this example, the `upper` and `lower` parsers are applied, and the results of
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`map`](map.md)
 * [`pipeB`](pipeb.md)

@@ -29,7 +29,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### Parameters
 
-* `cs` The set of characters that the next character is expected to be a part of. This can be either a string or an array of single-character strings.
+* `cs`: The set of characters that the next character is expected to be a part of. This can be either a string or an array of single-character strings.
 
 #### Success
 
@@ -46,4 +46,5 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`noneOf`](noneof.md)

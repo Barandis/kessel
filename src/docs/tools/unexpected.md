@@ -13,7 +13,7 @@ This is returned as a single-element [`ErrorList`](../types/errorlist.md). For a
 
 #### Parameters
 
-* `msg` The error message describing what happened that was not expected
+* `msg`: The error message describing what happened that was not expected
 
 #### Returns
 
@@ -21,4 +21,6 @@ This is returned as a single-element [`ErrorList`](../types/errorlist.md). For a
 
 #### See Also
 
+* [`ErrorList`](../types/errorlist.md)
+* [`LocalError`](../types/localerror.md)
 * [`merge`](merge.md)

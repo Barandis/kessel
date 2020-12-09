@@ -17,8 +17,8 @@ Contexts should be created using the functions [`ok`](../tools/ok.md), [`fail`](
 
 #### Properties
 
-* `view` A `DataView` representing the input text. This view is created by the parsing functions [`parse`](../tools/parse.md) and [`run`](../tools/run.md) from any of the legal types of input.
-* `index` A pointer that marks the current location in the view. The next byte read by a parser will be the byte at that location.
+* `view`: A `DataView` representing the input text. This view is created by the parsing functions [`parse`](../tools/parse.md) and [`run`](../tools/run.md) from any of the legal types of input.
+* `index`: A pointer that marks the current location in the view. The next byte read by a parser will be the byte at that location.
 
 #### See Also
 

@@ -33,7 +33,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### Parameters
 
-* `p` The parser to be applied. `notEmpty` fails if this `p` succeeds but produces no result.
+* `p`: The parser to be applied. `notEmpty` fails if this `p` succeeds but produces no result.
 
 #### Success
 
@@ -54,6 +54,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`followedBy`](followedby.md)
 * [`label`](label.md)
 * [`notEmptyM`](notemptym.md)

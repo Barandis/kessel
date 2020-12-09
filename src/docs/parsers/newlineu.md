@@ -39,6 +39,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`newline`](newline.md)
 * [`spacesU`](spacesu.md)
 * [`spaces1U`](spaces1u.md)

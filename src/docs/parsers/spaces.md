@@ -27,6 +27,7 @@ console.log(success(s)) // null
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`newline`](newline.md)
 * [`space`](space.md)
 * [`spaces1`](spaces1.md)

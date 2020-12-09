@@ -17,7 +17,7 @@ This function uses the same calculation used by the default formatter in [`forma
 
 #### Parameters
 
-* `ctx` The context supplying the text and position that is used to calculate the line and column numbers.
+* `ctx`: The context supplying the text and position that is used to calculate the line and column numbers.
 * `tabSize`: The size of the tab stops, used to calculate column numbers of characters that follow a tab within a line. Defaults to 8.
 
 #### Returns
@@ -26,4 +26,5 @@ This function uses the same calculation used by the default formatter in [`forma
 
 #### See Also
 
+* [`Context`](../types/context.md)
 * [`formatErrors`](formaterrors.md)

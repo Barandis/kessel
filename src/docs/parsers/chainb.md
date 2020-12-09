@@ -46,8 +46,8 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 
 #### Parameters
 
-* `p` The parser which is applied first and whose result is passed into `fn`.
-* `fn` A function which, when passed the result of `p`, should return a second parser to be applied to the input.
+* `p`: The parser which is applied first and whose result is passed into `fn`.
+* `fn`: A function which, when passed the result of `p`, should return a second parser to be applied to the input.
 
 #### Success
 
@@ -69,4 +69,5 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`chain`](chain.md)

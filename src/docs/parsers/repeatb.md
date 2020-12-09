@@ -45,8 +45,8 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 
 #### Parameters
 
-* `p` The parser to apply. Its results are returned in an array.
-* `n` The number of times that `p` is applied.
+* `p`: The parser to apply. Its results are returned in an array.
+* `n`: The number of times that `p` is applied.
 
 #### Success
 
@@ -62,5 +62,6 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`repeat`](repeat.md)
 * [`sequenceB`](sequenceb.md)

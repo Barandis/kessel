@@ -41,8 +41,8 @@ console.log(failure(t)) // Parse error at (line 1, column 3):
 
 #### Parameters
 
-* `p` The content parser. After `end` succeeds, the prior results of this parser are returned as an array.
-* `end` The end parser. `p` will continue to be applied until `end` succeeds. Its result is discarded.
+* `p`: The content parser. After `end` succeeds, the prior results of this parser are returned as an array.
+* `end`: The end parser. `p` will continue to be applied until `end` succeeds. Its result is discarded.
 
 #### Success
 
@@ -64,6 +64,7 @@ console.log(failure(t)) // Parse error at (line 1, column 3):
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`between`](between.md)
 * [`manyTillB](manytillb.md)
 * [`sequence`](sequence.md)

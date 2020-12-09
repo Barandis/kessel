@@ -38,9 +38,9 @@ When applied to the input `'12-34+56'`, the results of the content parser are `1
 
 #### Parameters
 
-* `p` The content parser.
-* `op` The operation parser. This parser must return a function.
-* `x` The default return value. This is used as a result if `p` doesn't succeed at least once.
+* `p`: The content parser.
+* `op`: The operation parser. This parser must return a function.
+* `x`: The default return value. This is used as a result if `p` doesn't succeed at least once.
 
 #### Success
 
@@ -57,5 +57,6 @@ When applied to the input `'12-34+56'`, the results of the content parser are `1
 
 #### See Also
 
+* [`Parser`](../types/parser.md)
 * [`assoc1L`](assoc1l.md)
 * [`assocR`](assocr.md)
