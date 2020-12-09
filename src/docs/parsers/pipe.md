@@ -5,15 +5,16 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `pipe<T>(...ps: (Parser<any> | ((...args: any[]) => T))[]): Parser<T>`
+> `pipe<T>(...ps: Parser[], fn: (...args: any[]) => T): Parser<T>`
 
-!!! warning "Inexpressive type"
-    TypeScript cannot express as much information in this type as would be useful. This type signature suffers from two unexpressable ideas.
+!!! warning "Not a real type"
+    The type given above is not a real type, because TypeScript/JavaScript does not have the ability to do rest arguments before other arguments. The "real" type is
 
-    1. The last argument is always a function, while the rest are always parsers.
-    2. The arguments to the function match the generic parameters of the parsers in both number and type.
+    `pipe<T>(...ps: (Parser<any> | ((...args: any[]) => T))[]): Parser<T>`
 
-    In the description below, `ps` refers to the parsers (all arguments but the last) and `fn` to the function (the last argument).
+    The given type is more expressive and makes for better documentation, but even that one is imperfect. TypeScript cannot express as much information in this type as would be useful. Namely, the parsers in `ps` can all have different generic parameters, and the types of the parameters to `fn` should match those generic parameters in number and in order.
+
+    A two-parser `pipe` can be expressed with `pipe<T, U>(p: Parser<T>, q: Parser<U>, fn: (a: T, b: U) => V): Parser<V>`. A three-parser version would have the type `pipe<T, U, V>(p: Parser<T>, q: Parser<U>, r: Parser<V>, fn: (a: T, b: U, c: V) => W): Parser<W>`, and so on. Unfortunately it's impossible to write a type with a variable number of arguments.
 
 Applies some parsers in order, then returns the result of a function to which all of the parser results have been passed.
 

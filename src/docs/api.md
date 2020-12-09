@@ -11,7 +11,7 @@
 
 Types are given in the descriptions for each of the parsers and functions listed below. These are contained in TypeScript definition files in the project that can be used either for writing TypeScript programs that use Kessel or just in providing signature information for your IDE.
 
-It should however be noted that some of the type information is incomplete because TypeScript leaves no way to express complete information. There are notes to that effect in [`choice`](parsers/choice.md), [`pipe`](parsers/pipe.md), [`pipeB`](parsers/pipeb.md), [`sequence`](parsers/sequence.md), and [`sequenceB`](parsers/sequenceb.md).
+It should however be noted that some of the type information is incomplete because TypeScript leaves no way to express complete information in the case where there are variable numbers of arguments that can have different generic parameter types. There are notes to that effect in [`choice`](parsers/choice.md), [`pipe`](parsers/pipe.md), [`pipeB`](parsers/pipeb.md), [`sequence`](parsers/sequence.md), and [`sequenceB`](parsers/sequenceb.md).
 
 However, there are shortcomings in other parsers that are not explicity marked. For example, TypeScript has no way to say that a string should be one character long, or that an array of strings should have elements that are all one character long. This affects the parameters in [`anyOf`](parsers/anyof.md), [`char`](parsers/char.md), [`charI`](parsers/chari.md), [`noneOf`](parsers/noneof.md), and [`range`](parsers/range.md).
 
