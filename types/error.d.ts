@@ -11,7 +11,7 @@ export function getCharIndex(index: number, view: DataView, start: number): numb
 export function tabify(charIndex: number, line: string, tabSize: number): { line: string, colIndex: number };
 export function getColNumber(colIndex: number, line: string): { colno: number, length: number };
 export function show(line: string, length: number, colno: number, maxWidth: number, indent?: number): string;
-export function format(errors: ErrorList, index: number, view: DataView, tabSize: number, maxWidth: number, indent?: number): string;
+export function format(errors: ErrorList, index: number, view: DataView, tabSize?: number, maxWidth?: number, indent?: number): string;
 export function formatErrors(ctx: Context, result: Result<any>, tabSize?: number, maxWidth?: number, formatter?: Formatter): string;
 export function getPosition(ctx: Context, tabSize?: number): { line: number, column: number };
 
@@ -40,6 +40,7 @@ export type CompoundError = {
   ctx: Context;
   errors: ErrorList;
 };
-export type Formatter = (errors: ErrorList, index: number, view: DataView, tabSize: number, maxWidth: number) => string;
+export type Formatter = (errors: ErrorList, index: number, view: DataView, tabSize?: number, maxWidth?: number) => string;
+
 type Context = import("./core").Context;
 type Result<T> = import("./core").Result<T>;

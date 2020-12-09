@@ -213,11 +213,14 @@ For TypeScript users, there will be a declaration file provided which will codif
 
 | Type | Description |
 |------|-------------|
+| [`CompoundError`](types/compounderror.md) | A nested error that happened at a different location than the current context and has its own error message. |
 | [`Context`](types/context.md) | The parsing context, which changes as more of the input is parsed. |
-| [`Error`](types/error.md) | A single parsing error. |
 | [`ErrorList`](types/errorlist.md) | A list of parsing errors. |
 | [`ErrorType`](types/errortype.md) | The type of a parsing error, used to determine how it should be displayed in an error message. |
+| [`Formatter`](types/formatter.md) | A function that formats error information into a string. |
 | [`Input`](types/input.md) | Parser input text, which can be in one of several different forms. |
+| [`LocalError`](types/localerror.md) | A simple parsing error. |
+| [`NestedError`](types/nestederror.md) | An error that happened at a different location than the current context. |
 | [`Parser`](types/parser.md) | A function which actually performs parsing. |
 | [`Reply`](types/reply.md) | The state of a parser after it has performed its parsing, consisting of an updated context and a result. |
 | [`Result`](types/result.md) | The output of a parser, consisting of either a parsed value or a parsing error. |

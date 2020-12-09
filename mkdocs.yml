@@ -139,18 +139,21 @@ nav:
       - ok: tools/ok.md
       - other: tools/other.md
       - parse: tools/parse.md
-      - Parser: tools/parser.md
+      - parser: tools/parser.md
       - run: tools/run.md
       - status: tools/status.md
       - succeeded: tools/succeeded.md
       - success: tools/success.md
       - unexpected: tools/unexpected.md
     - Types:
+      - CompoundError: types.compounderror.md
       - Context: types/context.md
-      - Error: types/error.md
       - ErrorList: types/errorlist.md
       - ErrorType: types/errortype.md
+      - Formatter: types/formatter.md
       - Input: types/input.md
+      - LocalError: types/localerror.md
+      - NestedError: types/nestederror.md
       - Parser: types/parser.md
       - Reply: types/reply.md
       - Result: types/result.md

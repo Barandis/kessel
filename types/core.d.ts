@@ -1,14 +1,14 @@
 
 export function context(input: Input): Context;
 export function ok(ctx: Context, value?: T, index?: number): Reply<T>;
-export function fail(ctx: Context, errors?: ErrorList, index?: number): Reply<any>;
-export function fatal(ctx: Context, errors?: ErrorList, index?: number): Reply<any>;
-export function maybeFatal(test: boolean, ctx: Context, errors?: ErrorList, index?: number): Reply<any>;
+export function fail(ctx: Context, errors?: ErrorList, index?: number): Reply<null>;
+export function fatal(ctx: Context, errors?: ErrorList, index?: number): Reply<null>;
+export function maybeFatal(test: boolean, ctx: Context, errors?: ErrorList, index?: number): Reply<null>;
 export function parse(parser: Parser<T>, input: Input): Reply<T>;
 export function status(reply: Reply<any>): Status;
 export function succeeded(reply: Reply<any>): boolean;
-export function success(reply: Reply<T>): T;
-export function failure(reply: Reply<any>): string;
+export function success(reply: Reply<T>): T | null;
+export function failure(reply: Reply<any>): string | null;
 export function run(parser: Parser<T>, input: Input): T;
 export function parser(parser: Parser<T>): Parser<T>;
 
