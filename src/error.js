@@ -17,41 +17,41 @@ const tab = /\t/gu
 const zeroWidth = /(?:\p{Mn}|\p{Cf})/gu
 
 /**
- * A symbol defining the type of an error.
- * @enum {symbol}
+ * A string defining the type of an error.
+ * @enum {string}
  */
 export const ErrorType = {
   /**
    * Error type representing an expected result. Produced by the vast
    * majority of parsers.
    */
-  Expected: Symbol('expected'),
+  Expected: 'expected',
   /**
    * Error type representing a result that was not expected. Typically
    * produced by parsers such as `unexpected` and `notFollowedBy`.
    */
-  Unexpected: Symbol('unexpected'),
+  Unexpected: 'unexpected',
   /**
    * Error type representing a generic error message. Typically produced
    * by parsers such as `fail` and `failFatally`.
    */
-  Generic: Symbol('generic'),
+  Generic: 'generic',
   /**
    * Error type representing an error within another error. This is
    * generally used for an error that caused backtracking, where the
    * parent error is reported after backtracking.
    */
-  Nested: Symbol('nested'),
+  Nested: 'nested',
   /**
    * Error type representing a nested error with its own separate error
    * message. This is produced specifically by the `compound` parser.
    */
-  Compound: Symbol('compound'),
+  Compound: 'compound',
   /**
    * Error type representing some other kind of error message to be
    * displayed in a custom error formatter.
    */
-  Other: Symbol('other'),
+  Other: 'other',
 }
 
 /**

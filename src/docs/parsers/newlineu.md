@@ -17,11 +17,11 @@ Unicode newlines include the ASCII newlines `\r`, `\n`, and `\r\n`, as well as t
 const parser = newlineU
 
 const s = parse(parser, '\u2028Next line')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "\u2028"
 
 const f = parse(parser, 'abc')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // abc

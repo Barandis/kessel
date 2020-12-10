@@ -17,7 +17,7 @@ Note that this explicit failure parser is the only way to fail fatally without c
 const parser = failFatally('a letter please?')
 
 const t = parse(parser, '123')
-console.log(status(t))  // Symbol(fatal)
+console.log(status(t))  // "fatal"
 console.log(failure(t)) // Parse error at (line 1, column 1):
                         //
                         // 123

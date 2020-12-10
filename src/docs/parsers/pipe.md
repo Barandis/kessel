@@ -41,11 +41,11 @@ apply(p, apply(q, always(b => a => fn(a, b)))) // applicative style
 const parser = pipe(upper, lower, (a, b) => a.toLowerCase() + b.toUpperCase())
 
 const s = parse(parser, 'Abc')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "aB"
 
 const f = parse(parser, 'abc')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // abc
@@ -53,7 +53,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Expected an uppercase letter
 
 const t = parse(parser, 'ABC')
-console.log(status(t))  // Symbol(fatal)
+console.log(status(t))  // "fatal"
 console.log(failure(t)) // Parse error at (line 1, column 2):
                         //
                         // ABC

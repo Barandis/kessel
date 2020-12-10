@@ -26,11 +26,11 @@ A two-parser `sequenceB` is the same as [`andThenB`](andthenb.md).
 const parser = sequenceB(letter, digit, letter)
 
 const s = parse(parser, 'a1b')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // ["a", "1", "b"]
 
 const f = parse(parser, '11b')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // 11b
@@ -38,7 +38,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Expected a letter
 
 const t = parse(parser, 'a11')
-console.log(status(t))  // Symbol(fail)
+console.log(status(t))  // "fail"
 console.log(failure(t)) // Parse error at (line 1, column 1):
                         //
                         // a11

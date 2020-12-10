@@ -21,11 +21,11 @@ There is another version of this parser ([`applyB`](applyb.md)) that will backtr
 const parser = apply(left(letter, digit), always(c => c.toUpperCase()))
 
 const s = parse(parser, 'a1')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "A"
 
 const f = parse(parser, '1a')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // 1a
@@ -33,7 +33,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Expected a letter
 
 const t = parse(parser, 'abc')
-console.log(status(t))  // Symbol(fatal)
+console.log(status(t))  // "fatal"
 console.log(failure(t)) // Parse error at (line 1, column 2):
                         //
                         // abc

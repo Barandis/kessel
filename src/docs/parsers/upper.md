@@ -17,11 +17,11 @@ This does not parse UTF-8 uppercase letters in general. Use [`upperU`](upperu.md
 const parser = upper
 
 const s = parse(parser, 'ABC')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "A"
 
 const f = parse(parser, 'abc')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // abc

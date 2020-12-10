@@ -15,27 +15,27 @@ export function format(errors: ErrorList, index: number, view: DataView, tabSize
 export function formatErrors(ctx: Context, result: Result<any>, tabSize?: number, maxWidth?: number, formatter?: Formatter): string;
 export function getPosition(ctx: Context, tabSize?: number): { line: number, column: number };
 
-export type ErrorType = symbol;
+export type ErrorType = 'expected' | 'unexpected' | 'generic' | 'nested' | 'compound' | 'other';
 export namespace ErrorType {
-  const Expected: symbol;
-  const Unexpected: symbol;
-  const Generic: symbol;
-  const Nested: symbol;
-  const Compound: symbol;
-  const Other: symbol;
+  const Expected: 'expected';
+  const Unexpected: 'unexpected';
+  const Generic: 'generic';
+  const Nested: 'nested';
+  const Compound: 'compound';
+  const Other: 'other';
 }
 export type ErrorList = (NestedError | CompoundError | LocalError)[];
 export type LocalError = {
-  type: ErrorType;
+  type: 'expected' | 'unexpected' | 'generic' | 'other';
   label: string;
 };
 export type NestedError = {
-  type: ErrorType;
+  type: 'nested';
   ctx: Context;
   errors: ErrorList;
 };
 export type CompoundError = {
-  type: ErrorType;
+  type: 'compound';
   label: string;
   ctx: Context;
   errors: ErrorList;

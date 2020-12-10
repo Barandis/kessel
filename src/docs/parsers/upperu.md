@@ -19,11 +19,11 @@ A character is a Unicode titlecase character if it has the Unicode `Letter, Titl
 const parser = upperU
 
 const s = parse(parser, 'АБВ')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "A"
 
 const f = parse(parser, 'абв')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // абв

@@ -15,11 +15,11 @@ Parses a character if that character is included in `cs`.
 const parser = anyOf('Test')
 
 const s = parse(parser, 'Test')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "T"
 
 const f = parse(parser, 'Exit')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // Exit

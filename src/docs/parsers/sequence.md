@@ -28,11 +28,11 @@ A two-parser `sequence` is the same as [`andThen`](andthen.md).
 const parser = sequence(letter, digit, letter)
 
 const s = parse(parser, 'a1b')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // ["a", "1", "b"]
 
 const f = parse(parser, '11b')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // 11b
@@ -40,7 +40,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Expected a letter
 
 const t = parse(parser, 'a11')
-console.log(status(t))  // Symbol(fatal)
+console.log(status(t))  // "fatal"
 console.log(failure(t)) // Parse error at (line 1, column 3):
                         //
                         // a11

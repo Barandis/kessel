@@ -17,11 +17,11 @@ If this parser fails, it will add [`expected(msg)`](../tools/expected.md) as an 
 const parser = notFollowedByM(digit, 'something other than a digit')
 
 const s = parse(parser, 'a')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // null
 
 const f = parse(parser, '1')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // 1

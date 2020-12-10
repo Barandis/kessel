@@ -17,11 +17,11 @@ Parses a character between `s` and `e` (inclusive).
 const parser = range('0', '3')
 
 const s = parse(parser, '246')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "2"
 
 const f = parse(parser, '468')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // 468

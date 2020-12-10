@@ -19,11 +19,11 @@ This parser works only if `p` returns an array, and it returns the first element
 const parser = first(many1(any))
 
 const s = parse(parser, '12345')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "1"
 
 const f = parse(parser, '')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // 

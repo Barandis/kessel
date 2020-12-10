@@ -17,11 +17,11 @@ Applies a parser and succeeds without consuming input if that parser fails.
 const parser = notFollowedBy(digit)
 
 const s = parse(parser, 'a')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // null
 
 const f = parse(parser, '1')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // 1

@@ -17,11 +17,11 @@ Applies a parser as many times as possible until it fails, collecting the result
 const parser = many(right(digit, letter))
 
 const s = parse(parser, '1a2b')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // ["a", "b"]
 
 const t = parse(parser, '112b')
-console.log(status(t))  // Symbol(fatal)
+console.log(status(t))  // "fatal"
 console.log(failure(t)) // Parse error at (line 1, column 2):
                         //
                         // 112b

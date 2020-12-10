@@ -15,11 +15,11 @@ Parses a hexadecimal digit (`0-9`, `a-f`, or `A-F`).
 const parser = hex
 
 const s = parse(parser, 'cafe')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "c"
 
 const f = parse(parser, 'xyz')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // xyz

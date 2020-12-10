@@ -17,11 +17,11 @@ A character is a Unicode letter if it has the Unicode `Alphabetic` binary proper
 const parser = letterU
 
 const s = parse(parser, 'абв')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "а"
 
 const f = parse(parser, '123')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // 123

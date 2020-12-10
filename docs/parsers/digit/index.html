@@ -177,6 +177,19 @@
     <li class="md-tabs__item">
       
       
+      <a href="../../guide/intro/" class="md-tabs__link">
+        User's Guide
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    <li class="md-tabs__item">
+      
+      
         
       
       <a href="../../api/" class="md-tabs__link md-tabs__link--active">
@@ -266,18 +279,91 @@
       
       
 
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4" >
+    <label class="md-nav__link" for="nav-4">
+      User's Guide
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="User's Guide" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        <span class="md-nav__icon md-icon"></span>
+        User's Guide
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../guide/intro/" class="md-nav__link">
+      Introduction
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../guide/parsers/" class="md-nav__link">
+      1. A Parser is What
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../guide/running/" class="md-nav__link">
+      2. Running Parsers
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../guide/operation/" class="md-nav__link">
+      3. Parsers, How Do They Work?
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
   
 
 
   <li class="md-nav__item md-nav__item--active md-nav__item--nested">
     
-    <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4" checked>
-    <label class="md-nav__link" for="nav-4">
+    <input class="md-nav__toggle md-toggle" data-md-toggle="nav-5" type="checkbox" id="nav-5" checked>
+    <label class="md-nav__link" for="nav-5">
       API Reference
       <span class="md-nav__icon md-icon"></span>
     </label>
     <nav class="md-nav" aria-label="API Reference" data-md-level="1">
-      <label class="md-nav__title" for="nav-4">
+      <label class="md-nav__title" for="nav-5">
         <span class="md-nav__icon md-icon"></span>
         API Reference
       </label>
@@ -305,13 +391,13 @@
 
   <li class="md-nav__item md-nav__item--active md-nav__item--nested">
     
-    <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-2" type="checkbox" id="nav-4-2" checked>
-    <label class="md-nav__link" for="nav-4-2">
+    <input class="md-nav__toggle md-toggle" data-md-toggle="nav-5-2" type="checkbox" id="nav-5-2" checked>
+    <label class="md-nav__link" for="nav-5-2">
       Parsers
       <span class="md-nav__icon md-icon"></span>
     </label>
     <nav class="md-nav" aria-label="Parsers" data-md-level="2">
-      <label class="md-nav__title" for="nav-4-2">
+      <label class="md-nav__title" for="nav-5-2">
         <span class="md-nav__icon md-icon"></span>
         Parsers
       </label>
@@ -1525,13 +1611,13 @@
 
   <li class="md-nav__item md-nav__item--nested">
     
-    <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-3" type="checkbox" id="nav-4-3" >
-    <label class="md-nav__link" for="nav-4-3">
+    <input class="md-nav__toggle md-toggle" data-md-toggle="nav-5-3" type="checkbox" id="nav-5-3" >
+    <label class="md-nav__link" for="nav-5-3">
       Tools
       <span class="md-nav__icon md-icon"></span>
     </label>
     <nav class="md-nav" aria-label="Tools" data-md-level="2">
-      <label class="md-nav__title" for="nav-4-3">
+      <label class="md-nav__title" for="nav-5-3">
         <span class="md-nav__icon md-icon"></span>
         Tools
       </label>
@@ -1790,13 +1876,13 @@
 
   <li class="md-nav__item md-nav__item--nested">
     
-    <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-4" type="checkbox" id="nav-4-4" >
-    <label class="md-nav__link" for="nav-4-4">
+    <input class="md-nav__toggle md-toggle" data-md-toggle="nav-5-4" type="checkbox" id="nav-5-4" >
+    <label class="md-nav__link" for="nav-5-4">
       Types
       <span class="md-nav__icon md-icon"></span>
     </label>
     <nav class="md-nav" aria-label="Types" data-md-level="2">
-      <label class="md-nav__title" for="nav-4-4">
+      <label class="md-nav__title" for="nav-5-4">
         <span class="md-nav__icon md-icon"></span>
         Types
       </label>
@@ -2037,11 +2123,11 @@
 <div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">digit</span>
 
 <span class="kr">const</span> <span class="nx">s</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;123&#39;</span><span class="p">)</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">status</span><span class="p">(</span><span class="nx">s</span><span class="p">))</span>  <span class="c1">// Symbol(ok)</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">status</span><span class="p">(</span><span class="nx">s</span><span class="p">))</span>  <span class="c1">// &quot;ok&quot;</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">success</span><span class="p">(</span><span class="nx">s</span><span class="p">))</span> <span class="c1">// &quot;1&quot;</span>
 
 <span class="kr">const</span> <span class="nx">f</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;abc&#39;</span><span class="p">)</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">status</span><span class="p">(</span><span class="nx">f</span><span class="p">))</span>  <span class="c1">// Symbol(fail)</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">status</span><span class="p">(</span><span class="nx">f</span><span class="p">))</span>  <span class="c1">// &quot;fail&quot;</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">failure</span><span class="p">(</span><span class="nx">f</span><span class="p">))</span> <span class="c1">// Parse error at (line 1, column 1):</span>
                         <span class="c1">//</span>
                         <span class="c1">// abc</span>

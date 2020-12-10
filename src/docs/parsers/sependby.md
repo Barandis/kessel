@@ -19,11 +19,11 @@ The content parser need not be the last to match. If the separator parser succee
 const parser = sepEndBy(count(letter, 3), char(','))
 
 const s = parse(parser, 'aaa,bbb,ccc,')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // ["aaa", "bbb", "ccc"]
 
 const t = parse(parser, 'aaa,bbb,cc1,')
-console.log(status(t))  // Symbol(fatal)
+console.log(status(t))  // "fatal"
 console.log(failure(t)) // Parse error at (line 1, column 11):
                         //
                         // aaa,bbb,cc1

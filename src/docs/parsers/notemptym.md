@@ -17,11 +17,11 @@ If this parser fails, it will use [`expected(msg)`](../tools/expected.md) as an 
 const parser = notEmpty(optional(char('+')), 'something other than +')
 
 const s = parse(parser, '123')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // null
 
 const f = parse(parser, '+123')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // +123

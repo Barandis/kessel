@@ -30,19 +30,19 @@ If all parsers in `ps` fail, then `choice` fails as well.
 const parser = choice(left(letter, digit), right(digit, letter), space)
 
 const s = parse(parser, 'a1')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "a"
 
 const r = parse(parser, '1a')
-console.log(status(r))  // Symbol(ok)
+console.log(status(r))  // "ok"
 console.log(success(r)) // "a"
 
 const p = parse(parser, ' ')
-console.log(status(p))  // Symbol(ok)
+console.log(status(p))  // "ok"
 console.log(success(p)) // " "
 
 const f = parse(parser, '-a')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // -a
@@ -50,7 +50,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Expected a letter, a digit, or whitespace
 
 const t = parse(parser, 'a ')
-console.log(status(t))  // Symbol(fatal)
+console.log(status(t))  // "fatal"
 console.log(failure(t)) // Parse error at (line 1, column 1):
                         //
                         // a 

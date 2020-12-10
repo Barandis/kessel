@@ -15,11 +15,11 @@ Parses the character `c` or its opposite case equivalent. In other words, this i
 const parser = charI('a')
 
 const s = parse(parser, 'ABC')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "A"
 
 const f = parse(parser, 'BCD')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // BCD

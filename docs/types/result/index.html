@@ -177,6 +177,19 @@
     <li class="md-tabs__item">
       
       
+      <a href="../../guide/intro/" class="md-tabs__link">
+        User's Guide
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    <li class="md-tabs__item">
+      
+      
         
       
       <a href="../../api/" class="md-tabs__link md-tabs__link--active">
@@ -266,18 +279,91 @@
       
       
 
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4" >
+    <label class="md-nav__link" for="nav-4">
+      User's Guide
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="User's Guide" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        <span class="md-nav__icon md-icon"></span>
+        User's Guide
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../guide/intro/" class="md-nav__link">
+      Introduction
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../guide/parsers/" class="md-nav__link">
+      1. A Parser is What
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../guide/running/" class="md-nav__link">
+      2. Running Parsers
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../guide/operation/" class="md-nav__link">
+      3. Parsers, How Do They Work?
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
   
 
 
   <li class="md-nav__item md-nav__item--active md-nav__item--nested">
     
-    <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4" checked>
-    <label class="md-nav__link" for="nav-4">
+    <input class="md-nav__toggle md-toggle" data-md-toggle="nav-5" type="checkbox" id="nav-5" checked>
+    <label class="md-nav__link" for="nav-5">
       API Reference
       <span class="md-nav__icon md-icon"></span>
     </label>
     <nav class="md-nav" aria-label="API Reference" data-md-level="1">
-      <label class="md-nav__title" for="nav-4">
+      <label class="md-nav__title" for="nav-5">
         <span class="md-nav__icon md-icon"></span>
         API Reference
       </label>
@@ -303,13 +389,13 @@
 
   <li class="md-nav__item md-nav__item--nested">
     
-    <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-2" type="checkbox" id="nav-4-2" >
-    <label class="md-nav__link" for="nav-4-2">
+    <input class="md-nav__toggle md-toggle" data-md-toggle="nav-5-2" type="checkbox" id="nav-5-2" >
+    <label class="md-nav__link" for="nav-5-2">
       Parsers
       <span class="md-nav__icon md-icon"></span>
     </label>
     <nav class="md-nav" aria-label="Parsers" data-md-level="2">
-      <label class="md-nav__title" for="nav-4-2">
+      <label class="md-nav__title" for="nav-5-2">
         <span class="md-nav__icon md-icon"></span>
         Parsers
       </label>
@@ -1468,13 +1554,13 @@
 
   <li class="md-nav__item md-nav__item--nested">
     
-    <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-3" type="checkbox" id="nav-4-3" >
-    <label class="md-nav__link" for="nav-4-3">
+    <input class="md-nav__toggle md-toggle" data-md-toggle="nav-5-3" type="checkbox" id="nav-5-3" >
+    <label class="md-nav__link" for="nav-5-3">
       Tools
       <span class="md-nav__icon md-icon"></span>
     </label>
     <nav class="md-nav" aria-label="Tools" data-md-level="2">
-      <label class="md-nav__title" for="nav-4-3">
+      <label class="md-nav__title" for="nav-5-3">
         <span class="md-nav__icon md-icon"></span>
         Tools
       </label>
@@ -1735,13 +1821,13 @@
 
   <li class="md-nav__item md-nav__item--active md-nav__item--nested">
     
-    <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-4" type="checkbox" id="nav-4-4" checked>
-    <label class="md-nav__link" for="nav-4-4">
+    <input class="md-nav__toggle md-toggle" data-md-toggle="nav-5-4" type="checkbox" id="nav-5-4" checked>
+    <label class="md-nav__link" for="nav-5-4">
       Types
       <span class="md-nav__icon md-icon"></span>
     </label>
     <nav class="md-nav" aria-label="Types" data-md-level="2">
-      <label class="md-nav__title" for="nav-4-4">
+      <label class="md-nav__title" for="nav-5-4">
         <span class="md-nav__icon md-icon"></span>
         Types
       </label>
@@ -2001,10 +2087,10 @@
 -->
 
 <blockquote>
-<p><code>type Result&lt;T&gt; = { status: Status; value: T; errors: ErrorList; }</code></p>
+<p><code>type Result&lt;T&gt; = { status: 'ok'; value: T; } | { status: 'fail' | 'fatal'; errors: ErrorList; }</code></p>
 </blockquote>
 <p>The result produced by a parser. This can either be a success or a failure, depending on the values of the properties.</p>
-<p>If the result is a success, then <code>status</code> should be <code>Status.Ok</code> and <code>errors</code> should be an empty array. If the result is a failure, then <code>status</code> should be either <code>Status.Fail</code> or <code>Status.Fatal</code> and <code>value</code> should be <code>null</code>.</p>
+<p>If the result is a success, then <code>status</code> should be <code>Status.Ok</code> and <code>value</code> will have the parsed value (<code>errors</code> won't exist). If the result is a failure, then <code>status</code> should be either <code>Status.Fail</code> or <code>Status.Fatal</code> and <code>value</code> will not exist.</p>
 <p>This kind of emulates a <code>Either</code> type from Haskell by using <code>status</code> to determine which of <code>value</code> and <code>errors</code> is valid.</p>
 <h4 id="properties">Properties</h4>
 <ul>

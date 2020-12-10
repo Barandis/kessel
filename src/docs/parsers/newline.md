@@ -17,11 +17,11 @@ ASCII newlines include `\r`, `\n`, and `\r\n`.
 const parser = newline
 
 const s = parse(parser, '\r\nNext line')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "\r\n"
 
 const f = parse(parser, 'abc')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // abc

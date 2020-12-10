@@ -15,7 +15,7 @@ Parses the entire remaining input.
 const parser = all
 
 const s = parse(parser, 'content')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "content"
 ```
 

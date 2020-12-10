@@ -19,11 +19,11 @@ As long as `p` succeeds at least once, the only way `many1` can fail is if `p` f
 const parser = many1(right(digit, letter))
 
 const s = parse(parser, '1a2b')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // ["a", "b"]
 
 const f = parse(parser, 'aabb')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 2):
                         //
                         // aabb
@@ -31,7 +31,7 @@ console.log(failure(f)) // Parse error at (line 1, column 2):
                         // Expected a digit
 
 const t = parse(parser, '112b')
-console.log(status(t))  // Symbol(fatal)
+console.log(status(t))  // "fatal"
 console.log(failure(t)) // Parse error at (line 1, column 2):
                         //
                         // 112b

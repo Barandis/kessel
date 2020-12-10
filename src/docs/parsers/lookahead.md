@@ -19,11 +19,11 @@ This parser allows for peeking ahead to see what characters are coming up withou
 const parser = lookAhead(letter)
 
 const s = parse(parser, 'abc')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "a"
 
 const f = parse(parser, '123')
-console.log(status(f))  // Symbol(ok)
+console.log(status(f))  // "ok"
 console.log(success(f)) // null
 ```
 

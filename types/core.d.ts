@@ -16,17 +16,21 @@ export type Context = {
   view: DataView;
   index: number;
 };
-export type Status = symbol;
+export type Status = "ok" | "fail" | "fatal";
 export namespace Status {
-  const Ok: symbol;
-  const Fail: symbol;
-  const Fatal: symbol;
+  const Ok: "ok";
+  const Fail: "fail";
+  const Fatal: "fatal";
 }
-export type Result<T> = {
-  status: Status;
+export type Success<T> = {
+  status: "ok";
   value: T;
+};
+export type Failure = {
+  status: "fail" | "fatal";
   errors: ErrorList;
 };
+export type Result<T> = Success<T> | Failure;
 export type Reply<T> = [Context, Result<T>];
 export type TypedArray = Int8Array | Uint8Array | Uint8ClampedArray | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array;
 export type Input = string | ArrayBuffer | DataView | Int8Array | Uint8Array | Uint8ClampedArray | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array;

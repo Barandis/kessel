@@ -15,11 +15,11 @@ Matches the current input location against a regular expression pattern.
 const parser = regex(/^\d+/)
 
 const s = parse(parser, '123abc')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "123"
 
 const f = parse(parser, 'abc123')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // abc123

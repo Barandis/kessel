@@ -19,15 +19,15 @@ A common use case is to skip some optional input; in this case, `optional` can b
 const parser = optional(sequence(letter, digit))
 
 const s = parse(parser, 'a1')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // ["a", "1"]
 
 const r = parse(parser, '1')
-console.log(status(r))  // Symbol(ok)
+console.log(status(r))  // "ok"
 console.log(success(r)) // null
 
 const t = parse(parser, 'ab')
-console.log(status(t))  // Symbol(fatal)
+console.log(status(t))  // "fatal"
 console.log(failure(t)) // Parse error at (line 1, column 2):
                         //
                         // ab

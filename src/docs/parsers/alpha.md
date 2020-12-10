@@ -17,11 +17,11 @@ This does not parse UTF-8 alphanumeric characters in general. Use [`alphaU`](#al
 const parser = alpha
 
 const s = parse(parser, 'abc')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "a"
 
 const f = parse(parser, '---')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // ---

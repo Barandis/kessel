@@ -19,11 +19,11 @@ The content parser must be the last to match. If the separator parser succeeds b
 const parser = sepBy1(count(letter, 3), char(','))
 
 const s = parse(parser, 'aaa,bbb,ccc')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // ["aaa", "bbb", "ccc"]
 
 const f = parse(parser, '111')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // 111
@@ -31,7 +31,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Expected a letter
 
 const t = parse(parser, 'aaa,bbb,cc1')
-console.log(status(t))  // Symbol(fatal)
+console.log(status(t))  // "fatal"
 console.log(failure(t)) // Parse error at (line 1, column 11):
                         //
                         // aaa,bbb,cc1

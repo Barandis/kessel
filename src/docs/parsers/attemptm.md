@@ -21,11 +21,11 @@ Note that this is slightly different than other `xxxM` parsers because `msg` doe
 const parser = attemptM(left(letter, digit), 'a letter and then a digit')
 
 const s = parse(parser, 'a1')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "a"
 
 const f = parse(parser, '1a')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // 1a
@@ -33,7 +33,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Expected a letter and then a digit
 
 const t = parse(parser, 'ab')
-console.log(status(t))  // Symbol(fail)
+console.log(status(t))  // "fail"
 console.log(failure(t)) // Parse error at (line 1, column 1):
                         //
                         // ab

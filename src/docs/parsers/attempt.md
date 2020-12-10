@@ -19,11 +19,11 @@ Take care when using this parser. It attempts to provide information about what 
 const parser = attempt(left(letter, digit))
 
 const s = parse(parser, 'a1')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "a"
 
 const f = parse(parser, '12')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // 12
@@ -31,7 +31,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Expected a letter
 
 const b = parse(parser, 'ab')
-console.log(status(b))  // Symbol(fail)
+console.log(status(b))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // ab

@@ -19,7 +19,7 @@ This parser serves both as the `pure` member of the `Applicative` type class and
 const parser = always(3.14)
 
 const s = parse(parser, 'abc')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // 3.14
 ```
 

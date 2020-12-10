@@ -19,11 +19,11 @@ Applies a parser and, if it succeeds, returns another value.
 const parser = value(string('""'), '"')
 
 const s = parse(parser, '""')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) / "\""
 
 const f = parse(parser, '"')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // "

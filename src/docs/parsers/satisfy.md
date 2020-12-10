@@ -17,11 +17,11 @@ Since the parser cannot reasonably figure out what conditions cause `fn` to pass
 const parser = satisfy(x => x === x.toUpperCase())
 
 const s = parse(parser, 'ABC')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "A"
 
 const f = parse(parser, 'abc')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // abc

@@ -17,7 +17,7 @@ A character is a Unicode whitespace character if it has the Unicode `White_Space
 const parser = spacesU
 
 const s = parse(parser, '   abc')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // null
 ```
 

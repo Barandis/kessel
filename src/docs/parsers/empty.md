@@ -17,7 +17,7 @@ This primarily exists for completeness, as it corresponds to the same-named oper
 const parser = empty
 
 const s = parse(empty, 'abc')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // null
 ```
 

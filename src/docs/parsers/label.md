@@ -19,11 +19,11 @@ This is typically used to clarify error messages, especially in parsers like [`c
 const parser = label(choice(upper, lower, digit), 'an alphanumeric character')
 
 const s = parse(parser, 'abc')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "a"
 
 const f = parse(parser, ' abc ')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         //  abc 

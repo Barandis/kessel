@@ -15,11 +15,11 @@ Parses a character for which predicate `fn` returns `true` when passed that char
 const parser = satisfyM(x => x === x.toUpperCase(), 'an uppercase letter')
 
 const s = parse(parser, 'ABC')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "A"
 
 const f = parse(parser, 'abc')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // abc

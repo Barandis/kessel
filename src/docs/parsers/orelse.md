@@ -21,15 +21,15 @@ In parser packages in other languages that support custom operators, `orElse` is
 const parser = orElse(left(letter, digit), right(digit, letter))
 
 const s = parse(parser, 'a1')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "a"
 
 const r = parse(parser, '1a')
-console.log(status(r))  // Symbol(ok)
+console.log(status(r))  // "ok"
 console.log(success(r)) // "a"
 
 const f = parse(parser, ' a')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         //  a
@@ -37,7 +37,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Expected a letter or a digit
 
 const t = parse(parser, 'a ')
-console.log(status(t))  // Symbol(fatal)
+console.log(status(t))  // "fatal"
 console.log(failure(t)) // Parse error at (line 1, column 1):
                         //
                         // a 

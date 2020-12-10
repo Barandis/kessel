@@ -26,6 +26,11 @@ nav:
   - Home: index.md
   - Overview: overview.md
   - Installation: installation.md
+  - "User's Guide":
+    - Introduction: guide/intro.md
+    - '1. A Parser is What': guide/parsers.md
+    - '2. Running Parsers': guide/running.md
+    - '3. Parsers, How Do They Work?': guide/operation.md
   - 'API Reference':
     - Summary: api.md
     - Parsers:

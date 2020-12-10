@@ -23,11 +23,11 @@ There is another version of this parser, [`betweenB`](betweenb.md), which backtr
 const parser = between(char('"'), char('"'), join(many(noneOf('"'))))
 
 const s = parse(parser, '"test"')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "test"
 
 const f = parse(parser, 'test"')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // test"
@@ -35,7 +35,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Expected '"'
 
 const t = parse(parser, '"test')
-console.log(status(t))  // Symbol(fatal)
+console.log(status(t))  // "fatal"
 console.log(failure(t)) // Parse error at (line 1, column 6):
                         //
                         // "test

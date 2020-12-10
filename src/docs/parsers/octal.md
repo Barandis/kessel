@@ -15,11 +15,11 @@ Parses an octal digit (`0-7`).
 const parser = octal
 
 const s = parse(parser, '123')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "1"
 
 const f = parse(parser, '890')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // 890

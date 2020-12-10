@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `type LocalError = { type: ErrorType; msg: string; }`
+> `type LocalError = { type: 'expected' | 'unexpected' | 'generic' | 'other'; msg: string; }`
 
 An error that happens at a location indicated by an associated context.
 

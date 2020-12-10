@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `type NestedError = { type: ErrorType; ctx: Context; errors: ErrorList }`
+> `type NestedError = { type: 'nested'; ctx: Context; errors: ErrorList }`
 
 An error that happens at a different location than that provided by the associated context.
 

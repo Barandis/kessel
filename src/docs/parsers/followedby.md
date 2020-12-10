@@ -19,11 +19,11 @@ This parser is similar to [`lookAhead`](lookahead.md) except that it does not pr
 const parser = followedBy(digit)
 
 const s = parse(parser, '1')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // null
 
 const f = parse(parser, 'a')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // a

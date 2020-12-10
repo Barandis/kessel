@@ -28,16 +28,16 @@ function isTypedArray(value) {
 }
 
 /**
- * A symbol representing the status of the last parsing operation.
- * @enum {symbol}
+ * A string representing the status of the last parsing operation.
+ * @enum {string}
  */
 export const Status = {
   /** Indicates that the last parse was successful. */
-  Ok: Symbol('ok'),
+  Ok: 'ok',
   /** Indicates that the last parse failed without consuming input. */
-  Fail: Symbol('fail'),
+  Fail: 'fail',
   /** Indicates that the last parse failed and consumed input. */
-  Fatal: Symbol('fatal'),
+  Fatal: 'fatal',
 }
 
 /**

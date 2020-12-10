@@ -26,7 +26,7 @@ const op = orElse(
 const parser = assocL(number, op, 0)
 
 const s = parse(parser, '12-34+56')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // 34
 ```
 

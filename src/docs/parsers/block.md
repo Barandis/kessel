@@ -33,11 +33,11 @@ const parser = block(function *() {
 })
 
 const s = parse(parser, '   1729   ')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // 1729
 
 const f = parse(parser, 'abcd')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // abcd
@@ -45,7 +45,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Expected a digit
 
 const t = parse(parser, '-abcd')
-console.log(status(t))  // Symbol(fatal)
+console.log(status(t))  // "fatal"
 console.log(failure(t)) // Parse error at (line 1, column 2):
                         //
                         // -abcd

@@ -15,11 +15,11 @@ Parses a string that is `n` characters long.
 const parser = anyString(3)
 
 const s = parse(parser, 'abcdef')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "abc"
 
 const f = parse(parser, 'ab')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // ab

@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `type CompoundError = { type: ErrorType; msg: string; ctx: Context; errors: ErrorList }`
+> `type CompoundError = { type: 'compound'; msg: string; ctx: Context; errors: ErrorList }`
 
 An error that happens at a different location than that provided by the associated context.
 

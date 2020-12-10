@@ -17,11 +17,11 @@ If `p` succeeds but the parser that is returned by `fn` fails, the state will ba
 const parser = chainB(any, c => char(c))
 
 const s = parse(parser, 'aabbcc')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "a"
 
 const f = parse(parser, '')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // 
@@ -30,7 +30,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Note: failure occurred at the end of input
 
 const t = parse(parser, 'abc')
-console.log(status(t))  // Symbol(fail)
+console.log(status(t))  // "fail"
 console.log(failure(t)) // Parse error at (line 1, column 1):
                         //
                         // abc

@@ -17,11 +17,11 @@ ASCII whitespace characters include any ASCII newline (`\r`, `\n`, or `\r\n`) al
 const parser = space
 
 const s = parse(parser, '   abc')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // " "
 
 const f = parse(parser, 'abc   ')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // abc   

@@ -17,11 +17,11 @@ A character is a Unicode lowercase letter if it has the Unicode `Lowercase`. Thi
 const parser = lowerU
 
 const s = parse(parser, 'абв')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "а"
 
 const f = parse(parser, 'АБВ')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // АБВ

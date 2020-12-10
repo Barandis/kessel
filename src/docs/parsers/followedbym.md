@@ -19,11 +19,11 @@ If `followedByM` fails, it will add a [`expected(msg)`](../tools/expected.md) as
 const parser = followedByM(digit, 'a digit')
 
 const s = parse(parser, '1')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // null
 
 const f = parse(parser, 'a')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // a

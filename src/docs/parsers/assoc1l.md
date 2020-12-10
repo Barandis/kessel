@@ -26,11 +26,11 @@ const op = orElse(
 const parser = assoc1L(number, op)
 
 const s = parse(parser, '12-34+56')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // 34
 
 const f = parse(parser, 'ab-cd+ef')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // ab-cd+ef

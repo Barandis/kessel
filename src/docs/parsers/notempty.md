@@ -19,11 +19,11 @@ This parser cannot produce a useful error message. To provide a custom message, 
 const parser = notEmpty(optional(char('+')))
 
 const s = parse(parser, '123')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // null
 
 const f = parse(parser, '+123')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // +123

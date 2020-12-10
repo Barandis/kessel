@@ -19,11 +19,11 @@ If `str` is the empty string, the parser will automatically succeed and consume 
 const parser = stringI('Test')
 
 const s = parse(parser, 'testing')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "test"
 
 const f = parse(parser, 'oops')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // oops

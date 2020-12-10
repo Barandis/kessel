@@ -21,11 +21,11 @@ There is another version of this parser ([`chainB`](chainb.md)) that will backtr
 const parser = chain(any, c => char(c))
 
 const s = parse(parser, 'aabbcc')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "a"
 
 const f = parse(parser, '')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // 
@@ -34,7 +34,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Note: failure occurred at the end of input
 
 const t = parse(parser, 'abc')
-console.log(status(t))  // Symbol(fatal)
+console.log(status(t))  // "fatal"
 console.log(failure(t)) // Parse error at (line 1, column 2):
                         //
                         // abc

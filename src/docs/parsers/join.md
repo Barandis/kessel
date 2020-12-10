@@ -19,11 +19,11 @@ This combinator solves the problem in JavaScript that there is no separate chara
 const parser = join(many1(any))
 
 const s = parse(parser, 'abcde')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "abcde"
 
 const f = parse(parser, '')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // 

@@ -19,11 +19,11 @@ Applies a parser and returns the value that a function returns when passed the p
 const parser = map(lower, c => c.toUpperCase())
 
 const s = parse(parser, 'abc')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "A"
 
 const f = parse(parser, 'ABC')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // ABC

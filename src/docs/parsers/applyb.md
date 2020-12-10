@@ -17,11 +17,11 @@ If `p` succeeds but `f` fails, the parser will backtrack to the location where `
 const parser = applyB(left(letter, digit), always(c => c.toUpperCase()))
 
 const s = parse(parser, 'a1')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "A"
 
 const f = parse(parser, '1a')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // 1a
@@ -29,7 +29,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Expected a letter
 
 const t = parse(parser, 'abc')
-console.log(status(t))  // Symbol(fail)
+console.log(status(t))  // "fail"
 console.log(failure(t)) // Parse error at (line 1, column 1):
                         //
                         // abc

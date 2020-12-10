@@ -19,11 +19,11 @@ If any of the parsers fails after some input was consumed, the state will be bac
 const parser = betweenB(char('"'), char('"'), join(many(noneOf('"'))))
 
 const s = parse(parser, '"test"')
-console.log(status(s))  // Symbol(ok)
+console.log(status(s))  // "ok"
 console.log(success(s)) // "test"
 
 const f = parse(parser, 'test"')
-console.log(status(f))  // Symbol(fail)
+console.log(status(f))  // "fail"
 console.log(failure(f)) // Parse error at (line 1, column 1):
                         //
                         // test"
@@ -31,7 +31,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Expected '"'
 
 const t = parse(parser, '"test')
-console.log(status(t))  // Symbol(fail)
+console.log(status(t))  // "fail"
 console.log(failure(t)) // Parse error at (line 1, column 1):
                         //
                         // "test
