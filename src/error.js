@@ -724,8 +724,8 @@ export function format(
  * defaults to 8 in the default formatter) and max width (for the error
  * message itself; defaults to 72 in the default formatter).
  *
- * @param {Context} ctx The parser's context when the error happened.
- * @param {Result} result The result produced when the error happened.
+ * @param {Reply} reply The reply returned by the parser when the error
+ *     happened.
  * @param {number} [tabSize] A number whose multiples define where tabs
  *     stop.
  * @param {number} [maxWidth] The maximum width of the line being
@@ -734,9 +734,8 @@ export function format(
  * @param {Formatter} [formatter=format] The function to which the
  *     actual formatting is delegated.
  */
-export function formatErrors(
-  ctx, result, tabSize, maxWidth, formatter = format,
-) {
+export function formatErrors(reply, tabSize, maxWidth, formatter = format) {
+  const [ctx, result] = reply
   const { index, view } = ctx
   return formatter(result.errors, index, view, tabSize, maxWidth)
 }

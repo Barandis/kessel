@@ -4,7 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import { formatErrors } from './error'
-import { stringToView, track } from './util'
+import { stringToView, track, twin } from './util'
 
 /** @typedef {import('./error.js').ErrorList} ErrorList */
 
@@ -282,7 +282,7 @@ export function success(reply) {
  *     the parser failure.
  */
 export function failure(reply) {
-  return succeeded(reply) ? null : formatErrors(...reply)
+  return succeeded(reply) ? null : formatErrors(reply)
 }
 
 /**
@@ -300,9 +300,9 @@ export function failure(reply) {
  *     detailed record of where the error occurred.
  */
 export function run(parser, input) {
-  const [ctx, result] = parser(context(input))
+  const [reply, [_, result]] = twin(parser(context(input)))
   if (result.status === Status.Ok) {
     return result.value
   }
-  throw new Error(formatErrors(ctx, result))
+  throw new Error(formatErrors(reply))
 }

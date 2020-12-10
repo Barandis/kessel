@@ -640,33 +640,34 @@ describe('Parse errors', () => {
 
     describe('formatErrors', () => {
       const input = '\t\tOnomatopoeia'
-      const state = context(input)
-      state.index = 4
+      const ctx = context(input)
+      ctx.index = 4
       const result = {
         errors: expected('a digit'),
         status: Status.Fail,
       }
+      const reply = [ctx, result]
 
       it('formats errors using default settings', () => {
         const exp = 'Parse error at (line 1, column 19):\n\n'
                   + '                Onomatopoeia\n'
                   + '                  ^\n'
                   + 'Expected a digit\n\n'
-        expect(formatErrors(state, result)).to.equal(exp)
+        expect(formatErrors(reply)).to.equal(exp)
       })
       it('formats errors using a custom tab size', () => {
         const exp = 'Parse error at (line 1, column 11):\n\n'
                   + '        Onomatopoeia\n'
                   + '          ^\n'
                   + 'Expected a digit\n\n'
-        expect(formatErrors(state, result, 4)).to.equal(exp)
+        expect(formatErrors(reply, 4)).to.equal(exp)
       })
       it('formats errors using a custom line length', () => {
         const exp = 'Parse error at (line 1, column 11):\n\n'
                   + '        Onom...\n'
                   + '          ^\n'
                   + 'Expected a digit\n\n'
-        expect(formatErrors(state, result, 4, 15)).to.equal(exp)
+        expect(formatErrors(reply, 4, 15)).to.equal(exp)
       })
       it('formats errors using a custom formatting function', () => {
         const fn = (errors, index, view, tabSize = 8, maxWidth = 72) =>
@@ -675,7 +676,7 @@ describe('Parse errors', () => {
           }\n${tabSize}\n${maxWidth}`
         const exp = 'a digit\n4\n14\n8\n72'
         expect(
-          formatErrors(state, result, undefined, undefined, fn),
+          formatErrors(reply, undefined, undefined, fn),
         ).to.equal(exp)
       })
     })
