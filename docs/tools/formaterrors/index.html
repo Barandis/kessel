@@ -2101,16 +2101,15 @@
 -->
 
 <blockquote>
-<p><code>formatErrors(ctx: Context, result: Result&lt;any&gt;, tabSize?: number, maxWidth?: number, formatter?: Formatter): string</code></p>
+<p><code>formatErrors(reply: Reply&lt;any&gt;, tabSize?: number, maxWidth?: number, formatter?: Formatter): string</code></p>
 </blockquote>
-<p>Formats a context and result into a string. There is a default formatter, but a custom formatter can be supplied if necessary.</p>
-<p>The default formatter calculates the line and column based on the context, includes all or part of the parsed line where the error happened, and displays a caret that points to the location of that error. Below that, unexpected, expected, generic, compound, and nested errors are displayed, in that order.</p>
+<p>Formats a failed reply into a string. There is a default formatter, but a custom formatter can be supplied if necessary.</p>
+<p>The default formatter calculates the line and column based on the reply, includes all or part of the parsed line where the error happened, and displays a caret that points to the location of that error. Below that, unexpected, expected, generic, compound, and nested errors are displayed, in that order.</p>
 <p>Every error case in the examples found on the parser API pages illustrates how that error would be formatted by the default formatter.</p>
 <p>To use a custom formatter, a new function that conforms to the <a href="../../types/formatter/"><code>Formatter</code></a> should be passed in as the <code>formatter</code> parameter. This function is responsible for both formatting and for the setting of default values for <code>tabSize</code> and <code>maxWidth</code>.</p>
 <h4 id="parameters">Parameters</h4>
 <ul>
-<li><code>ctx</code>: The context defining the location where the error(s) to be formatted occurred. In the default formatter, this is used to calculate the line and column in the text where the error happened, as well as to provide the text around that location.</li>
-<li><code>result</code>: The result object holding the error(s) that occurred at the context location.</li>
+<li><code>reply</code>: The failed reply returned from a parser, used to calculate the location of the error and the reason(s) why it happened.</li>
 <li><code>tabSize</code>: The size of tab stops, used to determine how tab characters (<code>'\t'</code>) are formatted. In the default formatter, this does not define the size of the tab; it and its multiples become the column numbers where tabs terminate. The default tab size in the default formatter is 8.</li>
 <li><code>maxWidth</code>: The maximum width of a line that is displayed in the error message. This controls only whether the line is truncated in the error message. The default max width in the default formatter is 72.</li>
 <li><code>formatter</code>: A formatting function that actually performs the formatting. The default formatter is a function not provided through the API, but the presence of this parameter allows an alternate formatting function to be used instead.</li>
@@ -2121,8 +2120,8 @@
 </ul>
 <h4 id="see-also">See Also</h4>
 <ul>
-<li><a href="../../types/context/"><code>Context</code></a></li>
 <li><a href="../../types/formatter/"><code>Formatter</code></a></li>
+<li><a href="../../types/reply/"><code>Reply</code></a></li>
 <li><a href="../getposition/"><code>getPosition</code></a></li>
 </ul>
                 

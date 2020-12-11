@@ -372,6 +372,20 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#the-result-object" class="md-nav__link">
+    The result object
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reply-what-is-it-good-for" class="md-nav__link">
+    Reply, what is it good for?
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2048,6 +2062,20 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#the-result-object" class="md-nav__link">
+    The result object
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reply-what-is-it-good-for" class="md-nav__link">
+    Reply, what is it good for?
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2079,11 +2107,45 @@
     view: DataView { byteLength: 6, byteOffset: 0, buffer: [ArrayBuffer] },
     index: 1
   },
-  { status: Symbol(ok), value: &#39;a&#39; }
+  { status: &#39;ok&#39;, value: &#39;a&#39; }
 ]
 </code></pre></div>
 <p>Okay, that's a little different than what <code>run</code> returns (which is...well, <code>'a'</code>). Here we have an array of two objects. One might reasonably guess that this is the famous <code>[Context, Result&lt;T&gt;]</code> tuple that we've talked about already, and one would be right. So the first object here is the updated context &mdash; but where's the text? Didn't we say the context is just the input text with some position information?</p>
 <p>To explain this, we're going to have to talk briefly about character encodings.</p>
+<p>UTF-8 is the standard for character encoding these days. It assigns each character one to four bytes, depending on the character; commonly-used characters tend to be smaller. This lets text be stored in as small a space as possible, on average, while still having enough assignments to cover all of the characters in the world's languages (with plenty of room for emojis left over).</p>
+<p>But JavaScript was designed before UTF-8 was a thing. Its characters are encoded in a two-byte-per-character encoding called UCS-2, with some UTF-16-like extensions that give it some four-byte characters. This isn't compatible with UTF-8, which means if Kessel was to support UTF-8, it couldn't use regular JavaScript strings.</p>
+<p>So when <code>parse</code> or <code>run</code> creates a context, it converts the UCS-2 string sent to it into an array of UTF-8 encoded bytes and stores this array as its input text. It's present in the context object shown above; it's the <code>buffer</code> in the <code>view</code> property (the <code>DataView</code> is just an interface to make it easier for Kessel to access the byte array). When a parse result is found, Kessel converts the UTF-8 bytes for the result <em>back</em> to a JavaScript string, and that's what becomes the result.</p>
+<p>The other part of the context is its <code>index</code>. This is the index (in the UTF-8 byte array) of the first byte of the character that will be read the next time a parser is applied to the input. It's a <em>byte</em> index, not a <em>character</em> index; if a parser reads a 3-byte character out of the array, the index will go up by 3.</p>
+<h2 id="the-result-object">The result object</h2>
+<p>There's one more part of the reply, which is the result. This is the second object in the tuple that <code>parse</code> returns:</p>
+<div class="highlight"><pre><span></span><code>{ status: &#39;ok&#39;, value: &#39;a&#39; }
+</code></pre></div>
+<p>This isn't nearly so difficult to figure out: the <code>status</code> indicates that the parse seemed to go okay, and the <code>value</code> is the actual parsed value. What does it look like when a parse fails?</p>
+<div class="highlight"><pre><span></span><code>&gt; K.parse(K.letter, &#39;123456&#39;)
+[
+  {
+    view: DataView { byteLength: 6, byteOffset: 0, buffer: [ArrayBuffer] },
+    index: 0
+  },
+  { status: &#39;fail&#39;, errors: [ [Object] ] }
+]
+</code></pre></div>
+<p>There's only one small difference in the context; the <code>index</code> is 0 instead of 1, indicating that nothing was consumed by the parse. And this makes sense; if a basic parser doesn't find the input it expects, it consumes nothing and results in a parse error. (Combinators can be different than parsers here, but we'll talk about that later.)</p>
+<p>On the other hand, the result is quite different. First, the <code>status</code> tells us that something went wrong, and there is no <code>value</code> at all, having been replaced by some property called <code>errors</code> that has an array of objects.</p>
+<p>This <code>errors</code> property, as the name suggests, is where the reply stores informaiton about any errors that occurred. Those errors are not plain text, and they do not make up a pretty error message like <code>run</code> threw, but this reply contains everything that's needed to <em>make</em> that message.</p>
+<p>A result will have either a <code>value</code> property if it was successful or an <code>errors</code> property if it was not.</p>
+<h2 id="reply-what-is-it-good-for">Reply, what is it good for?</h2>
+<p>So why would you use <code>parse</code> instead of <code>run</code>, when the latter returns things that are so much simpler?</p>
+<p>There are a few reasons. Your parser might be part of a larger program. If it is, then you might parts of the reply other than the parsed value, or perhaps you would prefer to have failure not throw an error. Perhaps you want to create your own custom error messages. Maybe you have need for some other code to track your context. Or maybe you just want to have extra control over what comes out of a parser.</p>
+<p>Whatever the reason, there are a few functions that take a <code>Reply</code> object specifically and are designed mostly for use right alongside <code>parse</code> itself.</p>
+<ul>
+<li><a href="../../tools/succeeded/"><code>succeeded</code></a> returns <code>true</code> or <code>false</code> to tell whether a parse succeeded,</li>
+<li><a href="../../tools/status/"><code>status</code></a> returns <code>'ok'</code>, <code>'fail'</code>, or <code>'fatal'</code> (which we'll talk about later) to tell how a parse went,</li>
+<li><a href="../../tools/success/"><code>success</code></a> returns the resulting value, just like <code>run</code> does, but returns <code>null</code> on failure instead of throwing an error,</li>
+<li><a href="../../tools/failure/"><code>failure</code></a> returns a formatted error message, just as the one in <code>run</code>'s thrown error, if a parser fails.</li>
+</ul>
+<p>Finally, there is <a href="../../tools/formaterrors/"><code>formatErrors</code></a>, which produces the same error message that <code>run</code> and <code>failure</code> do. It also has some options that aren't available through <code>run</code> or <code>failure</code>, including the ability to provide a custom formatting function.</p>
+<p>With these tools to make working with replies easier, the choice between <code>run</code> and <code>parse</code> can often just come down to personal preference.</p>
                 
               
               
