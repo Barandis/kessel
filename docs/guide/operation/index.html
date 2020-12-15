@@ -2191,7 +2191,12 @@ undefined
 <li>You want the added detail for any number of other reasons.</li>
 </ol>
 <p>If you choose to use <code>parse</code> in a particular application, there are some helpful functions to smooth over some of the details. All of them take the return value of <code>parse</code> and pick out some piece of it.</p>
-<p><a href="../../tools/success/"><code>success</code></a> returns the same thing as <code>run</code> does, except that it returns <code>null</code> on failure rather than throwing an exception. <a href="../../tools/failure/"><code>failure</code></a> does the opposite; it returns an error message on failure and returns <code>null</code> on success (again, no exception is thrown). <a href="../../tools/succeeded/"><code>succeeded</code></a> returns <code>true</code> if the parse was successful and <code>false</code> if it was not, while <a href="../../tools/status/"><code>status</code></a> returns <code>'ok'</code>, <code>'fail'</code>, or <code>'fatal'</code> to tell how the parse went. (We'll talk about <code>'fatal'</code> later in the guide.)</p>
+<ul>
+<li><a href="../../tools/success/"><code>success</code></a> returns the same thing as <code>run</code> does, except that it returns <code>null</code> on failure rather than throwing an exception. </li>
+<li><a href="../../tools/failure/"><code>failure</code></a> does the opposite; it returns an error message on failure and returns <code>null</code> on success (again, no exception is thrown). </li>
+<li><a href="../../tools/succeeded/"><code>succeeded</code></a> returns <code>true</code> if the parse was successful and <code>false</code> if it was not. </li>
+<li><a href="../../tools/status/"><code>status</code></a> returns <code>'ok'</code>, <code>'fail'</code>, or <code>'fatal'</code> to tell how the parse went. (We'll talk about <code>'fatal'</code> later in the guide.)</li>
+</ul>
 <p>Finally, there is <a href="../../tools/formaterrors/"><code>formatErrors</code></a>. This takes a failed reply and returns a detailed error message; it's the same error message that both <code>run</code> and <code>failure</code> use. Using <code>formatErrors</code> grants you access to more options, including the ability to send a custom formatting function in case you want something different out of the error messages. (See <a href="../../types/formatter/"><code>Formatter</code></a> for information about what that function has to look like.)</p>
 <p>So that's a pretty deep dive into parser internals, but at this point we've done nothing more than parse a single letter off the front of a string. Let's face it, that's not very useful. In the next chapter, we'll start to address that.</p>
 <div class="footnote">

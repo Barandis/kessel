@@ -159,7 +159,10 @@ Fact is, you may find that `run` is indeed best for you. But there are certainly
 
 If you choose to use `parse` in a particular application, there are some helpful functions to smooth over some of the details. All of them take the return value of `parse` and pick out some piece of it.
 
-[`success`](../tools/success.md) returns the same thing as `run` does, except that it returns `null` on failure rather than throwing an exception. [`failure`](../tools/failure.md) does the opposite; it returns an error message on failure and returns `null` on success (again, no exception is thrown). [`succeeded`](../tools/succeeded.md) returns `true` if the parse was successful and `false` if it was not, while [`status`](../tools/status.md) returns `'ok'`, `'fail'`, or `'fatal'` to tell how the parse went. (We'll talk about `'fatal'` later in the guide.)
+* [`success`](../tools/success.md) returns the same thing as `run` does, except that it returns `null` on failure rather than throwing an exception. 
+* [`failure`](../tools/failure.md) does the opposite; it returns an error message on failure and returns `null` on success (again, no exception is thrown). 
+* [`succeeded`](../tools/succeeded.md) returns `true` if the parse was successful and `false` if it was not. 
+* [`status`](../tools/status.md) returns `'ok'`, `'fail'`, or `'fatal'` to tell how the parse went. (We'll talk about `'fatal'` later in the guide.)
 
 Finally, there is [`formatErrors`](../tools/formaterrors.md). This takes a failed reply and returns a detailed error message; it's the same error message that both `run` and `failure` use. Using `formatErrors` grants you access to more options, including the ability to send a custom formatting function in case you want something different out of the error messages. (See [`Formatter`](../types/formatter.md) for information about what that function has to look like.)
 
