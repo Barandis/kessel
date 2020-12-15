@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-We all probably have a vague notion of what a parser is: it's some code that reads a piece of a longer string of text. By that reckoning, this might be the world's simplest parser:
+Most programmers probably have a good intuitive idea of what a parser is: it's some code that reads a piece of a longer string of text. By that reckoning, this might be the world's simplest parser:
 
 ```javascript
 const parser = text => {
@@ -14,27 +14,41 @@ const parser = text => {
 }
 ```
 
-This simple little function strips the first character off the text and returns it along with the rest of the unparsed text. It matches any character, so it's like Kessel's [`any`](../parsers/any.md) parser. This example parser doesn't handle parsing errors (what happens when text is the empty string?) and is pretty simplistic with what it can work with, but it shares a surprising amount with a Kessel parser.
+This simple little function strips the first character off the text and returns it along with the rest of the unparsed text (which can then have the parser called on it again). It matches any character, so it's like Kessel's [`any`](../parsers/any.md) parser. This example parser doesn't handle parsing errors (what happens when text is the empty string?) and is pretty simplistic with what it can work with, but it shares a surprising amount with a Kessel parser.
 
-The type of the example parser is `(text: string) => [string, string]`. It takes a string and returns a tuple of two strings, one for the parsed character and one for the remaining text.
+The TypeScript type of the example parser is `(text: string) => [string, string]`. It takes a string and returns a tuple of two strings, one for the parsed character and one for the remaining text.
 
 !!! note "Tuples"
     JavaScript, of course, doesn't have tuples. However, its arrays act very much like tuples in that, unlike most other languages, they can have elements of different types. We consistently use the term *tuple* when using arrays like this.
 
-The type of a Kessel parser is quite similar:
+The TypeScript type of a Kessel parser is very similar:
 
-```type Parser<T> = (ctx: Context) => [Context, Result<T>]```
+```Parser<T> = (ctx: Context) => [Context, Result<T>]```
 
-A parser in Kessel is a function which takes a *context* as an argument. It returns an updated context, along with a result. These types are just enhanced versions of what is in the simple parser; a context is basically text along with information about the location of the next character to be parsed, and a result is either the parsed value (if the parser was successful) or error information (if it was not).
+A parser in Kessel is a function which takes a *context* as an argument. It returns an updated context, along with a result. These types are just enhanced versions of what is in the simple parser; a context is just the input text along with information about the current parsing location within that text, and a result is either the parsed value (if the parser was successful) or error information (if it was not).
 
-!!! note "Reply"
-    The return type given for a `Parser` in the [API documentation](../types/parser.md) is `Reply<T>`. This doesn't make the type given above wrong; `Reply<T>` is just a type alias for `[Context, Result<T>]`.
+!!! note "TypeScript types"
+    Kessel is written in JavaScript, and its author regards TypeScript as a solution looking for a problem. However, one of the purposes of a type system is to create a common language, and we use that here to talk about parameters and return types. If you're not coding in TypeScript, you can safely regard types as nothing more than documentation.
 
-[`letter`](../parsers/letter.md) is a very basic example of a Kessel parser. It is a function that attempts to match a character in the range `'a'-'z'` or `'A'-'Z'` at its context's current location. If it does, the parser is successful; the returned tuple will have a context updated to show which is the *next* character to parse, along with a result that has the parsed character as its value.
+## Basic parsers
 
-Most parsers accept arguments to program what they're looking for. For instance, the [`char`](../parsers/char.md) parser accepts the character that it's looking for as an argument; `char('a')` will try to match the letter `'a'`, while `char('Я')` will match a Russian capital letter "Ya". Many parsers accept one or more *other parsers* as arguments; these are *combinators* and will be discussed later.
+Many of the parsers that Kessel come ready to go without any additional information needed. A good example of this is [`letter`](../parsers/letter.md). `letter` is a function that attempts to match a character in the range `'a'-'z'` or `'A'-'Z'` in the current location in the context passed into it. If it does, the parser is successful; the returned tuple will have a context updated to show which is the *next* character to parse, along with a result that has the parsed character as its value.
 
-!!! note "But wait..."
-    You may have noticed that we say `char` takes a character as an argument, while also saying that a parser takes a context as an argument. So what gives?
+There are a few of these basic parsers that match certain classes of characters, like digits, whitespace, and different cases of letters. And of course there's [`any`](../parsers/any.md), which like our simple little example above, parses any character at all.
 
-    Technically, `char` is not a parser, but it is a function that *returns* a parser. So while `char` may not be a parser, `char('a')` is.
+## Parser functions
+
+The `letter` parser is ready to use right out of the box; it has all of the information that it needs to do its job. But most parsers need a little extra to get started. For instance, [`char`](../parsers/char.md) is a parser that parses only a particular character, but it doesn't automatically know *which* character, so we have to have a way to tell it.
+
+That's done with parameters, and in the case of `char`, it's just a single parameter that is the character the parser should be trying to parse. `char('a')` will try to match the letter `'a'`, while `char('Я')` will match a Russian capital letter "Ya". In this guide we refer to `char` as a *parser function*.
+
+??? note "Wait a minute..."
+    A couple paragraphs back, we said "`char` is a parser...", but then we said that `char` takes a character as an argument. But we've also said that parsers take *contexts* as arguments, not characters. So what gives?
+
+    Technically, `char` isn't a parser at all. It's a function that *returns* a parser (hence calling it a *parser function*). Therefore, while `char` may not be a parser, `char('a')` is, and `char('Я')` is a different parser.
+
+    We don't ever use `char` by itself; we always use it with an argument. This is the same as saying that we never use the parser function by itself; we instead always use parsers it returns. So unless there's good reason to get into the technical aspect, it's pretty safe just to call them all *parsers*.
+
+## Combinators
+
+Finally, there is a class of parser functions that take *other parsers* for their arguments. These parsers are called *combinators* and hold a special place in a library like Kessel because they can do things that no regular parser can do. They deserve several chapters of discussion, and we'll do just that starting in [Chapter 4](sequence.md).

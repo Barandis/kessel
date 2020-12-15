@@ -314,7 +314,7 @@
 
   <li class="md-nav__item">
     <a href="../../guide/parsers/" class="md-nav__link">
-      1. A Parser is What
+      1. Parsers Parsers Parsers
     </a>
   </li>
 
@@ -326,7 +326,7 @@
 
   <li class="md-nav__item">
     <a href="../../guide/running/" class="md-nav__link">
-      2. Running Parsers
+      2. Making Parsers Go
     </a>
   </li>
 
@@ -339,6 +339,18 @@
   <li class="md-nav__item">
     <a href="../../guide/operation/" class="md-nav__link">
       3. Parsers, How Do They Work?
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../guide/sequence/" class="md-nav__link">
+      4. Sequencing Parsers
     </a>
   </li>
 
@@ -2108,18 +2120,22 @@
 <p>Additionally, it's entirely possible that future changes will create other reasons why this function must be used to create a parser.</p>
 <p>Every parser in Kessel complies with this rule, so every parser that they return, directly or indirectly, also complies. In short: this is only something to be concerned about if you are authoring your own parsers.</p>
 <p><code>parser</code> has a property attached to it called <code>created</code>. This property is a function that can be used on any object to see if it is, in fact, a parser that was created with this function. For example, passing the <a href="../../parsers/any/"><code>any</code></a> to this function, <code>parser.created(any)</code>, will return <code>true</code>.</p>
-<div class="admonition note">
-<p class="admonition-title">Some parsers aren't parsers, but create parsers</p>
-<p>It has been noted elsewhere that not every "parser" in this API is actually a parser. For example, <a href="../../parsers/any/"><code>any</code></a> may be a parser, but what about <a href="../../parsers/char/"><code>char</code></a>?</p>
-<div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">isParser</span> <span class="o">=</span> <span class="nx">parser</span><span class="p">.</span><span class="nx">created</span><span class="p">(</span><span class="kr">char</span><span class="p">)</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">isParser</span><span class="p">)</span>  <span class="c1">// false</span>
+<p>!!! note "Some parsers aren't parsers, but create parsers"
+    It has been noted elsewhere that not every "parser" in this API is actually a parser. For example, <a href="../../parsers/any/"><code>any</code></a> may be a parser, but what about <a href="../../parsers/char/"><code>char</code></a>?</p>
+<div class="highlight"><pre><span></span><code>```javascript
+const isParser = parser.created(char)
+console.log(isParser)  // false
+```
+
+However, these &quot;non-parsers&quot; are essentially just waiting for parameters to define their precise behavior (in the case of `char`, defining which character it matches), and after they have those parameters they return parsers.
+
+```javascript
+const isParser = parser.created(char(&#39;a&#39;))
+console.log(isParser)  // true
+```
+
+We only bother to differentiate parsers and parser-creating functions when it would otherwise be ambiguous.
 </code></pre></div>
-<p>However, these "non-parsers" are essentially just waiting for parameters to define their precise behavior (in the case of <code>char</code>, defining which character it matches), and after they have those parameters they return parsers.</p>
-<div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">isParser</span> <span class="o">=</span> <span class="nx">parser</span><span class="p">.</span><span class="nx">created</span><span class="p">(</span><span class="kr">char</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">))</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">isParser</span><span class="p">)</span>  <span class="c1">// true</span>
-</code></pre></div>
-<p>We only bother to differentiate parsers and parser-creating functions when it would otherwise be ambiguous.</p>
-</div>
 <h4 id="parameters">Parameters</h4>
 <ul>
 <li><code>p</code>: A function used to create a parser.</li>

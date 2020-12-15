@@ -18,7 +18,7 @@
     
     
       
-        <title>2. Running Parsers - Kessel</title>
+        <title>2. Making Parsers Go - Kessel</title>
       
     
     
@@ -60,6 +60,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#running-a-parser" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -86,7 +91,7 @@
           </span>
           <span class="md-header-nav__topic md-ellipsis">
             
-              2. Running Parsers
+              2. Making Parsers Go
             
           </span>
         </div>
@@ -311,7 +316,7 @@
 
   <li class="md-nav__item">
     <a href="../parsers/" class="md-nav__link">
-      1. A Parser is What
+      1. Parsers Parsers Parsers
     </a>
   </li>
 
@@ -328,9 +333,43 @@
     <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
     
     
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        2. Making Parsers Go
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+    
     <a href="./" class="md-nav__link md-nav__link--active">
-      2. Running Parsers
+      2. Making Parsers Go
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#running-a-parser" class="md-nav__link">
+    Running a parser
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parsing-a-parser" class="md-nav__link">
+    ...Parsing a parser?
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
     
   </li>
 
@@ -343,6 +382,18 @@
   <li class="md-nav__item">
     <a href="../operation/" class="md-nav__link">
       3. Parsers, How Do They Work?
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../sequence/" class="md-nav__link">
+      4. Sequencing Parsers
     </a>
   </li>
 
@@ -1995,13 +2046,48 @@
               </div>
             
             
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#running-a-parser" class="md-nav__link">
+    Running a parser
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parsing-a-parser" class="md-nav__link">
+    ...Parsing a parser?
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
           
           <div class="md-content">
             <article class="md-content__inner md-typeset">
               
                 
                 
-                  <h1>2. Running Parsers</h1>
+                  <h1>2. Making Parsers Go</h1>
                 
                 <!--
  Copyright (c) 2020 Thomas J. Otterson
@@ -2010,25 +2096,25 @@
  https://opensource.org/licenses/MIT
 -->
 
+<p>Now we've seen a couple examples of Kessel parsers, but we haven't actually <em>done</em> anything with them. A parser isn't worth much if you don't give it some text to parse, and we haven't seen how to do that yet. Let's fix that.</p>
 <p>Kessel offers up the function <a href="../../tools/parse/"><code>run</code></a> to run a parser against input text. It handles creating the context which is then passed to the parser that's being run. We'll talk about that context in a bit, but first let's make a parser just run.</p>
-<p>I will be doing this in a Node.js REPL. Enter <code>node</code> into a terminal and it should greet you with a message similar to this.</p>
+<p>I will be doing this in a Node.js REPL. Enter <code>node</code> into a terminal and it should greet you with a message similar to this (the version number may, of course, be different).</p>
 <div class="highlight"><pre><span></span><code>Welcome to Node.js v14.13.0.
 Type &quot;.help&quot; for more information.
 &gt;
 </code></pre></div>
-<p>The only setup we need is to make sure Kessel is loaded. Locate <code>kessel.js</code> (I'm working in the repo itself, so it's at <code>./lib/kessel.js</code> for me) and include it in a <code>require</code> expression.</p>
+<p>The only setup we need is to make sure Kessel is loaded. Locate <code>kessel.js</code> and include it in a <code>require</code> expression. (As I write this, I'm working in a local copy of the repo itself, so it's at <code>./lib/kessel.js</code> for me; change that part in the command below to match where it is for you.)</p>
 <div class="highlight"><pre><span></span><code>&gt; let K = require(&#39;./lib/kessel&#39;)
 undefined
 </code></pre></div>
-<p>And we're ready to go. This is the way I'm running every example in this user's guide and in the tutorial. You can run it any way you want...load it into a browser via a local webpage, write and execute scripts, however you like.</p>
+<p>And we're ready to go. This is the way I'm running every example in this user's guide and in the tutorial. There are lots of different ways to run JavScripot code and you can run it any way you want...load it into a browser via a local webpage, write and execute scripts, however you like.</p>
+<h2 id="running-a-parser">Running a parser</h2>
 <p>Let's run a simple parser.</p>
 <div class="highlight"><pre><span></span><code>&gt; K.run(K.letter, &#39;abcdef&#39;)
 &#39;a&#39;
 </code></pre></div>
 <p><code>run</code> executes the <code>letter</code> parser against the input, and <code>letter</code> matches the first character, which <code>run</code> returns.</p>
-<div class="admonition note">
-<p class="admonition-title">Namespaces</p>
-<p>Since we assigned the <code>require</code> expression to the variable <code>K</code>, all of Kessel's parsers and functions are available as properties on <code>K</code>. This might be convenient in code so that you can easily differentiate which parsers came from Kessel and which are custom.</p>
+<details class="note"><summary>Namespaces</summary><p>Since we assigned the <code>require</code> expression to the variable <code>K</code>, all of Kessel's parsers and functions are available as properties on <code>K</code>. This might be convenient in code so that you can easily differentiate which parsers came from Kessel and which are custom.</p>
 <p>Another good way to do it is by destructuring the <code>require</code> expression:</p>
 <div class="highlight"><pre><span></span><code>const { run, letter } = require(&#39;./lib/kessel&#39;)
 </code></pre></div>
@@ -2036,8 +2122,8 @@ undefined
 <div class="highlight"><pre><span></span><code>&gt; run(letter, &#39;abcdef&#39;)
 &#39;a&#39;
 </code></pre></div>
-<p>This is the way I normally program scripts, but for working in a REPL, I prefer not having to specify which parsers I'm going to use at the beginning.</p>
-</div>
+<p>This is the way I normally write JavaScript code. However, when working in a REPL as we are here, it's not very convenient to have to know exactly which library functions you're going to use at the very beginning, so we import them all into <code>K</code> and use them from there.</p>
+</details>
 <p>What if the parser fails?</p>
 <div class="highlight"><pre><span></span><code>&gt; K.run(K.letter, &#39;123456&#39;)
 Uncaught Error: Parse error at (line 1, column 1):
@@ -2047,7 +2133,31 @@ Uncaught Error: Parse error at (line 1, column 1):
 Expected a letter
 </code></pre></div>
 <p>A short stack trace follows that, but that's not as interesting as the error message. That message gives the line and column number where the error happened, prints out the line and points to the location, and says what was expected. In a short example, this information isn't that helpful, but if you're parsing a thousand-line document that uses 500 different parsers, you'll appreciate the detail of the error messages.</p>
-<p><code>run</code> is quick and dirty, but is often exactly what you want. You can also use <a href="../../tools/parse/"><code>parse</code></a>, which takes the same parameters, but instead of returning the value or throwing an error, it returns the same <code>[Context, Result&lt;T&gt;]</code> tuple that its parser returns. This affords more control over the parse result, but it means we need to know a little bit more about how Kessel parsers work.</p>
+<h2 id="parsing-a-parser">...<em>Parsing</em> a parser?</h2>
+<p>So after all of the talk in <a href="../parsers/">Chapter 1</a> about <em>contexts</em>, we come over here and see no hint of a context at all when we're running our first parser. Well, that is the way of things. Contexts are handled transparently. <code>run</code> creates the context out of the input text you give to it, and even when we get to composite parsers, we'll see that the context gets passed from parser to parser without us ever even having to see it. You can write an extraordinarily complex parser with Kessel and never even have to know that contexts exist.</p>
+<p>But <code>run</code> isn't the only game in town. In fact, <code>run</code> is pretty quick and dirty, either returning a successful result or just bailing with an exception. Oftentimes we would like more control than that. That's where <a href="../../tools/parse/"><code>parse</code></a> comes in.</p>
+<p><code>parse</code> does everything <em>almost</em> the same as <code>run</code>. It accepts the same arguments (a parser and some input text), it creates the context in the background, it executes the parser against that context. The difference is in what it returns.</p>
+<div class="highlight"><pre><span></span><code>&gt; K.parse(K.letter, &#39;abcdef&#39;)
+[
+  {
+    view: DataView { byteLength: 6, byteOffset: 0, buffer: [ArrayBuffer] },
+    index: 1
+  },
+  { status: &#39;ok&#39;, value: &#39;a&#39; }
+]
+</code></pre></div>
+<p>Alright, so that's a little more involved than the <code>'a'</code> that <code>run</code> returned. Given a little thought, you might guess that what we have here is the infamous <code>[Context, Result&lt;T&gt;]</code> tuple that we talked about in <a href="../parsers/">Chapter 1</a>, and you would be right. <code>parse</code> basically takes the output tuple that its parser returns and passes it right along to us.</p>
+<p>This is <em>really</em> notable when we run a parser that fails. <code>run</code> throws an exception, but <code>parse</code> is a different story.</p>
+<div class="highlight"><pre><span></span><code>&gt; K.parse(K.letter, &#39;123456&#39;)
+[
+  {
+    view: DataView { byteLength: 6, byteOffset: 0, buffer: [ArrayBuffer] },
+    index: 0
+  },
+  { status: &#39;fail&#39;, errors: [ [Object] ] }
+]
+</code></pre></div>
+<p>So <code>parse</code> gives us a window into the way that parsers work internally since it returns all of the information that parsers use. To know what to do with all of this information, we're going to have to learn a little about <a href="../../types/context/"><code>Context</code></a> and <a href="../../types/result/"><code>Result</code></a>.</p>
 <p>Fortunately, we cover that next.</p>
                 
               
@@ -2076,7 +2186,7 @@ Expected a letter
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                1. A Parser is What
+                1. Parsers Parsers Parsers
               </div>
             </div>
           </a>

@@ -18,7 +18,7 @@
     
     
       
-        <title>1. A Parser is What - Kessel</title>
+        <title>1. Parsers Parsers Parsers - Kessel</title>
       
     
     
@@ -60,6 +60,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#basic-parsers" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -86,7 +91,7 @@
           </span>
           <span class="md-header-nav__topic md-ellipsis">
             
-              1. A Parser is What
+              1. Parsers Parsers Parsers
             
           </span>
         </div>
@@ -316,9 +321,50 @@
     <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
     
     
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        1. Parsers Parsers Parsers
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+    
     <a href="./" class="md-nav__link md-nav__link--active">
-      1. A Parser is What
+      1. Parsers Parsers Parsers
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#basic-parsers" class="md-nav__link">
+    Basic parsers
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parser-functions" class="md-nav__link">
+    Parser functions
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#combinators" class="md-nav__link">
+    Combinators
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
     
   </li>
 
@@ -330,7 +376,7 @@
 
   <li class="md-nav__item">
     <a href="../running/" class="md-nav__link">
-      2. Running Parsers
+      2. Making Parsers Go
     </a>
   </li>
 
@@ -343,6 +389,18 @@
   <li class="md-nav__item">
     <a href="../operation/" class="md-nav__link">
       3. Parsers, How Do They Work?
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../sequence/" class="md-nav__link">
+      4. Sequencing Parsers
     </a>
   </li>
 
@@ -1995,13 +2053,55 @@
               </div>
             
             
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#basic-parsers" class="md-nav__link">
+    Basic parsers
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parser-functions" class="md-nav__link">
+    Parser functions
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#combinators" class="md-nav__link">
+    Combinators
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
           
           <div class="md-content">
             <article class="md-content__inner md-typeset">
               
                 
                 
-                  <h1>1. A Parser is What</h1>
+                  <h1>1. Parsers Parsers Parsers</h1>
                 
                 <!--
  Copyright (c) 2020 Thomas J. Otterson
@@ -2010,32 +2110,33 @@
  https://opensource.org/licenses/MIT
 -->
 
-<p>We all probably have a vague notion of what a parser is: it's some code that reads a piece of a longer string of text. By that reckoning, this might be the world's simplest parser:</p>
+<p>Most programmers probably have a good intuitive idea of what a parser is: it's some code that reads a piece of a longer string of text. By that reckoning, this might be the world's simplest parser:</p>
 <div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">text</span> <span class="p">=&gt;</span> <span class="p">{</span>
   <span class="kr">const</span> <span class="p">[</span><span class="kr">char</span><span class="p">,</span> <span class="p">...</span><span class="nx">rest</span><span class="p">]</span> <span class="o">=</span> <span class="nx">text</span>
   <span class="k">return</span> <span class="p">[</span><span class="kr">char</span><span class="p">,</span> <span class="nx">rest</span><span class="p">]</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>This simple little function strips the first character off the text and returns it along with the rest of the unparsed text. It matches any character, so it's like Kessel's <a href="../../parsers/any/"><code>any</code></a> parser. This example parser doesn't handle parsing errors (what happens when text is the empty string?) and is pretty simplistic with what it can work with, but it shares a surprising amount with a Kessel parser.</p>
-<p>The type of the example parser is <code>(text: string) =&gt; [string, string]</code>. It takes a string and returns a tuple of two strings, one for the parsed character and one for the remaining text.</p>
-<div class="admonition note">
-<p class="admonition-title">Tuples</p>
-<p>JavaScript, of course, doesn't have tuples. However, its arrays act very much like tuples in that, unlike most other languages, they can have elements of different types. We consistently use the term <em>tuple</em> when using arrays like this.</p>
-</div>
-<p>The type of a Kessel parser is quite similar:</p>
-<p><code>type Parser&lt;T&gt; = (ctx: Context) =&gt; [Context, Result&lt;T&gt;]</code></p>
-<p>A parser in Kessel is a function which takes a <em>context</em> as an argument. It returns an updated context, along with a result. These types are just enhanced versions of what is in the simple parser; a context is basically text along with information about the location of the next character to be parsed, and a result is either the parsed value (if the parser was successful) or error information (if it was not).</p>
-<div class="admonition note">
-<p class="admonition-title">Reply</p>
-<p>The return type given for a <code>Parser</code> in the <a href="../../types/parser/">API documentation</a> is <code>Reply&lt;T&gt;</code>. This doesn't make the type given above wrong; <code>Reply&lt;T&gt;</code> is just a type alias for <code>[Context, Result&lt;T&gt;]</code>.</p>
-</div>
-<p><a href="../../parsers/letter/"><code>letter</code></a> is a very basic example of a Kessel parser. It is a function that attempts to match a character in the range <code>'a'-'z'</code> or <code>'A'-'Z'</code> at its context's current location. If it does, the parser is successful; the returned tuple will have a context updated to show which is the <em>next</em> character to parse, along with a result that has the parsed character as its value.</p>
-<p>Most parsers accept arguments to program what they're looking for. For instance, the <a href="../../parsers/char/"><code>char</code></a> parser accepts the character that it's looking for as an argument; <code>char('a')</code> will try to match the letter <code>'a'</code>, while <code>char('Я')</code> will match a Russian capital letter "Ya". Many parsers accept one or more <em>other parsers</em> as arguments; these are <em>combinators</em> and will be discussed later.</p>
-<div class="admonition note">
-<p class="admonition-title">But wait...</p>
-<p>You may have noticed that we say <code>char</code> takes a character as an argument, while also saying that a parser takes a context as an argument. So what gives?</p>
-<p>Technically, <code>char</code> is not a parser, but it is a function that <em>returns</em> a parser. So while <code>char</code> may not be a parser, <code>char('a')</code> is.</p>
-</div>
+<p>This simple little function strips the first character off the text and returns it along with the rest of the unparsed text (which can then have the parser called on it again). It matches any character, so it's like Kessel's <a href="../../parsers/any/"><code>any</code></a> parser. This example parser doesn't handle parsing errors (what happens when text is the empty string?) and is pretty simplistic with what it can work with, but it shares a surprising amount with a Kessel parser.</p>
+<p>The TypeScript type of the example parser is <code>(text: string) =&gt; [string, string]</code>. It takes a string and returns a tuple of two strings, one for the parsed character and one for the remaining text.</p>
+<p>!!! note "Tuples"
+    JavaScript, of course, doesn't have tuples. However, its arrays act very much like tuples in that, unlike most other languages, they can have elements of different types. We consistently use the term <em>tuple</em> when using arrays like this.</p>
+<p>The TypeScript type of a Kessel parser is very similar:</p>
+<p><code>Parser&lt;T&gt; = (ctx: Context) =&gt; [Context, Result&lt;T&gt;]</code></p>
+<p>A parser in Kessel is a function which takes a <em>context</em> as an argument. It returns an updated context, along with a result. These types are just enhanced versions of what is in the simple parser; a context is just the input text along with information about the current parsing location within that text, and a result is either the parsed value (if the parser was successful) or error information (if it was not).</p>
+<p>!!! note "TypeScript types"
+    Kessel is written in JavaScript, and its author regards TypeScript as a solution looking for a problem. However, one of the purposes of a type system is to create a common language, and we use that here to talk about parameters and return types. If you're not coding in TypeScript, you can safely regard types as nothing more than documentation.</p>
+<h2 id="basic-parsers">Basic parsers</h2>
+<p>Many of the parsers that Kessel come ready to go without any additional information needed. A good example of this is <a href="../../parsers/letter/"><code>letter</code></a>. <code>letter</code> is a function that attempts to match a character in the range <code>'a'-'z'</code> or <code>'A'-'Z'</code> in the current location in the context passed into it. If it does, the parser is successful; the returned tuple will have a context updated to show which is the <em>next</em> character to parse, along with a result that has the parsed character as its value.</p>
+<p>There are a few of these basic parsers that match certain classes of characters, like digits, whitespace, and different cases of letters. And of course there's <a href="../../parsers/any/"><code>any</code></a>, which like our simple little example above, parses any character at all.</p>
+<h2 id="parser-functions">Parser functions</h2>
+<p>The <code>letter</code> parser is ready to use right out of the box; it has all of the information that it needs to do its job. But most parsers need a little extra to get started. For instance, <a href="../../parsers/char/"><code>char</code></a> is a parser that parses only a particular character, but it doesn't automatically know <em>which</em> character, so we have to have a way to tell it.</p>
+<p>That's done with parameters, and in the case of <code>char</code>, it's just a single parameter that is the character the parser should be trying to parse. <code>char('a')</code> will try to match the letter <code>'a'</code>, while <code>char('Я')</code> will match a Russian capital letter "Ya". In this guide we refer to <code>char</code> as a <em>parser function</em>.</p>
+<details class="note"><summary>Wait a minute...</summary><p>A couple paragraphs back, we said "<code>char</code> is a parser...", but then we said that <code>char</code> takes a character as an argument. But we've also said that parsers take <em>contexts</em> as arguments, not characters. So what gives?</p>
+<p>Technically, <code>char</code> isn't a parser at all. It's a function that <em>returns</em> a parser (hence calling it a <em>parser function</em>). Therefore, while <code>char</code> may not be a parser, <code>char('a')</code> is, and <code>char('Я')</code> is a different parser.</p>
+<p>We don't ever use <code>char</code> by itself; we always use it with an argument. This is the same as saying that we never use the parser function by itself; we instead always use parsers it returns. So unless there's good reason to get into the technical aspect, it's pretty safe just to call them all <em>parsers</em>.</p>
+</details>
+<h2 id="combinators">Combinators</h2>
+<p>Finally, there is a class of parser functions that take <em>other parsers</em> for their arguments. These parsers are called <em>combinators</em> and hold a special place in a library like Kessel because they can do things that no regular parser can do. They deserve several chapters of discussion, and we'll do just that starting in <a href="../sequence/">Chapter 4</a>.</p>
                 
               
               
@@ -2075,7 +2176,7 @@
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                2. Running Parsers
+                2. Making Parsers Go
               </div>
             </div>
             <div class="md-footer-nav__button md-icon">

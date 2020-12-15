@@ -314,7 +314,7 @@
 
   <li class="md-nav__item">
     <a href="../../guide/parsers/" class="md-nav__link">
-      1. A Parser is What
+      1. Parsers Parsers Parsers
     </a>
   </li>
 
@@ -326,7 +326,7 @@
 
   <li class="md-nav__item">
     <a href="../../guide/running/" class="md-nav__link">
-      2. Running Parsers
+      2. Making Parsers Go
     </a>
   </li>
 
@@ -339,6 +339,18 @@
   <li class="md-nav__item">
     <a href="../../guide/operation/" class="md-nav__link">
       3. Parsers, How Do They Work?
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../guide/sequence/" class="md-nav__link">
+      4. Sequencing Parsers
     </a>
   </li>
 
@@ -2159,13 +2171,14 @@
 <blockquote>
 <p><code>pipe&lt;T&gt;(...ps: Parser[], fn: (...args: any[]) =&gt; T): Parser&lt;T&gt;</code></p>
 </blockquote>
-<div class="admonition warning">
-<p class="admonition-title">Not a real type</p>
-<p>The type given above is not a real type, because TypeScript/JavaScript does not have the ability to do rest arguments before other arguments. The "real" type is</p>
-<p><code>pipe&lt;T&gt;(...ps: (Parser&lt;any&gt; | ((...args: any[]) =&gt; T))[]): Parser&lt;T&gt;</code></p>
-<p>The given type is more expressive and makes for better documentation, but even that one is imperfect. TypeScript cannot express as much information in this type as would be useful. Namely, the parsers in <code>ps</code> can all have different generic parameters, and the types of the parameters to <code>fn</code> should match those generic parameters in number and in order.</p>
-<p>A two-parser <code>pipe</code> can be expressed with <code>pipe&lt;T, U&gt;(p: Parser&lt;T&gt;, q: Parser&lt;U&gt;, fn: (a: T, b: U) =&gt; V): Parser&lt;V&gt;</code>. A three-parser version would have the type <code>pipe&lt;T, U, V&gt;(p: Parser&lt;T&gt;, q: Parser&lt;U&gt;, r: Parser&lt;V&gt;, fn: (a: T, b: U, c: V) =&gt; W): Parser&lt;W&gt;</code>, and so on. Unfortunately it's impossible to write a type with a variable number of arguments.</p>
-</div>
+<p>!!! warning "Not a real type"
+    The type given above is not a real type, because TypeScript/JavaScript does not have the ability to do rest arguments before other arguments. The "real" type is</p>
+<div class="highlight"><pre><span></span><code>`pipe&lt;T&gt;(...ps: (Parser&lt;any&gt; | ((...args: any[]) =&gt; T))[]): Parser&lt;T&gt;`
+
+The given type is more expressive and makes for better documentation, but even that one is imperfect. TypeScript cannot express as much information in this type as would be useful. Namely, the parsers in `ps` can all have different generic parameters, and the types of the parameters to `fn` should match those generic parameters in number and in order.
+
+A two-parser `pipe` can be expressed with `pipe&lt;T, U&gt;(p: Parser&lt;T&gt;, q: Parser&lt;U&gt;, fn: (a: T, b: U) =&gt; V): Parser&lt;V&gt;`. A three-parser version would have the type `pipe&lt;T, U, V&gt;(p: Parser&lt;T&gt;, q: Parser&lt;U&gt;, r: Parser&lt;V&gt;, fn: (a: T, b: U, c: V) =&gt; W): Parser&lt;W&gt;`, and so on. Unfortunately it&#39;s impossible to write a type with a variable number of arguments.
+</code></pre></div>
 <p>Applies some parsers in order, then returns the result of a function to which all of the parser results have been passed.</p>
 <p><code>fn</code> will be passed one argument for every member of <code>ps</code>. JavaScript does not enforce that there has to be a parameter for each passed argument, but likely you will want to provide an <code>fn</code> that has an arity equal to the number of parsers in <code>ps</code>.</p>
 <p>Unlike <a href="../sequence/"><code>sequence</code></a>, <code>null</code> parser results are <em>not</em> discarded. This ensures that the same number of arguments will be passed to <code>fn</code> no matter the results of the parsers.</p>

@@ -316,7 +316,7 @@
 
   <li class="md-nav__item">
     <a href="../parsers/" class="md-nav__link">
-      1. A Parser is What
+      1. Parsers Parsers Parsers
     </a>
   </li>
 
@@ -328,7 +328,7 @@
 
   <li class="md-nav__item">
     <a href="../running/" class="md-nav__link">
-      2. Running Parsers
+      2. Making Parsers Go
     </a>
   </li>
 
@@ -380,8 +380,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#reply-what-is-it-good-for" class="md-nav__link">
-    Reply, what is it good for?
+  <a href="#why-parse" class="md-nav__link">
+    Why parse?
   </a>
   
 </li>
@@ -390,6 +390,18 @@
   
 </nav>
     
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../sequence/" class="md-nav__link">
+      4. Sequencing Parsers
+    </a>
   </li>
 
         
@@ -2070,8 +2082,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#reply-what-is-it-good-for" class="md-nav__link">
-    Reply, what is it good for?
+  <a href="#why-parse" class="md-nav__link">
+    Why parse?
   </a>
   
 </li>
@@ -2098,9 +2110,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-<p>It's already been explained more than once that in Kessel, a parser is a function that accepts a context and returns an updated context with a result. But we haven't actually seen a context or a result to know what that means. <a href="../../tools/run/"><code>run</code></a> just returns a value, and we haven't supplied anything more than a string of text to anything.</p>
-<h2 id="the-context-object">The context object</h2>
-<p>Our tool for this chapter to help us out with this understanding is <a href="../../tools/parse/"><code>parse</code></a>. This runs a parser just like <code>run</code>, but what it returns is very different.</p>
+<p>Let's reprint the successful <a href="../../tools/parse/"><code>parse</code></a> example from the last page.</p>
 <div class="highlight"><pre><span></span><code>&gt; K.parse(K.letter, &#39;abcdef&#39;)
 [
   {
@@ -2110,17 +2120,42 @@
   { status: &#39;ok&#39;, value: &#39;a&#39; }
 ]
 </code></pre></div>
-<p>Okay, that's a little different than what <code>run</code> returns (which is...well, <code>'a'</code>). Here we have an array of two objects. One might reasonably guess that this is the famous <code>[Context, Result&lt;T&gt;]</code> tuple that we've talked about already, and one would be right. So the first object here is the updated context &mdash; but where's the text? Didn't we say the context is just the input text with some position information?</p>
-<p>To explain this, we're going to have to talk briefly about character encodings.</p>
-<p>UTF-8 is the standard for character encoding these days. It assigns each character one to four bytes, depending on the character; commonly-used characters tend to be smaller. This lets text be stored in as small a space as possible, on average, while still having enough assignments to cover all of the characters in the world's languages (with plenty of room for emojis left over).</p>
-<p>But JavaScript was designed before UTF-8 was a thing. Its characters are encoded in a two-byte-per-character encoding called UCS-2, with some UTF-16-like extensions that give it some four-byte characters. This isn't compatible with UTF-8, which means if Kessel was to support UTF-8, it couldn't use regular JavaScript strings.</p>
-<p>So when <code>parse</code> or <code>run</code> creates a context, it converts the UCS-2 string sent to it into an array of UTF-8 encoded bytes and stores this array as its input text. It's present in the context object shown above; it's the <code>buffer</code> in the <code>view</code> property (the <code>DataView</code> is just an interface to make it easier for Kessel to access the byte array). When a parse result is found, Kessel converts the UTF-8 bytes for the result <em>back</em> to a JavaScript string, and that's what becomes the result.</p>
-<p>The other part of the context is its <code>index</code>. This is the index (in the UTF-8 byte array) of the first byte of the character that will be read the next time a parser is applied to the input. It's a <em>byte</em> index, not a <em>character</em> index; if a parser reads a 3-byte character out of the array, the index will go up by 3.</p>
-<h2 id="the-result-object">The result object</h2>
-<p>There's one more part of the reply, which is the result. This is the second object in the tuple that <code>parse</code> returns:</p>
-<div class="highlight"><pre><span></span><code>{ status: &#39;ok&#39;, value: &#39;a&#39; }
+<p>As was already revealed, this return result is a tuple of a context and a result. Let's finally get down to talking about what that actually means.</p>
+<h2 id="the-context-object">The context object</h2>
+<p>Here's the isolated context object from the successful parse result above.</p>
+<div class="highlight"><pre><span></span><code>{
+  view: DataView { byteLength: 6, byteOffset: 0, buffer: [ArrayBuffer] },
+  index: 1
+}
 </code></pre></div>
-<p>This isn't nearly so difficult to figure out: the <code>status</code> indicates that the parse seemed to go okay, and the <code>value</code> is the actual parsed value. What does it look like when a parse fails?</p>
+<p>Alright, that's fine, but the context is supposed to contain the input text itself. But where's the text? To answer that question, we're going to have to learn (just a little) about character encodings.</p>
+<p>JavaScript is a 25-year-old language. In the days when it was created, the state of character encodings, particularly those that allow the vast array of characters needed to represent all of the world's languages (while leaving plenty of room for emojis), wasn't settled. The authors of JavaScript chose an encoding called UTF-16, which uses two bytes per character with the possibility of using four for some characters using escape sequences.<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup></p>
+<p>Around 2008, another encoding, called UTF-8, became the most popular in the world. UTF-8 encodes its characters in one to four bytes, depending on the character. The first 128 code points just <em>happen</em> to be the same as ASCII, and this ASCII compatibility became a chief reason for its adoption in the West.</p>
+<p>The ship had already sailed for JavaScript though, and JavaScript does not have direct support for UTF-8 text, whatever its popularity.</p>
+<details class="note"><summary>Is UTF-16 bad?</summary><p>None of this is meant to mean that UTF-16 is <em>bad</em>, per se. It can represent all of the same characters as UTF-8, just differently. Some would argue that UTF-16 is actually <em>better</em> in some ways because the more consistent character width makes it easier to index code points within strings.</p>
+<p>But UTF-16 is used by under 0.01% of web pages (UTF-8 is over 95%), and the powers-that-be in the web standards field consider UTF-8 to be the "mandatory encoding" for all text on the web. It further recommends specifically against using UTF-16 in browsers for security reasons.</p>
+<p>A lot of systems use UTF-16 &mdash; Microsoft Windows and Java are two examples, along with JavaScript &mdash; but at this point that may be more for backward compatibility reasons than anything.</p>
+</details>
+<p>Alright, so what does character encoding have to do with context? Basically, the effort was made to make Kessel use UTF-8, and since JavaScript strings are not UTF-8 compatible, something else needed to be done. That something else is making the context store text as an array of UTF-8-encoded bytes.</p>
+<p>When the context is created, the input text is converted into a UTF-8 byte array. That array is tucked away in the context object within a <code>DataView</code>, which is simply an object that makes it easier to access the byte array. You can "see" the text right there in the context object:</p>
+<p><div class="highlight"><pre><span></span><code>&gt; K.parse(K.letter, &#39;abcdef&#39;)
+[
+  {
+    view: DataView { byteLength: 6, byteOffset: 0, buffer: [ArrayBuffer] },
+    index: 1
+  },
+  { status: &#39;ok&#39;, value: &#39;a&#39; }
+]
+</code></pre></div>
+There it is, the <code>buffer</code> property of the top-level <code>view</code> property in the context. An <code>ArrayBuffer</code> object is a byte array, and this one happens to hold UTF-8 encoded bytes. Let's look a little closer, since this view doesn't show us much about it.</p>
+<div class="highlight"><pre><span></span><code>&gt; let r = K.parse(K.letter, &#39;abcdef&#39;)
+undefined
+&gt; r[0].view.buffer
+ArrayBuffer { [Uint8Contents]: &lt;61 62 63 64 65 66&gt;, byteLength: 6 }
+</code></pre></div>
+<p><em>There's</em> the text! The contents of the array buffer are six numbers, which just happen to be (in hexadecimal) the UTF-8 code points for the letters <code>'abcdef'</code>. Mystery solved.<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup></p>
+<p>As for the rest &mdash; well, there's just the <code>index</code>. It just points at the byte that is the next to be read when the next parser is applied. The byte array itself doesn't change once the context is created, so rather than stripping bytes off the front (as in the simple example at the start of <a href="../parsers/">Chapter 1</a>), this <code>index</code> is simply updated.</p>
+<p>As a final note about context, let's see what happens to <code>index</code> in a parse failure.</p>
 <div class="highlight"><pre><span></span><code>&gt; K.parse(K.letter, &#39;123456&#39;)
 [
   {
@@ -2130,22 +2165,68 @@
   { status: &#39;fail&#39;, errors: [ [Object] ] }
 ]
 </code></pre></div>
-<p>There's only one small difference in the context; the <code>index</code> is 0 instead of 1, indicating that nothing was consumed by the parse. And this makes sense; if a basic parser doesn't find the input it expects, it consumes nothing and results in a parse error. (Combinators can be different than parsers here, but we'll talk about that later.)</p>
-<p>On the other hand, the result is quite different. First, the <code>status</code> tells us that something went wrong, and there is no <code>value</code> at all, having been replaced by some property called <code>errors</code> that has an array of objects.</p>
-<p>This <code>errors</code> property, as the name suggests, is where the reply stores informaiton about any errors that occurred. Those errors are not plain text, and they do not make up a pretty error message like <code>run</code> threw, but this reply contains everything that's needed to <em>make</em> that message.</p>
-<p>A result will have either a <code>value</code> property if it was successful or an <code>errors</code> property if it was not.</p>
-<h2 id="reply-what-is-it-good-for">Reply, what is it good for?</h2>
-<p>So why would you use <code>parse</code> instead of <code>run</code>, when the latter returns things that are so much simpler?</p>
-<p>There are a few reasons. Your parser might be part of a larger program. If it is, then you might parts of the reply other than the parsed value, or perhaps you would prefer to have failure not throw an error. Perhaps you want to create your own custom error messages. Maybe you have need for some other code to track your context. Or maybe you just want to have extra control over what comes out of a parser.</p>
-<p>Whatever the reason, there are a few functions that take a <code>Reply</code> object specifically and are designed mostly for use right alongside <code>parse</code> itself.</p>
-<ul>
-<li><a href="../../tools/succeeded/"><code>succeeded</code></a> returns <code>true</code> or <code>false</code> to tell whether a parse succeeded,</li>
-<li><a href="../../tools/status/"><code>status</code></a> returns <code>'ok'</code>, <code>'fail'</code>, or <code>'fatal'</code> (which we'll talk about later) to tell how a parse went,</li>
-<li><a href="../../tools/success/"><code>success</code></a> returns the resulting value, just like <code>run</code> does, but returns <code>null</code> on failure instead of throwing an error,</li>
-<li><a href="../../tools/failure/"><code>failure</code></a> returns a formatted error message, just as the one in <code>run</code>'s thrown error, if a parser fails.</li>
-</ul>
-<p>Finally, there is <a href="../../tools/formaterrors/"><code>formatErrors</code></a>, which produces the same error message that <code>run</code> and <code>failure</code> do. It also has some options that aren't available through <code>run</code> or <code>failure</code>, including the ability to provide a custom formatting function.</p>
-<p>With these tools to make working with replies easier, the choice between <code>run</code> and <code>parse</code> can often just come down to personal preference.</p>
+<p>This time <code>index</code> does not move. When <code>letter</code> fails, it does not consume any input, so the next parse attempt will happen at the same place. <code>index</code> reflects this by remaining at 0 when <code>letter</code> fails. This happens with <em>every</em> parser in Kessel that is not a combinator &mdash; they are atomic, so when they fail, it's as though they never ran in the first place.<sup id="fnref:3"><a class="footnote-ref" href="#fn:3">3</a></sup></p>
+<h2 id="the-result-object">The result object</h2>
+<p>Alright, that was the hard part. Results are easy. Let's isolate the result object of the passing <code>letter</code> parse from the top of this page:</p>
+<div class="highlight"><pre><span></span><code>{ status: &#39;ok&#39;, value: &#39;a&#39; }
+</code></pre></div>
+<p>Doesn't get much more straightforward than that. The <code>status</code> is <code>'ok'</code>, which means that nothing failed. The <code>value</code> is <code>'a'</code>, and it's not coincidental that it's the same as the return value of the successful <a href="../../tools/run/"><code>run</code></a> invocation from the <a href="../running/">last chapter</a>. And that's all there is to it.</p>
+<p>So how does the failed case look?</p>
+<div class="highlight"><pre><span></span><code>{ status: &#39;fail&#39;, errors: [ [Object] ] }
+</code></pre></div>
+<p>This time, the <code>status</code> again tells us how it all worked out, in this case that the parse failed. With failure, there is no <code>value</code> property; in its place is <code>errors</code>, which is an array of objects describing errors that happened in the parse (there can be more than one, but there was not in this case.) Here's a closer look at the object in that <code>errors</code> property.</p>
+<div class="highlight"><pre><span></span><code>&gt; let e = K.parse(K.letter, &#39;123456&#39;)
+undefined
+&gt; e[1].errors[0]
+{ type: &#39;expected&#39;, label: &#39;a letter&#39; }
+</code></pre></div>
+<p>Each of the errors is just an object with a <code>type</code> and a <code>label</code>. These are used for making nice error messages. There are other types of errors that have different properties than this, but that's something we'll look at later in the guide.</p>
+<h2 id="why-parse">Why <code>parse</code>?</h2>
+<p>Alright, so we've learned a lot about what goes on in the parser internals, but where does that get us in real life? Why wouldn't we just use <code>run</code> and not have to worry about all of these details?</p>
+<p>Fact is, you may find that <code>run</code> is indeed best for you. But there are certainly reasons to use <code>parse</code> instead.</p>
+<ol>
+<li>You don't want an exception thrown on failure.</li>
+<li>You want to write your own error message formatter.</li>
+<li>Your parser is embedded within other code that will check for the parser's success or failure and act accordingly.</li>
+<li>You want the added detail for any number of other reasons.</li>
+</ol>
+<p>If you choose to use <code>parse</code> in a particular application, there are some helpful functions to smooth over some of the details. All of them take the return value of <code>parse</code> and pick out some piece of it.</p>
+<p><a href="../../tools/success/"><code>success</code></a> returns the same thing as <code>run</code> does, except that it returns <code>null</code> on failure rather than throwing an exception. <a href="../../tools/failure/"><code>failure</code></a> does the opposite; it returns an error message on failure and returns <code>null</code> on success (again, no exception is thrown). <a href="../../tools/succeeded/"><code>succeeded</code></a> returns <code>true</code> if the parse was successful and <code>false</code> if it was not, while <a href="../../tools/status/"><code>status</code></a> returns <code>'ok'</code>, <code>'fail'</code>, or <code>'fatal'</code> to tell how the parse went. (We'll talk about <code>'fatal'</code> later in the guide.)</p>
+<p>Finally, there is <a href="../../tools/formaterrors/"><code>formatErrors</code></a>. This takes a failed reply and returns a detailed error message; it's the same error message that both <code>run</code> and <code>failure</code> use. Using <code>formatErrors</code> grants you access to more options, including the ability to send a custom formatting function in case you want something different out of the error messages. (See <a href="../../types/formatter/"><code>Formatter</code></a> for information about what that function has to look like.)</p>
+<p>So that's a pretty deep dive into parser internals, but at this point we've done nothing more than parse a single letter off the front of a string. Let's face it, that's not very useful. In the next chapter, we'll start to address that.</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>JavaScript really used UCS-2, but this is a pure two-byte encoding that can represent only 65,536 characters, which is not enough. UTF-16 can in this context be regarded as an extension of UCS-2 that allows four-byte characters to be used alongside the two-byte ones.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:2">
+<p>To show how UTF-8 works, here's the same sort of thing, except using the first six letters of the <em>Russian</em> (Cyrillic) alphabet:</p>
+<div class="highlight"><pre><span></span><code>&gt; let r = K.parse(K.letter, &#39;абвгде&#39;)
+undefined
+&gt; r[0].view.buffer
+ArrayBuffer {
+  [Uint8Contents]: &lt;d0 b0 d0 b1 d0 b2 d0 b3 d0 b4 d0 b5&gt;,
+  byteLength: 12
+}
+</code></pre></div>
+<p>Twelve bytes to represent six characters; in UTF-8, Russian letters are two bytes long.&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:3">
+<p>Alright, <em>one</em> more thing about <code>index</code>: it is a <em>byte</em> index, not a <em>character</em> index. Let's see how it works in that Russian text again (this uses <a href="../../parsers/letteru/"><code>letterU</code></a> because <code>letter</code> succeeds only with ASCII letters).</p>
+<div class="highlight"><pre><span></span><code>&gt; K.parse(K.letterU, &#39;абвгде&#39;)
+[
+  {
+    view: DataView { byteLength: 12, byteOffset: 0, buffer: [ArrayBuffer] },
+    index: 2
+  },
+  { status: &#39;ok&#39;, value: &#39;а&#39; }
+]
+</code></pre></div>
+<p>This time <code>index</code> is incremented by 2, because Russian letters are two bytes long.&#160;<a class="footnote-backref" href="#fnref:3" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
                 
               
               
@@ -2173,19 +2254,19 @@
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                2. Running Parsers
+                2. Making Parsers Go
               </div>
             </div>
           </a>
         
         
-          <a href="../../api/" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../sequence/" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-footer-nav__title">
               <div class="md-ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Summary
+                4. Sequencing Parsers
               </div>
             </div>
             <div class="md-footer-nav__button md-icon">

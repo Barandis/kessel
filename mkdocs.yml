@@ -12,7 +12,8 @@ markdown_extensions:
   - pymdownx.highlight
   - pymdownx.superfences
   - pymdownx.tabbed
-  - admonition
+  - pymdownx.details
+  - footnotes
 
 theme:
   name: material
@@ -28,9 +29,10 @@ nav:
   - Installation: installation.md
   - "User's Guide":
     - Introduction: guide/intro.md
-    - '1. A Parser is What': guide/parsers.md
-    - '2. Running Parsers': guide/running.md
+    - '1. Parsers Parsers Parsers': guide/parsers.md
+    - '2. Making Parsers Go': guide/running.md
     - '3. Parsers, How Do They Work?': guide/operation.md
+    - '4. Sequencing Parsers': guide/sequence.md
   - 'API Reference':
     - Summary: api.md
     - Parsers:

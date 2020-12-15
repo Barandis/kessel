@@ -5,11 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-It's already been explained more than once that in Kessel, a parser is a function that accepts a context and returns an updated context with a result. But we haven't actually seen a context or a result to know what that means. [`run`](../tools/run.md) just returns a value, and we haven't supplied anything more than a string of text to anything.
-
-## The context object
-
-Our tool for this chapter to help us out with this understanding is [`parse`](../tools/parse.md). This runs a parser just like `run`, but what it returns is very different.
+Let's reprint the successful [`parse`](../tools/parse.md) example from the last page.
 
 ```
 > K.parse(K.letter, 'abcdef')
@@ -22,27 +18,78 @@ Our tool for this chapter to help us out with this understanding is [`parse`](..
 ]
 ```
 
-Okay, that's a little different than what `run` returns (which is...well, `'a'`). Here we have an array of two objects. One might reasonably guess that this is the famous `[Context, Result<T>]` tuple that we've talked about already, and one would be right. So the first object here is the updated context &mdash; but where's the text? Didn't we say the context is just the input text with some position information?
+As was already revealed, this return result is a tuple of a context and a result. Let's finally get down to talking about what that actually means.
 
-To explain this, we're going to have to talk briefly about character encodings.
+## The context object
 
-UTF-8 is the standard for character encoding these days. It assigns each character one to four bytes, depending on the character; commonly-used characters tend to be smaller. This lets text be stored in as small a space as possible, on average, while still having enough assignments to cover all of the characters in the world's languages (with plenty of room for emojis left over).
-
-But JavaScript was designed before UTF-8 was a thing. Its characters are encoded in a two-byte-per-character encoding called UCS-2, with some UTF-16-like extensions that give it some four-byte characters. This isn't compatible with UTF-8, which means if Kessel was to support UTF-8, it couldn't use regular JavaScript strings.
-
-So when `parse` or `run` creates a context, it converts the UCS-2 string sent to it into an array of UTF-8 encoded bytes and stores this array as its input text. It's present in the context object shown above; it's the `buffer` in the `view` property (the `DataView` is just an interface to make it easier for Kessel to access the byte array). When a parse result is found, Kessel converts the UTF-8 bytes for the result *back* to a JavaScript string, and that's what becomes the result.
-
-The other part of the context is its `index`. This is the index (in the UTF-8 byte array) of the first byte of the character that will be read the next time a parser is applied to the input. It's a *byte* index, not a *character* index; if a parser reads a 3-byte character out of the array, the index will go up by 3.
-
-## The result object
-
-There's one more part of the reply, which is the result. This is the second object in the tuple that `parse` returns:
+Here's the isolated context object from the successful parse result above.
 
 ```
-{ status: 'ok', value: 'a' }
+{
+  view: DataView { byteLength: 6, byteOffset: 0, buffer: [ArrayBuffer] },
+  index: 1
+}
 ```
 
-This isn't nearly so difficult to figure out: the `status` indicates that the parse seemed to go okay, and the `value` is the actual parsed value. What does it look like when a parse fails?
+Alright, that's fine, but the context is supposed to contain the input text itself. But where's the text? To answer that question, we're going to have to learn (just a little) about character encodings.
+
+JavaScript is a 25-year-old language. In the days when it was created, the state of character encodings, particularly those that allow the vast array of characters needed to represent all of the world's languages (while leaving plenty of room for emojis), wasn't settled. The authors of JavaScript chose an encoding called UTF-16, which uses two bytes per character with the possibility of using four for some characters using escape sequences.[^1]
+
+[^1]: JavaScript really used UCS-2, but this is a pure two-byte encoding that can represent only 65,536 characters, which is not enough. UTF-16 can in this context be regarded as an extension of UCS-2 that allows four-byte characters to be used alongside the two-byte ones.
+
+Around 2008, another encoding, called UTF-8, became the most popular in the world. UTF-8 encodes its characters in one to four bytes, depending on the character. The first 128 code points just *happen* to be the same as ASCII, and this ASCII compatibility became a chief reason for its adoption in the West.
+
+The ship had already sailed for JavaScript though, and JavaScript does not have direct support for UTF-8 text, whatever its popularity.
+
+??? note "Is UTF-16 bad?"
+    None of this is meant to mean that UTF-16 is *bad*, per se. It can represent all of the same characters as UTF-8, just differently. Some would argue that UTF-16 is actually *better* in some ways because the more consistent character width makes it easier to index code points within strings.
+
+    But UTF-16 is used by under 0.01% of web pages (UTF-8 is over 95%), and the powers-that-be in the web standards field consider UTF-8 to be the "mandatory encoding" for all text on the web. It further recommends specifically against using UTF-16 in browsers for security reasons.
+
+    A lot of systems use UTF-16 &mdash; Microsoft Windows and Java are two examples, along with JavaScript &mdash; but at this point that may be more for backward compatibility reasons than anything.
+
+Alright, so what does character encoding have to do with context? Basically, the effort was made to make Kessel use UTF-8, and since JavaScript strings are not UTF-8 compatible, something else needed to be done. That something else is making the context store text as an array of UTF-8-encoded bytes.
+
+When the context is created, the input text is converted into a UTF-8 byte array. That array is tucked away in the context object within a `DataView`, which is simply an object that makes it easier to access the byte array. You can "see" the text right there in the context object:
+
+```
+> K.parse(K.letter, 'abcdef')
+[
+  {
+    view: DataView { byteLength: 6, byteOffset: 0, buffer: [ArrayBuffer] },
+    index: 1
+  },
+  { status: 'ok', value: 'a' }
+]
+```
+There it is, the `buffer` property of the top-level `view` property in the context. An `ArrayBuffer` object is a byte array, and this one happens to hold UTF-8 encoded bytes. Let's look a little closer, since this view doesn't show us much about it.
+
+```
+> let r = K.parse(K.letter, 'abcdef')
+undefined
+> r[0].view.buffer
+ArrayBuffer { [Uint8Contents]: <61 62 63 64 65 66>, byteLength: 6 }
+```
+
+*There's* the text! The contents of the array buffer are six numbers, which just happen to be (in hexadecimal) the UTF-8 code points for the letters `'abcdef'`. Mystery solved.[^2]
+
+[^2]: To show how UTF-8 works, here's the same sort of thing, except using the first six letters of the *Russian* (Cyrillic) alphabet:
+
+    ```
+    > let r = K.parse(K.letter, 'абвгде')
+    undefined
+    > r[0].view.buffer
+    ArrayBuffer {
+      [Uint8Contents]: <d0 b0 d0 b1 d0 b2 d0 b3 d0 b4 d0 b5>,
+      byteLength: 12
+    }
+    ```
+
+    Twelve bytes to represent six characters; in UTF-8, Russian letters are two bytes long.
+
+As for the rest &mdash; well, there's just the `index`. It just points at the byte that is the next to be read when the next parser is applied. The byte array itself doesn't change once the context is created, so rather than stripping bytes off the front (as in the simple example at the start of [Chapter 1](parsers.md)), this `index` is simply updated.
+
+As a final note about context, let's see what happens to `index` in a parse failure.
 
 ```
 > K.parse(K.letter, '123456')
@@ -55,27 +102,65 @@ This isn't nearly so difficult to figure out: the `status` indicates that the pa
 ]
 ```
 
-There's only one small difference in the context; the `index` is 0 instead of 1, indicating that nothing was consumed by the parse. And this makes sense; if a basic parser doesn't find the input it expects, it consumes nothing and results in a parse error. (Combinators can be different than parsers here, but we'll talk about that later.)
+This time `index` does not move. When `letter` fails, it does not consume any input, so the next parse attempt will happen at the same place. `index` reflects this by remaining at 0 when `letter` fails. This happens with *every* parser in Kessel that is not a combinator &mdash; they are atomic, so when they fail, it's as though they never ran in the first place.[^3]
 
-On the other hand, the result is quite different. First, the `status` tells us that something went wrong, and there is no `value` at all, having been replaced by some property called `errors` that has an array of objects.
+[^3]: Alright, *one* more thing about `index`: it is a *byte* index, not a *character* index. Let's see how it works in that Russian text again (this uses [`letterU`](../parsers/letteru.md) because `letter` succeeds only with ASCII letters).
 
-This `errors` property, as the name suggests, is where the reply stores informaiton about any errors that occurred. Those errors are not plain text, and they do not make up a pretty error message like `run` threw, but this reply contains everything that's needed to *make* that message.
+    ```
+    > K.parse(K.letterU, 'абвгде')
+    [
+      {
+        view: DataView { byteLength: 12, byteOffset: 0, buffer: [ArrayBuffer] },
+        index: 2
+      },
+      { status: 'ok', value: 'а' }
+    ]
+    ```
 
-A result will have either a `value` property if it was successful or an `errors` property if it was not.
+    This time `index` is incremented by 2, because Russian letters are two bytes long.
 
-## Reply, what is it good for?
+## The result object
 
-So why would you use `parse` instead of `run`, when the latter returns things that are so much simpler?
+Alright, that was the hard part. Results are easy. Let's isolate the result object of the passing `letter` parse from the top of this page:
 
-There are a few reasons. Your parser might be part of a larger program. If it is, then you might parts of the reply other than the parsed value, or perhaps you would prefer to have failure not throw an error. Perhaps you want to create your own custom error messages. Maybe you have need for some other code to track your context. Or maybe you just want to have extra control over what comes out of a parser.
+```
+{ status: 'ok', value: 'a' }
+```
 
-Whatever the reason, there are a few functions that take a `Reply` object specifically and are designed mostly for use right alongside `parse` itself.
+Doesn't get much more straightforward than that. The `status` is `'ok'`, which means that nothing failed. The `value` is `'a'`, and it's not coincidental that it's the same as the return value of the successful [`run`](../tools/run.md) invocation from the [last chapter](running.md). And that's all there is to it.
 
-* [`succeeded`](../tools/succeeded.md) returns `true` or `false` to tell whether a parse succeeded,
-* [`status`](../tools/status.md) returns `'ok'`, `'fail'`, or `'fatal'` (which we'll talk about later) to tell how a parse went,
-* [`success`](../tools/success.md) returns the resulting value, just like `run` does, but returns `null` on failure instead of throwing an error,
-* [`failure`](../tools/failure.md) returns a formatted error message, just as the one in `run`'s thrown error, if a parser fails.
+So how does the failed case look?
 
-Finally, there is [`formatErrors`](../tools/formaterrors.md), which produces the same error message that `run` and `failure` do. It also has some options that aren't available through `run` or `failure`, including the ability to provide a custom formatting function.
+```
+{ status: 'fail', errors: [ [Object] ] }
+```
 
-With these tools to make working with replies easier, the choice between `run` and `parse` can often just come down to personal preference.
+This time, the `status` again tells us how it all worked out, in this case that the parse failed. With failure, there is no `value` property; in its place is `errors`, which is an array of objects describing errors that happened in the parse (there can be more than one, but there was not in this case.) Here's a closer look at the object in that `errors` property.
+
+```
+> let e = K.parse(K.letter, '123456')
+undefined
+> e[1].errors[0]
+{ type: 'expected', label: 'a letter' }
+```
+
+Each of the errors is just an object with a `type` and a `label`. These are used for making nice error messages. There are other types of errors that have different properties than this, but that's something we'll look at later in the guide.
+
+## Why `parse`?
+
+Alright, so we've learned a lot about what goes on in the parser internals, but where does that get us in real life? Why wouldn't we just use `run` and not have to worry about all of these details?
+
+Fact is, you may find that `run` is indeed best for you. But there are certainly reasons to use `parse` instead.
+
+1. You don't want an exception thrown on failure.
+2. You want to write your own error message formatter.
+3. Your parser is embedded within other code that will check for the parser's success or failure and act accordingly.
+4. You want the added detail for any number of other reasons.
+
+If you choose to use `parse` in a particular application, there are some helpful functions to smooth over some of the details. All of them take the return value of `parse` and pick out some piece of it.
+
+[`success`](../tools/success.md) returns the same thing as `run` does, except that it returns `null` on failure rather than throwing an exception. [`failure`](../tools/failure.md) does the opposite; it returns an error message on failure and returns `null` on success (again, no exception is thrown). [`succeeded`](../tools/succeeded.md) returns `true` if the parse was successful and `false` if it was not, while [`status`](../tools/status.md) returns `'ok'`, `'fail'`, or `'fatal'` to tell how the parse went. (We'll talk about `'fatal'` later in the guide.)
+
+Finally, there is [`formatErrors`](../tools/formaterrors.md). This takes a failed reply and returns a detailed error message; it's the same error message that both `run` and `failure` use. Using `formatErrors` grants you access to more options, including the ability to send a custom formatting function in case you want something different out of the error messages. (See [`Formatter`](../types/formatter.md) for information about what that function has to look like.)
+
+So that's a pretty deep dive into parser internals, but at this point we've done nothing more than parse a single letter off the front of a string. Let's face it, that's not very useful. In the next chapter, we'll start to address that.
