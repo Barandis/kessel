@@ -2110,7 +2110,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-<p>Let's reprint the successful <a href="../../tools/parse/"><code>parse</code></a> example from the last page.</p>
+<p>For convenience, let's reprint the successful <a href="../../tools/parse/"><code>parse</code></a> example from the last page.</p>
 <div class="highlight"><pre><span></span><code>&gt; K.parse(K.letter, &#39;abcdef&#39;)
 [
   {
@@ -2120,7 +2120,7 @@
   { status: &#39;ok&#39;, value: &#39;a&#39; }
 ]
 </code></pre></div>
-<p>As was already revealed, this return result is a tuple of a context and a result. Let's finally get down to talking about what that actually means.</p>
+<p>We know by now that this pair of objects is the context followed by the result. Let's go ahead now and discuss what those actually <em>are</em>.</p>
 <h2 id="the-context-object">The context object</h2>
 <p>Here's the isolated context object from the successful parse result above.</p>
 <div class="highlight"><pre><span></span><code>{
@@ -2129,32 +2129,23 @@
 }
 </code></pre></div>
 <p>Alright, that's fine, but the context is supposed to contain the input text itself. But where's the text? To answer that question, we're going to have to learn (just a little) about character encodings.</p>
-<p>JavaScript is a 25-year-old language. In the days when it was created, the state of character encodings, particularly those that allow the vast array of characters needed to represent all of the world's languages (while leaving plenty of room for emojis), wasn't settled. The authors of JavaScript chose an encoding called UTF-16, which uses two bytes per character with the possibility of using four for some characters using escape sequences.<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup></p>
-<p>Around 2008, another encoding, called UTF-8, became the most popular in the world. UTF-8 encodes its characters in one to four bytes, depending on the character. The first 128 code points just <em>happen</em> to be the same as ASCII, and this ASCII compatibility became a chief reason for its adoption in the West.</p>
-<p>The ship had already sailed for JavaScript though, and JavaScript does not have direct support for UTF-8 text, whatever its popularity.</p>
-<details class="note"><summary>Is UTF-16 bad?</summary><p>None of this is meant to mean that UTF-16 is <em>bad</em>, per se. It can represent all of the same characters as UTF-8, just differently. Some would argue that UTF-16 is actually <em>better</em> in some ways because the more consistent character width makes it easier to index code points within strings.</p>
-<p>But UTF-16 is used by under 0.01% of web pages (UTF-8 is over 95%), and the powers-that-be in the web standards field consider UTF-8 to be the "mandatory encoding" for all text on the web. It further recommends specifically against using UTF-16 in browsers for security reasons.</p>
-<p>A lot of systems use UTF-16 &mdash; Microsoft Windows and Java are two examples, along with JavaScript &mdash; but at this point that may be more for backward compatibility reasons than anything.</p>
-</details>
-<p>Alright, so what does character encoding have to do with context? Basically, the effort was made to make Kessel use UTF-8, and since JavaScript strings are not UTF-8 compatible, something else needed to be done. That something else is making the context store text as an array of UTF-8-encoded bytes.</p>
-<p>When the context is created, the input text is converted into a UTF-8 byte array. That array is tucked away in the context object within a <code>DataView</code>, which is simply an object that makes it easier to access the byte array. You can "see" the text right there in the context object:</p>
-<p><div class="highlight"><pre><span></span><code>&gt; K.parse(K.letter, &#39;abcdef&#39;)
-[
-  {
-    view: DataView { byteLength: 6, byteOffset: 0, buffer: [ArrayBuffer] },
-    index: 1
-  },
-  { status: &#39;ok&#39;, value: &#39;a&#39; }
-]
+<p>The most common way to represent characters in the modern age is an encoding called UTF-8. In this encoding, each character is one to four bytes long; the one-byte characters <em>happen</em> to have the same encodings as ASCII characters. This made UTF-8 popular, especially in the West: ASCII is already a subset of UTF-8, and with the multi-byte characters there's plenty of room to cover all of the other languages of the world (with plenty of room left over for emojis).</p>
+<p>JavaScript comes from a time before UTF-8, and it represents its characters in a two-or-four-byte encoding.<sup id="fnref:jsencode"><a class="footnote-ref" href="#fn:jsencode">1</a></sup> The merits of an encoding like this aren't in question; in some ways they're even better because the less-variable length makes it easier to do some things internally within the language. But this encoding causes <em>us</em> some problems. In parsing, it's really important to have a solid concept of "character", and these four-byte characters are counted as <em>two</em> characters in most JavaScript operations. (For example, <code>'🍔'.length === 2</code> is <code>true</code> even though the hamburger emoji is only one character.)</p>
+<p>Alright, so what does this have to do with context? Basically, since there are some pitfalls to JavaScript string encoding, Kessel has to put in some safeguards, and since it already has to bother with encoding to that degree, it just chucks it all and uses UTF-8 encoding instead. That means it can't use JavaScript strings internally, so instead it uses <em>arrays of UTF-8 encoded bytes</em>.</p>
+<p>When the context is created, the input text is converted into a UTF-8 byte array. That array is tucked away in the context object within a <code>DataView</code>, which is simply an object that makes it easier to access the byte array. You can see it if you look really close at that example context object again:</p>
+<p><div class="highlight"><pre><span></span><code>{
+  view: DataView { byteLength: 6, byteOffset: 0, buffer: [ArrayBuffer] },
+  index: 1
+}
 </code></pre></div>
-There it is, the <code>buffer</code> property of the top-level <code>view</code> property in the context. An <code>ArrayBuffer</code> object is a byte array, and this one happens to hold UTF-8 encoded bytes. Let's look a little closer, since this view doesn't show us much about it.</p>
-<div class="highlight"><pre><span></span><code>&gt; let r = K.parse(K.letter, &#39;abcdef&#39;)
+There it is, it's the <code>buffer</code> property <code>view</code> property in the context. An <code>ArrayBuffer</code> object is a byte array, and this one happens to hold UTF-8 encoded bytes. Let's look a little closer, since this view doesn't show us much about it.</p>
+<div class="highlight"><pre><span></span><code>&gt; const [ctx1, res1] = K.parse(K.letter, &#39;abcdef&#39;)
 undefined
-&gt; r[0].view.buffer
+&gt; ctx1.view.buffer
 ArrayBuffer { [Uint8Contents]: &lt;61 62 63 64 65 66&gt;, byteLength: 6 }
 </code></pre></div>
-<p><em>There's</em> the text! The contents of the array buffer are six numbers, which just happen to be (in hexadecimal) the UTF-8 code points for the letters <code>'abcdef'</code>. Mystery solved.<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup></p>
-<p>As for the rest &mdash; well, there's just the <code>index</code>. It just points at the byte that is the next to be read when the next parser is applied. The byte array itself doesn't change once the context is created, so rather than stripping bytes off the front (as in the simple example at the start of <a href="../parsers/">Chapter 1</a>), this <code>index</code> is simply updated.</p>
+<p><em>There's</em> the text! The contents of the array buffer are six numbers, which just happen to be (in hexadecimal) the UTF-8 code points for the letters <code>'abcdef'</code>. Mystery solved.<sup id="fnref:jsabcdef"><a class="footnote-ref" href="#fn:jsabcdef">2</a></sup> <sup id="fnref:russian"><a class="footnote-ref" href="#fn:russian">3</a></sup></p>
+<p>As for the rest of the context &mdash; well, there's just the <code>index</code>. It just points at the byte that is the next to be read when the next parser is applied. The byte array itself doesn't change once the context is created, so rather than stripping bytes off the front (as in the simple example at the start of <a href="../parsers/">Chapter 1</a>), this <code>index</code> is simply updated.</p>
 <p>As a final note about context, let's see what happens to <code>index</code> in a parse failure.</p>
 <div class="highlight"><pre><span></span><code>&gt; K.parse(K.letter, &#39;123456&#39;)
 [
@@ -2165,7 +2156,7 @@ ArrayBuffer { [Uint8Contents]: &lt;61 62 63 64 65 66&gt;, byteLength: 6 }
   { status: &#39;fail&#39;, errors: [ [Object] ] }
 ]
 </code></pre></div>
-<p>This time <code>index</code> does not move. When <code>letter</code> fails, it does not consume any input, so the next parse attempt will happen at the same place. <code>index</code> reflects this by remaining at 0 when <code>letter</code> fails. This happens with <em>every</em> parser in Kessel that is not a combinator &mdash; they are atomic, so when they fail, it's as though they never ran in the first place.<sup id="fnref:3"><a class="footnote-ref" href="#fn:3">3</a></sup></p>
+<p>This time <code>index</code> does not move. When <code>letter</code> fails, it does not consume any input, so the next parse attempt will happen at the same place. <code>index</code> reflects this by remaining at 0 when <code>letter</code> fails. This happens with <em>every</em> parser in Kessel that is not a combinator &mdash; they are atomic, so when they fail, it's as though they never ran in the first place.<sup id="fnref:byteindex"><a class="footnote-ref" href="#fn:byteindex">4</a></sup></p>
 <h2 id="the-result-object">The result object</h2>
 <p>Alright, that was the hard part. Results are easy. Let's isolate the result object of the passing <code>letter</code> parse from the top of this page:</p>
 <div class="highlight"><pre><span></span><code>{ status: &#39;ok&#39;, value: &#39;a&#39; }
@@ -2175,9 +2166,9 @@ ArrayBuffer { [Uint8Contents]: &lt;61 62 63 64 65 66&gt;, byteLength: 6 }
 <div class="highlight"><pre><span></span><code>{ status: &#39;fail&#39;, errors: [ [Object] ] }
 </code></pre></div>
 <p>This time, the <code>status</code> again tells us how it all worked out, in this case that the parse failed. With failure, there is no <code>value</code> property; in its place is <code>errors</code>, which is an array of objects describing errors that happened in the parse (there can be more than one, but there was not in this case.) Here's a closer look at the object in that <code>errors</code> property.</p>
-<div class="highlight"><pre><span></span><code>&gt; let e = K.parse(K.letter, &#39;123456&#39;)
+<div class="highlight"><pre><span></span><code>&gt; const [ctx2, res2] = K.parse(K.letter, &#39;123456&#39;)
 undefined
-&gt; e[1].errors[0]
+&gt; res2.errors[0]
 { type: &#39;expected&#39;, label: &#39;a letter&#39; }
 </code></pre></div>
 <p>Each of the errors is just an object with a <code>type</code> and a <code>label</code>. These are used for making nice error messages. There are other types of errors that have different properties than this, but that's something we'll look at later in the guide.</p>
@@ -2190,7 +2181,7 @@ undefined
 <li>Your parser is embedded within other code that will check for the parser's success or failure and act accordingly.</li>
 <li>You want the added detail for any number of other reasons.</li>
 </ol>
-<p>If you choose to use <code>parse</code> in a particular application, there are some helpful functions to smooth over some of the details. All of them take the return value of <code>parse</code> and pick out some piece of it.</p>
+<p>If one of these reasons compels you to use <code>parse</code>, rest assured that there are some helper functions to let you avoid getting deep into the internals of a parser reply. Each of these functions takes the reply object that is returned by <code>parse</code> and picks out some part of it to return to you.</p>
 <ul>
 <li><a href="../../tools/success/"><code>success</code></a> returns the same thing as <code>run</code> does, except that it returns <code>null</code> on failure rather than throwing an exception. </li>
 <li><a href="../../tools/failure/"><code>failure</code></a> does the opposite; it returns an error message on failure and returns <code>null</code> on success (again, no exception is thrown). </li>
@@ -2202,23 +2193,27 @@ undefined
 <div class="footnote">
 <hr />
 <ol>
-<li id="fn:1">
-<p>JavaScript really used UCS-2, but this is a pure two-byte encoding that can represent only 65,536 characters, which is not enough. UTF-16 can in this context be regarded as an extension of UCS-2 that allows four-byte characters to be used alongside the two-byte ones.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+<li id="fn:jsencode">
+<p>JavaScript implementations can choose their encoding, as long as how it <em>acts</em> conforms to the spec. And that spec mandates something that is a weird amalgam of UCS-2 and UTF-16; it's not quite UCS-2 because it has four-byte characters through pairs of two-byte code points called <em>surrogate pairs</em>, but it isn't quite UTF-16 because it allows partial and reversed surrogate pairs.&#160;<a class="footnote-backref" href="#fnref:jsencode" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
-<li id="fn:2">
+<li id="fn:jsabcdef">
+<p>JavaScript would encode this same string as <code>&lt;61 00 62 00 63 00 64 00 65 00 66 00&gt;</code>.&#160;<a class="footnote-backref" href="#fnref:jsabcdef" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:russian">
 <p>To show how UTF-8 works, here's the same sort of thing, except using the first six letters of the <em>Russian</em> (Cyrillic) alphabet:</p>
-<div class="highlight"><pre><span></span><code>&gt; let r = K.parse(K.letter, &#39;абвгде&#39;)
+<div class="highlight"><pre><span></span><code>&gt; const [ctxr, resr] = K.parse(K.letter, &#39;абвгде&#39;)
 undefined
-&gt; r[0].view.buffer
+&gt; ctxr.view.buffer
 ArrayBuffer {
   [Uint8Contents]: &lt;d0 b0 d0 b1 d0 b2 d0 b3 d0 b4 d0 b5&gt;,
   byteLength: 12
 }
 </code></pre></div>
-<p>Twelve bytes to represent six characters; in UTF-8, Russian letters are two bytes long.&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+<p>Twelve bytes to represent six characters; in UTF-8, Russian letters are two bytes long.</p>
+<p>A JavaScript string with the same content would be encoded <code>&lt;30 04 31 04 32 04 33 04 34 04 35 04&gt;</code>. Even though these particular characters are the same length in both encodings, the encoding values are entirely different.&#160;<a class="footnote-backref" href="#fnref:russian" title="Jump back to footnote 3 in the text">&#8617;</a></p>
 </li>
-<li id="fn:3">
-<p>Alright, <em>one</em> more thing about <code>index</code>: it is a <em>byte</em> index, not a <em>character</em> index. Let's see how it works in that Russian text again (this uses <a href="../../parsers/letteru/"><code>letterU</code></a> because <code>letter</code> succeeds only with ASCII letters).</p>
+<li id="fn:byteindex">
+<p>Alright, <em>one</em> more thing about <code>index</code>: it is a <em>byte</em> index, not a <em>character</em> index. Let's see how it works in that Russian text again (this uses <a href="../../parsers/letteru/"><code>letterU</code></a> because <code>letter</code> only succeeds with ASCII letters).</p>
 <div class="highlight"><pre><span></span><code>&gt; K.parse(K.letterU, &#39;абвгде&#39;)
 [
   {
@@ -2228,7 +2223,7 @@ ArrayBuffer {
   { status: &#39;ok&#39;, value: &#39;а&#39; }
 ]
 </code></pre></div>
-<p>This time <code>index</code> is incremented by 2, because Russian letters are two bytes long.&#160;<a class="footnote-backref" href="#fnref:3" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+<p>This time <code>index</code> is incremented by 2, because Russian letters are two bytes long.&#160;<a class="footnote-backref" href="#fnref:byteindex" title="Jump back to footnote 4 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>

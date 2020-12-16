@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-Let's reprint the successful [`parse`](../tools/parse.md) example from the last page.
+For convenience, let's reprint the successful [`parse`](../tools/parse.md) example from the last page.
 
 ```
 > K.parse(K.letter, 'abcdef')
@@ -18,7 +18,7 @@ Let's reprint the successful [`parse`](../tools/parse.md) example from the last 
 ]
 ```
 
-As was already revealed, this return result is a tuple of a context and a result. Let's finally get down to talking about what that actually means.
+We know by now that this pair of objects is the context followed by the result. Let's go ahead now and discuss what those actually *are*.
 
 ## The context object
 
@@ -33,61 +33,32 @@ Here's the isolated context object from the successful parse result above.
 
 Alright, that's fine, but the context is supposed to contain the input text itself. But where's the text? To answer that question, we're going to have to learn (just a little) about character encodings.
 
-JavaScript is a 25-year-old language. In the days when it was created, the state of character encodings, particularly those that allow the vast array of characters needed to represent all of the world's languages (while leaving plenty of room for emojis), wasn't settled. The authors of JavaScript chose an encoding called UTF-16, which uses two bytes per character with the possibility of using four for some characters using escape sequences.[^1]
+The most common way to represent characters in the modern age is an encoding called UTF-8. In this encoding, each character is one to four bytes long; the one-byte characters *happen* to have the same encodings as ASCII characters. This made UTF-8 popular, especially in the West: ASCII is already a subset of UTF-8, and with the multi-byte characters there's plenty of room to cover all of the other languages of the world (with plenty of room left over for emojis).
 
-[^1]: JavaScript really used UCS-2, but this is a pure two-byte encoding that can represent only 65,536 characters, which is not enough. UTF-16 can in this context be regarded as an extension of UCS-2 that allows four-byte characters to be used alongside the two-byte ones.
+JavaScript comes from a time before UTF-8, and it represents its characters in a two-or-four-byte encoding.[^jsencode] The merits of an encoding like this aren't in question; in some ways they're even better because the less-variable length makes it easier to do some things internally within the language. But this encoding causes *us* some problems. In parsing, it's really important to have a solid concept of "character", and these four-byte characters are counted as *two* characters in most JavaScript operations. (For example, `'🍔'.length === 2` is `true` even though the hamburger emoji is only one character.)
 
-Around 2008, another encoding, called UTF-8, became the most popular in the world. UTF-8 encodes its characters in one to four bytes, depending on the character. The first 128 code points just *happen* to be the same as ASCII, and this ASCII compatibility became a chief reason for its adoption in the West.
+Alright, so what does this have to do with context? Basically, since there are some pitfalls to JavaScript string encoding, Kessel has to put in some safeguards, and since it already has to bother with encoding to that degree, it just chucks it all and uses UTF-8 encoding instead. That means it can't use JavaScript strings internally, so instead it uses *arrays of UTF-8 encoded bytes*.
 
-The ship had already sailed for JavaScript though, and JavaScript does not have direct support for UTF-8 text, whatever its popularity.
-
-??? note "Is UTF-16 bad?"
-    None of this is meant to mean that UTF-16 is *bad*, per se. It can represent all of the same characters as UTF-8, just differently. Some would argue that UTF-16 is actually *better* in some ways because the more consistent character width makes it easier to index code points within strings.
-
-    But UTF-16 is used by under 0.01% of web pages (UTF-8 is over 95%), and the powers-that-be in the web standards field consider UTF-8 to be the "mandatory encoding" for all text on the web. It further recommends specifically against using UTF-16 in browsers for security reasons.
-
-    A lot of systems use UTF-16 &mdash; Microsoft Windows and Java are two examples, along with JavaScript &mdash; but at this point that may be more for backward compatibility reasons than anything.
-
-Alright, so what does character encoding have to do with context? Basically, the effort was made to make Kessel use UTF-8, and since JavaScript strings are not UTF-8 compatible, something else needed to be done. That something else is making the context store text as an array of UTF-8-encoded bytes.
-
-When the context is created, the input text is converted into a UTF-8 byte array. That array is tucked away in the context object within a `DataView`, which is simply an object that makes it easier to access the byte array. You can "see" the text right there in the context object:
+When the context is created, the input text is converted into a UTF-8 byte array. That array is tucked away in the context object within a `DataView`, which is simply an object that makes it easier to access the byte array. You can see it if you look really close at that example context object again:
 
 ```
-> K.parse(K.letter, 'abcdef')
-[
-  {
-    view: DataView { byteLength: 6, byteOffset: 0, buffer: [ArrayBuffer] },
-    index: 1
-  },
-  { status: 'ok', value: 'a' }
-]
+{
+  view: DataView { byteLength: 6, byteOffset: 0, buffer: [ArrayBuffer] },
+  index: 1
+}
 ```
-There it is, the `buffer` property of the top-level `view` property in the context. An `ArrayBuffer` object is a byte array, and this one happens to hold UTF-8 encoded bytes. Let's look a little closer, since this view doesn't show us much about it.
+There it is, it's the `buffer` property `view` property in the context. An `ArrayBuffer` object is a byte array, and this one happens to hold UTF-8 encoded bytes. Let's look a little closer, since this view doesn't show us much about it.
 
 ```
-> let r = K.parse(K.letter, 'abcdef')
+> const [ctx1, res1] = K.parse(K.letter, 'abcdef')
 undefined
-> r[0].view.buffer
+> ctx1.view.buffer
 ArrayBuffer { [Uint8Contents]: <61 62 63 64 65 66>, byteLength: 6 }
 ```
 
-*There's* the text! The contents of the array buffer are six numbers, which just happen to be (in hexadecimal) the UTF-8 code points for the letters `'abcdef'`. Mystery solved.[^2]
+*There's* the text! The contents of the array buffer are six numbers, which just happen to be (in hexadecimal) the UTF-8 code points for the letters `'abcdef'`. Mystery solved.[^jsabcdef] [^russian]
 
-[^2]: To show how UTF-8 works, here's the same sort of thing, except using the first six letters of the *Russian* (Cyrillic) alphabet:
-
-    ```
-    > let r = K.parse(K.letter, 'абвгде')
-    undefined
-    > r[0].view.buffer
-    ArrayBuffer {
-      [Uint8Contents]: <d0 b0 d0 b1 d0 b2 d0 b3 d0 b4 d0 b5>,
-      byteLength: 12
-    }
-    ```
-
-    Twelve bytes to represent six characters; in UTF-8, Russian letters are two bytes long.
-
-As for the rest &mdash; well, there's just the `index`. It just points at the byte that is the next to be read when the next parser is applied. The byte array itself doesn't change once the context is created, so rather than stripping bytes off the front (as in the simple example at the start of [Chapter 1](parsers.md)), this `index` is simply updated.
+As for the rest of the context &mdash; well, there's just the `index`. It just points at the byte that is the next to be read when the next parser is applied. The byte array itself doesn't change once the context is created, so rather than stripping bytes off the front (as in the simple example at the start of [Chapter 1](parsers.md)), this `index` is simply updated.
 
 As a final note about context, let's see what happens to `index` in a parse failure.
 
@@ -102,22 +73,7 @@ As a final note about context, let's see what happens to `index` in a parse fail
 ]
 ```
 
-This time `index` does not move. When `letter` fails, it does not consume any input, so the next parse attempt will happen at the same place. `index` reflects this by remaining at 0 when `letter` fails. This happens with *every* parser in Kessel that is not a combinator &mdash; they are atomic, so when they fail, it's as though they never ran in the first place.[^3]
-
-[^3]: Alright, *one* more thing about `index`: it is a *byte* index, not a *character* index. Let's see how it works in that Russian text again (this uses [`letterU`](../parsers/letteru.md) because `letter` succeeds only with ASCII letters).
-
-    ```
-    > K.parse(K.letterU, 'абвгде')
-    [
-      {
-        view: DataView { byteLength: 12, byteOffset: 0, buffer: [ArrayBuffer] },
-        index: 2
-      },
-      { status: 'ok', value: 'а' }
-    ]
-    ```
-
-    This time `index` is incremented by 2, because Russian letters are two bytes long.
+This time `index` does not move. When `letter` fails, it does not consume any input, so the next parse attempt will happen at the same place. `index` reflects this by remaining at 0 when `letter` fails. This happens with *every* parser in Kessel that is not a combinator &mdash; they are atomic, so when they fail, it's as though they never ran in the first place.[^byteindex]
 
 ## The result object
 
@@ -138,9 +94,9 @@ So how does the failed case look?
 This time, the `status` again tells us how it all worked out, in this case that the parse failed. With failure, there is no `value` property; in its place is `errors`, which is an array of objects describing errors that happened in the parse (there can be more than one, but there was not in this case.) Here's a closer look at the object in that `errors` property.
 
 ```
-> let e = K.parse(K.letter, '123456')
+> const [ctx2, res2] = K.parse(K.letter, '123456')
 undefined
-> e[1].errors[0]
+> res2.errors[0]
 { type: 'expected', label: 'a letter' }
 ```
 
@@ -157,7 +113,7 @@ Fact is, you may find that `run` is indeed best for you. But there are certainly
 3. Your parser is embedded within other code that will check for the parser's success or failure and act accordingly.
 4. You want the added detail for any number of other reasons.
 
-If you choose to use `parse` in a particular application, there are some helpful functions to smooth over some of the details. All of them take the return value of `parse` and pick out some piece of it.
+If one of these reasons compels you to use `parse`, rest assured that there are some helper functions to let you avoid getting deep into the internals of a parser reply. Each of these functions takes the reply object that is returned by `parse` and picks out some part of it to return to you.
 
 * [`success`](../tools/success.md) returns the same thing as `run` does, except that it returns `null` on failure rather than throwing an exception. 
 * [`failure`](../tools/failure.md) does the opposite; it returns an error message on failure and returns `null` on success (again, no exception is thrown). 
@@ -167,3 +123,38 @@ If you choose to use `parse` in a particular application, there are some helpful
 Finally, there is [`formatErrors`](../tools/formaterrors.md). This takes a failed reply and returns a detailed error message; it's the same error message that both `run` and `failure` use. Using `formatErrors` grants you access to more options, including the ability to send a custom formatting function in case you want something different out of the error messages. (See [`Formatter`](../types/formatter.md) for information about what that function has to look like.)
 
 So that's a pretty deep dive into parser internals, but at this point we've done nothing more than parse a single letter off the front of a string. Let's face it, that's not very useful. In the next chapter, we'll start to address that.
+
+[^jsencode]: JavaScript implementations can choose their encoding, as long as how it *acts* conforms to the spec. And that spec mandates something that is a weird amalgam of UCS-2 and UTF-16; it's not quite UCS-2 because it has four-byte characters through pairs of two-byte code points called *surrogate pairs*, but it isn't quite UTF-16 because it allows partial and reversed surrogate pairs.
+
+[^jsabcdef]: JavaScript would encode this same string as `<61 00 62 00 63 00 64 00 65 00 66 00>`.
+
+[^russian]: To show how UTF-8 works, here's the same sort of thing, except using the first six letters of the *Russian* (Cyrillic) alphabet:
+
+    ```
+    > const [ctxr, resr] = K.parse(K.letter, 'абвгде')
+    undefined
+    > ctxr.view.buffer
+    ArrayBuffer {
+      [Uint8Contents]: <d0 b0 d0 b1 d0 b2 d0 b3 d0 b4 d0 b5>,
+      byteLength: 12
+    }
+    ```
+
+    Twelve bytes to represent six characters; in UTF-8, Russian letters are two bytes long.
+
+    A JavaScript string with the same content would be encoded `<30 04 31 04 32 04 33 04 34 04 35 04>`. Even though these particular characters are the same length in both encodings, the encoding values are entirely different.
+
+[^byteindex]: Alright, *one* more thing about `index`: it is a *byte* index, not a *character* index. Let's see how it works in that Russian text again (this uses [`letterU`](../parsers/letteru.md) because `letter` only succeeds with ASCII letters).
+
+    ```
+    > K.parse(K.letterU, 'абвгде')
+    [
+      {
+        view: DataView { byteLength: 12, byteOffset: 0, buffer: [ArrayBuffer] },
+        index: 2
+      },
+      { status: 'ok', value: 'а' }
+    ]
+    ```
+
+    This time `index` is incremented by 2, because Russian letters are two bytes long.
