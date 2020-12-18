@@ -2181,7 +2181,6 @@ A two-parser `pipe` can be expressed with `pipe&lt;T, U&gt;(p: Parser&lt;T&gt;, 
 </code></pre></div>
 <p>Applies some parsers in order, then returns the result of a function to which all of the parser results have been passed.</p>
 <p><code>fn</code> will be passed one argument for every member of <code>ps</code>. JavaScript does not enforce that there has to be a parameter for each passed argument, but likely you will want to provide an <code>fn</code> that has an arity equal to the number of parsers in <code>ps</code>.</p>
-<p>Unlike <a href="../sequence/"><code>sequence</code></a>, <code>null</code> parser results are <em>not</em> discarded. This ensures that the same number of arguments will be passed to <code>fn</code> no matter the results of the parsers.</p>
 <p>There is another version of this parser (<a href="../pipeb/"><code>pipeB</code></a>) that fails non-fatally and backtracks if the parser that fails does so non-fatally.</p>
 <p><code>fn</code> can return anything, so this is one of the few combinators that can return something other than a string.</p>
 <p><code>pipe</code> is functionally the same as applicative <code>lift</code> functions in Haskell. A two-parser <code>pipe</code> is the same as <code>liftA2</code>, a three-parser <code>pipe</code> is the same as <code>liftA3</code>, etc. A single-parser <code>pipe</code> is therefore the same as <a href="../map/"><code>map</code></a>.</p>

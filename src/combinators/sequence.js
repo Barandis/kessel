@@ -605,7 +605,7 @@ export const manyTill = (p, end) => parser(ctx => {
         context.index !== index, context, merge(pres.errors, endres.errors),
       )
     }
-    if (pres.value !== null) values.push(pres.value)
+    values.push(pres.value)
   }
   return ok(context, values)
 })

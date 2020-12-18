@@ -636,11 +636,11 @@ describe('Sequence combinators', () => {
         status: Fatal,
       })
     })
-    it('does not add null to the results', () => {
+    it('adds null to the results', () => {
       tpass(
         manyTill(
           choice(letter, skip(space)), digit,
-        ), 'a b c 1', ['a', 'b', 'c'],
+        ), 'a b c 1', ['a', null, 'b', null, 'c', null],
       )
     })
   })

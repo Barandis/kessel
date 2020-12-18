@@ -20,8 +20,6 @@ Applies some parsers in order, then returns the result of a function to which al
 
 `fn` will be passed one argument for every member of `ps`. JavaScript does not enforce that there has to be a parameter for each passed argument, but likely you will want to provide an `fn` that has an arity equal to the number of parsers in `ps`.
 
-Unlike [`sequence`](sequence.md), `null` parser results are *not* discarded. This ensures that the same number of arguments will be passed to `fn` no matter the results of the parsers.
-
 There is another version of this parser ([`pipeB`](pipeb.md)) that fails non-fatally and backtracks if the parser that fails does so non-fatally.
 
 `fn` can return anything, so this is one of the few combinators that can return something other than a string.
