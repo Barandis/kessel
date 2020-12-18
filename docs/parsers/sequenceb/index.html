@@ -2177,7 +2177,7 @@
 </code></pre></div>
 <p>Applies a series of parsers in order, returning an array that contains each parser's result.</p>
 <p><code>sequenceB</code> will only succeed if <em>all</em> of its parsers succeed. If one of them fails, <code>sequenceB</code> will also fail. If input was consumed before the failure occurred, <code>sequenceB</code> will backtrack to the location where its first parser was applied.</p>
-<p>All of the results are gathered into an array, but <code>null</code> results are skipped.</p>
+<p>All of the results are gathered into an array.</p>
 <p>A two-parser <code>sequenceB</code> is the same as <a href="../andthenb/"><code>andThenB</code></a>.</p>
 <h4 id="example">Example</h4>
 <div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">sequenceB</span><span class="p">(</span><span class="nx">letter</span><span class="p">,</span> <span class="nx">digit</span><span class="p">,</span> <span class="nx">letter</span><span class="p">)</span>
@@ -2214,7 +2214,7 @@
 </ul>
 <h4 id="success">Success</h4>
 <ul>
-<li>Succeeds if every parser in <code>ps</code> succeeds. Returns all of the non-<code>null</code> results of the parsers in <code>ps</code> gathered into an array.</li>
+<li>Succeeds if every parser in <code>ps</code> succeeds. Returns all of the results of the parsers in <code>ps</code> gathered into an array.</li>
 </ul>
 <h4 id="failure">Failure</h4>
 <ul>

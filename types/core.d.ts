@@ -25,9 +25,11 @@ export namespace Status {
 export type Success<T> = {
   status: "ok";
   value: T;
+  errors?: ErrorLlist;
 };
 export type Failure = {
   status: "fail" | "fatal";
+  value?: T;
   errors: ErrorList;
 };
 export type Result<T> = Success<T> | Failure;

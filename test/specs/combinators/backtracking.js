@@ -187,9 +187,9 @@ describe('Backtracking and error handling combinators', () => {
     it('succeeds if all of its parsers succeed', () => {
       tpass(parser, 'abcdefghi', { result: ['abc', 'def', 'ghi'], index: 9 })
     })
-    it('does not add null to results', () => {
+    it('adds null to results', () => {
       tpass(sequenceB(string('abc'), eof), 'abc', {
-        result: ['abc'],
+        result: ['abc', null],
         index: 3,
       })
     })
@@ -200,13 +200,13 @@ describe('Backtracking and error handling combinators', () => {
     it('gives opt error messages if later parsers fail', () => {
       const parser = sequenceB(opt(char('+')), opt(char('-')), digit)
       tpass(parser, '+-1', ['+', '-', '1'])
-      tpass(parser, '1', ['1'])
+      tpass(parser, '1', [null, null, '1'])
       tfail(parser, 'a', "'+', '-', or a digit")
     })
     it('ignores opt error messages if a later parser succeeds', () => {
       const parser = sequenceB(opt(char('-')), digit, digit)
       tpass(parser, '-12', ['-', '1', '2'])
-      tpass(parser, '12', ['1', '2'])
+      tpass(parser, '12', [null, '1', '2'])
       tfail(parser, 'ab', "'-' or a digit")
       tfail(parser, '1a', { nested: 'a digit' })
     })

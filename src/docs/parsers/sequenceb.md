@@ -16,7 +16,7 @@ Applies a series of parsers in order, returning an array that contains each pars
 
 `sequenceB` will only succeed if *all* of its parsers succeed. If one of them fails, `sequenceB` will also fail. If input was consumed before the failure occurred, `sequenceB` will backtrack to the location where its first parser was applied.
 
-All of the results are gathered into an array, but `null` results are skipped.
+All of the results are gathered into an array.
 
 A two-parser `sequenceB` is the same as [`andThenB`](andthenb.md).
 
@@ -58,7 +58,7 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 
 #### Success
 
-* Succeeds if every parser in `ps` succeeds. Returns all of the non-`null` results of the parsers in `ps` gathered into an array.
+* Succeeds if every parser in `ps` succeeds. Returns all of the results of the parsers in `ps` gathered into an array.
 
 #### Failure
 

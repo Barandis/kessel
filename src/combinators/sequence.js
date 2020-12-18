@@ -55,7 +55,7 @@ export const sequence = (...ps) => parser(ctx => {
     if (pres.status !== Ok) {
       return maybeFatal(context.index !== index, context, errors)
     }
-    if (pres.value !== null) values.push(pres.value)
+    values.push(pres.value)
   }
   return ok(context, values)
 })
@@ -191,7 +191,7 @@ export const many = p => parser(ctx => {
 
     if (pres.status === Fatal) return prep
     if (pres.status === Fail) break
-    if (pres.value !== null) values.push(pres.value)
+    values.push(pres.value)
     if (context.index >= context.view.byteLength) break
   }
   return ok(context, values)
@@ -216,7 +216,7 @@ export const many1 = p => parser(ctx => {
   if (pres.status !== Ok) return prep
 
   let context = pctx
-  const values = pres.value !== null ? [pres.value] : []
+  const values = [pres.value]
 
   while (true) {
     const [prep, [pctx, pres]] = twin(p(context))
@@ -224,7 +224,7 @@ export const many1 = p => parser(ctx => {
 
     if (pres.status === Fatal) return prep
     if (pres.status === Fail) break
-    if (pres.value !== null) values.push(pres.value)
+    values.push(pres.value)
     if (context.index >= context.view.byteLength) break
   }
   return ok(context, values)

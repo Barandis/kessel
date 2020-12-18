@@ -61,19 +61,22 @@ describe('Sequence combinators', () => {
     it('succeeds if all of its parsers succeed', () => {
       tpass(parser, 'abcdefghi', { result: ['abc', 'def', 'ghi'], index: 9 })
     })
-    it('does not add null to results', () => {
-      tpass(sequence(string('abc'), eof), 'abc', { result: ['abc'], index: 3 })
+    it('adds null to results', () => {
+      tpass(sequence(string('abc'), eof), 'abc', {
+        result: ['abc', null],
+        index: 3,
+      })
     })
     it('gives opt error messages if later parsers fail', () => {
       const parser = sequence(opt(char('+')), opt(char('-')), digit)
       tpass(parser, '+-1', ['+', '-', '1'])
-      tpass(parser, '1', ['1'])
+      tpass(parser, '1', [null, null, '1'])
       tfail(parser, 'a', "'+', '-', or a digit")
     })
     it('ignores opt error messages if a later parser succeeds', () => {
       const parser = sequence(opt(char('-')), digit, digit)
       tpass(parser, '-12', ['-', '1', '2'])
-      tpass(parser, '12', ['1', '2'])
+      tpass(parser, '12', [null, '1', '2'])
       tfail(parser, 'ab', "'-' or a digit")
       tfail(parser, '1a', 'a digit')
     })
@@ -176,11 +179,11 @@ describe('Sequence combinators', () => {
         status: Fatal,
       })
     })
-    it('does not add null to the results', () => {
+    it('adds null to the results', () => {
       tpass(
         many(map(letter, x => x === 'a' ? null : x)),
         'abc',
-        ['b', 'c'],
+        [null, 'b', 'c'],
       )
     })
   })
@@ -207,21 +210,21 @@ describe('Sequence combinators', () => {
         status: Fatal,
       })
     })
-    it('does not add null to the results', () => {
+    it('adds null to the results', () => {
       tpass(
         many1(map(letter, x => x === 'a' ? null : x)),
         'abc',
-        ['b', 'c'],
+        [null, 'b', 'c'],
       )
       tpass(
         many1(map(letter, x => x === 'b' ? null : x)),
         'abc',
-        ['a', 'c'],
+        ['a', null, 'c'],
       )
     })
     it('succeeds with a single null result', () => {
       tpass(
-        many1(map(letter, x => x === 'a' ? null : x)), 'a', [],
+        many1(map(letter, x => x === 'a' ? null : x)), 'a', [null],
       )
     })
   })

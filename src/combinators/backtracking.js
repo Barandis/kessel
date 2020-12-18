@@ -139,7 +139,7 @@ export const sequenceB = (...ps) => parser(ctx => {
       const err = index === context.index ? errors : nested(context, errors)
       return fail(context, err, index)
     }
-    if (pres.value !== null) values.push(pres.value)
+    values.push(pres.value)
   }
   return ok(context, values)
 })
