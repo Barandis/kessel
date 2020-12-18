@@ -3,7 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { choice } from 'kessel/combinators/alternative'
+import { choice, opt } from 'kessel/combinators/alternative'
 import { join, value } from 'kessel/combinators/misc'
 import { map } from 'kessel/combinators/primitive'
 import {
@@ -64,6 +64,19 @@ describe('Sequence combinators', () => {
     it('does not add null to results', () => {
       tpass(sequence(string('abc'), eof), 'abc', { result: ['abc'], index: 3 })
     })
+    it('gives opt error messages if later parsers fail', () => {
+      const parser = sequence(opt(char('+')), opt(char('-')), digit)
+      tpass(parser, '+-1', ['+', '-', '1'])
+      tpass(parser, '1', ['1'])
+      tfail(parser, 'a', "'+', '-', or a digit")
+    })
+    it('ignores opt error messages if a later parser succeeds', () => {
+      const parser = sequence(opt(char('-')), digit, digit)
+      tpass(parser, '-12', ['-', '1', '2'])
+      tpass(parser, '12', ['1', '2'])
+      tfail(parser, 'ab', "'-' or a digit")
+      tfail(parser, '1a', 'a digit')
+    })
   })
 
   describe('block', () => {
@@ -116,6 +129,28 @@ describe('Sequence combinators', () => {
     })
     it('succeeds with its return value if all parsers succeed', () => {
       tpass(parser, 'abc d ', { result: 'd', index: 6 })
+    })
+    it('gives opt error messages if later parsers fail', () => {
+      const parser = block(function *() {
+        yield opt(char('+'))
+        yield opt(char('-'))
+        return yield digit
+      })
+      tpass(parser, '+-1', '1')
+      tpass(parser, '1', '1')
+      tfail(parser, 'a', "'+', '-', or a digit")
+    })
+    it('ignores opt error messages if a later parser succeeds', () => {
+      const parser = block(function *() {
+        yield opt(char('-'))
+        const a = yield digit
+        const b = yield digit
+        return a + b
+      })
+      tpass(parser, '-12', '12')
+      tpass(parser, '12', '12')
+      tfail(parser, 'ab', "'-' or a digit")
+      tfail(parser, '1a', 'a digit')
     })
   })
 
@@ -909,6 +944,12 @@ describe('Sequence combinators', () => {
         status: Status.Fatal,
       })
     })
+    it('gives opt error messages if second parser fails', () => {
+      const parser = left(opt(char('-')), digit)
+      tpass(parser, '-1', '-')
+      tpass(parser, '1', { result: null })
+      tfail(parser, 'a', "'-' or a digit")
+    })
   })
 
   describe('right', () => {
@@ -944,6 +985,12 @@ describe('Sequence combinators', () => {
         index: 1,
         status: Fatal,
       })
+    })
+    it('gives opt error messages if second parser fails', () => {
+      const parser = right(opt(char('-')), digit)
+      tpass(parser, '-1', '1')
+      tpass(parser, '1', '1')
+      tfail(parser, 'a', "'-' or a digit")
     })
   })
 
@@ -983,6 +1030,20 @@ describe('Sequence combinators', () => {
         index: 1,
         status: Fatal,
       })
+    })
+    it('includes opt message if next parser fails', () => {
+      const parser = pipe(opt(char('-')), digit, digit, (s, a, b) =>
+        parseInt(a + b) * (s ? -1 : 1))
+      tpass(parser, '-12', { result: -12 })
+      tpass(parser, '12', { result: 12 })
+      tfail(parser, 'a1', "'-' or a digit")
+    })
+    it('does not include opt message if next parser succeeds', () => {
+      const parser = pipe(opt(char('-')), digit, digit, (s, a, b) =>
+        parseInt(a + b) * (s ? -1 : 1))
+      tpass(parser, '-12', { result: -12 })
+      tpass(parser, '12', { result: 12 })
+      tfail(parser, '1a', 'a digit')
     })
   })
 
@@ -1031,6 +1092,18 @@ describe('Sequence combinators', () => {
         index: 2,
         status: Fatal,
       })
+    })
+    it('gives opt error message if next parser fails', () => {
+      const parser = between(opt(char('-')), char('-'), digit)
+      tpass(parser, '-1-', '1')
+      tpass(parser, '1-', '1')
+      tfail(parser, 'a', "'-' or a digit")
+    })
+    it('gives no opt message if next parser succeeds', () => {
+      const parser = between(opt(char('-')), char('-'), digit)
+      tpass(parser, '-1-', '1')
+      tfail(parser, 'a', "'-' or a digit")
+      tfail(parser, '1+', "'-'")
     })
   })
 })

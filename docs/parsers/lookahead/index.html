@@ -1211,8 +1211,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../optional/" class="md-nav__link">
-      optional
+    <a href="../opt/" class="md-nav__link">
+      opt
     </a>
   </li>
 
@@ -2159,7 +2159,7 @@
 </blockquote>
 <p>Applies a parser and returns its result on success, but does not consume input.</p>
 <p>This parser allows for peeking ahead to see what characters are coming up without actually consuming those characters. It's common to see it in <a href="../block/"><code>block</code></a> parsers to drive logic that determines which parser gets applied based on the next character.</p>
-<p><code>lookAhead</code> is very similar to <a href="../optional/"><code>optional</code></a>. The difference is that <code>optional</code> consumes input on success where <code>lookAhead</code> does not.</p>
+<p><code>lookAhead</code> is very similar to <a href="../opt/"><code>opt</code></a>. The difference is that <code>opt</code> consumes input on success where <code>lookAhead</code> does not.</p>
 <h4 id="example">Example</h4>
 <div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">lookAhead</span><span class="p">(</span><span class="nx">letter</span><span class="p">)</span>
 
@@ -2191,7 +2191,7 @@
 <ul>
 <li><a href="../../types/parser/"><code>Parser</code></a></li>
 <li><a href="../block/"><code>block</code></a></li>
-<li><a href="../optional/"><code>optional</code></a></li>
+<li><a href="../opt/"><code>opt</code></a></li>
 </ul>
                 
               

@@ -91,7 +91,9 @@ export const apply = (p, q) => parser(ctx => {
 
   const [qctx, qres] = q(pctx)
   if (qres.status !== Ok) {
-    return maybeFatal(qctx.index !== index, qctx, qres.errors)
+    return maybeFatal(
+      qctx.index !== index, qctx, merge(pres.errors, qres.errors),
+    )
   }
 
   const fn = qres.value
@@ -142,7 +144,7 @@ export const chain = (p, fn) => parser(ctx => {
   const [qrep, [qctx, qres]] = twin(q(pctx))
   return qres.status === Ok
     ? qrep
-    : maybeFatal(qctx.index !== index, qctx, qres.errors)
+    : maybeFatal(qctx.index !== index, qctx, merge(pres.errors, qres.errors))
 })
 
 // ====================================================================
@@ -222,5 +224,5 @@ export const andThen = (p, q) => parser(ctx => {
   const [qctx, qres] = q(pctx)
   return qres.status === Ok
     ? ok(qctx, [pres.value, qres.value])
-    : maybeFatal(qctx.index !== index, qctx, qres.errors)
+    : maybeFatal(qctx.index !== index, qctx, merge(pres.errors, qres.errors))
 })

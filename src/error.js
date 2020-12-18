@@ -197,12 +197,12 @@ export function compound(label, ctx, errors) {
 /**
  * Merges two arrays of errors.
  *
- * @param {ErrorList} errors1 The first array of errors.
- * @param {ErrorList} errors2 The second array of errors.
+ * @param {ErrorList} [errors1=[]] The first array of errors.
+ * @param {ErrorList} [errors2=[]] The second array of errors.
  * @returns {ErrorList} A new array containing all of the errors from
  *     the first two arrays.
  */
-export function merge(errors1, errors2) {
+export function merge(errors1 = [], errors2 = []) {
   return [...errors1, ...errors2]
 }
 

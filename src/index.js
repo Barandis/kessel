@@ -62,7 +62,7 @@ export {
   notEmptyM,
   notFollowedBy,
   notFollowedByM,
-  optional,
+  opt,
   orValue,
 } from './combinators/alternative'
 export {

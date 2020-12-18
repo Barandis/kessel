@@ -96,7 +96,7 @@ nav:
       - notFollowedByM: parsers/notfollowedbym.md
       - nth: parsers/nth.md
       - octal: parsers/octal.md
-      - optional: parsers/optional.md
+      - opt: parsers/opt.md
       - orElse: parsers/orelse.md
       - orValue: parsers/orvalue.md
       - pipe: parsers/pipe.md

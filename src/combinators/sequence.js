@@ -44,14 +44,16 @@ export const sequence = (...ps) => parser(ctx => {
 
   const values = []
   const index = ctx.index
+  let errors = []
   let context = ctx
 
   for (const p of ps) {
     const [pctx, pres] = p(context)
     context = pctx
+    errors = pres.errors?.length ? merge(errors, pres.errors) : []
 
     if (pres.status !== Ok) {
-      return maybeFatal(context.index !== index, context, pres.errors)
+      return maybeFatal(context.index !== index, context, errors)
     }
     if (pres.value !== null) values.push(pres.value)
   }
@@ -82,7 +84,7 @@ export const left = (p, q) => parser(ctx => {
 
   const [qctx, qres] = q(pctx)
   return qres.status === Ok ? ok(qctx, pres.value)
-    : maybeFatal(qctx.index !== index, qctx, qres.errors)
+    : maybeFatal(qctx.index !== index, qctx, merge(pres.errors, qres.errors))
 })
 
 /**
@@ -109,7 +111,7 @@ export const right = (p, q) => parser(ctx => {
 
   const [qrep, [qctx, qres]] = twin(q(pctx))
   return qres.status === Ok ? qrep
-    : maybeFatal(qctx.index !== index, qctx, qres.errors)
+    : maybeFatal(qctx.index !== index, qctx, merge(pres.errors, qres.errors))
 })
 
 /**
@@ -140,6 +142,7 @@ export const block = genFn => parser(ctx => {
 
   const gen = genFn()
   const index = ctx.index
+  let errors = []
   let nextValue
   let context = ctx
   let i = 0
@@ -154,9 +157,10 @@ export const block = genFn => parser(ctx => {
 
     const [pctx, pres] = value(context)
     context = pctx
+    errors = pres.errors?.length ? merge(errors, pres.errors) : []
 
     if (pres.status !== Ok) {
-      return maybeFatal(context.index !== index, context, pres.errors)
+      return maybeFatal(context.index !== index, context, errors)
     }
     nextValue = pres.value
     i++
@@ -550,13 +554,17 @@ export const between = (pre, post, p) => parser(ctx => {
   if (preres.status !== Ok) return prerep
 
   const [pctx, pres] = p(prectx)
+  const errors = pres.errors?.length ? merge(preres.errors, pres.errors) : []
   if (pres.status !== Ok) {
-    return maybeFatal(pctx.index !== index, pctx, pres.errors)
+    return maybeFatal(pctx.index !== index, pctx, errors)
   }
 
   const [postctx, postres] = post(pctx)
-  return postres.status === Ok ? ok(postctx, pres.value)
-    : maybeFatal(postctx.index !== index, postctx, postres.errors)
+  return postres.status === Ok
+    ? ok(postctx, pres.value)
+    : maybeFatal(
+      postctx.index !== index, postctx, merge(errors, postres.errors),
+    )
 })
 
 /**
@@ -620,7 +628,7 @@ export const manyTill = (p, end) => parser(ctx => {
  * `liftA2` if two parsers are passed in, `liftA3` if three are passed
  * in, etc.
  *
- * @param {...(Parser|function(...*):*)} ps An array of parsers to be
+ * @param {...(Parser|function(...*):*)} args An array of parsers to be
  *     executed one at a time, in order, followed by a function which
  *     will receive as parameters the results of each parser. Its return
  *     value will become the result of this parser. A single function
@@ -630,27 +638,32 @@ export const manyTill = (p, end) => parser(ctx => {
  *     feed the results to its function, and result in the function's
  *     return value.
  */
-export const pipe = (...ps) => parser(ctx => {
+export const pipe = (...args) => {
+  const ps = args.slice()
   const fn = ps.pop()
 
-  ASSERT && assertParsers('pipe', ps)
-  ASSERT && assertFunction('pipe', fn, ordFnFormatter(ordinal(ps.length + 1)))
+  return parser(ctx => {
+    ASSERT && assertParsers('pipe', ps)
+    ASSERT && assertFunction('pipe', fn, ordFnFormatter(ordinal(ps.length + 1)))
 
-  const index = ctx.index
-  const values = []
-  let context = ctx
+    const index = ctx.index
+    const values = []
+    let context = ctx
+    let errors = []
 
-  for (const p of ps) {
-    const [pctx, pres] = p(context)
-    context = pctx
+    for (const p of ps) {
+      const [pctx, pres] = p(context)
+      context = pctx
+      errors = pres.errors?.length ? merge(errors, pres.errors) : []
 
-    if (pres.status !== Ok) {
-      return maybeFatal(context.index !== index, context, pres.errors)
+      if (pres.status !== Ok) {
+        return maybeFatal(context.index !== index, context, errors)
+      }
+      values.push(pres.value)
     }
-    values.push(pres.value)
-  }
-  return ok(context, fn(...values))
-})
+    return ok(context, fn(...values))
+  })
+}
 
 /**
  * Private formatting function for assertion messages about op parsers

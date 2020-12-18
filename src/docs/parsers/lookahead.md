@@ -11,7 +11,7 @@ Applies a parser and returns its result on success, but does not consume input.
 
 This parser allows for peeking ahead to see what characters are coming up without actually consuming those characters. It's common to see it in [`block`](block.md) parsers to drive logic that determines which parser gets applied based on the next character.
 
-`lookAhead` is very similar to [`optional`](optional.md). The difference is that `optional` consumes input on success where `lookAhead` does not.
+`lookAhead` is very similar to [`opt`](opt.md). The difference is that `opt` consumes input on success where `lookAhead` does not.
 
 #### Example
 
@@ -47,4 +47,4 @@ console.log(success(f)) // null
 
 * [`Parser`](../types/parser.md)
 * [`block`](block.md)
-* [`optional`](optional.md)
+* [`opt`](opt.md)

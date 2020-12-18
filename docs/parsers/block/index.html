@@ -1218,8 +1218,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../optional/" class="md-nav__link">
-      optional
+    <a href="../opt/" class="md-nav__link">
+      opt
     </a>
   </li>
 
@@ -2209,7 +2209,7 @@
                         <span class="c1">// Expected a digit</span>
 </code></pre></div>
 <p>The first yielded parser here is <code>spaces</code>. This skips zero or more whitespace characters. Its result is discarded as it is not assigned to anything (besides, <code>spaces</code> only returns <code>null</code> so its result isn't useful).</p>
-<p>The second yielded parser is <code>optional(orElse(char('+'), char('-')))</code>. This will match either a <code>'+'</code> or <code>'-'</code> if it's there, or return <code>null</code> if the next character is neither of those (without <code>optional</code> it would fail, and we don't want that because it's okay for a number to have no sign). This value (either <code>'+'</code>, <code>'-'</code>, or <code>null</code>) is assigned to the variable <code>sign</code>.</p>
+<p>The second yielded parser is <code>opt(orElse(char('+'), char('-')))</code>. This will match either a <code>'+'</code> or <code>'-'</code> if it's there, or return <code>null</code> if the next character is neither of those (without <code>opt</code> it would fail, and we don't want that because it's okay for a number to have no sign). This value (either <code>'+'</code>, <code>'-'</code>, or <code>null</code>) is assigned to the variable <code>sign</code>.</p>
 <p>The third yielded parser is <code>join(many1(digit))</code>. This simply matches a series of one or more digit characters (<code>0-9</code>), returning them as a single string instead of an array of characters (because of <code>join</code>). This parses a natural number, assigning the result to <code>number</code>. (When combined with <code>sign</code>, this could be a negative number as well, so the two together parse an integer.)</p>
 <p>The fourth yielded parser skips whitespace at the end, similar to the first parser.</p>
 <p>After the parsing is done, <code>sign</code> and <code>number</code> are used in a calculation that turns them into an integer of the JavaScript <code>number</code> type. This number is returned at the end, so the <code>block</code> parser in total results in this number. Note that it isn't a string, like most parsers return; <code>block</code> can return anything that its function can return.</p>

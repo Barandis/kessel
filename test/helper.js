@@ -139,6 +139,10 @@ export function tfail(parser, test, error = {}) {
     if ('status' in error) {
       expect(result.status).to.equal(error.status)
     }
+    if ('nested' in error) {
+      expect(first(result.errors[0].errors, ErrorType.Expected))
+        .to.equal(error.nested)
+    }
   }
 }
 

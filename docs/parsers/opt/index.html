@@ -18,7 +18,7 @@
     
     
       
-        <title>optional - Kessel</title>
+        <title>opt - Kessel</title>
       
     
     
@@ -91,7 +91,7 @@
           </span>
           <span class="md-header-nav__topic md-ellipsis">
             
-              optional
+              opt
             
           </span>
         </div>
@@ -1149,12 +1149,12 @@
     
     
       <label class="md-nav__link md-nav__link--active" for="__toc">
-        optional
+        opt
         <span class="md-nav__icon md-icon"></span>
       </label>
     
     <a href="./" class="md-nav__link md-nav__link--active">
-      optional
+      opt
     </a>
     
       
@@ -2145,7 +2145,7 @@
               
                 
                 
-                  <h1>optional</h1>
+                  <h1>opt</h1>
                 
                 <!--
  Copyright (c) 2020 Thomas J. Otterson
@@ -2155,13 +2155,13 @@
 -->
 
 <blockquote>
-<p><code>optional(p: Parser&lt;T&gt;): Parser&lt;T | null&gt;</code></p>
+<p><code>opt(p: Parser&lt;T&gt;): Parser&lt;T | null&gt;</code></p>
 </blockquote>
 <p>Optionally matches a parser. If this parser succeeds, its result is returned. If it fails, <code>null</code> is returned.</p>
-<p><code>optional</code> will only fail (fatally) if its parser fails fatally.</p>
-<p>A common use case is to skip some optional input; in this case, <code>optional</code> can be wrapped in <a href="../skip/"><code>skip</code></a>, it can be placed in a position in another combinator where its output is ignored (such as <a href="../left/"><code>left</code></a>'s second parser.md), or its output can simply not be used.</p>
+<p><code>opt</code> will only fail (fatally) if its parser fails fatally.</p>
+<p>A common use case is to skip some optional input; in this case, <code>opt</code> can be wrapped in <a href="../skip/"><code>skip</code></a>, it can be placed in a position in another combinator where its output is ignored (such as <a href="../left/"><code>left</code></a>'s second parser.md), or its output can simply not be used.</p>
 <h4 id="example">Example</h4>
-<div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">optional</span><span class="p">(</span><span class="nx">sequence</span><span class="p">(</span><span class="nx">letter</span><span class="p">,</span> <span class="nx">digit</span><span class="p">))</span>
+<div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">opt</span><span class="p">(</span><span class="nx">sequence</span><span class="p">(</span><span class="nx">letter</span><span class="p">,</span> <span class="nx">digit</span><span class="p">))</span>
 
 <span class="kr">const</span> <span class="nx">s</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;a1&#39;</span><span class="p">)</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">status</span><span class="p">(</span><span class="nx">s</span><span class="p">))</span>  <span class="c1">// &quot;ok&quot;</span>
@@ -2185,7 +2185,7 @@
 </ul>
 <h4 id="success">Success</h4>
 <ul>
-<li>Succeeds unless <code>p</code> fails fatally. If <code>p</code> succeeds, its result is returned. If <code>p</code> fails, <code>optional</code> still succeeds, but it returns nothing (<code>null</code>).</li>
+<li>Succeeds unless <code>p</code> fails fatally. If <code>p</code> succeeds, its result is returned. If <code>p</code> fails, <code>opt</code> still succeeds, but it returns nothing (<code>null</code>) and still generates an error message (for use in sequential combinators when the next parser also fails).</li>
 </ul>
 <h4 id="fatal-failure">Fatal Failure</h4>
 <ul>

@@ -12,7 +12,7 @@ import {
   notEmptyM,
   notFollowedBy,
   notFollowedByM,
-  optional,
+  opt,
   orValue,
 } from 'kessel/combinators/alternative'
 import { many, sequence } from 'kessel/combinators/sequence'
@@ -55,23 +55,23 @@ describe('Alternative and conditional combinators', () => {
     })
   })
 
-  describe('optional', () => {
+  describe('opt', () => {
     it('throws if its argument is not a parser', () => {
-      terror(optional(0), '', '[optional]: expected a parser; found 0')
+      terror(opt(0), '', '[opt]: expected a parser; found 0')
     })
     it('consumes input and provides a result on success', () => {
-      tpass(optional(char('a')), 'abc', { result: 'a', index: 1 })
+      tpass(opt(char('a')), 'abc', { result: 'a', index: 1 })
     })
     it('succeeds without consuming if its parser fails', () => {
-      tpass(optional(char('a')), 'bcd', { result: null, index: 0 })
+      tpass(opt(char('a')), 'bcd', { result: null, index: 0 })
     })
     it('fails fatally if its parser fails fatally', () => {
-      tfail(optional(sequence(char('a'), char('b'))), 'acd', {
+      tfail(opt(sequence(char('a'), char('b'))), 'acd', {
         expected: "'b'",
         index: 1,
         status: Fatal,
       })
-      tpass(optional(attempt(sequence(char('a'), char('b')))), 'acd', {
+      tpass(opt(attempt(sequence(char('a'), char('b')))), 'acd', {
         result: null,
         index: 0,
       })

@@ -55,7 +55,7 @@ console.log(failure(t)) // Parse error at (line 1, column 2):
 
 The first yielded parser here is `spaces`. This skips zero or more whitespace characters. Its result is discarded as it is not assigned to anything (besides, `spaces` only returns `null` so its result isn't useful).
 
-The second yielded parser is `optional(orElse(char('+'), char('-')))`. This will match either a `'+'` or `'-'` if it's there, or return `null` if the next character is neither of those (without `optional` it would fail, and we don't want that because it's okay for a number to have no sign). This value (either `'+'`, `'-'`, or `null`) is assigned to the variable `sign`.
+The second yielded parser is `opt(orElse(char('+'), char('-')))`. This will match either a `'+'` or `'-'` if it's there, or return `null` if the next character is neither of those (without `opt` it would fail, and we don't want that because it's okay for a number to have no sign). This value (either `'+'`, `'-'`, or `null`) is assigned to the variable `sign`.
 
 The third yielded parser is `join(many1(digit))`. This simply matches a series of one or more digit characters (`0-9`), returning them as a single string instead of an array of characters (because of `join`). This parses a natural number, assigning the result to `number`. (When combined with `sign`, this could be a negative number as well, so the two together parse an integer.)
 

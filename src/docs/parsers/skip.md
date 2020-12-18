@@ -54,6 +54,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 #### See Also
 
 * [`Parser`](../types/parser.md)
-* [`optional`](optional.md)
+* [`opt`](opt.md)
 * [`skipMany`](skipmany.md)
 * [`skipMany1`](skipmany1.md)

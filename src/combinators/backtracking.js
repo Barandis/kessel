@@ -16,7 +16,7 @@ import {
   ordParFormatter,
   ordStrFormatter,
 } from 'kessel/assert'
-import { fail, ok, parser, Status } from 'kessel/core'
+import { fail, fatal, ok, parser, Status } from 'kessel/core'
 import { compound, ErrorType, expected, merge, nested } from 'kessel/error'
 import { ordinal, range, stringify, twin } from 'kessel/util'
 
@@ -127,16 +127,16 @@ export const sequenceB = (...ps) => parser(ctx => {
   const values = []
   const index = ctx.index
   let context = ctx
+  let errors = []
 
   for (const p of ps) {
     const [prep, [pctx, pres]] = twin(p(context))
     context = pctx
+    errors = pres.errors?.length ? merge(errors, pres.errors) : []
 
     if (pres.status === Fatal) return prep
     if (pres.status === Fail) {
-      const err = index === context.index
-        ? pres.errors
-        : nested(context, pres.errors)
+      const err = index === context.index ? errors : nested(context, errors)
       return fail(context, err, index)
     }
     if (pres.value !== null) values.push(pres.value)
@@ -177,9 +177,10 @@ export const chainB = (p, fn) => parser(ctx => {
   )
 
   const [qrep, [qctx, qres]] = twin(q(pctx))
-  if (qres.status !== Fail) return qrep
-
-  const err = index === qctx.index ? qres.errors : nested(qctx, qres.errors)
+  if (qres.status === Ok) return qrep
+  const errors = merge(pres.errors, qres.errors)
+  if (qres.status === Fatal) return fatal(qctx, errors)
+  const err = index === qctx.index ? errors : nested(qctx, errors)
   return fail(qctx, err, index)
 })
 
@@ -206,9 +207,13 @@ export const applyB = (p, q) => parser(ctx => {
   const [prep, [pctx, pres]] = twin(p(ctx))
   if (pres.status !== Ok) return prep
 
-  const [qrep, [qctx, qres]] = twin(q(pctx))
-  if (qres.status === Fatal) return qrep
-  if (qres.status === Fail) return fail(qctx, qres.errors, index)
+  const [qctx, qres] = q(pctx)
+  const errors = merge(pres.errors, qres.errors)
+  if (qres.status === Fatal) return fatal(qctx, errors)
+  if (qres.status === Fail) {
+    const err = index === qctx.index ? errors : nested(qctx, errors)
+    return fail(qctx, err, index)
+  }
 
   const fn = qres.value
   ASSERT && assertFunction(
@@ -238,11 +243,13 @@ export const leftB = (p, q) => parser(ctx => {
   const [prep, [pctx, pres]] = twin(p(ctx))
   if (pres.status !== Ok) return prep
 
-  const [qrep, [qctx, qres]] = twin(q(pctx))
-  if (qres.status === Fatal) return qrep
+  const [qctx, qres] = q(pctx)
   if (qres.status === Ok) return ok(qctx, pres.value)
 
-  const err = index === qctx.index ? qres.errors : nested(qctx, qres.errors)
+  const errors = merge(pres.errors, qres.errors)
+  if (qres.status === Fatal) return fatal(qctx, errors)
+
+  const err = index === qctx.index ? errors : nested(qctx, errors)
   return fail(qctx, err, index)
 })
 
@@ -265,12 +272,15 @@ export const rightB = (p, q) => parser(ctx => {
   const index = ctx.index
 
   const [prep, [pctx, pres]] = twin(p(ctx))
-  if (pres.status !== Status.Ok) return prep
+  if (pres.status !== Ok) return prep
 
   const [qrep, [qctx, qres]] = twin(q(pctx))
-  if (qres.status !== Fail) return qrep
+  if (qres.status === Ok) return qrep
 
-  const err = index === qctx.index ? qres.errors : nested(qctx, qres.errors)
+  const errors = merge(pres.errors, qres.errors)
+  if (qres.status === Fatal) return fatal(qctx, errors)
+
+  const err = index === qctx.index ? errors : nested(qctx, errors)
   return fail(qctx, err, index)
 })
 
@@ -295,11 +305,13 @@ export const andThenB = (p, q) => parser(ctx => {
   const [prep, [pctx, pres]] = twin(p(ctx))
   if (pres.status !== Ok) return prep
 
-  const [qrep, [qctx, qres]] = twin(q(pctx))
-  if (qres.status === Fatal) return qrep
+  const [qctx, qres] = q(pctx)
   if (qres.status === Ok) return ok(qctx, [pres.value, qres.value])
 
-  const err = index === qctx.index ? qres.errors : nested(qctx, qres.errors)
+  const errors = merge(pres.errors, qres.errors)
+  if (qres.status === Fatal) return fatal(qctx, errors)
+
+  const err = index === qctx.index ? errors : nested(qctx, errors)
   return fail(qctx, err, index)
 })
 
@@ -407,6 +419,7 @@ export const blockB = genFn => parser(ctx => {
 
   const gen = genFn()
   const index = ctx.index
+  let errors = []
   let nextValue
   let context = ctx
   let i = 0
@@ -419,11 +432,15 @@ export const blockB = genFn => parser(ctx => {
       ordinal(i + 1)
     } yield to be to a parser; found ${stringify(v)}`)
 
-    const [prep, [pctx, pres]] = twin(value(context))
+    const [pctx, pres] = value(context)
     context = pctx
+    errors = pres.errors?.length ? merge(errors, pres.errors) : []
 
-    if (pres.status === Fatal) return prep
-    if (pres.status === Fail) return fail(pctx, pres.errors, index)
+    if (pres.status === Fatal) return fatal(context, errors)
+    if (pres.status === Fail) {
+      const err = index === context.index ? errors : nested(context, errors)
+      return fail(context, err, index)
+    }
     nextValue = pres.value
     i++
   }
@@ -439,7 +456,7 @@ export const blockB = genFn => parser(ctx => {
  * parsers succeeded, this parser will backtrack to the point where the
  * very first parser was executed and will fail non-fatally.
  *
- * @param {...(Parser|function(...*):*)} ps An array of parsers to be
+ * @param {...(Parser|function(...*):*)} args An array of parsers to be
  *     executed one at a time, in order, followed by a function which
  *     will receive as parameters the results of each parser. Its return
  *     value will become the result of this parser. A single function
@@ -449,26 +466,36 @@ export const blockB = genFn => parser(ctx => {
  *     feed the results to its function, and result in the function's
  *     return value.
  */
-export const pipeB = (...ps) => parser(ctx => {
+export const pipeB = (...args) => {
+  const ps = args.slice()
   const fn = ps.pop()
 
-  ASSERT && assertParsers('pipeB', ps)
-  ASSERT && assertFunction('pipeB', fn, ordFnFormatter(ordinal(ps.length + 1)))
+  return parser(ctx => {
+    ASSERT && assertParsers('pipeB', ps)
+    ASSERT && assertFunction(
+      'pipeB', fn, ordFnFormatter(ordinal(ps.length + 1)),
+    )
 
-  const index = ctx.index
-  const values = []
-  let context = ctx
+    const index = ctx.index
+    const values = []
+    let context = ctx
+    let errors = []
 
-  for (const p of ps) {
-    const [prep, [pctx, pres]] = twin(p(context))
-    context = pctx
+    for (const p of ps) {
+      const [pctx, pres] = p(context)
+      context = pctx
+      errors = pres.errors?.length ? merge(errors, pres.errors) : []
 
-    if (pres.status === Fatal) return prep
-    if (pres.status === Fail) return fail(context, pres.errors, index)
-    values.push(pres.value)
-  }
-  return ok(context, fn(...values))
-})
+      if (pres.status === Fatal) return fatal(context, errors)
+      if (pres.status === Fail) {
+        const err = index === context.index ? errors : nested(context, errors)
+        return fail(context, err, index)
+      }
+      values.push(pres.value)
+    }
+    return ok(context, fn(...values))
+  })
+}
 
 /**
  * A parser which executes its pre, content, and post parsers in order
@@ -494,12 +521,22 @@ export const betweenB = (pre, post, p) => parser(ctx => {
   const [prerep, [prectx, preres]] = twin(pre(ctx))
   if (preres.status !== Ok) return prerep
 
-  const [prep, [pctx, pres]] = twin(p(prectx))
-  if (pres.status === Fatal) return prep
-  if (pres.status === Fail) return fail(pctx, pres.errors, index)
+  const [pctx, pres] = p(prectx)
+  let errors = pres.errors?.length ? merge(preres.errors, pres.errors) : []
+  if (pres.status === Fatal) return fatal(pctx, errors)
+  if (pres.status === Fail) {
+    const err = index === pctx.index ? errors : nested(pctx, errors)
+    return fail(pctx, err, index)
+  }
 
-  const [postrep, [postctx, postres]] = twin(post(pctx))
-  if (postres.status === Fatal) return postrep
-  if (postres.status === Fail) return fail(postctx, postres.errors, index)
+  const [postctx, postres] = post(pctx)
+  if (postres.status === Fatal) {
+    return fatal(postctx, merge(errors, postres.errors))
+  }
+  if (postres.status === Fail) {
+    errors = merge(errors, postres.errors)
+    const err = index === postctx.index ? errors : nested(postctx, errors)
+    return fail(postctx, err, index)
+  }
   return ok(postctx, pres.value)
 })

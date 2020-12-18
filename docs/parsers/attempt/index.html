@@ -1211,8 +1211,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../optional/" class="md-nav__link">
-      optional
+    <a href="../opt/" class="md-nav__link">
+      opt
     </a>
   </li>
 
@@ -2158,7 +2158,7 @@
 <p><code>attempt(p: Parser&lt;T&gt;): Parser&lt;T&gt;</code></p>
 </blockquote>
 <p>Applies a parser and, if it fails after consuming input, backtracks to the original location and fails non-fatally.</p>
-<p><code>attempt</code> implements general backtracking. It is different from the backtracking <code>B</code> parsers (<a href="../sequenceb/"><code>sequenceB</code></a>, <a href="../leftb/"><code>leftB</code></a>, etc.) in that it is meant to deal with all fatal failures (the <code>B</code> parsers only deal with fatal failures that result from non-fatal failures that come after successes). It's common to use this parser in conjunction with <a href="../choice/"><code>choice</code></a>, <a href="../optional/"><code>optional</code></a>, and other parsers which only fail if their parsers fail fatally.</p>
+<p><code>attempt</code> implements general backtracking. It is different from the backtracking <code>B</code> parsers (<a href="../sequenceb/"><code>sequenceB</code></a>, <a href="../leftb/"><code>leftB</code></a>, etc.) in that it is meant to deal with all fatal failures (the <code>B</code> parsers only deal with fatal failures that result from non-fatal failures that come after successes). It's common to use this parser in conjunction with <a href="../choice/"><code>choice</code></a>, <a href="../opt/"><code>opt</code></a>, and other parsers which only fail if their parsers fail fatally.</p>
 <p>Take care when using this parser. It attempts to provide information about what caused the backtracking to occur, but it's not hard to get long and convoluted error messages that don't help a lot if it's used to much. Use backtracking as little as can be done and still serve your needs.</p>
 <h4 id="example">Example</h4>
 <div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">attempt</span><span class="p">(</span><span class="nx">left</span><span class="p">(</span><span class="nx">letter</span><span class="p">,</span> <span class="nx">digit</span><span class="p">))</span>
@@ -2212,7 +2212,7 @@
 <li><a href="../../types/parser/"><code>Parser</code></a></li>
 <li><a href="../attemptm/"><code>attemptM</code></a></li>
 <li><a href="../choice/"><code>choice</code></a></li>
-<li><a href="../optional/"><code>optional</code></a></li>
+<li><a href="../opt/"><code>opt</code></a></li>
 <li><a href="../orvalue/"><code>orValue</code></a></li>
 </ul>
                 

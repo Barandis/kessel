@@ -123,7 +123,7 @@ Additionally, parsers are often said to *return* a value or to have a value as a
 | Parser | Description |
 |--------|-------------|
 | [`choice`](parsers/choice.md) | Executes a series of parsers one at a time until one succeeds. |
-| [`optional`](parsers/optional.md) | Executes a parser and returns its result on success. On failure, succeeds but returns nothing. |
+| [`opt`](parsers/opt.md) | Executes a parser and returns its result on success. On failure, succeeds but returns nothing. |
 | [`orValue`](parsers/orvalue.md) | Executes a parser and returns either its result upon success or another value upon failure. |
 | [`lookAhead`](parsers/lookahead.md) | Executes a parser and returns its result without consuming input. |
 | [`notEmpty`](parsers/notempty.md) | Executes a parser and fails if the parser succeeds without consuming input. |

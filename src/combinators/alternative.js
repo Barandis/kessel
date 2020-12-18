@@ -55,11 +55,19 @@ export const choice = (...ps) => parser(ctx => {
  *     contained parser fails fatally. This parser consumes text only
  *     if its contained parser succeeds.
  */
-export const optional = p => parser(ctx => {
-  ASSERT && assertParser('optional', p)
+export const opt = p => parser(ctx => {
+  ASSERT && assertParser('opt', p)
 
   const [prep, [pctx, pres]] = twin(p(ctx))
-  return pres.status !== Fail ? prep : ok(pctx, null)
+  if (pres.status !== Fail) return prep
+
+  // If the optional parser fails, we add the error message even though
+  // the end result of `opt` is success. This lets sequencing parsers
+  // add the opt parser's expected to error messages if a later parser
+  // in the sequence fails.
+  const reply = ok(pctx, null)
+  reply[1].errors = pres.errors
+  return reply
 })
 
 /**

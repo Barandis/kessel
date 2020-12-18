@@ -5,18 +5,18 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `optional(p: Parser<T>): Parser<T | null>`
+> `opt(p: Parser<T>): Parser<T | null>`
 
 Optionally matches a parser. If this parser succeeds, its result is returned. If it fails, `null` is returned.
 
-`optional` will only fail (fatally) if its parser fails fatally.
+`opt` will only fail (fatally) if its parser fails fatally.
 
-A common use case is to skip some optional input; in this case, `optional` can be wrapped in [`skip`](skip.md), it can be placed in a position in another combinator where its output is ignored (such as [`left`](left.md)'s second parser.md), or its output can simply not be used.
+A common use case is to skip some optional input; in this case, `opt` can be wrapped in [`skip`](skip.md), it can be placed in a position in another combinator where its output is ignored (such as [`left`](left.md)'s second parser.md), or its output can simply not be used.
 
 #### Example
 
 ```javascript
-const parser = optional(sequence(letter, digit))
+const parser = opt(sequence(letter, digit))
 
 const s = parse(parser, 'a1')
 console.log(status(s))  // "ok"
@@ -41,7 +41,7 @@ console.log(failure(t)) // Parse error at (line 1, column 2):
 
 #### Success
 
-* Succeeds unless `p` fails fatally. If `p` succeeds, its result is returned. If `p` fails, `optional` still succeeds, but it returns nothing (`null`).
+* Succeeds unless `p` fails fatally. If `p` succeeds, its result is returned. If `p` fails, `opt` still succeeds, but it returns nothing (`null`) and still generates an error message (for use in sequential combinators when the next parser also fails).
 
 #### Fatal Failure
 

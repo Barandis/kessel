@@ -3,6 +3,8 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+import { opt } from 'kessel/combinators/alternative'
+import { value } from 'kessel/combinators/misc'
 import {
   always,
   andThen,
@@ -101,6 +103,12 @@ describe('Primitive combinators', () => {
       tfail(p, 'cd', { expected: "'a'", status: Fail })
       tfail(p, 'ac', { expected: "'b'", status: Fatal })
     })
+    it('adds opt error message if next parser fails', () => {
+      const parser = apply(opt(char('-')), value(digit, x => x))
+      tpass(parser, '-1', '-')
+      tpass(parser, '1', { value: null })
+      tfail(parser, 'a', "'-' or a digit")
+    })
   })
 
   describe('chain', () => {
@@ -149,6 +157,12 @@ describe('Primitive combinators', () => {
       tpass(p, 'ab', ['a', 'b'])
       tfail(p, 'cd', { expected: "'a'", status: Fail })
       tfail(p, 'ac', { expected: "'b'", status: Fatal })
+    })
+    it('adds opt error message if next parser fails', () => {
+      const parser = chain(opt(char('-')), () => digit)
+      tpass(parser, '-1', '1')
+      tpass(parser, '1', '1')
+      tfail(parser, 'a', "'-' or a digit")
     })
   })
 
@@ -228,6 +242,12 @@ describe('Primitive combinators', () => {
         index: 1,
         status: Status.Fatal,
       })
+    })
+    it('returns opt error message if later parser fails', () => {
+      const parser = andThen(opt(char('+')), digit)
+      tpass(parser, '+1', ['+', '1'])
+      tpass(parser, '1', [null, '1'])
+      tfail(parser, 'a', "'+' or a digit")
     })
   })
 })
