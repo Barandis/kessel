@@ -62,6 +62,7 @@ nav:
       - char: parsers/char.md
       - charI: parsers/chari.md
       - choice: parsers/choice.md
+      - compact: parsers/compact.md
       - digit: parsers/digit.md
       - empty: parsers/empty.md
       - eof: parsers/eof.md

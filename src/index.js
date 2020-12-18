@@ -82,6 +82,7 @@ export {
   sequenceB,
 } from './combinators/backtracking'
 export {
+  compact,
   fifth,
   first,
   fourth,

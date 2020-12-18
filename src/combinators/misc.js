@@ -21,7 +21,7 @@ const { Ok } = Status
 /**
  * A parser which will execute `p` and return `p`'s results joined
  * together into a single string. This requires that `p` returns an
- * array of strings; an error will be thrown if it does not.
+ * array; an error will be thrown if it does not.
  *
  * @param {Parser} p A parser that is expected to return an array of
  *     strings.
@@ -39,6 +39,27 @@ export const join = p => parser(ctx => {
   ASSERT && assertArray('join', v, formatter('argument to return an array'))
 
   return ok(pctx, v.join(''))
+})
+
+/**
+ * A parser which will execute `p` and return its results minus any
+ * `null` or `undefined` results. This requires that `p` returns an
+ * array; an error will be thrown if it does not.
+ *
+ * @param {Parser} p A parser that is expected to return an array.
+ * @returns {Parser} A parser that executes `p` and returns its results
+ *     minus any `null` or `undefined` results.
+ */
+export const compact = p => parser(ctx => {
+  ASSERT && assertParser('compact', p)
+
+  const [prep, [pctx, pres]] = twin(p(ctx))
+  if (pres.status !== Ok) return prep
+
+  const v = pres.value
+  ASSERT && assertArray('compact', v, formatter('argument to return an array'))
+
+  return ok(pctx, v.filter(x => x != null))
 })
 
 /**

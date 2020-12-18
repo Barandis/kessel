@@ -18,7 +18,7 @@
     
     
       
-        <title>between - Kessel</title>
+        <title>compact - Kessel</title>
       
     
     
@@ -91,7 +91,7 @@
           </span>
           <span class="md-header-nav__topic md-ellipsis">
             
-              between
+              compact
             
           </span>
         </div>
@@ -624,87 +624,11 @@
           
           
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-    
-    
-      <label class="md-nav__link md-nav__link--active" for="__toc">
-        between
-        <span class="md-nav__icon md-icon"></span>
-      </label>
-    
-    <a href="./" class="md-nav__link md-nav__link--active">
+  <li class="md-nav__item">
+    <a href="../between/" class="md-nav__link">
       between
     </a>
-    
-      
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
-    Example
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
-    Parameters
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#success" class="md-nav__link">
-    Success
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#failure" class="md-nav__link">
-    Failure
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#fatal-failure" class="md-nav__link">
-    Fatal Failure
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#throws" class="md-nav__link">
-    Throws
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    See Also
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-    
   </li>
 
         
@@ -808,11 +732,87 @@
           
           
 
+  
 
-  <li class="md-nav__item">
-    <a href="../compact/" class="md-nav__link">
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        compact
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+    
+    <a href="./" class="md-nav__link md-nav__link--active">
       compact
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parameters" class="md-nav__link">
+    Parameters
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#success" class="md-nav__link">
+    Success
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#failure" class="md-nav__link">
+    Failure
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fatal-failure" class="md-nav__link">
+    Fatal Failure
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#throws" class="md-nav__link">
+    Throws
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    See Also
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+    
   </li>
 
         
@@ -2171,7 +2171,7 @@
               
                 
                 
-                  <h1>between</h1>
+                  <h1>compact</h1>
                 
                 <!--
  Copyright (c) 2020 Thomas J. Otterson
@@ -2181,65 +2181,57 @@
 -->
 
 <blockquote>
-<p><code>between(pre: Parser&lt;U&gt;, post: Parser&lt;V&gt;, p: Parser&lt;T&gt;): Parser&lt;T&gt;</code></p>
+<p><code>compact(p: Parser&lt;[T]&gt;): Parser&lt;[T]&gt;</code></p>
 </blockquote>
-<p>Applies a pre-parser, a content parser, and a post-parser in order, returning the value of the content parser.</p>
-<p>All three parsers must succeed for <code>between</code> to succeed. Take care to avoid parsing too far with <code>p</code>; e.g., if the example used <code>join(many(any))</code> as a content parser instead of what it does, it would also match the ending <code>"</code>. This would mean that <code>post</code> would never succeed because <code>p</code> already consumed its <code>"</code>, so <code>between</code> would never succeed.</p>
-<p>The first failure case in the example (<code>f</code>) is non-fatal failure, because no characters were consumed before the failure occurred. The second failure case (<code>t</code>) is fatal failure because, though <code>post</code> fails non-fatally, input was consumed before that failure happened.</p>
-<p>There is another version of this parser, <a href="../betweenb/"><code>betweenB</code></a>, which backtracks and fails non-fatally if a non-fatal failure happens after input is consumed.</p>
-<p><code>between(pre, post, p)</code> is an optimized implementation of <code>chain(chain(pre, () =&gt; p), x =&gt; value(post, x))</code>. (Using higher-level parsers, this can also be written <code>left(right(pre, p), post)</code>.)</p>
+<p>Applies a parser and returns the elements of the resulting array except for any <code>null</code> or <code>undefined</code> elements.</p>
+<p>This combinator is useful in conjunction with parsers like <a href="../sequence/"><code>sequence</code></a> and <a href="../many/"><code>many</code></a>, which may return <code>null</code> values amongst their array elements, particularly if the <a href="../opt/"><code>opt</code></a> parser is used in their contained parsers. In a prior version of Kessel, <code>sequence</code> and <code>many</code> dropped their <code>null</code> values by default, but this was found to be less than ideal for a number of reasons. <code>compact</code> brings that behavior back when needed.</p>
 <h4 id="example">Example</h4>
-<div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">between</span><span class="p">(</span><span class="kr">char</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">),</span> <span class="kr">char</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">),</span> <span class="nx">join</span><span class="p">(</span><span class="nx">many</span><span class="p">(</span><span class="nx">noneOf</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">))))</span>
+<div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">compact</span><span class="p">(</span><span class="nx">sequence</span><span class="p">(</span><span class="nx">opt</span><span class="p">(</span><span class="kr">char</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)),</span> <span class="nx">digit</span><span class="p">,</span> <span class="nx">digit</span><span class="p">))</span>
 
-<span class="kr">const</span> <span class="nx">s</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;&quot;test&quot;&#39;</span><span class="p">)</span>
+<span class="kr">const</span> <span class="nx">s</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;-12&#39;</span><span class="p">)</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">status</span><span class="p">(</span><span class="nx">s</span><span class="p">))</span>  <span class="c1">// &quot;ok&quot;</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">success</span><span class="p">(</span><span class="nx">s</span><span class="p">))</span> <span class="c1">// &quot;test&quot;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">success</span><span class="p">(</span><span class="nx">s</span><span class="p">))</span> <span class="c1">// [&quot;-&quot;, &quot;1&quot;, &quot;2&quot;]</span>
 
-<span class="kr">const</span> <span class="nx">f</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;test&quot;&#39;</span><span class="p">)</span>
+<span class="kr">const</span> <span class="nx">r</span> <span class="o">=</span> <span class="nx">parser</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;12&#39;</span><span class="p">)</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">status</span><span class="p">(</span><span class="nx">r</span><span class="p">))</span>  <span class="c1">// &quot;ok&quot;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">success</span><span class="p">(</span><span class="nx">r</span><span class="p">))</span> <span class="c1">// [&quot;1&quot;, &quot;2&quot;]</span>
+
+<span class="kr">const</span> <span class="nx">f</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;ab&#39;</span><span class="p">)</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">status</span><span class="p">(</span><span class="nx">f</span><span class="p">))</span>  <span class="c1">// &quot;fail&quot;</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">failure</span><span class="p">(</span><span class="nx">f</span><span class="p">))</span> <span class="c1">// Parse error at (line 1, column 1):</span>
                         <span class="c1">//</span>
-                        <span class="c1">// test&quot;</span>
+                        <span class="c1">// ab</span>
                         <span class="c1">// ^</span>
-                        <span class="c1">// Expected &#39;&quot;&#39;</span>
-
-<span class="kr">const</span> <span class="nx">t</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;&quot;test&#39;</span><span class="p">)</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">status</span><span class="p">(</span><span class="nx">t</span><span class="p">))</span>  <span class="c1">// &quot;fatal&quot;</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">failure</span><span class="p">(</span><span class="nx">t</span><span class="p">))</span> <span class="c1">// Parse error at (line 1, column 6):</span>
-                        <span class="c1">//</span>
-                        <span class="c1">// &quot;test</span>
-                        <span class="c1">//      ^</span>
-                        <span class="c1">// Expected &#39;&quot;&#39;</span>
-                        <span class="c1">// Note: failure occurred at the end of input</span>
+                        <span class="c1">// Expected &#39;-&#39; or a digit</span>
 </code></pre></div>
 <h4 id="parameters">Parameters</h4>
 <ul>
-<li><code>pre</code>: The parser that is applied first. Its result is discarded.</li>
-<li><code>post</code>: The parser that is applied last. Its result is discarded.</li>
-<li><code>p</code>: The parser that is applied after <code>pre</code> and before <code>post</code>. Its result is returned by <code>between</code> itself.</li>
+<li><code>p</code>: The parser that is applied, which must return an array.</li>
 </ul>
 <h4 id="success">Success</h4>
 <ul>
-<li>Succeeds if all three parsers succeed. Returns the result of <code>p</code>.</li>
+<li>Succeeds if <code>p</code> succeeds. Returns the resulting array's elements except for <code>null</code> and <code>undefined</code> elements.</li>
 </ul>
 <h4 id="failure">Failure</h4>
 <ul>
-<li>Fails if any of its three parsers fails before any input is consumed.</li>
+<li>Fails if <code>p</code> fails.</li>
 </ul>
 <h4 id="fatal-failure">Fatal Failure</h4>
 <ul>
-<li>Fails fatally if any of its three parsers fails fatally.</li>
-<li>Fails fatally if any of its three parsers fails after some input was consumed.</li>
+<li>Fails fatally if <code>p</code> fails fatally.</li>
 </ul>
 <h4 id="throws">Throws</h4>
 <ul>
-<li>Throws an error if any of <code>pre</code>, <code>post</code>, and <code>p</code> are not parsers.</li>
+<li>Throws an error if <code>p</code> is not a parser.</li>
+<li>Throws an error if <code>p</code> succeeds but does not return an array.</li>
 </ul>
 <h4 id="see-also">See Also</h4>
 <ul>
 <li><a href="../../types/parser/"><code>Parser</code></a></li>
-<li><a href="../betweenb/"><code>betweenB</code></a></li>
-<li><a href="../manytill/"><code>manyTill</code></a></li>
+<li><a href="../many/"><code>many</code></a></li>
+<li><a href="../map/"><code>map</code></a></li>
+<li><a href="../opt/"><code>opt</code></a></li>
+<li><a href="../sequence/"><code>sequence</code></a></li>
 </ul>
                 
               
@@ -2259,7 +2251,7 @@
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
         
-          <a href="../attemptm/" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../choice/" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-footer-nav__button md-icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
             </div>
@@ -2268,19 +2260,19 @@
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                attemptM
+                choice
               </div>
             </div>
           </a>
         
         
-          <a href="../betweenb/" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../digit/" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-footer-nav__title">
               <div class="md-ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                betweenB
+                digit
               </div>
             </div>
             <div class="md-footer-nav__button md-icon">

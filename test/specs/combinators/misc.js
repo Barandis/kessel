@@ -4,6 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import {
+  compact,
   fifth,
   first,
   fourth,
@@ -13,7 +14,7 @@ import {
   third,
   value,
 } from 'kessel/combinators/misc'
-import { map } from 'kessel/combinators/primitive'
+import { always, map } from 'kessel/combinators/primitive'
 import { many, many1, sequence } from 'kessel/combinators/sequence'
 import { Status } from 'kessel/core'
 import { any, char, digit, letter } from 'kessel/parsers/char'
@@ -43,6 +44,33 @@ describe('Chaining and piping combinators', () => {
         status: Fail,
       })
       tfail(join(sequence(letter, digit)), 'ab', {
+        expected: 'a digit',
+        status: Fatal,
+      })
+    })
+  })
+
+  describe('compact', () => {
+    it('throws if its argument is not a parser', () => {
+      terror(compact(0), '', '[compact]: expected a parser; found 0')
+    })
+    it('throws if its argument does not return an array', () => {
+      terror(
+        compact(any),
+        'a',
+        '[compact]: expected argument to return an array; found "a"',
+      )
+    })
+    it('drops null and undefined elements', () => {
+      tpass(compact(always(['1', null, '3'])), '123', ['1', '3'])
+      tpass(compact(always(['1', undefined, '3'])), '123', ['1', '3'])
+    })
+    it('fails if its contained parser fails', () => {
+      tfail(compact(many1(any)), '', {
+        expected: 'any character',
+        status: Fail,
+      })
+      tfail(compact(sequence(letter, digit)), 'ab', {
         expected: 'a digit',
         status: Fatal,
       })
