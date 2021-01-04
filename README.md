@@ -18,7 +18,7 @@ This is alpha-quality software. The truth is that it sprouted from my attempt to
 npm install @barandis/kessel
 ```
 
-This won't actually be available on NPM until I finish basic documentation, which should happen around the beginning of December.
+This won't actually be available on NPM until I finish basic documentation. Writing that documentation has revealed the occasional bit that I've wanted to change. That documentation is being [posted here][5] as it's written, and once it's finished, an alpha release will be done.
 
 There are also self-contained files (kessel.js and the minified kessel.min.js) in the `lib` directory of the distribution. These should work in the browser (where a global `kessel` object is provided) or with CommonJS or AMD.
 

@@ -28,11 +28,11 @@ nav:
   - Overview: overview.md
   - Installation: installation.md
   - "User's Guide":
-    - Introduction: guide/intro.md
-    - '1. Parsers Parsers Parsers': guide/parsers.md
-    - '2. Making Parsers Go': guide/running.md
-    - '3. Parsers, How Do They Work?': guide/operation.md
-    - '4. Sequencing Parsers': guide/sequence.md
+    - Introduction: guide/ch-00.md
+    - '1. Parsers Parsers Parsers': guide/ch-01.md
+    - '2. Making Parsers Go': guide/ch-02.md
+    - '3. Parsers, How Do They Work?': guide/ch-03.md
+    - '4. Combining Parsers': guide/ch-04.md
   - 'API Reference':
     - Summary: api.md
     - Parsers:
