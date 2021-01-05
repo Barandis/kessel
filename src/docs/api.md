@@ -127,11 +127,8 @@ Additionally, parsers are often said to *return* a value or to have a value as a
 | [`orValue`](parsers/orvalue.md) | Executes a parser and returns either its result upon success or another value upon failure. |
 | [`lookAhead`](parsers/lookahead.md) | Executes a parser and returns its result without consuming input. |
 | [`notEmpty`](parsers/notempty.md) | Executes a parser and fails if the parser succeeds without consuming input. |
-| [`notEmptyM`](parsers/notemptym.md) | Executes a parser and fails if the parser succeeds without consuming input. Overwrites the error message with a custom one on failure. |
 | [`followedBy`](parsers/followedby.md) | Executes a parser and succeeds without consuming input if that parser succeeds. |
-| [`followedByM`](parsers/followedbym.md) | Executes a parser and succeeds without consuming input if that parser succeeds. Overwrites the error message with a custom one on failure. |
 | [`notFollowedBy`](parsers/notfollowedby.md) | Executes a parser and succeeds without consuming input if that parser fails. |
-| [`notFollowedByM`](parsers/notfollowedbym.md) | Executes a parser and succeeds without consuming input if that parser fails. Overwrites the error message with a custom one on failure.  |
 
 ### Table 8: Backtracking combinators
 

@@ -4,11 +4,12 @@
 // https://opensource.org/licenses/MIT
 
 import {
+  argParFormatter,
+  argStrFormatter,
   assertParser,
   assertParsers,
   assertString,
   ordParFormatter,
-  ordStrFormatter,
 } from 'kessel/assert'
 import { fail, fatal, ok, parser, Status } from 'kessel/core'
 import { expected, merge } from 'kessel/error'
@@ -112,44 +113,24 @@ export const lookAhead = p => parser(ctx => {
  * consume input. If the parser succeeds any other way or fails, this
  * parser transparently passes that result along.
  *
- * This parser produces no error messages on failure. It should be used
- * in conjunction with other parsers that take care of potential errors,
- * or else `notEmptyL` should be used instead.
+ * This parser, by default, produces no error messages on failure. An
+ * error message can be specified by passing the expected message in as
+ * the optional second parameter.
  *
  * @param {Parser} p The parser to execute.
  * @returns {Parser} A parser which fails if `p` passes but doesn't
  *     consume any input, or otherwise passes the result through.
  */
-export const notEmpty = p => parser(ctx => {
-  ASSERT && assertParser('notEmpty', p)
+export const notEmpty = (p, m) => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && assertParser('notEmpty', p, argParFormatter(1, hasM))
+  ASSERT && hasM && assertString('notEmpty', m, argStrFormatter(2, hasM))
 
   const index = ctx.index
+  const msg = hasM ? expected(m) : undefined
   const [prep, [pctx, pres]] = twin(p(ctx))
-  return pres.status !== Ok || pctx.index !== index ? prep : fail(pctx)
-})
-
-/**
- * A parser that fails if the provided parser succeeds but does not
- * consume input. If the parser succeeds any other way or fails, this
- * parser transparently passes that result along.
- *
- * If this parser fails, it will use `msg` as an expected error message.
- *
- * @param {Parser} p The parser to execute.
- * @param {string} msg The expected error message to use if `p` succeeds
- *     without consuming input.
- * @returns {Parser} A parser which fails if `p` passes but doesn't
- *     consume any input, or otherwise passes the result through.
- */
-export const notEmptyM = (p, msg) => parser(ctx => {
-  ASSERT && assertParser('notEmptyM', p, ordParFormatter('1st'))
-  ASSERT && assertString('notEmptyM', msg, ordStrFormatter('2nd'))
-
-  const index = ctx.index
-  const [prep, [pctx, pres]] = twin(p(ctx))
-  return pres.status !== Ok || pctx.index !== index
-    ? prep
-    : fail(pctx, expected(msg))
+  return pres.status !== Ok || pctx.index !== index ? prep : fail(pctx, msg)
 })
 
 /**
@@ -157,88 +138,50 @@ export const notEmptyM = (p, msg) => parser(ctx => {
  * does not consume input. If `p` does not succeed, this parser fails
  * non-fatally.
  *
- * This parser produces no error messages on failure. It should be used
- * in conjunction with other parsers that take care of potential errors,
- * or else `followedByL` should be used instead.
+ * This parser, by default, produces no error messages on failure. An
+ * error message can be specified by passing the expected message in as
+ * the optional second parameter.
  *
  * @param {Parser} p The parser to execute.
+ * @param {string} [m] The expected error message to use if `p` fails.
  * @returns {Parser} A parser that applies `p` but does not change the
  *     parser context, whether or not `p` succeeds.
  */
-export const followedBy = p => parser(ctx => {
-  ASSERT && assertParser('followedBy', p)
+export const followedBy = (p, m) => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && assertParser('followedBy', p, argParFormatter(1, hasM))
+  ASSERT && hasM && assertString('followedBy', m, argStrFormatter(2, hasM))
 
   const index = ctx.index
+  const msg = hasM ? expected(m) : undefined
   const [pctx, pres] = p(ctx)
-  return pres.status === Ok ? ok(pctx, null, index)
-    : fail(pctx, undefined, index)
-})
-
-/**
- * A parser that succeeds if the supplied parser succeeds, but which
- * does not consume input. If `p` does not succeed, this parser fails
- * non-fatally.
- *
- * If this parser fails, it will use `msg` as an expected error message.
- *
- * @param {Parser} p The parser to apply.
- * @param {string} msg The expected error message to use if `p` fails.
- * @returns {Parser} A parser that applies `p` but does not change the
- *     parser context, whether or not `p` succeeds.
- */
-export const followedByM = (p, msg) => parser(ctx => {
-  ASSERT && assertParser('followedByM', p, ordParFormatter('1st'))
-  ASSERT && assertString('followedByM', msg, ordStrFormatter('2nd'))
-
-  const index = ctx.index
-  const [pctx, pres] = p(ctx)
-  return pres.status === Ok
-    ? ok(pctx, null, index)
-    : fail(pctx, expected(msg), index)
+  return pres.status === Ok ? ok(pctx, null, index) : fail(pctx, msg, index)
 })
 
 /**
  * A parser that succeeds if the supplied parser fails, but which does
  * not consume input. If `p` succeeds, this parser fails non-fatally.
  *
- * This parser produces no error messages on failure. It should be used
- * in conjunction with other parsers that take care of potential errors,
- * or else `notFollowedByL` should be used instead.
+ * This parser, by default, produces no error messages on failure. An
+ * error message can be specified by passing the expected message in as
+ * the optional second parameter.
  *
  * @param {Parser} p The parser to apply.
+ * @param {string} [m] The expected error message to use if `p`
+ *     succeeds.
  * @returns {Parser} A parser that applies `p` and succeeds when it
  *     fails, but does not change the parser context, whether or not `p`
  *     succeeds.
  */
-export const notFollowedBy = p => parser(ctx => {
-  ASSERT && assertParser('notFollowedBy', p)
+export const notFollowedBy = (p, m) => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && assertParser('notFollowedBy', p, argParFormatter(1, hasM))
+  ASSERT && hasM && assertString('notFollowedBy', m, argStrFormatter(2, hasM))
 
   const index = ctx.index
+  const msg = hasM ? expected(m) : undefined
   const [pctx, pres] = p(ctx)
-  return pres.status === Ok
-    ? fail(pctx, undefined, index)
-    : ok(pctx, null, index)
-})
-
-/**
- * A parser that succeeds if the supplied parser fails, but which does
- * not consume input. If `p` succeeds, this parser fails non-fatally.
- *
- * If this parser fails, it will use `msg` as an expected error message.
- *
- * @param {Parser} p The parser to apply.
- * @param {string} msg The expected error message to use if `p`
- *    succeeds.
- * @returns {Parser} A parser that applies `p` but does not change the
- *     parser context, whether or not `p` succeeds.
- */
-export const notFollowedByM = (p, msg) => parser(ctx => {
-  ASSERT && assertParser('notFollowedByM', p, ordParFormatter('1st'))
-  ASSERT && assertString('notFollowedByM', msg, ordStrFormatter('2nd'))
-
-  const index = ctx.index
-  const [pctx, pres] = p(ctx)
-  return pres.status === Ok
-    ? fail(pctx, expected(msg), index)
-    : ok(pctx, null, index)
+  return pres.status === Ok ? fail(pctx, msg, index) : ok(pctx, null, index)
 })

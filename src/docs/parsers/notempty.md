@@ -5,11 +5,11 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `notEmpty(p: Parser<T>): Parser<null>`
+> `notEmpty(p: Parser<T>, m?: string): Parser<null>`
 
 Applies a parser and succeeds if that parser succeeds and returns a result. If the parser does not return a result, `notEmpty` will fail.
 
-This parser cannot produce a useful error message. To provide a custom message, either wrap the parser with [`label`](label.md) or use [`notEmptyM`](notemptym.md).
+This parser cannot produce a useful error message automatically. To provide a custom message, pass an expected error message in as the second argument.
 
 `notEmpty` can be used to require at least one match from a parser. For example, [`many1(p)`](many1.md) could be naively implemented as `notEmpty(many(p))`, though it would not have a good error message.
 
@@ -34,6 +34,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 #### Parameters
 
 * `p`: The parser to be applied. `notEmpty` fails if this `p` succeeds but produces no result.
+* `m`: The optional expected message that will be added if `notEmpty` fails.
 
 #### Success
 
@@ -57,5 +58,4 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 * [`Parser`](../types/parser.md)
 * [`followedBy`](followedby.md)
 * [`label`](label.md)
-* [`notEmptyM`](notemptym.md)
 * [`notFollowedBy`](notfollowedby.md)

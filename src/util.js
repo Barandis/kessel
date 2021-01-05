@@ -338,6 +338,24 @@ export function ordinal(n) {
   return n + (suffixes[(v - 20) % 10] ?? suffixes[v] ?? suffixes[0])
 }
 
+const ordinals = [
+  'zeroth', 'first', 'second', 'third', 'fourth',
+  'fifth', 'sixth', 'seventh', 'eighth', 'ninth',
+]
+
+/**
+ * Converts a number to its string ordinal form (i.e., `1` becomes
+ * `'1st'`, `1729` becomes `'1729th'`, etc.). If the number has one
+ * digit, this will instead return the ordinal word (first, second,
+ * etc.).
+ *
+ * @param {number} n The number to convert into an ordinal.
+ * @returns {string} The same number in its ordinal form.
+ */
+export function ordinalWord(num) {
+  return num < 10 ? ordinals[num] : ordinal(num)
+}
+
 /**
  * Returns a reasonable string representation of a value. This will most
  * often be the output from `JSON.stringify()`, though representations

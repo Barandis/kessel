@@ -56,12 +56,9 @@ export {
 export {
   choice,
   followedBy,
-  followedByM,
   lookAhead,
   notEmpty,
-  notEmptyM,
   notFollowedBy,
-  notFollowedByM,
   opt,
   orValue,
 } from './combinators/alternative'

@@ -71,7 +71,6 @@ nav:
       - fifth: parsers/fifth.md
       - first: parsers/first.md
       - followedBy: parsers/followedby.md
-      - followedByM: parsers/followedbym.md
       - fourth: parsers/fourth.md
       - hex: parsers/hex.md
       - join: parsers/join.md
@@ -92,9 +91,7 @@ nav:
       - newlineU: parsers/newlineu.md
       - noneOf: parsers/noneof.md
       - notEmpty: parsers/notempty.md
-      - notEmptyM: parsers/notemptym.md
       - notFollowedBy: parsers/notfollowedby.md
-      - notFollowedByM: parsers/notfollowedbym.md
       - nth: parsers/nth.md
       - octal: parsers/octal.md
       - opt: parsers/opt.md

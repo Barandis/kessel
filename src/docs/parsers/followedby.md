@@ -5,13 +5,13 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `followedBy(p: Parser<T>): Parser<null>`
+> `followedBy(p: Parser<T>, m?: string): Parser<null>`
 
 Applies a parser and succeeds without consuming input if that parser succeeds.
 
 This parser is similar to [`lookAhead`](lookahead.md) except that it does not produce a result.
 
-`followedBy` does not produce an error message on failure. It could, but other related parsers like [`notEmpty`](notempty.md) and [`notFollowedBy`](notfollowedby.md) cannot, so the choice was made to make `followedBy` consistent with those parsers. To add an error message, either wrap this parser in [`label`](label.md) or use [`followedByM`](followedbym.md) instead.
+`followedBy` does not produce an error message on failure by default. It could, but other related parsers like [`notEmpty`](notempty.md) and [`notFollowedBy`](notfollowedby.md) cannot, so the choice was made to make `followedBy` consistent with those parsers. To add an error message, pass the expected error message in as the optional second parameter.
 
 #### Example
 
@@ -34,6 +34,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 #### Parameters
 
 * `p`: The parser to apply. If it succeeds, `followedBy` succeeds.
+* `m`: The optional expected message that will be added if `p` fails.
 
 #### Success
 
@@ -50,7 +51,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 #### See Also
 
 * [`Parser`](../types/parser.md)
-* [`followedByM`](followedbym.md)
 * [`label`](label.md)
 * [`lookAhead`](lookahead.md)
 * [`notEmpty`](notempty.md)

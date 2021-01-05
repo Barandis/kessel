@@ -18,7 +18,7 @@
     
     
       
-        <title>4. Sequencing Parsers - Kessel</title>
+        <title>Ch 00 - Kessel</title>
       
     
     
@@ -60,6 +60,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#a-10000-foot-view-of-toml" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -86,7 +91,7 @@
           </span>
           <span class="md-header-nav__topic md-ellipsis">
             
-              4. Sequencing Parsers
+              Ch 00
             
           </span>
         </div>
@@ -146,9 +151,7 @@
         
           
 
-  
-
-<nav class="md-tabs md-tabs--active" aria-label="Tabs" data-md-component="tabs">
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
   <div class="md-tabs__inner md-grid">
     <ul class="md-tabs__list">
       
@@ -156,7 +159,9 @@
   <li class="md-tabs__item">
     
     
-    <a href="../.." class="md-tabs__link">
+      
+    
+    <a href="../.." class="md-tabs__link md-tabs__link--active">
       Home
     </a>
   </li>
@@ -172,9 +177,7 @@
     <li class="md-tabs__item">
       
       
-        
-      
-      <a href="../intro/" class="md-tabs__link md-tabs__link--active">
+      <a href="../../guide/ch-00/" class="md-tabs__link">
         User's Guide
       </a>
     </li>
@@ -274,12 +277,10 @@
       
       
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+  <li class="md-nav__item md-nav__item--nested">
     
-    <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4" checked>
+    <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4" >
     <label class="md-nav__link" for="nav-4">
       User's Guide
       <span class="md-nav__icon md-icon"></span>
@@ -298,7 +299,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../intro/" class="md-nav__link">
+    <a href="../../guide/ch-00/" class="md-nav__link">
       Introduction
     </a>
   </li>
@@ -310,7 +311,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../parsers/" class="md-nav__link">
+    <a href="../../guide/ch-01/" class="md-nav__link">
       1. Parsers Parsers Parsers
     </a>
   </li>
@@ -322,7 +323,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../running/" class="md-nav__link">
+    <a href="../../guide/ch-02/" class="md-nav__link">
       2. Making Parsers Go
     </a>
   </li>
@@ -334,7 +335,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../operation/" class="md-nav__link">
+    <a href="../../guide/ch-03/" class="md-nav__link">
       3. Parsers, How Do They Work?
     </a>
   </li>
@@ -344,18 +345,11 @@
           
           
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-    
-    
-    <a href="./" class="md-nav__link md-nav__link--active">
-      4. Sequencing Parsers
+  <li class="md-nav__item">
+    <a href="../../guide/ch-04/" class="md-nav__link">
+      4. Combining Parsers
     </a>
-    
   </li>
 
         
@@ -842,18 +836,6 @@
 
 
   <li class="md-nav__item">
-    <a href="../../parsers/followedbym/" class="md-nav__link">
-      followedByM
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
     <a href="../../parsers/fourth/" class="md-nav__link">
       fourth
     </a>
@@ -1094,32 +1076,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../../parsers/notemptym/" class="md-nav__link">
-      notEmptyM
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
     <a href="../../parsers/notfollowedby/" class="md-nav__link">
       notFollowedBy
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../../parsers/notfollowedbym/" class="md-nav__link">
-      notFollowedByM
     </a>
   </li>
 
@@ -2019,15 +1977,58 @@
               </div>
             
             
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#a-10000-foot-view-of-toml" class="md-nav__link">
+    A 10,000 foot view of TOML
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
           
           <div class="md-content">
             <article class="md-content__inner md-typeset">
               
                 
                 
-                  <h1>4. Sequencing Parsers</h1>
+                  <h1>Ch 00</h1>
                 
-                
+                <!--
+ Copyright (c) 2021 Thomas J. Otterson
+
+ This software is released under the MIT License.
+ https://opensource.org/licenses/MIT
+-->
+
+<p>There's not a better way to learn how to use a package &mdash; or even just to learn what a package is really good for &mdash; than to actually <em>use</em> that package. To that end, this is a tutorial in which we use Kessel to create a parser that actually does something useful.</p>
+<p>So what should we parse? For the purpose of this tutorial, I was looking for a couple things. First, it had to be the right amount of complexity. There's an example of a CSV parser earlier in the documentation that's five lines long, which wouldn't make for much of a tutorial at all. On the other hand, one could write an entire book on parsing and compiling C (and in fact many such books have been written), and that's a bit much for a tutorial.</p>
+<p>The second requirement was that there be a clearly defined spec. I want the focus to be on how to write parsers, not on trying to decipher the language before being able to even figure out what parsers to write.</p>
+<p>With that in mind, I chose to base the tutorial on writing a <a href="https://toml.io/en/">TOML</a> parser. TOML is a language for writing configuration files, much like JSON or YAML or even XML could be. It has more features than JSON, has a nicer and more consistent syntax than YAML, and...well, anything's better than XML. The fact that it's my <em>favorite</em> configuration language probably played a part in me picking it as well.</p>
+<p>The application developed in this tutorial will take a TOML file and spit out an equivalent JavaScript object. </p>
+<p>We'll have to get deep into the details when the writing actually starts, but to start, let's just get a quick look at TOML syntax.</p>
+<h2 id="a-10000-foot-view-of-toml">A 10,000 foot view of TOML</h2>
+<p>We'll equate TOML structures to JavaScript structures, since after all we'll be turning the former into the latter.</p>
+<p>The first structure that we'll mention, briefly, is the file itself. Our parser is always going to output a single </p>
                 
               
               
@@ -2042,41 +2043,6 @@
       
         
 <footer class="md-footer">
-  
-    <div class="md-footer-nav">
-      <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
-        
-          <a href="../operation/" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
-            <div class="md-footer-nav__button md-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
-            </div>
-            <div class="md-footer-nav__title">
-              <div class="md-ellipsis">
-                <span class="md-footer-nav__direction">
-                  Previous
-                </span>
-                3. Parsers, How Do They Work?
-              </div>
-            </div>
-          </a>
-        
-        
-          <a href="../../api/" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
-            <div class="md-footer-nav__title">
-              <div class="md-ellipsis">
-                <span class="md-footer-nav__direction">
-                  Next
-                </span>
-                Summary
-              </div>
-            </div>
-            <div class="md-footer-nav__button md-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
-            </div>
-          </a>
-        
-      </nav>
-    </div>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">

@@ -5,11 +5,11 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `notFollowedBy(p: Parser<T>): Parser<null>`
+> `notFollowedBy(p: Parser<T>, m?: string): Parser<null>`
 
 Applies a parser and succeeds without consuming input if that parser fails.
 
-`notFollowedBy` cannot feasibly produce an error message on failure. To add an error message, either wrap this parser in [`label`](label.md) or use [`notFollowedByM`](notfollowedbym.md) instead.
+`notFollowedBy` cannot feasibly produce an automatic error message on failure. To add an error message, pass an expected error message in as the second argument.
 
 #### Example
 
@@ -32,6 +32,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 #### Parameters
 
 * `p`: The parser to apply. If it fails, `notFollowedBy` succeeds.
+* `m`: The optional expected message that will be added if `notFollowedBy` fails.
 
 #### Success
 
@@ -51,4 +52,3 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 * [`followedBy`](followedby.md)
 * [`label`](label.md)
 * [`notEmpty`](notempty.md)
-* [`notFollowedByM`](notfollowedbym.md)
