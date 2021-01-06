@@ -229,23 +229,43 @@ describe('Sequence combinators', () => {
   })
 
   describe('many', () => {
-    it('throws if its argument is not a parser', () => {
-      terror(many(0), '', '[many]: expected a parser; found 0')
+    it('throws if its first argument is not a parser', () => {
+      terror(many(0), '', '[many]: expected argument to be a parser; found 0')
+      terror(
+        many(0, 'test'),
+        '',
+        '[many]: expected first argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument exists and is not a string', () => {
+      terror(
+        many(any, 0),
+        '',
+        '[many]: expected second argument to be a string; found 0',
+      )
     })
     it('succeeds zero times with an empty array', () => {
       tpass(many(digit), 'abc123', [])
       tpass(many(digit), '', [])
+      tpass(many(digit, 'many digits'), 'abc123', [])
     })
     it('succeeds with all results until a non-match', () => {
       tpass(many(digit), '123abc', ['1', '2', '3'])
       tpass(many(digit), '123abc456', ['1', '2', '3'])
+      tpass(many(digit, 'many digits'), '123abc', ['1', '2', '3'])
     })
     it('succeeds until EOF if matches continue until then', () => {
       tpass(many(digit), '123', ['1', '2', '3'])
+      tpass(many(digit, 'many digits'), '123', ['1', '2', '3'])
     })
     it('fails if its parser consumes while failing', () => {
       tfail(many(seq(char('a'), char('b'))), 'ababac', {
         expected: "'b'",
+        index: 5,
+        status: Fatal,
+      })
+      tfail(many(seq(char('a'), char('b')), "series of 'ab'"), 'ababac', {
+        expected: "series of 'ab'",
         index: 5,
         status: Fatal,
       })
@@ -260,23 +280,43 @@ describe('Sequence combinators', () => {
   })
 
   describe('many1', () => {
-    it('throws if its argument is not a parser', () => {
-      terror(many1(0), '', '[many1]: expected a parser; found 0')
+    it('throws if its first argument is not a parser', () => {
+      terror(many1(0), '', '[many1]: expected argument to be a parser; found 0')
+      terror(
+        many1(0, 'test'),
+        '',
+        '[many1]: expected first argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument exists and is not a string', () => {
+      terror(
+        many1(any, 0),
+        '',
+        '[many1]: expected second argument to be a string; found 0',
+      )
     })
     it('fails if its parser does not match at least once', () => {
       tfail(many1(digit), 'abc123', 'a digit')
       tfail(many1(digit), '', 'a digit')
+      tfail(many1(digit, 'many digits'), 'abc123', 'many digits')
     })
     it('succeeds with all results until a non-match', () => {
       tpass(many1(digit), '123abc', ['1', '2', '3'])
       tpass(many1(digit), '123abc456', ['1', '2', '3'])
+      tpass(many1(digit, 'many digits'), '123abc', ['1', '2', '3'])
     })
     it('succeeds until EOF if matches continue until then', () => {
       tpass(many1(digit), '123', ['1', '2', '3'])
+      tpass(many1(digit, 'many digits'), '123', ['1', '2', '3'])
     })
     it('fails if its parser consumes while failing', () => {
       tfail(many1(seq(char('a'), char('b'))), 'ababac', {
         expected: "'b'",
+        index: 5,
+        status: Fatal,
+      })
+      tfail(many1(seq(char('a'), char('b')), "series of 'ab'"), 'ababac', {
+        expected: "series of 'ab'",
         index: 5,
         status: Fatal,
       })

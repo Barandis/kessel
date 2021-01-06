@@ -17,7 +17,7 @@ import {
   ordNumFormatter,
   ordParFormatter,
 } from 'kessel/assert'
-import { maybeFatal, ok, parser, Status } from 'kessel/core'
+import { fatal, maybeFatal, ok, parser, Status } from 'kessel/core'
 import { expected, merge } from 'kessel/error'
 import { ordinal, range, stringify, twin, wordinal } from 'kessel/util'
 
@@ -215,21 +215,28 @@ export const block = (g, m) => parser(ctx => {
  * fatally, then so will this parser.
  *
  * @param {Parser} p A parser to be executed zero or more times.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser that executes the supplied parser
  *     repeatedly until it fails. Its result will be an array of the
  *     successful results from the contained parser.
  */
-export const many = p => parser(ctx => {
-  ASSERT && assertParser('many', p)
+export const many = (p, m) => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && assertParser('many', p, argParFormatter(1, hasM))
+  ASSERT && hasM && assertString('many', m, argStrFormatter(2, true))
 
   const values = []
   let context = ctx
 
   while (true) {
-    const [prep, [pctx, pres]] = twin(p(context))
+    const [pctx, pres] = p(context)
     context = pctx
 
-    if (pres.status === Fatal) return prep
+    if (pres.status === Fatal) {
+      return fatal(pctx, hasM ? expected(m) : pres.errors)
+    }
     if (pres.status === Fail) break
     values.push(pres.value)
     if (context.index >= context.view.byteLength) break
@@ -245,24 +252,35 @@ export const many = p => parser(ctx => {
  * once. It can fail fatally if `p` ever fails fatally.
  *
  * @param {Parser} p A parser to be executed one or more times.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser that executes the supplied parser
  *     repeatedly until it fails. Its result will be an array of the
  *     successful results from the contained parser.
  */
-export const many1 = p => parser(ctx => {
-  ASSERT && assertParser('many1', p)
+export const many1 = (p, m) => parser(ctx => {
+  const hasM = m != null
 
-  const [prep, [pctx, pres]] = twin(p(ctx))
-  if (pres.status !== Ok) return prep
+  ASSERT && assertParser('many1', p, argParFormatter(1, hasM))
+  ASSERT && hasM && assertString('many1', m, argStrFormatter(2, true))
+
+  const [pctx, pres] = p(ctx)
+  if (pres.status !== Ok) {
+    return maybeFatal(
+      pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors,
+    )
+  }
 
   let context = pctx
   const values = [pres.value]
 
   while (true) {
-    const [prep, [pctx, pres]] = twin(p(context))
+    const [pctx, pres] = p(context)
     context = pctx
 
-    if (pres.status === Fatal) return prep
+    if (pres.status === Fatal) {
+      return fatal(pctx, hasM ? expected(m) : pres.errors)
+    }
     if (pres.status === Fail) break
     values.push(pres.value)
     if (context.index >= context.view.byteLength) break

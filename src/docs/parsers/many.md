@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `many(p: Parser<T>): Parser<[T]>`
+> `many(p: Parser, m?: string): Parser`
 
 Applies a parser as many times as possible until it fails, collecting the results into a resulting array.
 
@@ -34,6 +34,7 @@ The failure case in this example shows the only way that `many` can fail: its un
 #### Parameters
 
 * `p`: The parser to apply repeatedly until it fails.
+* `m`: The optional expected error message that will take the place of the default error message.
 
 #### Success
 
