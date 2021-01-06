@@ -9,7 +9,7 @@
 
 Applies a parser and, if it fails after consuming input, backtracks to the original location and fails non-fatally.
 
-`attempt` implements general backtracking. It is different from the backtracking `B` parsers ([`sequenceB`](sequenceb.md), [`leftB`](leftb.md), etc.) in that it is meant to deal with all fatal failures (the `B` parsers only deal with fatal failures that result from non-fatal failures that come after successes). It's common to use this parser in conjunction with [`choice`](choice.md), [`opt`](opt.md), and other parsers which only fail if their parsers fail fatally.
+`attempt` implements general backtracking. It is different from the backtracking `B` parsers ([`sequenceB`](sequenceb.md), [`leftB`](leftb.md), etc.) in that it is meant to deal with all fatal failures (the `B` parsers only deal with fatal failures that result from non-fatal failures that come after successes). It's common to use this parser in conjunction with [`alt`](alt.md), [`opt`](opt.md), and other parsers which only fail if their parsers fail fatally.
 
 Take care when using this parser. It attempts to provide information about what caused the backtracking to occur, but it's not hard to get long and convoluted error messages that don't help a lot if it's used to much. Use backtracking as little as can be done and still serve your needs.
 
@@ -66,7 +66,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 * [`NestedError`](../types/nestederror.md)
 * [`Parser`](../types/parser.md)
+* [`alt`](alt.md)
 * [`attemptM`](attemptm.md)
-* [`choice`](choice.md)
+* [`def`](def.md)
 * [`opt`](opt.md)
-* [`orValue`](orvalue.md)

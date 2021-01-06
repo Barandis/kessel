@@ -5,16 +5,16 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `notFollowedBy(p: Parser<T>, m?: string): Parser<null>`
+> `not(p: Parser, m?: string): Parser`
 
 Applies a parser and succeeds without consuming input if that parser fails.
 
-`notFollowedBy` cannot feasibly produce an automatic error message on failure. To add an error message, pass an expected error message in as the second argument.
+`not` cannot feasibly produce an automatic error message on failure. To add an error message, pass an expected error message in as the second argument.
 
 #### Example
 
 ```javascript
-const parser = notFollowedBy(digit)
+const parser = not(digit)
 
 const s = parse(parser, 'a')
 console.log(status(s))  // "ok"
@@ -31,8 +31,8 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### Parameters
 
-* `p`: The parser to apply. If it fails, `notFollowedBy` succeeds.
-* `m`: The optional expected message that will be added if `notFollowedBy` fails.
+* `p`: The parser to apply. If it fails, `not` succeeds.
+* `m`: The optional expected message that will be added if `not` fails.
 
 #### Success
 
@@ -49,6 +49,5 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 #### See Also
 
 * [`Parser`](../types/parser.md)
-* [`followedBy`](followedby.md)
+* [`empty`](empty.md)
 * [`label`](label.md)
-* [`notEmpty`](notempty.md)

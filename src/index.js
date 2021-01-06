@@ -54,13 +54,12 @@ export {
 // COMBINATORS
 
 export {
-  choice,
-  followedBy,
-  lookAhead,
-  notEmpty,
-  notFollowedBy,
+  alt,
+  def,
+  empty,
+  not,
   opt,
-  orValue,
+  peek,
 } from './combinators/alternative'
 export {
   andThenB,
@@ -94,7 +93,6 @@ export {
   andThen,
   apply,
   chain,
-  empty,
   map,
   orElse,
 } from './combinators/primitive'

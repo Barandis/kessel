@@ -10,7 +10,6 @@ import {
   andThen,
   apply,
   chain,
-  empty,
   map,
   orElse,
 } from 'kessel/combinators/primitive'
@@ -163,12 +162,6 @@ describe('Primitive combinators', () => {
       tpass(parser, '-1', '1')
       tpass(parser, '1', '1')
       tfail(parser, 'a', "'-' or a digit")
-    })
-  })
-
-  describe('empty', () => {
-    it('always succeeds with no result', () => {
-      tpass(empty, 'abc', { result: null, index: 0 })
     })
   })
 

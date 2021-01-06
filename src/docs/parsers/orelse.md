@@ -69,7 +69,6 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 #### See Also
 
 * [`Parser`](../types/parser.md)
-* [`andThen`](#andthen)
-* [`attempt`](#attempt)
-* [`choice`](#choice)
-* [`empty`](#empty)
+* [`alt`](alt.md)
+* [`andThen`](andthen.md)
+* [`attempt`](attempt.md)

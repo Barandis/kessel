@@ -7,12 +7,10 @@ import {
   argParFormatter,
   argStrFormatter,
   assertParser,
-  assertParsers,
   assertString,
-  ordParFormatter,
 } from 'kessel/assert'
 import { fail, fatal, ok, parser, Status } from 'kessel/core'
-import { expected, merge } from 'kessel/error'
+import { compound, expected, merge, nested } from 'kessel/error'
 import { twin } from 'kessel/util'
 
 const { Ok, Fail, Fatal } = Status
@@ -22,52 +20,69 @@ const { Ok, Fail, Fatal } = Status
 /**
  * A parser that executes parsers one at a time until one succeeds, one
  * fails fatally, or all fail. On failure (fatal or otherwise), error
- * messages from all parsers that had failed are merged into `choice`'s
+ * messages from all parsers that had failed are merged into `alt`'s
  * error messages.
  *
- * @param {...Parser} ps The parsers to execute, one at a time, until
- *     one succeeds, one fails fatally, or all fail.
+ * @param {...Parser|string} args The parsers to execute, one at a time,
+ *     until one succeeds, one fails fatally, or all fail. The last
+ *     argument *may* be a string, in which case it becomes the expected
+ *     error message in place of the collected expected error messages
+ *     of the constituent parsers.
  * @returns {Parser} A parser that applies its contained parsers until
  *     one succeeds.
  */
-export const choice = (...ps) => parser(ctx => {
-  ASSERT && assertParsers('choice', ps)
+export const alt = (...args) => {
+  const ps = args
+  const m = typeof args[args.length - 1] === 'string' ? ps.pop() : null
 
-  let errors = []
+  return parser(ctx => {
+    const hasM = m != null
 
-  for (const p of ps) {
-    const [prep, [pctx, pres]] = twin(p(ctx))
-    if (pres.status === Ok) return prep
+    ASSERT && ps.forEach((p, i) =>
+      assertParser('alt', p, argParFormatter(i + 1, true)))
 
-    errors = merge(errors, pres.errors)
-    if (pres.status === Fatal) return fatal(pctx, errors)
-  }
-  return fail(ctx, errors)
-})
+    let errors = hasM ? expected(m) : []
+
+    for (const p of ps) {
+      const [prep, [pctx, pres]] = twin(p(ctx))
+      if (pres.status === Ok) return prep
+
+      if (!hasM) errors = merge(errors, pres.errors)
+      if (pres.status === Fatal) return fatal(pctx, errors)
+    }
+    return fail(ctx, errors)
+  })
+}
 
 /**
- * A parser that executes the supplied parser, succeeding whether
- * it fails or not but only consuming input if it succeeds. This parser
+ * A parser that executes the supplied parser, succeeding whether it
+ * fails or not but only consuming input if it succeeds. This parser
  * will only fail if its supplied parser fails fatally.
  *
  * @param {Parser} p The parser for optional content to be executed and
  *     then have its result ignored.
+ * @param {string} [m] The expected error message to use if `p` fails.
  * @return {Parser} A parser that succeeds with no result unless its
- *     contained parser fails fatally. This parser consumes text only
- *     if its contained parser succeeds.
+ *     contained parser fails fatally. This parser consumes text only if
+ *     its contained parser succeeds.
  */
-export const opt = p => parser(ctx => {
-  ASSERT && assertParser('opt', p)
+export const opt = (p, m) => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && assertParser('opt', p, argParFormatter(1, hasM))
+  ASSERT && hasM && assertString('opt', m, argStrFormatter(2, true))
 
   const [prep, [pctx, pres]] = twin(p(ctx))
-  if (pres.status !== Fail) return prep
+  if (pres.status === Ok) return prep
+  const errors = hasM ? expected(m) : pres.errors
+  if (pres.status === Fatal) return fatal(pctx, errors)
 
   // If the optional parser fails, we add the error message even though
   // the end result of `opt` is success. This lets sequencing parsers
   // add the opt parser's expected to error messages if a later parser
   // in the sequence fails.
   const reply = ok(pctx, null)
-  reply[1].errors = pres.errors
+  reply[1].errors = errors
   return reply
 })
 
@@ -80,14 +95,21 @@ export const opt = p => parser(ctx => {
  *     result if it succeeds.
  * @param {*} x A value which will be the created parser's result if the
  *     supplied parser fails.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser which results in either its contained
  *     parser's successful result or the provided value.
  */
-export const orValue = (p, x) => parser(ctx => {
-  ASSERT && assertParser('orValue', p, ordParFormatter('1st'))
+export const def = (p, x, m) => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && assertParser('def', p, argParFormatter(1, true))
+  ASSERT && hasM && assertString('def', m, argStrFormatter(3, true))
 
   const [prep, [pctx, pres]] = twin(p(ctx))
-  return pres.status !== Fail ? prep : ok(pctx, x)
+  if (pres.status === Ok) return prep
+  if (pres.status === Fail) return ok(pctx, x)
+  return fatal(pctx, hasM ? expected(m) : pres.errors)
 })
 
 /**
@@ -95,68 +117,65 @@ export const orValue = (p, x) => parser(ctx => {
  * Success or failure are still returned, though fatal failure is
  * converted to non-fatal due to the fact that no input is consumed.
  *
+ * If the consituent parser fails fatally, a nested error message will
+ * be created to track the actual error cause before this parser
+ * automatically backtracks.
+ *
  * @param {Parser} p The parser to be executed.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser that applies `p` and succeeds or fails
  *     with it, but which consumes no input either way.
  */
-export const lookAhead = p => parser(ctx => {
-  ASSERT && assertParser('lookAhead', p)
+export const peek = (p, m) => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && assertParser('peek', p, argParFormatter(1, hasM))
+  ASSERT && hasM && assertString('peek', m, argStrFormatter(2, true))
 
   const index = ctx.index
   const [pctx, pres] = p(ctx)
-  return pres.status === Ok ? ok(pctx, pres.value, index)
-    : fail(pctx, pres.errors, index)
+  if (pres.status === Ok) return ok(pctx, pres.value, index)
+  if (pres.status === Fail) {
+    return fail(pctx, hasM ? expected(m) : pres.errors, index)
+  }
+  // This parser implements automatic backtracking, so if its parser
+  // fails fatally, it has to track that through a nested error
+  return fail(
+    pctx,
+    hasM ? compound(m, pctx, pres.errors) : nested(pctx, pres.errors),
+    index,
+  )
 })
 
 /**
- * A parser that fails if the provided parser succeeds but does not
+ * A parser that succeeds if the provided parser succeeds but does not
  * consume input. If the parser succeeds any other way or fails, this
  * parser transparently passes that result along.
  *
- * This parser, by default, produces no error messages on failure. An
- * error message can be specified by passing the expected message in as
- * the optional second parameter.
+ * This parser, by default, produces no error message on failure if that
+ * failure was caused by a success with input consumed. An error message
+ * can be specified by passing the expected message in as the optional
+ * second parameter.
  *
  * @param {Parser} p The parser to execute.
- * @returns {Parser} A parser which fails if `p` passes but doesn't
- *     consume any input, or otherwise passes the result through.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
+ * @returns {Parser} A parser which fails if `p` passes but consumes
+ *     input, or otherwise passes the result through.
  */
-export const notEmpty = (p, m) => parser(ctx => {
+export const empty = (p, m) => parser(ctx => {
   const hasM = m != null
 
-  ASSERT && assertParser('notEmpty', p, argParFormatter(1, hasM))
-  ASSERT && hasM && assertString('notEmpty', m, argStrFormatter(2, hasM))
+  ASSERT && assertParser('empty', p, argParFormatter(1, hasM))
+  ASSERT && hasM && assertString('empty', m, argStrFormatter(2, true))
 
   const index = ctx.index
-  const msg = hasM ? expected(m) : undefined
-  const [prep, [pctx, pres]] = twin(p(ctx))
-  return pres.status !== Ok || pctx.index !== index ? prep : fail(pctx, msg)
-})
-
-/**
- * A parser that succeeds if the supplied parser succeeds, but which
- * does not consume input. If `p` does not succeed, this parser fails
- * non-fatally.
- *
- * This parser, by default, produces no error messages on failure. An
- * error message can be specified by passing the expected message in as
- * the optional second parameter.
- *
- * @param {Parser} p The parser to execute.
- * @param {string} [m] The expected error message to use if `p` fails.
- * @returns {Parser} A parser that applies `p` but does not change the
- *     parser context, whether or not `p` succeeds.
- */
-export const followedBy = (p, m) => parser(ctx => {
-  const hasM = m != null
-
-  ASSERT && assertParser('followedBy', p, argParFormatter(1, hasM))
-  ASSERT && hasM && assertString('followedBy', m, argStrFormatter(2, hasM))
-
-  const index = ctx.index
-  const msg = hasM ? expected(m) : undefined
   const [pctx, pres] = p(ctx)
-  return pres.status === Ok ? ok(pctx, null, index) : fail(pctx, msg, index)
+  if (pres.status === Ok && pctx.index === index) return ok(pctx, null)
+  const errors = hasM ? expected(m) : pres.errors
+  if (pres.status === Fatal) return fatal(pctx, errors)
+  return fail(pctx, errors)
 })
 
 /**
@@ -174,14 +193,14 @@ export const followedBy = (p, m) => parser(ctx => {
  *     fails, but does not change the parser context, whether or not `p`
  *     succeeds.
  */
-export const notFollowedBy = (p, m) => parser(ctx => {
+export const not = (p, m) => parser(ctx => {
   const hasM = m != null
 
-  ASSERT && assertParser('notFollowedBy', p, argParFormatter(1, hasM))
-  ASSERT && hasM && assertString('notFollowedBy', m, argStrFormatter(2, hasM))
+  ASSERT && assertParser('not', p, argParFormatter(1, hasM))
+  ASSERT && hasM && assertString('not', m, argStrFormatter(2, true))
 
   const index = ctx.index
-  const msg = hasM ? expected(m) : undefined
+  const errors = hasM ? expected(m) : undefined
   const [pctx, pres] = p(ctx)
-  return pres.status === Ok ? fail(pctx, msg, index) : ok(pctx, null, index)
+  return pres.status === Ok ? fail(pctx, errors, index) : ok(pctx, null, index)
 })

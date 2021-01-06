@@ -143,6 +143,9 @@ export function tfail(parser, test, error = {}) {
       expect(first(result.errors[0].errors, ErrorType.Expected))
         .to.equal(error.nested)
     }
+    if ('compound' in error) {
+      expect(result.errors[0].label).to.equal(error.compound)
+    }
   }
 }
 

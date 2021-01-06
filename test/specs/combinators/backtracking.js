@@ -5,7 +5,7 @@
 
 import { expect } from 'chai'
 
-import { choice, lookAhead, opt } from 'kessel/combinators/alternative'
+import { alt, opt, peek } from 'kessel/combinators/alternative'
 import {
   andThenB,
   applyB,
@@ -64,7 +64,7 @@ describe('Backtracking and error handling combinators', () => {
       tfail(label(sequence(char('a'), char('b')), 'letter b'), 'a1', "'b'")
     })
     it('overwrites all of multiple expected messages', () => {
-      const parser = choice(char('a'), char('b'), char('c'))
+      const parser = alt(char('a'), char('b'), char('c'))
       tfail(parser, 'def', "'a', 'b', or 'c'")
       tfail(label(parser, 'a, b, or c'), 'def', 'a, b, or c')
     })
@@ -238,7 +238,7 @@ describe('Backtracking and error handling combinators', () => {
       })
     })
     it('fails when the second fails without the first consuming', () => {
-      tfail(chainB(lookAhead(char('a')), () => char('b')), 'a', {
+      tfail(chainB(peek(char('a')), () => char('b')), 'a', {
         expected: "'b'",
         index: 0,
         status: Fail,

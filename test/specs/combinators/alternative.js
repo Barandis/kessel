@@ -4,13 +4,12 @@
 // https://opensource.org/licenses/MIT
 
 import {
-  choice,
-  followedBy,
-  lookAhead,
-  notEmpty,
-  notFollowedBy,
+  alt,
+  def,
+  empty,
+  not,
   opt,
-  orValue,
+  peek,
 } from 'kessel/combinators/alternative'
 import { many, sequence } from 'kessel/combinators/sequence'
 import { Status } from 'kessel/core'
@@ -22,45 +21,75 @@ import { terror, tfail, tpass } from 'test/helper'
 const { Fail, Fatal } = Status
 
 describe('Alternative and conditional combinators', () => {
-  describe('choice', () => {
-    const parser = choice(
+  describe('alt', () => {
+    const parser = alt(
       sequence(char('a'), char('b')),
       sequence(char('c'), char('d')),
       sequence(char('e'), char('f')),
     )
+    const parserm = alt(
+      sequence(char('a'), char('b')),
+      sequence(char('c'), char('d')),
+      sequence(char('e'), char('f')),
+      "one of 'ab', 'cd', or 'ef'",
+    )
 
     it('throws if any of its arguments are not parsers', () => {
       terror(
-        choice(any, 0),
+        alt(any, 0),
         'abc',
-        '[choice]: expected 2nd argument to be a parser; found 0',
+        '[alt]: expected second argument to be a parser; found 0',
       )
       terror(
-        choice(any, letter, () => letter),
+        alt(any, letter, () => letter),
         'abc',
-        '[choice]: expected 3rd argument to be a parser; found function',
+        '[alt]: expected third argument to be a parser; found function',
+      )
+    })
+    it('does not throw if the last argument only is a string', () => {
+      tpass(alt(any, 'test'), 'abc', 'a')
+      terror(
+        alt(any, 'test', letter),
+        'abc',
+        '[alt]: expected second argument to be a parser; found "test"',
       )
     })
     it('fails with all expecteds if all parsers fail without consuming', () => {
       tfail(parser, 'yz', "'a', 'c', or 'e'")
+      tfail(parserm, 'yz', "one of 'ab', 'cd', or 'ef'")
     })
     it('fails immediately if a failed parser consumes input', () => {
       tfail(parser, 'ce', "'a' or 'd'")
+      tfail(parserm, 'ce', "one of 'ab', 'cd', or 'ef'")
     })
     it('succeeds if one parser succeeds first', () => {
       tpass(parser, 'cd', { result: ['c', 'd'] })
+      tpass(parserm, 'cd', { result: ['c', 'd'] })
     })
   })
 
   describe('opt', () => {
     it('throws if its argument is not a parser', () => {
-      terror(opt(0), '', '[opt]: expected a parser; found 0')
+      terror(opt(0), '', '[opt]: expected argument to be a parser; found 0')
+      terror(
+        opt(0, 'test'),
+        '',
+        '[opt]: expected first argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument exists and is not a string', () => {
+      terror(
+        opt(letter, 0),
+        '',
+        '[opt]: expected second argument to be a string; found 0',
+      )
     })
     it('consumes input and provides a result on success', () => {
       tpass(opt(char('a')), 'abc', { result: 'a', index: 1 })
     })
     it('succeeds without consuming if its parser fails', () => {
       tpass(opt(char('a')), 'bcd', { result: null, index: 0 })
+      tpass(opt(char('a'), 'test'), 'bcd', { result: null, index: 0 })
     })
     it('fails fatally if its parser fails fatally', () => {
       tfail(opt(sequence(char('a'), char('b'))), 'acd', {
@@ -72,185 +101,181 @@ describe('Alternative and conditional combinators', () => {
         result: null,
         index: 0,
       })
+      tfail(opt(sequence(char('a'), char('b')), 'test'), 'acd', {
+        expected: 'test',
+        index: 1,
+        status: Fatal,
+      })
+      tpass(opt(attempt(sequence(char('a'), char('b'))), 'test'), 'acd', {
+        result: null,
+        index: 0,
+      })
     })
   })
 
-  describe('orValue', () => {
+  describe('def', () => {
     it('throws if its first argument is not a parser', () => {
       terror(
-        orValue(0),
+        def(0),
         '',
-        '[orValue]: expected 1st argument to be a parser; found 0',
+        '[def]: expected first argument to be a parser; found 0',
+      )
+    })
+    it('throws if its third argument exists and is not a string', () => {
+      terror(
+        def(letter, 0, 0),
+        '',
+        '[def]: expected third argument to be a string; found 0',
       )
     })
     it('succeeds with its parser\'s successful result', () => {
-      tpass(orValue(char('a'), 'z'), 'abc', 'a')
+      tpass(def(char('a'), 'z'), 'abc', 'a')
+      tpass(def(char('a'), 'z', 'test'), 'abc', 'a')
     })
     it('succeeds with its value if is parser fails', () => {
-      tpass(orValue(char('b'), 'z'), 'abc', 'z')
+      tpass(def(char('b'), 'z'), 'abc', 'z')
+      tpass(def(char('b'), 'z', 'test'), 'abc', 'z')
     })
     it('fails fatally if its parser does', () => {
-      tfail(orValue(sequence(string('ab'), string('cd')), 'z'), 'abce', {
+      tfail(def(sequence(string('ab'), string('cd')), 'z'), 'abce', {
         expected: "'cd'",
         status: Fatal,
       })
+      tfail(def(sequence(string('ab'), string('cd')), 'z', 'test'), 'abce', {
+        expected: 'test',
+        status: Fatal,
+      })
     })
   })
 
-  describe('lookAhead', () => {
-    const parser = lookAhead(sequence(string('ab'), string('cd')))
+  describe('peek', () => {
+    const parser = peek(sequence(string('ab'), string('cd')))
+    const parserm = peek(sequence(string('ab'), string('cd')), "'abcd'")
 
-    it('throws if its argument is not a parser', () => {
-      terror(lookAhead(0), '', '[lookAhead]: expected a parser; found 0')
+    it('throws if its first argument is not a parser', () => {
+      terror(
+        peek(0),
+        '',
+        '[peek]: expected argument to be a parser; found 0',
+      )
+      terror(
+        peek(0, 'test'),
+        '',
+        '[peek]: expected first argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument exists and is not a string', () => {
+      terror(
+        peek(letter, 0),
+        '',
+        '[peek]: expected second argument to be a string; found 0',
+      )
     })
     it('succeeds with no consumption if its parser succeeds', () => {
       tpass(parser, 'abcd', { result: ['ab', 'cd'], index: 0 })
+      tpass(parserm, 'abcd', { result: ['ab', 'cd'], index: 0 })
     })
     it('fails with no consumption if its parser fails', () => {
-      tfail(parser, 'abd', { expected: "'cd'", index: 0 })
+      tfail(parser, 'abd', { nested: "'cd'", index: 0 })
+      tfail(parserm, 'abd', { compound: "'abcd'", index: 0 })
     })
   })
 
-  describe('notEmpty', () => {
+  describe('empty', () => {
     it('throws if its argument is not a parser', () => {
       terror(
-        notEmpty(0),
+        empty(0),
         '',
-        '[notEmpty]: expected argument to be a parser; found 0',
+        '[empty]: expected argument to be a parser; found 0',
       )
       terror(
-        notEmpty(0, 'test'),
+        empty(0, 'test'),
         '',
-        '[notEmpty]: expected first argument to be a parser; found 0',
+        '[empty]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument exists and is not a string', () => {
       terror(
-        notEmpty(many(letter), 0),
+        empty(many(letter), 0),
         '',
-        '[notEmpty]: expected second argument to be a string; found 0',
+        '[empty]: expected second argument to be a string; found 0',
       )
     })
-    it('fails if its parser succeeds without consuming input', () => {
-      tfail(notEmpty(many(letter)), '123', {
-        expected: '',
-        index: 0,
-        status: Fail,
-      })
-      tfail(notEmpty(many(letter), 'a letter'), '123', {
-        expected: 'a letter',
-        index: 0,
-        status: Fail,
-      })
+    it('succeeds if its parser succeeds without consuming input', () => {
+      tpass(empty(many(letter)), '123', { result: null })
+      tpass(empty(many(letter), 'no letters'), '123', { result: null })
     })
-    it('succeeds if its parser succeeds and consumed input', () => {
-      tpass(notEmpty(many(letter)), 'abc', ['a', 'b', 'c'])
-      tpass(notEmpty(many(letter), 'a letter'), 'abc', ['a', 'b', 'c'])
+    it('fails if its parser succeeds and consumed input', () => {
+      tfail(empty(many(letter)), 'abc', {
+        expected: '',
+        index: 3,
+        status: Fail,
+      })
+      tfail(empty(many(letter), 'no letters'), 'abc', {
+        expected: 'no letters',
+        index: 3,
+        status: Fail,
+      })
     })
     it('fails if its parser fails', () => {
-      tfail(notEmpty(letter), '123', {
+      tfail(empty(letter), '123', {
         expected: 'a letter',
         index: 0,
         status: Fail,
       })
-      tfail(notEmpty(sequence(letter, letter)), 'a1', {
+      tfail(empty(sequence(letter, letter)), 'a1', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
-      tfail(notEmpty(letter, 'at least one letter'), '123', {
-        expected: 'a letter',
+      tfail(empty(letter, 'at least one letter'), '123', {
+        expected: 'at least one letter',
         index: 0,
         status: Fail,
       })
-      tfail(notEmpty(sequence(letter, letter), 'a1 or something'), 'a1', {
-        expected: 'a letter',
+      tfail(empty(sequence(letter, letter), 'a1 or something'), 'a1', {
+        expected: 'a1 or something',
         index: 1,
         status: Fatal,
       })
     })
   })
 
-  describe('followedBy', () => {
+  describe('not', () => {
     it('throws if its argument is not a parser', () => {
       terror(
-        followedBy(0),
+        not(0),
         '',
-        '[followedBy]: expected argument to be a parser; found 0',
+        '[not]: expected argument to be a parser; found 0',
       )
       terror(
-        followedBy(0, 'test'),
+        not(0, 'test'),
         '',
-        '[followedBy]: expected first argument to be a parser; found 0',
+        '[not]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument exists and is not a string', () => {
       terror(
-        followedBy(many(letter), 0),
+        not(many(letter), 0),
         '',
-        '[followedBy]: expected second argument to be a string; found 0',
-      )
-    })
-    it('succeeds without changing state if its parser succeeds', () => {
-      tpass(followedBy(letter), 'abc', { result: null, index: 0 })
-      tpass(followedBy(letter, 'test'), 'abc', { result: null, index: 0 })
-    })
-    it('fails without changing state if its parser fails', () => {
-      tfail(followedBy(letter), '123', { index: 0, status: Fail })
-      tfail(followedBy(sequence(letter, digit)), 'abc', {
-        index: 0,
-        status: Fail,
-      })
-      tfail(followedBy(letter, 'one single letter'), '123', {
-        expected: 'one single letter',
-        index: 0,
-        status: Fail,
-      })
-      tfail(followedBy(
-        sequence(letter, digit), 'a letter, then a digit',
-      ), 'abc', {
-        expected: 'a letter, then a digit',
-        index: 0,
-        status: Fail,
-      })
-    })
-  })
-
-  describe('notFollowedBy', () => {
-    it('throws if its argument is not a parser', () => {
-      terror(
-        notFollowedBy(0),
-        '',
-        '[notFollowedBy]: expected argument to be a parser; found 0',
-      )
-      terror(
-        notFollowedBy(0, 'test'),
-        '',
-        '[notFollowedBy]: expected first argument to be a parser; found 0',
-      )
-    })
-    it('throws if its second argument exists and is not a string', () => {
-      terror(
-        notFollowedBy(many(letter), 0),
-        '',
-        '[notFollowedBy]: expected second argument to be a string; found 0',
+        '[not]: expected second argument to be a string; found 0',
       )
     })
     it('fails without changing state if its parser succeeds', () => {
-      tfail(notFollowedBy(letter), 'abc', { index: 0, status: Fail })
-      tfail(notFollowedBy(letter, 'something other than a letter'), 'abc', {
+      tfail(not(letter), 'abc', { index: 0, status: Fail })
+      tfail(not(letter, 'something other than a letter'), 'abc', {
         expected: 'something other than a letter',
         index: 0,
         status: Fail,
       })
     })
     it('succeeds without changing state if its parser fails', () => {
-      tpass(notFollowedBy(letter), '123', { result: null, index: 0 })
-      tpass(notFollowedBy(sequence(letter, digit)), 'abc', {
+      tpass(not(letter), '123', { result: null, index: 0 })
+      tpass(not(sequence(letter, digit)), 'abc', {
         result: null, index: 0,
       })
-      tpass(notFollowedBy(letter, 'test'), '123', { result: null, index: 0 })
-      tpass(notFollowedBy(sequence(letter, digit), 'test'), 'abc', {
+      tpass(not(letter, 'test'), '123', { result: null, index: 0 })
+      tpass(not(sequence(letter, digit), 'test'), 'abc', {
         result: null, index: 0,
       })
     })

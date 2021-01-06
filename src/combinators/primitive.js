@@ -151,16 +151,6 @@ export const chain = (p, fn) => parser(ctx => {
 // Alternative
 
 /**
- * A parser that always succeeds with no result.
- *
- * This represents the `empty` operation from Haskell's `Alternative`
- * class.
- *
- * @type {Parser}
- */
-export const empty = parser(ctx => ok(ctx))
-
-/**
  * A parser that first applies `p` and, if that fails, applies `q`. The
  * result is the result of whatever parser succeeds. If both fail,
  * `orElse` also fails, and if either fail fatally, `orElse` fails

@@ -6,8 +6,8 @@
 import { expect } from 'chai'
 
 import {
+  alt,
   char,
-  choice,
   join,
   label,
   many,
@@ -22,7 +22,7 @@ import {
   value,
 } from 'kessel'
 
-const quotedChar = choice(noneOf('"'), value(string('""'), '"'))
+const quotedChar = alt(noneOf('"'), value(string('""'), '"'))
 
 const quotedCell = second(sequenceB(
   char('"'),
@@ -30,16 +30,16 @@ const quotedCell = second(sequenceB(
   label(char('"'), 'quote at end of cell'),
 ))
 
-const cell = choice(quotedCell, join(many(noneOf(',\n\r'))))
+const cell = alt(quotedCell, join(many(noneOf(',\n\r'))))
 const line = sepBy(cell, char(','))
 const csv = sepEndBy(line, newline)
 
 const parseCsv = input => run(csv, input)
 
-const parseCsv1 = input => run(sepEndBy(sepBy(choice(
+const parseCsv1 = input => run(sepEndBy(sepBy(alt(
   second(sequenceB(
     char('"'),
-    join(many(choice(noneOf('"'), value(string('""'), '"')))),
+    join(many(alt(noneOf('"'), value(string('""'), '"')))),
     label(char('"'), 'quote at end of cell'),
   )), join(many(noneOf(',\n\r'))),
 ), char(',')), newline), input)

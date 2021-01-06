@@ -4,7 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import { parser } from './core'
-import { charLength, enumerate, ordinal, ordinalWord, stringify } from './util'
+import { charLength, enumerate, ordinal, stringify, wordinal } from './util'
 
 /**
  * Generates a formatter function out of a type.
@@ -40,7 +40,7 @@ const parFormatter = formatter('a parser')
  */
 export const argFormatter = (type, order = 1, multiple = false) => value =>
   `expected ${
-    multiple ? `${ordinalWord(order)} ` : ''
+    multiple ? `${wordinal(order)} ` : ''
   }argument to be ${type}; found ${stringify(value)}`
 
 export const argCharFormatter = (order = 1, multiple = false) =>

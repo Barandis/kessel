@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `opt(p: Parser<T>): Parser<T | null>`
+> `opt(p: Parser, m?: string): Parser`
 
 Optionally matches a parser. If this parser succeeds, its result is returned. If it fails, `null` is returned.
 
@@ -38,6 +38,7 @@ console.log(failure(t)) // Parse error at (line 1, column 2):
 #### Parameters
 
 * `p`: The parser that gets applied.
+* `m`: The optional expected error message that will take the place of the default error message.
 
 #### Success
 
@@ -54,6 +55,6 @@ console.log(failure(t)) // Parse error at (line 1, column 2):
 #### See Also
 
 * [`Parser`](../types/parser.md)
-* [`lookAhead`](lookahead.md)
-* [`orValue`](orvalue.md)
+* [`def`](def.md)
+* [`peek`](peek.md)
 * [`skip`](skip.md)

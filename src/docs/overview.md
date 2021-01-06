@@ -22,11 +22,11 @@ To illustrate, here's a short parser definition for a CSV parser. This is a full
 
     ```javascript
     import { 
-      char, choice, join, label, many, newline, noneOf, run, second, sepBy,
+      alt, char, join, label, many, newline, noneOf, run, second, sepBy,
       sepEndBy, sequenceB, string, value,
     } from '@barandis/kessel'
 
-    const quotedChar = choice(noneOf('"'), value(string('""'), '"'))
+    const quotedChar = alt(noneOf('"'), value(string('""'), '"'))
 
     const quotedCell = second(sequenceB(
       char('"'),
@@ -34,7 +34,7 @@ To illustrate, here's a short parser definition for a CSV parser. This is a full
       label(char('"'), 'quote at end of cell'),
     ))
 
-    const cell = choice(quotedCell, join(many(noneOf(',\n\r'))))
+    const cell = alt(quotedCell, join(many(noneOf(',\n\r'))))
     const line = sepBy(cell, char(','))
     const csv = sepEndBy(line, newline)
 

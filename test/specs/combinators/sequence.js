@@ -3,7 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { choice, opt } from 'kessel/combinators/alternative'
+import { alt, opt } from 'kessel/combinators/alternative'
 import { join, value } from 'kessel/combinators/misc'
 import { map } from 'kessel/combinators/primitive'
 import {
@@ -639,7 +639,7 @@ describe('Sequence combinators', () => {
     it('adds null to the results', () => {
       tpass(
         manyTill(
-          choice(letter, skip(space)), digit,
+          alt(letter, skip(space)), digit,
         ), 'a b c 1', ['a', null, 'b', null, 'c', null],
       )
     })
@@ -647,7 +647,7 @@ describe('Sequence combinators', () => {
 
   describe('assocL', () => {
     const p = map(join(many1(digit)), x => parseInt(x))
-    const op = choice(
+    const op = alt(
       value(char('+'), (a, b) => a + b),
       value(char('-'), (a, b) => a - b),
     )
@@ -711,7 +711,7 @@ describe('Sequence combinators', () => {
 
   describe('assoc1L', () => {
     const p = map(join(many1(digit)), x => parseInt(x))
-    const op = choice(
+    const op = alt(
       value(char('+'), (a, b) => a + b),
       value(char('-'), (a, b) => a - b),
     )
@@ -779,7 +779,7 @@ describe('Sequence combinators', () => {
 
   describe('assocR', () => {
     const p = map(join(many1(digit)), x => parseInt(x))
-    const op = choice(
+    const op = alt(
       value(char('+'), (a, b) => a + b),
       value(char('-'), (a, b) => a - b),
     )
@@ -844,7 +844,7 @@ describe('Sequence combinators', () => {
 
   describe('assoc1R', () => {
     const p = map(join(many1(digit)), x => parseInt(x))
-    const op = choice(
+    const op = alt(
       value(char('+'), (a, b) => a + b),
       value(char('-'), (a, b) => a - b),
     )

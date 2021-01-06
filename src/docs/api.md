@@ -11,7 +11,7 @@
 
 Types are given in the descriptions for each of the parsers and functions listed below. These are contained in TypeScript definition files in the project that can be used either for writing TypeScript programs that use Kessel or just in providing signature information for your IDE.
 
-It should however be noted that some of the type information is incomplete because TypeScript leaves no way to express complete information in the case where there are variable numbers of arguments that can have different generic parameter types. There are notes to that effect in [`choice`](parsers/choice.md), [`pipe`](parsers/pipe.md), [`pipeB`](parsers/pipeb.md), [`sequence`](parsers/sequence.md), and [`sequenceB`](parsers/sequenceb.md).
+It should however be noted that some of the type information is incomplete because TypeScript leaves no way to express complete information in the case where there are variable numbers of arguments that can have different generic parameter types. There are notes to that effect in [`alt`](parsers/alt.md), [`pipe`](parsers/pipe.md), [`pipeB`](parsers/pipeb.md), [`sequence`](parsers/sequence.md), and [`sequenceB`](parsers/sequenceb.md).
 
 However, there are shortcomings in other parsers that are not explicity marked. For example, TypeScript has no way to say that a string should be one character long, or that an array of strings should have elements that are all one character long. This affects the parameters in [`anyOf`](parsers/anyof.md), [`char`](parsers/char.md), [`charI`](parsers/chari.md), [`noneOf`](parsers/noneof.md), and [`range`](parsers/range.md).
 
@@ -85,7 +85,6 @@ Additionally, parsers are often said to *return* a value or to have a value as a
 | Parser | Description |
 |--------|-------------|
 | [`always`](parsers/always.md) | Always succeeds and returns a value. |
-| [`empty`](parsers/empty.md) | Always succeeds and returns nothing. |
 | [`map`](parsers/map.md) | Applies a parser, then applies a function to the result, then returns the result of that function. |
 | [`apply`](parsers/apply.md) | Parses content and a function, returning the result of the function when passed the content. |
 | [`chain`](parsers/chain.md) | Applies a parser, then applies a function to the result, then applies the parser returned by the function. |
@@ -122,13 +121,12 @@ Additionally, parsers are often said to *return* a value or to have a value as a
 
 | Parser | Description |
 |--------|-------------|
-| [`choice`](parsers/choice.md) | Executes a series of parsers one at a time until one succeeds. |
+| [`alt`](parsers/alt.md) | Executes a series of parsers one at a time until one succeeds. |
 | [`opt`](parsers/opt.md) | Executes a parser and returns its result on success. On failure, succeeds but returns nothing. |
-| [`orValue`](parsers/orvalue.md) | Executes a parser and returns either its result upon success or another value upon failure. |
-| [`lookAhead`](parsers/lookahead.md) | Executes a parser and returns its result without consuming input. |
-| [`notEmpty`](parsers/notempty.md) | Executes a parser and fails if the parser succeeds without consuming input. |
-| [`followedBy`](parsers/followedby.md) | Executes a parser and succeeds without consuming input if that parser succeeds. |
-| [`notFollowedBy`](parsers/notfollowedby.md) | Executes a parser and succeeds without consuming input if that parser fails. |
+| [`def`](parsers/def.md) | Executes a parser and returns either its result upon success or a default value upon failure. |
+| [`peek`](parsers/peek.md) | Executes a parser and returns its result without consuming input. |
+| [`empty`](parsers/empty.md) | Executes a parser and fails if the parser succeeds but consumes input. |
+| [`not`](parsers/not.md) | Executes a parser and succeeds without consuming input if that parser fails. |
 
 ### Table 8: Backtracking combinators
 

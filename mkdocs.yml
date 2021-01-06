@@ -33,12 +33,15 @@ nav:
     - '2. Making Parsers Go': guide/ch-02.md
     - '3. Parsers, How Do They Work?': guide/ch-03.md
     - '4. Combining Parsers': guide/ch-04.md
+  - Tutorial:
+    - Introduction: tutorial/ch-00.md
   - 'API Reference':
     - Summary: api.md
     - Parsers:
       - all: parsers/all.md
       - alpha: parsers/alpha.md
       - alphaU: parsers/alphau.md
+      - alt: parsers/alt.md
       - always: parsers/always.md
       - andThen: parsers/andthen.md
       - andThenB: parsers/andthenb.md
@@ -61,8 +64,8 @@ nav:
       - chainB: parsers/chainb.md
       - char: parsers/char.md
       - charI: parsers/chari.md
-      - choice: parsers/choice.md
       - compact: parsers/compact.md
+      - def: parsers/def.md
       - digit: parsers/digit.md
       - empty: parsers/empty.md
       - eof: parsers/eof.md
@@ -70,7 +73,6 @@ nav:
       - failNormally: parsers/failnormally.md
       - fifth: parsers/fifth.md
       - first: parsers/first.md
-      - followedBy: parsers/followedby.md
       - fourth: parsers/fourth.md
       - hex: parsers/hex.md
       - join: parsers/join.md
@@ -79,7 +81,6 @@ nav:
       - leftB: parsers/leftb.md
       - letter: parsers/letter.md
       - letterU: parsers/letteru.md
-      - lookAhead: parsers/lookahead.md
       - lower: parsers/lower.md
       - lowerU: parsers/loweru.md
       - many: parsers/many.md
@@ -90,13 +91,12 @@ nav:
       - newline: parsers/newline.md
       - newlineU: parsers/newlineu.md
       - noneOf: parsers/noneof.md
-      - notEmpty: parsers/notempty.md
-      - notFollowedBy: parsers/notfollowedby.md
+      - not: parsers/not.md
       - nth: parsers/nth.md
       - octal: parsers/octal.md
       - opt: parsers/opt.md
       - orElse: parsers/orelse.md
-      - orValue: parsers/orvalue.md
+      - peek: parsers/peek.md
       - pipe: parsers/pipe.md
       - pipeB: parsers/pipeb.md
       - range: parsers/range.md
