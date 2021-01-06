@@ -114,7 +114,7 @@ export {
   sepBy1,
   sepEndBy,
   sepEndBy1,
-  sequence,
+  seq,
   skip,
   skipMany,
   skipMany1,

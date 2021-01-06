@@ -9,7 +9,7 @@
 
 Applies a parser and returns the elements of the resulting array except for any `null` or `undefined` elements.
 
-This combinator is useful in conjunction with parsers like [`sequence`](sequence.md) and [`many`](many.md), which may return `null` values amongst their array elements, particularly if the [`opt`](opt.md) parser is used in their contained parsers. In a prior version of Kessel, `sequence` and `many` dropped their `null` values by default, but this was found to be less than ideal for a number of reasons. `compact` brings that behavior back when needed.
+This combinator is useful in conjunction with parsers like [`seq`](seq.md) and [`many`](many.md), which may return `null` values amongst their array elements, particularly if the [`opt`](opt.md) parser is used in their contained parsers. In a prior version of Kessel, `sequence` and `many` dropped their `null` values by default, but this was found to be less than ideal for a number of reasons. `compact` brings that behavior back when needed.
 
 #### Example
 
@@ -60,4 +60,4 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 * [`many`](many.md)
 * [`map`](map.md)
 * [`opt`](opt.md)
-* [`sequence`](sequence.md)
+* [`seq`](seq.md)

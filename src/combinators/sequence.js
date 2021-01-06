@@ -4,6 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import {
+  argParFormatter,
   assertFunction,
   assertGeneratorFunction,
   assertNumber,
@@ -14,7 +15,7 @@ import {
   ordParFormatter,
 } from 'kessel/assert'
 import { maybeFatal, ok, parser, Status } from 'kessel/core'
-import { merge } from 'kessel/error'
+import { expected, merge } from 'kessel/error'
 import { ordinal, range, stringify, twin } from 'kessel/util'
 
 /** @typedef {import('kessel/core').Parser} Parser */
@@ -35,30 +36,41 @@ function loopMessage(name) {
  * This parser will fail fatally if any input was consumed before any of
  * its parsers fail, even if that failure itself was non-fatal.
  *
- * @param {...Parser} ps The parsers to be executed.
+ * @param {...Parser|string} ps The parsers to be executed. The last
+ *     argument *may* be a string, in which case it becomes the expected
+ *     error message in place of the collected expected error messages
+ *     of the constituent parsers.
  * @returns {Parser} A parser that executes the supplied parsers one at
  *     a time, in order, and fails if any of those parsers fail.
  */
-export const sequence = (...ps) => parser(ctx => {
-  ASSERT && assertParsers('sequence', ps)
+export const seq = (...args) => {
+  const ps = args
+  const m = typeof args[args.length - 1] === 'string' ? ps.pop() : null
 
-  const values = []
-  const index = ctx.index
-  let errors = []
-  let context = ctx
+  return parser(ctx => {
+    const hasM = m != null
 
-  for (const p of ps) {
-    const [pctx, pres] = p(context)
-    context = pctx
-    errors = pres.errors?.length ? merge(errors, pres.errors) : []
+    ASSERT && ps.forEach((p, i) =>
+      assertParser('seq', p, argParFormatter(i + 1, true)))
 
-    if (pres.status !== Ok) {
-      return maybeFatal(context.index !== index, context, errors)
+    const values = []
+    const index = ctx.index
+    let errors = hasM ? expected(m) : []
+    let context = ctx
+
+    for (const p of ps) {
+      const [pctx, pres] = p(context)
+      context = pctx
+      if (!hasM) errors = pres.errors?.length ? merge(errors, pres.errors) : []
+
+      if (pres.status !== Ok) {
+        return maybeFatal(context.index !== index, context, errors)
+      }
+      values.push(pres.value)
     }
-    values.push(pres.value)
-  }
-  return ok(context, values)
-})
+    return ok(context, values)
+  })
+}
 
 /**
  * A parser that executes the parsers `p` and `q` in order and returns

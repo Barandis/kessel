@@ -24,7 +24,7 @@ import {
 } from 'kessel/combinators/backtracking'
 import { value } from 'kessel/combinators/misc'
 import { always } from 'kessel/combinators/primitive'
-import { left, many1, right, sequence } from 'kessel/combinators/sequence'
+import { left, many1, right, seq } from 'kessel/combinators/sequence'
 import { parse, Status } from 'kessel/core'
 import { ErrorType } from 'kessel/error'
 import { any, char, digit, eof, letter, noneOf } from 'kessel/parsers/char'
@@ -60,8 +60,8 @@ describe('Backtracking and error handling combinators', () => {
       tfail(label(char('a'), 'letter a'), 'bcd', 'letter a')
     })
     it('does not change the expected message on a fatal error', () => {
-      tfail(sequence(char('a'), char('b')), 'a1', "'b'")
-      tfail(label(sequence(char('a'), char('b')), 'letter b'), 'a1', "'b'")
+      tfail(seq(char('a'), char('b')), 'a1', "'b'")
+      tfail(label(seq(char('a'), char('b')), 'letter b'), 'a1', "'b'")
     })
     it('overwrites all of multiple expected messages', () => {
       const parser = alt(char('a'), char('b'), char('c'))
@@ -96,7 +96,7 @@ describe('Backtracking and error handling combinators', () => {
     })
     it('adds a compound error if its parser fails while consuming', () => {
       const [ctx, result] = parse(
-        attemptM(sequence(char('a'), char('b')), 'test'), 'a1',
+        attemptM(seq(char('a'), char('b')), 'test'), 'a1',
       )
       const error = result.errors[0]
 
@@ -135,12 +135,12 @@ describe('Backtracking and error handling combinators', () => {
       expect(r1).to.deep.equal(r2)
     })
     it('resets the index if its parser fails with consuming input', () => {
-      const parser = sequence(string('te'), string('st'))
+      const parser = seq(string('te'), string('st'))
       tfail(parser, 'tesl', { index: 2, status: Fatal })
       tfail(attempt(parser), 'tesl', { index: 0, status: Fail })
     })
     it('creates a nested error if it fails while consuming input', () => {
-      const parser = sequence(string('te'), string('st'))
+      const parser = seq(string('te'), string('st'))
       const [ctx, result] = parse(attempt(parser), 'tesl')
       const error = result.errors[0]
 
@@ -194,7 +194,7 @@ describe('Backtracking and error handling combinators', () => {
       })
     })
     it('still fails fatally if any of its parsers does', () => {
-      const parser = sequenceB(sequence(letter, digit), letter, digit)
+      const parser = sequenceB(seq(letter, digit), letter, digit)
       tfail(parser, 'aaa1', { expected: 'a digit', index: 1, status: Fatal })
     })
     it('gives opt error messages if later parsers fail', () => {
@@ -255,12 +255,12 @@ describe('Backtracking and error handling combinators', () => {
       expect(err.errors[0].label).to.equal("'b'")
     })
     it('still fails fatally if either parser fails fatally', () => {
-      tfail(chainB(sequence(letter, digit), () => letter), 'aaa', {
+      tfail(chainB(seq(letter, digit), () => letter), 'aaa', {
         expected: 'a digit',
         index: 1,
         status: Fatal,
       })
-      tfail(chainB(letter, c => sequence(char(c), char(c))), 'aab', {
+      tfail(chainB(letter, c => seq(char(c), char(c))), 'aab', {
         expected: "'a'",
         index: 2,
         status: Fatal,
@@ -370,12 +370,12 @@ describe('Backtracking and error handling combinators', () => {
       expect(err.errors[0].label).to.equal('a digit')
     })
     it('still fails fatally if either parser fails fatally', () => {
-      tfail(leftB(sequence(letter, letter), digit), 'a11', {
+      tfail(leftB(seq(letter, letter), digit), 'a11', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
-      tfail(leftB(letter, sequence(letter, digit)), 'aab', {
+      tfail(leftB(letter, seq(letter, digit)), 'aab', {
         expected: 'a digit',
         index: 2,
         status: Fatal,
@@ -422,12 +422,12 @@ describe('Backtracking and error handling combinators', () => {
       expect(err.errors[0].label).to.equal('a digit')
     })
     it('still fails fatally if either parser fails fatally', () => {
-      tfail(rightB(sequence(letter, letter), digit), 'a11', {
+      tfail(rightB(seq(letter, letter), digit), 'a11', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
-      tfail(rightB(letter, sequence(letter, digit)), 'aab', {
+      tfail(rightB(letter, seq(letter, digit)), 'aab', {
         expected: 'a digit',
         index: 2,
         status: Fatal,
@@ -477,12 +477,12 @@ describe('Backtracking and error handling combinators', () => {
       expect(err.errors[0].label).to.equal('a digit')
     })
     it('still fails fatally if either parser fails fatally', () => {
-      tfail(andThenB(sequence(letter, letter), digit), 'a11', {
+      tfail(andThenB(seq(letter, letter), digit), 'a11', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
-      tfail(andThenB(letter, sequence(letter, digit)), 'aab', {
+      tfail(andThenB(letter, seq(letter, digit)), 'aab', {
         expected: 'a digit',
         index: 2,
         status: Fatal,
@@ -525,7 +525,7 @@ describe('Backtracking and error handling combinators', () => {
       })
     })
     it('fails fatally if the parser fails fatally', () => {
-      tfail(repeatB(sequence(letter, letter), 5), 'a1b2c3d4e5', {
+      tfail(repeatB(seq(letter, letter), 5), 'a1b2c3d4e5', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
@@ -581,12 +581,12 @@ describe('Backtracking and error handling combinators', () => {
       expect(err.errors[1].label).to.equal('a letter')
     })
     it('fails fatally if either of its parsers fail fatally', () => {
-      tfail(manyTillB(digit, sequence(letter, digit)), '123abc', {
+      tfail(manyTillB(digit, seq(letter, digit)), '123abc', {
         expected: 'a digit',
         index: 4,
         status: Fatal,
       })
-      tfail(manyTillB(sequence(letter, digit), digit), 'a1b2cc3', {
+      tfail(manyTillB(seq(letter, digit), digit), 'a1b2cc3', {
         expected: 'a digit',
         index: 5,
         status: Fatal,
@@ -596,7 +596,7 @@ describe('Backtracking and error handling combinators', () => {
 
   describe('blockB', () => {
     const parser = blockB(function *() {
-      yield sequence(char('a'), char('b'), char('c'))
+      yield seq(char('a'), char('b'), char('c'))
       yield space
       const c = yield any
       yield space
@@ -708,7 +708,7 @@ describe('Backtracking and error handling combinators', () => {
     })
     it('fails fatally if one of its parsers fails fatally', () => {
       tfail(
-        pipeB(letter, sequence(digit, digit), (a, [b1, b2]) => b1 + b2 + a),
+        pipeB(letter, seq(digit, digit), (a, [b1, b2]) => b1 + b2 + a),
         'a1b',
         { expected: 'a digit', index: 2, status: Fatal },
       )
@@ -776,13 +776,13 @@ describe('Backtracking and error handling combinators', () => {
       })
     })
     it('fails fatally if one of its parsers fails fatally', () => {
-      tfail(betweenB(char('('), char(')'), sequence(letter, letter)), '(a)', {
+      tfail(betweenB(char('('), char(')'), seq(letter, letter)), '(a)', {
         expected: 'a letter',
         index: 2,
         status: Fatal,
       })
       tfail(
-        betweenB(char('('), sequence(char(')'), char(')')), letter), '(a)', {
+        betweenB(char('('), seq(char(')'), char(')')), letter), '(a)', {
           expected: "')'",
           index: 3,
           status: Fatal,

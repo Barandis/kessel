@@ -95,4 +95,4 @@ The third case (`t`) fails because, while the whitespace was ignored and the opt
 
 * [`Parser`](../types/parser.md)
 * [`blockB`](blockb.md)
-* [`sequence`](sequence.md)
+* [`seq`](seq.md)

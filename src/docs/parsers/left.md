@@ -77,4 +77,4 @@ In this example, `f` represents a non-fatal failure because the first parser (`l
 * [`andThen`](andthen.md)
 * [`leftB`](leftb.md)
 * [`right`](right.md)
-* [`sequence`](sequence.md)
+* [`seq`](seq.md)

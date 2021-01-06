@@ -15,7 +15,7 @@ import {
   value,
 } from 'kessel/combinators/misc'
 import { always, map } from 'kessel/combinators/primitive'
-import { many, many1, sequence } from 'kessel/combinators/sequence'
+import { many, many1, seq } from 'kessel/combinators/sequence'
 import { Status } from 'kessel/core'
 import { any, char, digit, letter } from 'kessel/parsers/char'
 import { terror, tfail, tpass } from 'test/helper'
@@ -43,7 +43,7 @@ describe('Chaining and piping combinators', () => {
         expected: 'any character',
         status: Fail,
       })
-      tfail(join(sequence(letter, digit)), 'ab', {
+      tfail(join(seq(letter, digit)), 'ab', {
         expected: 'a digit',
         status: Fatal,
       })
@@ -70,7 +70,7 @@ describe('Chaining and piping combinators', () => {
         expected: 'any character',
         status: Fail,
       })
-      tfail(compact(sequence(letter, digit)), 'ab', {
+      tfail(compact(seq(letter, digit)), 'ab', {
         expected: 'a digit',
         status: Fatal,
       })
@@ -116,7 +116,7 @@ describe('Chaining and piping combinators', () => {
     })
     it('extracts the nth element of an array result', () => {
       tpass(nth(many(any), 2), '12345', '3')
-      tpass(nth(sequence(char('"'), any, char('"')), 1), '"a"', 'a')
+      tpass(nth(seq(char('"'), any, char('"')), 1), '"a"', 'a')
     })
     it('passes any parser failure through', () => {
       tfail(nth(many1(any), 2), '', 'any character')

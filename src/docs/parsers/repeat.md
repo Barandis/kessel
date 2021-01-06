@@ -63,4 +63,4 @@ console.log(failure(t)) // Parse error at (line 1, column 3):
 * [`Parser`](../types/parser.md)
 * [`opt`](opt.md)
 * [`repeatB`](repeatb.md)
-* [`sequence`](sequence.md)
+* [`seq`](seq.md)

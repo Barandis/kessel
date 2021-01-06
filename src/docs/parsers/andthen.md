@@ -84,4 +84,4 @@ console.log(failure(t)) // Parse error at (line 1, column 2):
 * [`chain`](chain.md)
 * [`left`](left.md)
 * [`right`](right.md)
-* [`sequence`](sequence.md)
+* [`seq`](seq.md)

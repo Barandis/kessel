@@ -11,7 +11,7 @@ import {
   opt,
   peek,
 } from 'kessel/combinators/alternative'
-import { many, sequence } from 'kessel/combinators/sequence'
+import { many, seq } from 'kessel/combinators/sequence'
 import { Status } from 'kessel/core'
 import { attempt } from 'kessel/index'
 import { any, char, digit, letter } from 'kessel/parsers/char'
@@ -23,14 +23,14 @@ const { Fail, Fatal } = Status
 describe('Alternative and conditional combinators', () => {
   describe('alt', () => {
     const parser = alt(
-      sequence(char('a'), char('b')),
-      sequence(char('c'), char('d')),
-      sequence(char('e'), char('f')),
+      seq(char('a'), char('b')),
+      seq(char('c'), char('d')),
+      seq(char('e'), char('f')),
     )
     const parserm = alt(
-      sequence(char('a'), char('b')),
-      sequence(char('c'), char('d')),
-      sequence(char('e'), char('f')),
+      seq(char('a'), char('b')),
+      seq(char('c'), char('d')),
+      seq(char('e'), char('f')),
       "one of 'ab', 'cd', or 'ef'",
     )
 
@@ -92,21 +92,21 @@ describe('Alternative and conditional combinators', () => {
       tpass(opt(char('a'), 'test'), 'bcd', { result: null, index: 0 })
     })
     it('fails fatally if its parser fails fatally', () => {
-      tfail(opt(sequence(char('a'), char('b'))), 'acd', {
+      tfail(opt(seq(char('a'), char('b'))), 'acd', {
         expected: "'b'",
         index: 1,
         status: Fatal,
       })
-      tpass(opt(attempt(sequence(char('a'), char('b')))), 'acd', {
+      tpass(opt(attempt(seq(char('a'), char('b')))), 'acd', {
         result: null,
         index: 0,
       })
-      tfail(opt(sequence(char('a'), char('b')), 'test'), 'acd', {
+      tfail(opt(seq(char('a'), char('b')), 'test'), 'acd', {
         expected: 'test',
         index: 1,
         status: Fatal,
       })
-      tpass(opt(attempt(sequence(char('a'), char('b'))), 'test'), 'acd', {
+      tpass(opt(attempt(seq(char('a'), char('b'))), 'test'), 'acd', {
         result: null,
         index: 0,
       })
@@ -137,11 +137,11 @@ describe('Alternative and conditional combinators', () => {
       tpass(def(char('b'), 'z', 'test'), 'abc', 'z')
     })
     it('fails fatally if its parser does', () => {
-      tfail(def(sequence(string('ab'), string('cd')), 'z'), 'abce', {
+      tfail(def(seq(string('ab'), string('cd')), 'z'), 'abce', {
         expected: "'cd'",
         status: Fatal,
       })
-      tfail(def(sequence(string('ab'), string('cd')), 'z', 'test'), 'abce', {
+      tfail(def(seq(string('ab'), string('cd')), 'z', 'test'), 'abce', {
         expected: 'test',
         status: Fatal,
       })
@@ -149,8 +149,8 @@ describe('Alternative and conditional combinators', () => {
   })
 
   describe('peek', () => {
-    const parser = peek(sequence(string('ab'), string('cd')))
-    const parserm = peek(sequence(string('ab'), string('cd')), "'abcd'")
+    const parser = peek(seq(string('ab'), string('cd')))
+    const parserm = peek(seq(string('ab'), string('cd')), "'abcd'")
 
     it('throws if its first argument is not a parser', () => {
       terror(
@@ -223,7 +223,7 @@ describe('Alternative and conditional combinators', () => {
         index: 0,
         status: Fail,
       })
-      tfail(empty(sequence(letter, letter)), 'a1', {
+      tfail(empty(seq(letter, letter)), 'a1', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
@@ -233,7 +233,7 @@ describe('Alternative and conditional combinators', () => {
         index: 0,
         status: Fail,
       })
-      tfail(empty(sequence(letter, letter), 'a1 or something'), 'a1', {
+      tfail(empty(seq(letter, letter), 'a1 or something'), 'a1', {
         expected: 'a1 or something',
         index: 1,
         status: Fatal,
@@ -271,11 +271,11 @@ describe('Alternative and conditional combinators', () => {
     })
     it('succeeds without changing state if its parser fails', () => {
       tpass(not(letter), '123', { result: null, index: 0 })
-      tpass(not(sequence(letter, digit)), 'abc', {
+      tpass(not(seq(letter, digit)), 'abc', {
         result: null, index: 0,
       })
       tpass(not(letter, 'test'), '123', { result: null, index: 0 })
-      tpass(not(sequence(letter, digit), 'test'), 'abc', {
+      tpass(not(seq(letter, digit), 'test'), 'abc', {
         result: null, index: 0,
       })
     })

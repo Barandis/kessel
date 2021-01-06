@@ -9,7 +9,7 @@
 
 Applies a parser and returns a given element of the resulting array.
 
-This parser works only if `p` returns an array, and it returns the `n`th (parsers/0-based) element of that array. It's most useful with parsers like [`sequence`](sequence.md) and [`many`](many.md) that always return arrays, though it will work with parsers like [`map`](map.md) and [`always`](always.md) if they are programmed to return arrays.
+This parser works only if `p` returns an array, and it returns the `n`th (parsers/0-based) element of that array. It's most useful with parsers like [`seq`](seq.md) and [`many`](many.md) that always return arrays, though it will work with parsers like [`map`](map.md) and [`always`](always.md) if they are programmed to return arrays.
 
 `nth(p, n)` is an optimized implementation of `chain(p, x => always(x[n]))`.
 

@@ -79,4 +79,4 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 * [`blockB`](blockb.md)
 * [`leftB`](leftb.md)
 * [`rightB`](rightb.md)
-* [`sequence`](sequence.md)
+* [`seq`](seq.md)

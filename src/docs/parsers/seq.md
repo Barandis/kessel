@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `sequence(...ps: Parser[]): Parser<any[]>`
+> `seq(...ps: Parser[], m?: string): Parser`
 
 !!! warning "Inexpressive type"
     TypeScript cannot express as much information in this type as would be useful. Namely, the parsers in `ps` can all have different generic parameters, and the generic parameter of the return value is an array with each of those types in order, potentially missing members that are `null`.
@@ -14,18 +14,18 @@
 
 Applies a series of parsers in order, returning an array that contains each parser's result.
 
-`sequence` will only succeed if *all* of its parsers succeed. If one of them fails, `sequence` will fail fatally if it had consumed any input up to that point, even if the parser that failed did so non-fatally.
+`seq` will only succeed if *all* of its parsers succeed. If one of them fails, `seq` will fail fatally if it had consumed any input up to that point, even if the parser that failed did so non-fatally.
 
 There is another version of this parser ([`sequenceB`](sequenceb.md)) that fails non-fatally and backtracks if the parser that fails does so non-fatally.
 
 All of the results are gathered into an array.
 
-A two-parser `sequence` is the same as [`andThen`](andthen.md).
+A two-parser `seq` is the same as [`andThen`](andthen.md).
 
 #### Example
 
 ```javascript
-const parser = sequence(letter, digit, letter)
+const parser = seq(letter, digit, letter)
 
 const s = parse(parser, 'a1b')
 console.log(status(s))  // "ok"

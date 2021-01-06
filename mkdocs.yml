@@ -112,7 +112,7 @@ nav:
       - sepBy1: parsers/sepby1.md
       - sepEndBy: parsers/sependby.md
       - sepEndBy1: parsers/sependby1.md
-      - sequence: parsers/sequence.md
+      - seq: parsers/seq.md
       - sequenceB: parsers/sequenceb.md
       - skip: parsers/skip.md
       - skipMany: parsers/skipmany.md
