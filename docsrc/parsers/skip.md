@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `skip(p: Parser<T>): Parser<null>`
+> `skip(p: Parser, m?: string): Parser`
 
 Applies a parser and discards its result on success.
 
@@ -32,6 +32,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 #### Parameters
 
 * `p`: The parser to apply to the input.
+* `m`: The optional expected error message that will take the place of the default error message.
 
 #### Success
 
@@ -48,6 +49,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 #### Throws
 
 * Throws an error if `p` is not a parser.
+* Throws an error if `m` exists and is not a string.
 
 #### See Also
 

@@ -293,14 +293,21 @@ export const many1 = (p, m) => parser(ctx => {
  * still consuming input.
  *
  * @param {Parser} p The parser whose result is to be discarded.
- * @returns {Parser} A parser that will consume input as `p`  does on
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
+ * @returns {Parser} A parser that will consume input as `p` does on
  *     success, but will produce no result.
  */
-export const skip = p => parser(ctx => {
-  ASSERT && assertParser('skip', p)
+export const skip = (p, m) => parser(ctx => {
+  const hasM = m != null
 
-  const [prep, [pctx, pres]] = twin(p(ctx))
-  return pres.status === Ok ? ok(pctx, null) : prep
+  ASSERT && assertParser('skip', p, argParFormatter(1, hasM))
+  ASSERT && hasM && assertString('skip', m, argStrFormatter(2, true))
+
+  const [pctx, pres] = p(ctx)
+  return pres.status === Ok
+    ? ok(pctx, null)
+    : maybeFatal(pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors)
 })
 
 /**

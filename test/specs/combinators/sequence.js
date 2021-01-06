@@ -341,17 +341,38 @@ describe('Sequence combinators', () => {
   })
 
   describe('skip', () => {
-    it('throws if its argument is not a parser', () => {
-      terror(skip(0), '', '[skip]: expected a parser; found 0')
+    it('throws if its first argument is not a parser', () => {
+      terror(skip(0), '', '[skip]: expected argument to be a parser; found 0')
+      terror(
+        skip(0, 'test'),
+        '',
+        '[skip]: expected first argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument exists and is not a parser', () => {
+      terror(
+        skip(any, 0),
+        '',
+        '[skip]: expected second argument to be a string; found 0',
+      )
     })
     it('succeeds with no result if its parser succeeds', () => {
       tpass(skip(char('a')), 'abc', { result: null, index: 1 })
       tpass(skip(many(letter)), 'abcdef123', { result: null, index: 6 })
+      tpass(skip(char('a'), 'test'), 'abc', { result: null, index: 1 })
     })
     it('propagates failures without modification', () => {
       tfail(skip(char('a')), '123', { expected: "'a'", status: Fail })
       tfail(skip(seq(string('ab'), string('cd'))), 'abce', {
         expected: "'cd'",
+        status: Fatal,
+      })
+      tfail(skip(char('a'), "an 'a'"), '123', {
+        expected: "an 'a'",
+        status: Fail,
+      })
+      tfail(skip(seq(string('ab'), string('cd')), "'abcd'"), 'abce', {
+        expected: "'abcd'",
         status: Fatal,
       })
     })
