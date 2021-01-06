@@ -71,6 +71,7 @@ In this example, `f` represents a non-fatal failure because the first parser (`l
 #### Throws
 
 * Throws an error if either `p` or `q` are not parsers.
+* Throws an error if `m` exists and is not a string.
 
 #### See Also
 

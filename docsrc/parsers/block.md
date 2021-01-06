@@ -89,7 +89,8 @@ The third case (`t`) fails because, while the whitespace was ignored and the opt
 
 #### Throws
 
-* Throws an error if `genFn` is not a generator function. 
+* Throws an error if `g` is not a generator function. 
+* Throws an error if `m` exists and is not a string.
 * Throws an error if any `yield` statement is executed and the value that is yielded is not a parser.
 
 #### See Also
