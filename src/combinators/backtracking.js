@@ -5,7 +5,7 @@
 
 import {
   assertFunction,
-  assertGeneratorFunction,
+  assertGenFunction,
   assertNumber,
   assertParser,
   assertParsers,
@@ -415,7 +415,7 @@ export const manyTillB = (p, end) => parser(ctx => {
  *     value of the generator.
  */
 export const blockB = genFn => parser(ctx => {
-  ASSERT && assertGeneratorFunction('blockB', genFn)
+  ASSERT && assertGenFunction('blockB', genFn)
 
   const gen = genFn()
   const index = ctx.index

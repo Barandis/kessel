@@ -47,6 +47,8 @@ export const argCharFormatter = (order = 1, multiple = false) =>
   argFormatter('a one-character string', order, multiple)
 export const argFnFormatter = (order = 1, multiple = false) =>
   argFormatter('a function', order, multiple)
+export const argGenFormatter = (order = 1, multiple = false) =>
+  argFormatter('a generator function', order, multiple)
 export const argNumFormatter = (order = 1, multiple = false) =>
   argFormatter('a number', order, multiple)
 export const argParFormatter = (order = 1, multiple = false) =>
@@ -118,7 +120,7 @@ export function assertFunction(name, value, formatter = fnFormatter) {
  * @param {function(*):string} [formatter] A function that accepts a
  *     value of any type and returns a string incorporating that value.
  */
-export function assertGeneratorFunction(name, value, formatter = genFormatter) {
+export function assertGenFunction(name, value, formatter = genFormatter) {
   if (Object.prototype.toString.call(value) !== '[object GeneratorFunction]') {
     failAssert(name, value, formatter)
   }

@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `block(genFn: Iterator<Parser<any>, T, any>): Parser<T>`
+> `block(g: GeneratorFunction, m?: string): Parser`
 
 Executes a generator function that can yield to parsers in its body.
 
@@ -15,9 +15,9 @@ The generator function can do anything that any function could do. In addition, 
 
 If any of the parsers fail when yielded, then `block` will fail. If any input was consumed before the failure, that failure will be fatal.
 
-`block` can be used to implement pretty much any other combinator. It, in conjunction with [`any`](#any), could be used to implement any other parser in this library. However, if there is a parser that already does what needs to be done, it's sure to be more efficient than just shoving everything into a `block`.
+`block` can be used to implement pretty much any other combinator. It, in conjunction with [`any`](any.md), could be used to implement any other parser in this library. However, if there is a parser that already does what needs to be done, it's sure to be more efficient than just shoving everything into a `block`.
 
-This is most notable with sequences. A `block` parser that discards a number of parser results and keeps one, returning that result, can very often be implemented as a [`sequence`](#parser) wrapped in [`nth`](#nth). This is a fairly common use case.
+This is most notable with sequences. A `block` parser that discards a number of parser results and keeps one, returning that result, can very often be implemented as a [`seq`](seq.md) wrapped in [`nth`](nth.md). This is a fairly common use case.
 
 #### Example
 
@@ -71,7 +71,8 @@ The third case (`t`) fails because, while the whitespace was ignored and the opt
 
 #### Parameters
 
-* `genFn`: A generator function that provides the body of the `block` parser. This generator function can `yield` parsers, which will have those parsers' results fed back into the function when it's restarted (so that they can be assigned to variables, used in calculations, etc.). The return value of this generator function becomes the result of the `block` parser.
+* `g`: A generator function that provides the body of the `block` parser. This generator function can `yield` parsers, which will have those parsers' results fed back into the function when it's restarted (so that they can be assigned to variables, used in calculations, etc.). The return value of this generator function becomes the result of the `block` parser.
+* `m`: The optional expected error message that will take the place of the default error message.
 
 #### Success
 

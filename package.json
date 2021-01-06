@@ -5,6 +5,7 @@
   "main": "lib/kessel.js",
   "types": "types/index.d.ts",
   "scripts": {
+    "add": "npm run build && npm run docs && git add -A",
     "clean": "rimraf dist",
     "build": "npm run clean && npm run bundle",
     "bundle:dev": "cross-env NODE_ENV=development webpack --progress --colors --config webpack.dev.js",
@@ -16,7 +17,7 @@
     "docs": "mkdocs build",
     "docs:serve": "mkdocs serve",
     "fix": "eslint ./src ./test --fix",
-    "git": "npm run build && npm run docs && git add -A && npm run commit",
+    "git": "npm run add && npm run commit",
     "lint": "eslint ./src ./test",
     "test": "cross-env NODE_PATH=./src NODE_ENV=test mocha ./test --require config/mocha.js --reporter dot --recursive",
     "debug": "cross-env NODE_PATH=./src NODE_ENV=test DEBUG=1 mocha ./test --require config/mocha.js --reporter dot --recursive",

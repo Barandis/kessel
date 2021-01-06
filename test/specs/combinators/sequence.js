@@ -116,25 +116,49 @@ describe('Sequence combinators', () => {
 
       return c
     })
+    const parserm = block(function *() {
+      yield string('abc')
+      yield space
+      const c = yield any
+      yield space
 
-    it('throws if its argument is not a generator function', () => {
-      terror(block(0), '', '[block]: expected a generator function; found 0')
+      return c
+    }, "a character after 'abc'")
+
+    it('throws if its first argument is not a generator function', () => {
+      terror(
+        block(0),
+        '',
+        '[block]: expected argument to be a generator function; found 0',
+      )
       terror(
         block(() => {}),
         '',
-        '[block]: expected a generator function; found function',
+        '[block]: expected argument to be a generator function; found function',
+      )
+      terror(
+        block(0, 'test'),
+        '',
+        '[block]: expected first argument to be a generator function; found 0',
+      )
+    })
+    it('throws if its second argument exists and is not a string', () => {
+      terror(
+        block(function *() { yield 1 }, 0),
+        '',
+        '[block]: expected second argument to be a string; found 0',
       )
     })
     it('throws if it yields something other than a parser', () => {
       terror(
         block(function *() { yield any; yield 0; return 0 }),
         'abc',
-        '[block]: expected 2nd yield to be to a parser; found 0',
+        '[block]: expected second yield to be to a parser; found 0',
       )
       terror(
         block(function *() { yield any; yield any; yield x => x; return 0 }),
         'abc',
-        '[block]: expected 3rd yield to be to a parser; found function',
+        '[block]: expected third yield to be to a parser; found function',
       )
     })
     it('fails if any of its parsers fail', () => {
@@ -154,9 +178,30 @@ describe('Sequence combinators', () => {
         index: 5,
         status: Fatal,
       })
+      tfail(parserm, 'abd', {
+        expected: "a character after 'abc'",
+        index: 0,
+        status: Fail,
+      })
+      tfail(parserm, 'abcd', {
+        expected: "a character after 'abc'",
+        index: 3,
+        status: Fatal,
+      })
+      tfail(parserm, 'abc ', {
+        expected: "a character after 'abc'",
+        index: 4,
+        status: Fatal,
+      })
+      tfail(parserm, 'abc de', {
+        expected: "a character after 'abc'",
+        index: 5,
+        status: Fatal,
+      })
     })
     it('succeeds with its return value if all parsers succeed', () => {
       tpass(parser, 'abc d ', { result: 'd', index: 6 })
+      tpass(parserm, 'abc d ', { result: 'd', index: 6 })
     })
     it('gives opt error messages if later parsers fail', () => {
       const parser = block(function *() {
@@ -167,6 +212,7 @@ describe('Sequence combinators', () => {
       tpass(parser, '+-1', '1')
       tpass(parser, '1', '1')
       tfail(parser, 'a', "'+', '-', or a digit")
+      tfail(parserm, 'a', "a character after 'abc'")
     })
     it('ignores opt error messages if a later parser succeeds', () => {
       const parser = block(function *() {

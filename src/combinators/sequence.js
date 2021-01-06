@@ -4,10 +4,11 @@
 // https://opensource.org/licenses/MIT
 
 import {
+  argGenFormatter,
   argParFormatter,
   argStrFormatter,
   assertFunction,
-  assertGeneratorFunction,
+  assertGenFunction,
   assertNumber,
   assertParser,
   assertParsers,
@@ -18,7 +19,7 @@ import {
 } from 'kessel/assert'
 import { maybeFatal, ok, parser, Status } from 'kessel/core'
 import { expected, merge } from 'kessel/error'
-import { ordinal, range, stringify, twin } from 'kessel/util'
+import { ordinal, range, stringify, twin, wordinal } from 'kessel/util'
 
 /** @typedef {import('kessel/core').Parser} Parser */
 
@@ -163,20 +164,25 @@ export const right = (p, q, m) => parser(ctx => {
  * Only parsers may be yielded in a block. Yielding anything else will
  * cause an error to be thrown.
  *
- * @param {function():*} genFn A generator function that takes no
- *     arguments and returns whatever should be used as the returned
- *     parser's result. This generator function can `yield` only
- *     `Parser`s; otherwise an error is thrown.
+ * @param {function():*} g A generator function that takes no arguments
+ *     and returns whatever should be used as the returned parser's
+ *     result. This generator function can `yield` only `Parser`s;
+ *     otherwise an error is thrown.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser that executes the generator function,
  *     executes parsers as they are yielded, and results in the return
  *     value of the generator.
  */
-export const block = genFn => parser(ctx => {
-  ASSERT && assertGeneratorFunction('block', genFn)
+export const block = (g, m) => parser(ctx => {
+  const hasM = m != null
 
-  const gen = genFn()
+  ASSERT && assertGenFunction('block', g, argGenFormatter(1, hasM))
+  ASSERT && hasM && assertString('block', m, argStrFormatter(2, true))
+
+  const gen = g()
   const index = ctx.index
-  let errors = []
+  let errors = hasM ? expected(m) : []
   let nextValue
   let context = ctx
   let i = 0
@@ -186,12 +192,12 @@ export const block = genFn => parser(ctx => {
     if (done) return ok(context, value)
 
     ASSERT && assertParser('block', value, v => `expected ${
-      ordinal(i + 1)
+      wordinal(i + 1)
     } yield to be to a parser; found ${stringify(v)}`)
 
     const [pctx, pres] = value(context)
     context = pctx
-    errors = pres.errors?.length ? merge(errors, pres.errors) : []
+    if (!hasM) errors = pres.errors?.length ? merge(errors, pres.errors) : []
 
     if (pres.status !== Ok) {
       return maybeFatal(context.index !== index, context, errors)

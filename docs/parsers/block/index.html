@@ -2171,14 +2171,14 @@
 -->
 
 <blockquote>
-<p><code>block(genFn: Iterator&lt;Parser&lt;any&gt;, T, any&gt;): Parser&lt;T&gt;</code></p>
+<p><code>block(g: GeneratorFunction, m?: string): Parser</code></p>
 </blockquote>
 <p>Executes a generator function that can yield to parsers in its body.</p>
 <p><code>block</code> is the most versatile parser in the entire library and provides a way to parse pretty much anything without having to write a custom parser. It corresponds to using do-notation blocks in Haskell (hence the name <code>block</code>).</p>
 <p>The generator function can do anything that any function could do. In addition, it can have <code>yield</code> expressions that yield any parser. That parser will be applied at that point, and if it's successful, its result will be fed back into the generator function, able to be used as needed (for example, in <code>const number = yield join(many1(digit))</code> in the example, the result of the <code>join</code> parser is assigned to the variable <code>number</code>). When the generator function returns, its return value becomes the value returned by the <code>block</code> parser.</p>
 <p>If any of the parsers fail when yielded, then <code>block</code> will fail. If any input was consumed before the failure, that failure will be fatal.</p>
-<p><code>block</code> can be used to implement pretty much any other combinator. It, in conjunction with <a href="#any"><code>any</code></a>, could be used to implement any other parser in this library. However, if there is a parser that already does what needs to be done, it's sure to be more efficient than just shoving everything into a <code>block</code>.</p>
-<p>This is most notable with sequences. A <code>block</code> parser that discards a number of parser results and keeps one, returning that result, can very often be implemented as a <a href="#parser"><code>sequence</code></a> wrapped in <a href="#nth"><code>nth</code></a>. This is a fairly common use case.</p>
+<p><code>block</code> can be used to implement pretty much any other combinator. It, in conjunction with <a href="../any/"><code>any</code></a>, could be used to implement any other parser in this library. However, if there is a parser that already does what needs to be done, it's sure to be more efficient than just shoving everything into a <code>block</code>.</p>
+<p>This is most notable with sequences. A <code>block</code> parser that discards a number of parser results and keeps one, returning that result, can very often be implemented as a <a href="../seq/"><code>seq</code></a> wrapped in <a href="../nth/"><code>nth</code></a>. This is a fairly common use case.</p>
 <h4 id="example">Example</h4>
 <div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">block</span><span class="p">(</span><span class="kd">function</span> <span class="o">*</span><span class="p">()</span> <span class="p">{</span>
   <span class="k">yield</span> <span class="nx">spaces</span>
@@ -2220,7 +2220,8 @@
 <p>The third case (<code>t</code>) fails because, while the whitespace was ignored and the optional sign was parsed, the third parser fails against the non-digit <code>'a'</code>. Since input <em>was</em> consumed (the negative sign) before this failure, it is fatal.</p>
 <h4 id="parameters">Parameters</h4>
 <ul>
-<li><code>genFn</code>: A generator function that provides the body of the <code>block</code> parser. This generator function can <code>yield</code> parsers, which will have those parsers' results fed back into the function when it's restarted (so that they can be assigned to variables, used in calculations, etc.). The return value of this generator function becomes the result of the <code>block</code> parser.</li>
+<li><code>g</code>: A generator function that provides the body of the <code>block</code> parser. This generator function can <code>yield</code> parsers, which will have those parsers' results fed back into the function when it's restarted (so that they can be assigned to variables, used in calculations, etc.). The return value of this generator function becomes the result of the <code>block</code> parser.</li>
+<li><code>m</code>: The optional expected error message that will take the place of the default error message.</li>
 </ul>
 <h4 id="success">Success</h4>
 <ul>
