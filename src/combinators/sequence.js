@@ -5,11 +5,13 @@
 
 import {
   argParFormatter,
+  argStrFormatter,
   assertFunction,
   assertGeneratorFunction,
   assertNumber,
   assertParser,
   assertParsers,
+  assertString,
   ordFnFormatter,
   ordNumFormatter,
   ordParFormatter,
@@ -36,7 +38,7 @@ function loopMessage(name) {
  * This parser will fail fatally if any input was consumed before any of
  * its parsers fail, even if that failure itself was non-fatal.
  *
- * @param {...Parser|string} ps The parsers to be executed. The last
+ * @param {...Parser|string} args The parsers to be executed. The last
  *     argument *may* be a string, in which case it becomes the expected
  *     error message in place of the collected expected error messages
  *     of the constituent parsers.
@@ -82,21 +84,31 @@ export const seq = (...args) => {
  *
  * @param {Parser} p The first parser to execute.
  * @param {Parser} q The second parser to execute.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser that executes `p` and `q` and returns the
  *     result of `p`.
  */
-export const left = (p, q) => parser(ctx => {
-  ASSERT && assertParser('left', p, ordParFormatter('1st'))
-  ASSERT && assertParser('left', q, ordParFormatter('2nd'))
+export const left = (p, q, m) => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && assertParser('left', p, argParFormatter(1, true))
+  ASSERT && assertParser('left', q, argParFormatter(2, true))
+  ASSERT && hasM && assertString('left', m, argStrFormatter(3, true))
 
   const index = ctx.index
 
-  const [prep, [pctx, pres]] = twin(p(ctx))
-  if (pres.status !== Ok) return prep
+  const [pctx, pres] = p(ctx)
+  if (pres.status !== Status.Ok) {
+    const errors = hasM ? expected(m) : pres.errors
+    return maybeFatal(pres.status === Fatal, pctx, errors)
+  }
 
   const [qctx, qres] = q(pctx)
-  return qres.status === Ok ? ok(qctx, pres.value)
-    : maybeFatal(qctx.index !== index, qctx, merge(pres.errors, qres.errors))
+  const errors = hasM ? expected(m) : merge(pres.errors, qres.errors)
+  return qres.status === Ok
+    ? ok(qctx, pres.value)
+    : maybeFatal(qctx.index !== index, qctx, errors)
 })
 
 /**
@@ -109,21 +121,31 @@ export const left = (p, q) => parser(ctx => {
  *
  * @param {Parser} p The first parser to execute.
  * @param {Parser} q The second parser to execute.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser that executes both contained parsers and
  *     results in the value of the second.
  */
-export const right = (p, q) => parser(ctx => {
-  ASSERT && assertParser('right', p, ordParFormatter('1st'))
-  ASSERT && assertParser('right', q, ordParFormatter('2nd'))
+export const right = (p, q, m) => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && assertParser('right', p, argParFormatter(1, true))
+  ASSERT && assertParser('right', q, argParFormatter(2, true))
+  ASSERT && hasM && assertString('right', m, argStrFormatter(3, true))
 
   const index = ctx.index
 
-  const [prep, [pctx, pres]] = twin(p(ctx))
-  if (pres.status !== Status.Ok) return prep
+  const [pctx, pres] = p(ctx)
+  if (pres.status !== Status.Ok) {
+    const errors = hasM ? expected(m) : pres.errors
+    return maybeFatal(pres.status === Fatal, pctx, errors)
+  }
 
   const [qrep, [qctx, qres]] = twin(q(pctx))
-  return qres.status === Ok ? qrep
-    : maybeFatal(qctx.index !== index, qctx, merge(pres.errors, qres.errors))
+  const errors = hasM ? expected(m) : merge(pres.errors, qres.errors)
+  return qres.status === Ok
+    ? qrep
+    : maybeFatal(qctx.index !== index, qctx, errors)
 })
 
 /**

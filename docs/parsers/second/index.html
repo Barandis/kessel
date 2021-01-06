@@ -1436,8 +1436,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../sequence/" class="md-nav__link">
-      sequence
+    <a href="../seq/" class="md-nav__link">
+      seq
     </a>
   </li>
 
@@ -2174,7 +2174,7 @@
 <p><code>second(p: Parser&lt;[T]&gt;): Parser&lt;T&gt;</code></p>
 </blockquote>
 <p>Applies a parser and returns the second element of the resulting array.</p>
-<p>This parser works only if <code>p</code> returns an array, and it returns the second element of that array. It's most useful with parsers like <a href="../sequence/"><code>sequence</code></a> and <a href="../many/"><code>many</code></a> that always return arrays, though it will work with parsers like <a href="../map/"><code>map</code></a> and <a href="../always/"><code>always</code></a> if they are programmed to return arrays.</p>
+<p>This parser works only if <code>p</code> returns an array, and it returns the second element of that array. It's most useful with parsers like <a href="../seq/"><code>seq</code></a> and <a href="../many/"><code>many</code></a> that always return arrays, though it will work with parsers like <a href="../map/"><code>map</code></a> and <a href="../always/"><code>always</code></a> if they are programmed to return arrays.</p>
 <p><code>second(p)</code> is an optimized implementation of <code>chain(p, x =&gt; always(x[1]))</code>.</p>
 <h4 id="example">Example</h4>
 <div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">second</span><span class="p">(</span><span class="nx">many1</span><span class="p">(</span><span class="nx">any</span><span class="p">))</span>

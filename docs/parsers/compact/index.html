@@ -1436,8 +1436,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../sequence/" class="md-nav__link">
-      sequence
+    <a href="../seq/" class="md-nav__link">
+      seq
     </a>
   </li>
 
@@ -2174,7 +2174,7 @@
 <p><code>compact(p: Parser&lt;[T]&gt;): Parser&lt;[T]&gt;</code></p>
 </blockquote>
 <p>Applies a parser and returns the elements of the resulting array except for any <code>null</code> or <code>undefined</code> elements.</p>
-<p>This combinator is useful in conjunction with parsers like <a href="../sequence/"><code>sequence</code></a> and <a href="../many/"><code>many</code></a>, which may return <code>null</code> values amongst their array elements, particularly if the <a href="../opt/"><code>opt</code></a> parser is used in their contained parsers. In a prior version of Kessel, <code>sequence</code> and <code>many</code> dropped their <code>null</code> values by default, but this was found to be less than ideal for a number of reasons. <code>compact</code> brings that behavior back when needed.</p>
+<p>This combinator is useful in conjunction with parsers like <a href="../seq/"><code>seq</code></a> and <a href="../many/"><code>many</code></a>, which may return <code>null</code> values amongst their array elements, particularly if the <a href="../opt/"><code>opt</code></a> parser is used in their contained parsers. In a prior version of Kessel, <code>sequence</code> and <code>many</code> dropped their <code>null</code> values by default, but this was found to be less than ideal for a number of reasons. <code>compact</code> brings that behavior back when needed.</p>
 <h4 id="example">Example</h4>
 <div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">compact</span><span class="p">(</span><span class="nx">sequence</span><span class="p">(</span><span class="nx">opt</span><span class="p">(</span><span class="kr">char</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)),</span> <span class="nx">digit</span><span class="p">,</span> <span class="nx">digit</span><span class="p">))</span>
 
@@ -2221,7 +2221,7 @@
 <li><a href="../many/"><code>many</code></a></li>
 <li><a href="../map/"><code>map</code></a></li>
 <li><a href="../opt/"><code>opt</code></a></li>
-<li><a href="../sequence/"><code>sequence</code></a></li>
+<li><a href="../seq/"><code>seq</code></a></li>
 </ul>
                 
               

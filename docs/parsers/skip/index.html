@@ -1360,8 +1360,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../sequence/" class="md-nav__link">
-      sequence
+    <a href="../seq/" class="md-nav__link">
+      seq
     </a>
   </li>
 
@@ -2174,7 +2174,6 @@
 <p><code>skip(p: Parser&lt;T&gt;): Parser&lt;null&gt;</code></p>
 </blockquote>
 <p>Applies a parser and discards its result on success.</p>
-<p>A good use for this parser is to null results in a <a href="../sequence/"><code>sequence</code></a> or <a href="../many/"><code>many</code></a> parser, as those exclude results that are <code>null</code> from their final results.</p>
 <p><code>skip(p)</code> is an optimized implementation of <code>chain(p, () =&gt; always(null))</code>.</p>
 <h4 id="example">Example</h4>
 <div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">skip</span><span class="p">(</span><span class="nx">letter</span><span class="p">)</span>

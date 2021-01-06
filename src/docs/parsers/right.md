@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `right(p: Parser<T>, q: Parser<U>): Parser<U>`
+> `right(p: Parser, q: Parser, m?: string): Parser`
 
 Applies two parsers in order, returning the result of the second one.
 
@@ -52,6 +52,7 @@ In this example, `f` represents a non-fatal failure because the first parser (`l
 
 * `p`: The first parser to apply. This parser's result will be discarded.
 * `q`: The second parser to apply. If both parsers succeed, this parser's result will be `right`'s result.
+* `m`: The optional expected error message that will take the place of the default error message.
 
 #### Success
 

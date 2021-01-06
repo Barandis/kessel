@@ -940,18 +940,26 @@ describe('Sequence combinators', () => {
       terror(
         left(0, any),
         '',
-        '[left]: expected 1st argument to be a parser; found 0',
+        '[left]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
         left(any, 0),
         '',
-        '[left]: expected 2nd argument to be a parser; found 0',
+        '[left]: expected second argument to be a parser; found 0',
+      )
+    })
+    it('throws if its third argumeent exists and is not a string', () => {
+      terror(
+        left(any, any, 0),
+        '',
+        '[left]: expected third argument to be a string; found 0',
       )
     })
     it('returns the result of its left parser if both pass', () => {
       tpass(left(letter, digit), 'a1', 'a')
+      tpass(left(letter, digit, 'test'), 'a1', 'a')
     })
     it('fails non-fatally if one parser fails and no input is consumed', () => {
       tfail(left(letter, digit), '1', {
@@ -959,17 +967,35 @@ describe('Sequence combinators', () => {
         status: Fail,
       })
       tfail(left(eof, char('a')), '', { expected: "'a'", status: Fail })
+      tfail(left(letter, digit, 'a letter, then a digit'), '1', {
+        expected: 'a letter, then a digit',
+        status: Fail,
+      })
+      tfail(left(eof, char('a'), 'something impossible'), '', {
+        expected: 'something impossible',
+        status: Fail,
+      })
     })
     it('fails fatally if any input is consumed on failure', () => {
       tfail(left(seq(letter, letter), digit), 'a11', {
         expected: 'a letter',
         index: 1,
-        status: Status.Fatal,
+        status: Fatal,
       })
       tfail(left(letter, digit), 'ab', {
         expected: 'a digit',
         index: 1,
-        status: Status.Fatal,
+        status: Fatal,
+      })
+      tfail(left(seq(letter, letter), digit, 'two letters, digit'), 'a11', {
+        expected: 'two letters, digit',
+        index: 1,
+        status: Fatal,
+      })
+      tfail(left(letter, digit, 'letter/digit'), 'ab', {
+        expected: 'letter/digit',
+        index: 1,
+        status: Fatal,
       })
     })
     it('gives opt error messages if second parser fails', () => {
@@ -977,6 +1003,9 @@ describe('Sequence combinators', () => {
       tpass(parser, '-1', '-')
       tpass(parser, '1', { result: null })
       tfail(parser, 'a', "'-' or a digit")
+      tfail(left(opt(
+        char('-'),
+      ), digit, 'one-digit integer'), 'a', 'one-digit integer')
     })
   })
 
@@ -985,22 +1014,38 @@ describe('Sequence combinators', () => {
       terror(
         right(0, any),
         '',
-        '[right]: expected 1st argument to be a parser; found 0',
+        '[right]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
         right(any, 0),
         '',
-        '[right]: expected 2nd argument to be a parser; found 0',
+        '[right]: expected second argument to be a parser; found 0',
+      )
+    })
+    it('throws if its third argumeent exists and is not a string', () => {
+      terror(
+        right(any, any, 0),
+        '',
+        '[right]: expected third argument to be a string; found 0',
       )
     })
     it('returns the result of its right parser if both pass', () => {
       tpass(right(letter, digit), 'a1', '1')
+      tpass(right(letter, digit, 'test'), 'a1', '1')
     })
     it('fails non-fatally if one parser fails and no input is consumed', () => {
       tfail(right(letter, digit), '1', { expected: 'a letter', status: Fail })
       tfail(right(eof, char('a')), '', { expected: "'a'", status: Fail })
+      tfail(right(letter, digit, 'a letter, then a digit'), '1', {
+        expected: 'a letter, then a digit',
+        status: Fail,
+      })
+      tfail(right(eof, char('a'), 'something impossible'), '', {
+        expected: 'something impossible',
+        status: Fail,
+      })
     })
     it('fails fatally if any input is consumed on failure', () => {
       tfail(right(seq(letter, letter), digit), 'a11', {
@@ -1019,6 +1064,9 @@ describe('Sequence combinators', () => {
       tpass(parser, '-1', '1')
       tpass(parser, '1', '1')
       tfail(parser, 'a', "'-' or a digit")
+      tfail(right(opt(
+        char('-'),
+      ), digit, 'one-digit integer'), 'a', 'one-digit integer')
     })
   })
 
