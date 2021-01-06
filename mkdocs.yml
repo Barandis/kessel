@@ -1,5 +1,5 @@
 site_name: Kessel
-docs_dir: src/docs
+docs_dir: docsrc
 site_dir: docs
 site_description: 'Kessel parser combinators for JavaScript'
 site_author: 'Thomas J. Otterson'
