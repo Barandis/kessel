@@ -47,6 +47,7 @@ The failure case in this example shows the only way that `skipMany` can fail: it
 #### Throws
 
 * Throws an error if `p` is not a parser.
+* Throws an error if `m` exists and is not a string.
 
 #### See Also
 

@@ -59,6 +59,7 @@ console.log(failure(t)) // Parse error at (line 1, column 2):
 #### Throws
 
 * Throws an error if `p` is not a parser.
+* Throws an error if `m` exists and is not a string.
 
 #### See Also
 
