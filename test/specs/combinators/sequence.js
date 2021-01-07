@@ -917,21 +917,30 @@ describe('Sequence combinators', () => {
       terror(
         manyTill(0, any),
         '',
-        '[manyTill]: expected 1st argument to be a parser; found 0',
+        '[manyTill]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
         manyTill(any, 0),
         '',
-        '[manyTill]: expected 2nd argument to be a parser; found 0',
+        '[manyTill]: expected second argument to be a parser; found 0',
+      )
+    })
+    it('throws if its third argument exists and is not a string', () => {
+      terror(
+        manyTill(any, any, 0),
+        '',
+        '[manyTill]: expected third argument to be a string; found 0',
       )
     })
     it('succeeds with content parser results before the end', () => {
       tpass(manyTill(any, letter), '12./abc', ['1', '2', '.', '/'])
+      tpass(manyTill(any, letter, 'test'), '12./abc', ['1', '2', '.', '/'])
     })
     it('can succeed with zero successes', () => {
       tpass(manyTill(any, letter), 'abc', [])
+      tpass(manyTill(any, letter, 'test'), 'abc', [])
     })
     it('fails if the content parser fails before the end', () => {
       tfail(manyTill(digit, letter), '.123abc', {
@@ -939,10 +948,20 @@ describe('Sequence combinators', () => {
         index: 0,
         status: Fail,
       })
+      tfail(manyTill(digit, letter, 'digits, then a letter'), '.123abc', {
+        expected: 'digits, then a letter',
+        index: 0,
+        status: Fail,
+      })
     })
     it('fails fatally if input is consumed before content parser fails', () => {
       tfail(manyTill(digit, letter), '123.abc', {
         expected: 'a digit or a letter',
+        index: 3,
+        status: Fatal,
+      })
+      tfail(manyTill(digit, letter, 'digits, then a letter'), '123.abc', {
+        expected: 'digits, then a letter',
         index: 3,
         status: Fatal,
       })
@@ -958,12 +977,22 @@ describe('Sequence combinators', () => {
         index: 5,
         status: Fatal,
       })
+      tfail(manyTill(digit, seq(letter, digit), 'test'), '123abc', {
+        expected: 'test',
+        index: 4,
+        status: Fatal,
+      })
+      tfail(manyTill(seq(letter, digit), digit, 'test'), 'a1b2cc3', {
+        expected: 'test',
+        index: 5,
+        status: Fatal,
+      })
     })
     it('adds null to the results', () => {
       tpass(
-        manyTill(
-          alt(letter, skip(space)), digit,
-        ), 'a b c 1', ['a', null, 'b', null, 'c', null],
+        manyTill(alt(letter, skip(space)), digit),
+        'a b c 1',
+        ['a', null, 'b', null, 'c', null],
       )
     })
   })

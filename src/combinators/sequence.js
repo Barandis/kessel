@@ -728,36 +728,47 @@ export const between = (s, e, p, m) => parser(ctx => {
  * the successful content parser results. The end parser is executed
  * *first*, so the results of the two parsers will not overlap.
  *
- * If `p` fails before `end` succeeds but after prior executions of `p`
+ * If `p` fails before `e` succeeds but after prior executions of `p`
  * have consumed input, this parser will fail fatally.
  *
  * @param {Parser} p The content parser. Its results are pushed into an
  *     array and become the returned parser's result.
- * @param {Parser} end The end parser. Parsing ends when this parser
+ * @param {Parser} e The end parser. Parsing ends when this parser
  *     succeeds. Its result is discarded.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser which will execute `p` zero or more times
- *     until `end` succeeds.
+ *     until `e` succeeds.
  */
-export const manyTill = (p, end) => parser(ctx => {
-  ASSERT && assertParser('manyTill', p, ordParFormatter('1st'))
-  ASSERT && assertParser('manyTill', end, ordParFormatter('2nd'))
+export const manyTill = (p, e, m) => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && assertParser('manyTill', p, argParFormatter(1, true))
+  ASSERT && assertParser('manyTill', e, argParFormatter(2, true))
+  ASSERT && hasM && assertString('manyTill', m, argStrFormatter(3, true))
 
   const index = ctx.index
   const values = []
   let context = ctx
 
   while (true) {
-    const [endrep, [endctx, endres]] = twin(end(context))
-    context = endctx
-    if (endres.status === Fatal) return endrep
-    if (endres.status === Ok) break
+    const [ectx, eres] = e(context)
+    context = ectx
+    if (eres.status === Fatal) {
+      return fatal(ectx, hasM ? expected(m) : eres.errors)
+    }
+    if (eres.status === Ok) break
 
-    const [prep, [pctx, pres]] = twin(p(context))
+    const [pctx, pres] = p(context)
     context = pctx
-    if (pres.status === Fatal) return prep
+    if (pres.status === Fatal) {
+      return fatal(pctx, hasM ? expected(m) : pres.errors)
+    }
     if (pres.status === Fail) {
       return maybeFatal(
-        context.index !== index, context, merge(pres.errors, endres.errors),
+        context.index !== index,
+        context,
+        hasM ? expected(m) : merge(pres.errors, eres.errors),
       )
     }
     values.push(pres.value)
