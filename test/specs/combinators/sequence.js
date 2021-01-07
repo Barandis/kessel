@@ -1423,34 +1423,49 @@ describe('Sequence combinators', () => {
 
   describe('between', () => {
     const parser = between(char('('), char(')'), many(noneOf(')')))
+    const parserm = between(char('('), char(')'), many(noneOf(')')),
+      'parenthesized characters')
 
     it('throws if its first argument is not a parser', () => {
       terror(
         between(0, any, any),
         '',
-        '[between]: expected 1st argument to be a parser; found 0',
+        '[between]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
         between(any, 0, any),
         '',
-        '[between]: expected 2nd argument to be a parser; found 0',
+        '[between]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its third argument is not a parser', () => {
       terror(
         between(any, any, 0),
         '',
-        '[between]: expected 3rd argument to be a parser; found 0',
+        '[between]: expected third argument to be a parser; found 0',
+      )
+    })
+    it('throws if its fourth argument exists and is not a string', () => {
+      terror(
+        between(any, any, any, 0),
+        '',
+        '[between]: expected fourth argument to be a string; found 0',
       )
     })
     it('succeeds with the result of its content parser', () => {
       tpass(parser, '(abc)', ['a', 'b', 'c'])
+      tpass(parserm, '(abc)', ['a', 'b', 'c'])
     })
     it('fails non-fatally if no content is consumed', () => {
       tfail(parser, 'abc)', {
         expected: "'('",
+        index: 0,
+        status: Fail,
+      })
+      tfail(parserm, 'abc)', {
+        expected: 'parenthesized characters',
         index: 0,
         status: Fail,
       })
@@ -1461,8 +1476,18 @@ describe('Sequence combinators', () => {
         index: 4,
         status: Fatal,
       })
+      tfail(parserm, '(abc', {
+        expected: 'parenthesized characters',
+        index: 4,
+        status: Fatal,
+      })
       tfail(between(char('('), char(')'), seq(letter, letter)), '(a)', {
         expected: 'a letter',
+        index: 2,
+        status: Fatal,
+      })
+      tfail(between(char('('), char(')'), seq(letter, letter), 'test'), '(a)', {
+        expected: 'test',
         index: 2,
         status: Fatal,
       })

@@ -5,17 +5,15 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `between(pre: Parser<U>, post: Parser<V>, p: Parser<T>): Parser<T>`
+> `between(s: Parser, e: Parser, p: Parser, m?: string): Parser`
 
 Applies a pre-parser, a content parser, and a post-parser in order, returning the value of the content parser.
 
-All three parsers must succeed for `between` to succeed. Take care to avoid parsing too far with `p`; e.g., if the example used `join(many(any))` as a content parser instead of what it does, it would also match the ending `"`. This would mean that `post` would never succeed because `p` already consumed its `"`, so `between` would never succeed.
-
-The first failure case in the example (`f`) is non-fatal failure, because no characters were consumed before the failure occurred. The second failure case (`t`) is fatal failure because, though `post` fails non-fatally, input was consumed before that failure happened.
+All three parsers must succeed for `between` to succeed. Take care to avoid parsing too far with `p`; e.g., if the example used `join(many(any))` as a content parser instead of what it does, it would also match the ending `"`. This would mean that `e` would never succeed because `p` already consumed its `"`, so `between` would never succeed.
 
 There is another version of this parser, [`betweenB`](betweenb.md), which backtracks and fails non-fatally if a non-fatal failure happens after input is consumed.
 
-`between(pre, post, p)` is an optimized implementation of `chain(chain(pre, () => p), x => value(post, x))`. (Using higher-level parsers, this can also be written `left(right(pre, p), post)`.)
+`between(s, e, p)` is an optimized implementation of `chain(chain(s, () => p), x => value(e, x))`. (Using higher-level parsers, this can also be written `left(right(s, p), e)`.)
 
 #### Example
 
@@ -44,11 +42,14 @@ console.log(failure(t)) // Parse error at (line 1, column 6):
                         // Note: failure occurred at the end of input
 ```
 
+The first failure case in the example (`f`) is non-fatal failure, because no characters were consumed before the failure occurred. The second failure case (`t`) is fatal failure because, though `e` fails non-fatally, input was consumed before that failure happened.
+
 #### Parameters
 
-* `pre`: The parser that is applied first. Its result is discarded.
-* `post`: The parser that is applied last. Its result is discarded.
-* `p`: The parser that is applied after `pre` and before `post`. Its result is returned by `between` itself.
+* `s`: The parser that is applied first. Its result is discarded.
+* `e`: The parser that is applied last. Its result is discarded.
+* `p`: The parser that is applied after `s` and before `e`. Its result is returned by `between` itself.
+* `m`: The optional expected error message that will take the place of the default error message.
 
 #### Success
 
@@ -65,7 +66,8 @@ console.log(failure(t)) // Parse error at (line 1, column 6):
 
 #### Throws
 
-* Throws an error if any of `pre`, `post`, and `p` are not parsers.
+* Throws an error if any of `s`, `e`, and `p` are not parsers.
+* Throws an error if `m` exists and is not a string.
 
 #### See Also
 

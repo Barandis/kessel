@@ -674,40 +674,51 @@ export const repeat = (p, n, m) => parser(ctx => {
 })
 
 /**
- * A parser which executes its pre, content, and post parsers in order
+ * A parser which executes its start, content, and end parsers in order
  * and results in the result of its content parser.
  *
- * If either `p` or `post` fails after a prior parser has consumed
+ * If either `p` or `e` fails after a prior parser has consumed
  * input, this parser will fail fatally.
  *
- * @param {Parser} pre The first parser to apply.
- * @param {Parser} post The last parser to apply.
+ * @param {Parser} s The first parser to apply.
+ * @param {Parser} e The last parser to apply.
  * @param {Parser} p The second parser to apply and whose result becomes
  *     the result of the new parser.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser which applies its parsers in the correct
  *     order and then results in the result of its content parser.
  */
-export const between = (pre, post, p) => parser(ctx => {
-  ASSERT && assertParser('between', pre, ordParFormatter('1st'))
-  ASSERT && assertParser('between', post, ordParFormatter('2nd'))
-  ASSERT && assertParser('between', p, ordParFormatter('3rd'))
+export const between = (s, e, p, m) => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && assertParser('between', s, argParFormatter(1, true))
+  ASSERT && assertParser('between', e, argParFormatter(2, true))
+  ASSERT && assertParser('between', p, argParFormatter(3, true))
+  ASSERT && hasM && assertString('between', m, argStrFormatter(4, true))
 
   const index = ctx.index
 
-  const [prerep, [prectx, preres]] = twin(pre(ctx))
-  if (preres.status !== Ok) return prerep
+  const [sctx, sres] = s(ctx)
+  if (sres.status !== Ok) {
+    return maybeFatal(
+      sres.status === Fatal, sctx, hasM ? expected(m) : sres.errors,
+    )
+  }
 
-  const [pctx, pres] = p(prectx)
-  const errors = pres.errors?.length ? merge(preres.errors, pres.errors) : []
+  const [pctx, pres] = p(sctx)
+  const errors = hasM
+    ? expected(m)
+    : pres.errors?.length ? merge(sres.errors, pres.errors) : []
   if (pres.status !== Ok) {
     return maybeFatal(pctx.index !== index, pctx, errors)
   }
 
-  const [postctx, postres] = post(pctx)
-  return postres.status === Ok
-    ? ok(postctx, pres.value)
+  const [ectx, eres] = e(pctx)
+  return eres.status === Ok
+    ? ok(ectx, pres.value)
     : maybeFatal(
-      postctx.index !== index, postctx, merge(errors, postres.errors),
+      ectx.index !== index, ectx, hasM ? errors : merge(errors, eres.errors),
     )
 })
 
