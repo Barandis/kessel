@@ -92,14 +92,21 @@ export const compact = (p, m) => parser(ctx => {
  * @param {Parser} p The parser to apply. Its result is ignored.
  * @param {*} x The value that the new parser will result in if `p`
  *     succeeds.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser that will apply `p` but return `x` on
  *     success.
  */
-export const value = (p, x) => parser(ctx => {
-  ASSERT && assertParser('value', p, ordParFormatter('1st'))
+export const value = (p, x, m) => parser(ctx => {
+  const hasM = m != null
 
-  const [prep, [pctx, pres]] = twin(p(ctx))
-  return pres.status === Ok ? ok(pctx, x) : prep
+  ASSERT && assertParser('value', p, argParFormatter(1, true))
+  ASSERT && hasM && assertString('value', m, argStrFormatter(3, true))
+
+  const [pctx, pres] = p(ctx)
+  return pres.status === Ok
+    ? ok(pctx, x)
+    : maybeFatal(pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors)
 })
 
 /**

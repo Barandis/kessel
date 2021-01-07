@@ -2135,7 +2135,7 @@
 -->
 
 <blockquote>
-<p><code>value&lt;U&gt;(p: Parser&lt;T&gt;, x: U): Parser&lt;U&gt;</code></p>
+<p><code>value(p: Parser, x: *, m?: string): Parser</code></p>
 </blockquote>
 <p>Applies a parser and, if it succeeds, returns another value.</p>
 <p><code>x</code> can be anything, so <code>value</code> is one of the few combinators that can return something other than a string.</p>
@@ -2160,6 +2160,7 @@
 <ul>
 <li><code>p</code>: The parser that gets applied to the input.</li>
 <li><code>x</code>: The value for <code>value</code> to return if <code>p</code> succeeds.</li>
+<li><code>m</code>: The optional expected error message that will take the place of the default error message.</li>
 </ul>
 <h4 id="success">Success</h4>
 <ul>
@@ -2176,6 +2177,7 @@
 <h4 id="throws">Throws</h4>
 <ul>
 <li>Throws an error if <code>p</code> is not a parser.</li>
+<li>Throws an error if <code>m</code> exists and is not a string.</li>
 </ul>
 <h4 id="see-also">See Also</h4>
 <ul>

@@ -125,15 +125,26 @@ describe('Chaining and piping combinators', () => {
   describe('value', () => {
     it('throws if its first argument is not a parser', () => {
       terror(
-        value(0), '', '[value]: expected 1st argument to be a parser; found 0',
+        value(0),
+        '',
+        '[value]: expected first argument to be a parser; found 0',
+      )
+    })
+    it('throws if its third argument exists and is not a string', () => {
+      terror(
+        value(any, 0, 0),
+        '',
+        '[value]: expected third argument to be a string; found 0',
       )
     })
     it('returns its constant when its parser succeeds', () => {
       tpass(value(letter, '!'), 'a', '!')
       tpass(value(digit, 10), '1', { result: 10 })
+      tpass(value(letter, '!', 'letter?'), 'a', '!')
     })
     it('passes failures through', () => {
       tfail(value(char('a'), '!'), 'b', "'a'")
+      tfail(value(char('a'), '!', 'an a'), 'b', 'an a')
     })
   })
 

@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `value<U>(p: Parser<T>, x: U): Parser<U>`
+> `value(p: Parser, x: *, m?: string): Parser`
 
 Applies a parser and, if it succeeds, returns another value.
 
@@ -37,6 +37,7 @@ In this example, if the parser `string('""')` succeeds, then `value` returns a s
 
 * `p`: The parser that gets applied to the input.
 * `x`: The value for `value` to return if `p` succeeds.
+* `m`: The optional expected error message that will take the place of the default error message.
 
 #### Success
 
@@ -53,6 +54,7 @@ In this example, if the parser `string('""')` succeeds, then `value` returns a s
 #### Throws
 
 * Throws an error if `p` is not a parser.
+* Throws an error if `m` exists and is not a string.
 
 #### See Also
 
