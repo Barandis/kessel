@@ -5,6 +5,7 @@
 
 import {
   argGenFormatter,
+  argNumFormatter,
   argParFormatter,
   argStrFormatter,
   assertFunction,
@@ -14,7 +15,6 @@ import {
   assertParsers,
   assertString,
   ordFnFormatter,
-  ordNumFormatter,
   ordParFormatter,
 } from 'kessel/assert'
 import { fatal, maybeFatal, ok, parser, Status } from 'kessel/core'
@@ -644,12 +644,17 @@ export const sepEndBy1 = (p, s, m) => parser(ctx => {
  *
  * @param {Parser} p A parser to execute multiple times.
  * @param {number} n The number of times to execute the parser.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser that executes `p` `n` times and results in
  *     an array of all of the successful results of `p`.
  */
-export const repeat = (p, n) => parser(ctx => {
-  ASSERT && assertParser('repeat', p, ordParFormatter('1st'))
-  ASSERT && assertNumber('repeat', n, ordNumFormatter('2nd'))
+export const repeat = (p, n, m) => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && assertParser('repeat', p, argParFormatter(1, true))
+  ASSERT && assertNumber('repeat', n, argNumFormatter(2, true))
+  ASSERT && hasM && assertString('repeat', m, argStrFormatter(3, true))
 
   const index = ctx.index
   const values = []
@@ -659,7 +664,9 @@ export const repeat = (p, n) => parser(ctx => {
     const [pctx, pres] = p(context)
     context = pctx
     if (pres.status !== Ok) {
-      return maybeFatal(context.index !== index, context, pres.errors)
+      return maybeFatal(
+        context.index !== index, context, hasM ? expected(m) : pres.errors,
+      )
     }
     values.push(pres.value)
   }

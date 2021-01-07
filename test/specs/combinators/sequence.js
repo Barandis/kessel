@@ -851,24 +851,37 @@ describe('Sequence combinators', () => {
       terror(
         repeat(0, 5),
         '',
-        '[repeat]: expected 1st argument to be a parser; found 0',
+        '[repeat]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a number', () => {
       terror(
         repeat(any, '3'),
         '',
-        '[repeat]: expected 2nd argument to be a number; found "3"',
+        '[repeat]: expected second argument to be a number; found "3"',
+      )
+    })
+    it('throws if its third argument exists and is not a string', () => {
+      terror(
+        repeat(any, 3, 0),
+        '',
+        '[repeat]: expected third argument to be a string; found 0',
       )
     })
     it('applies one parser a number of times', () => {
       tpass(repeat(letter, 5), 'abcdef', ['a', 'b', 'c', 'd', 'e'])
       tpass(repeat(letter, 2), 'abcdef', ['a', 'b'])
       tpass(repeat(letter, 0), 'abcdef', [])
+      tpass(repeat(letter, 2, 'two letters'), 'abcdef', ['a', 'b'])
     })
     it('fails non-fatally if no input was consumed', () => {
       tfail(repeat(letter, 5), '12345', {
         expected: 'a letter',
+        index: 0,
+        status: Fail,
+      })
+      tfail(repeat(letter, 5, 'five letters'), '12345', {
+        expected: 'five letters',
         index: 0,
         status: Fail,
       })
@@ -879,10 +892,20 @@ describe('Sequence combinators', () => {
         index: 1,
         status: Fatal,
       })
+      tfail(repeat(seq(letter, letter), 5, 'ten letters'), 'a1b2c3d4e5', {
+        expected: 'ten letters',
+        index: 1,
+        status: Fatal,
+      })
     })
     it('fails fatally on non-fatal errors if input was consumed', () => {
       tfail(repeat(letter, 5), 'abc123', {
         expected: 'a letter',
+        index: 3,
+        status: Fatal,
+      })
+      tfail(repeat(letter, 5, 'five letters'), 'abc123', {
+        expected: 'five letters',
         index: 3,
         status: Fatal,
       })
