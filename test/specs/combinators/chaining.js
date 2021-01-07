@@ -153,21 +153,21 @@ describe('Chaining and piping combinators', () => {
       terror(
         nth(0, 1),
         '',
-        '[nth]: expected 1st argument to be a parser; found 0',
+        '[nth]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a number', () => {
       terror(
         nth(many(any), '1'),
         '',
-        '[nth]: expected 2nd argument to be a number; found "1"',
+        '[nth]: expected second argument to be a number; found "1"',
       )
     })
     it('throws if its first argument does not return an array', () => {
       terror(
         nth(any, 0),
         'a',
-        '[nth]: expected 1st argument to return an array; found "a"',
+        '[nth]: expected first argument to return an array; found "a"',
       )
     })
     it('extracts the nth element of an array result', () => {
@@ -181,7 +181,19 @@ describe('Chaining and piping combinators', () => {
 
   describe('first', () => {
     it('throws if its argument is not a parser', () => {
-      terror(first(0), '', '[first]: expected a parser; found 0')
+      terror(first(0), '', '[first]: expected argument to be a parser; found 0')
+      terror(
+        first(0, 'test'),
+        '',
+        '[first]: expected first argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument exists and is not a string', () => {
+      terror(
+        first(any, 0),
+        '',
+        '[first]: expected second argument to be a string; found 0',
+      )
     })
     it('throws if its argument does not return an array', () => {
       terror(
@@ -192,15 +204,33 @@ describe('Chaining and piping combinators', () => {
     })
     it('extracts the first element of an array result', () => {
       tpass(first(many(any)), '12345', '1')
+      tpass(first(many(any), 'test'), '12345', '1')
     })
     it('passes any parser failure through', () => {
       tfail(first(many1(any)), '', 'any character')
+      tfail(first(many1(any), 'a character'), '', 'a character')
     })
   })
 
   describe('second', () => {
     it('throws if its argument is not a parser', () => {
-      terror(second(0), '', '[second]: expected a parser; found 0')
+      terror(
+        second(0),
+        '',
+        '[second]: expected argument to be a parser; found 0',
+      )
+      terror(
+        second(0, 'test'),
+        '',
+        '[second]: expected first argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument exists and is not a string', () => {
+      terror(
+        second(any, 0),
+        '',
+        '[second]: expected second argument to be a string; found 0',
+      )
     })
     it('throws if its argument does not return an array', () => {
       terror(
@@ -211,15 +241,29 @@ describe('Chaining and piping combinators', () => {
     })
     it('extracts the second element of an array result', () => {
       tpass(second(many(any)), '12345', '2')
+      tpass(second(many(any), 'test'), '12345', '2')
     })
     it('passes any parser failure through', () => {
       tfail(second(many1(any)), '', 'any character')
+      tfail(second(many1(any), 'a character'), '', 'a character')
     })
   })
 
   describe('third', () => {
     it('throws if its argument is not a parser', () => {
-      terror(third(0), '', '[third]: expected a parser; found 0')
+      terror(third(0), '', '[third]: expected argument to be a parser; found 0')
+      terror(
+        third(0, 'test'),
+        '',
+        '[third]: expected first argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument exists and is not a string', () => {
+      terror(
+        third(any, 0),
+        '',
+        '[third]: expected second argument to be a string; found 0',
+      )
     })
     it('throws if its argument does not return an array', () => {
       terror(
@@ -230,15 +274,33 @@ describe('Chaining and piping combinators', () => {
     })
     it('extracts the third element of an array result', () => {
       tpass(third(many(any)), '12345', '3')
+      tpass(third(many(any), 'test'), '12345', '3')
     })
     it('passes any parser failure through', () => {
       tfail(third(many1(any)), '', 'any character')
+      tfail(third(many1(any), 'a character'), '', 'a character')
     })
   })
 
   describe('fourth', () => {
     it('throws if its argument is not a parser', () => {
-      terror(fourth(0), '', '[fourth]: expected a parser; found 0')
+      terror(
+        fourth(0),
+        '',
+        '[fourth]: expected argument to be a parser; found 0',
+      )
+      terror(
+        fourth(0, 'test'),
+        '',
+        '[fourth]: expected first argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument exists and is not a string', () => {
+      terror(
+        fourth(any, 0),
+        '',
+        '[fourth]: expected second argument to be a string; found 0',
+      )
     })
     it('throws if its argument does not return an array', () => {
       terror(
@@ -249,15 +311,29 @@ describe('Chaining and piping combinators', () => {
     })
     it('extracts the fourth element of an array result', () => {
       tpass(fourth(many(any)), '12345', '4')
+      tpass(fourth(many(any), 'test'), '12345', '4')
     })
     it('passes any parser failure through', () => {
       tfail(fourth(many1(any)), '', 'any character')
+      tfail(fourth(many1(any), 'a character'), '', 'a character')
     })
   })
 
   describe('fifth', () => {
     it('throws if its argument is not a parser', () => {
-      terror(fifth(0), '', '[fifth]: expected a parser; found 0')
+      terror(fifth(0), '', '[fifth]: expected argument to be a parser; found 0')
+      terror(
+        fifth(0, 'test'),
+        '',
+        '[fifth]: expected first argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument exists and is not a string', () => {
+      terror(
+        fifth(any, 0),
+        '',
+        '[fifth]: expected second argument to be a string; found 0',
+      )
     })
     it('throws if its argument does not return an array', () => {
       terror(
@@ -268,9 +344,11 @@ describe('Chaining and piping combinators', () => {
     })
     it('extracts the fifth element of an array result', () => {
       tpass(fifth(many(any)), '12345', '5')
+      tpass(fifth(many(any), 'test'), '12345', '5')
     })
     it('passes any parser failure through', () => {
       tfail(fifth(many1(any)), '', 'any character')
+      tfail(fifth(many1(any), 'a character'), '', 'a character')
     })
   })
 

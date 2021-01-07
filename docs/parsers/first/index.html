@@ -2135,7 +2135,7 @@
 -->
 
 <blockquote>
-<p><code>first(p: Parser&lt;[T]&gt;): Parser&lt;T&gt;</code></p>
+<p><code>first(p: Parser, m?: string): Parser</code></p>
 </blockquote>
 <p>Applies a parser and returns the first element of the resulting array.</p>
 <p>This parser works only if <code>p</code> returns an array, and it returns the first element of that array. It's most useful with parsers like <a href="../seq/"><code>seq</code></a> and <a href="../many/"><code>many</code></a> that always return arrays, though it will work with parsers like <a href="../map/"><code>map</code></a> and <a href="../always/"><code>always</code></a> if they are programmed to return arrays.</p>
@@ -2159,6 +2159,7 @@
 <h4 id="parameters">Parameters</h4>
 <ul>
 <li><code>p</code>: The parser to apply. This parser should return an array.</li>
+<li><code>m</code>: The optional expected error message that will take the place of the default error message.</li>
 </ul>
 <h4 id="success">Success</h4>
 <ul>
@@ -2175,6 +2176,7 @@
 <h4 id="throws">Throws</h4>
 <ul>
 <li>Throws an error if <code>p</code> is not a parser.</li>
+<li>Throws an error if <code>m</code> exists and is not a string.</li>
 <li>Throws an error if <code>p</code> succeeds but does not return an array.</li>
 </ul>
 <h4 id="see-also">See Also</h4>

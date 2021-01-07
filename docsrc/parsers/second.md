@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `second(p: Parser<[T]>): Parser<T>`
+> `second(p: Parser, m?: string): Parser`
 
 Applies a parser and returns the second element of the resulting array.
 
@@ -35,6 +35,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 #### Parameters
 
 * `p`: The parser to apply. This parser should return an array.
+* `m`: The optional expected error message that will take the place of the default error message.
 
 #### Success
 
@@ -51,6 +52,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 #### Throws
 
 * Throws an error if `p` is not a parser.
+* Throws an error if `m` exists and is not a string.
 * Throws an error if `p` succeeds but does not return an array.
 
 #### See Also

@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `nth(p: Parser<[T]>, n: number): Parser<T>`
+> `nth(p: Parser, n: number. m?: string): Parser`
 
 Applies a parser and returns a given element of the resulting array.
 
@@ -36,6 +36,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 * `p`: The parser to apply. This parser should return an array.
 * `n`: The 0-based index of the element from `p`'s result that should be returned.
+* `m`: The optional expected error message that will take the place of the default error message.
 
 #### Success
 
@@ -53,6 +54,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 * Throws an error if `p` is not a parser.
 * Throws an error if `n` is not a number.
+* Throws an error if `m` exists and is not a string.
 * Throws an error if `p` succeeds but does not return an array.
 
 #### See Also

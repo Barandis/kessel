@@ -4,6 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import {
+  argNumFormatter,
   argParFormatter,
   argStrFormatter,
   assertArray,
@@ -13,7 +14,6 @@ import {
   assertString,
   formatter,
   ordFnFormatter,
-  ordNumFormatter,
   ordParFormatter,
 } from 'kessel/assert'
 import { maybeFatal, ok, parser, Status } from 'kessel/core'
@@ -115,18 +115,25 @@ export const value = (p, x, m) => parser(ctx => {
  *
  * @param {Parser} p A parser that results in an array.
  * @param {number} n The 0-based index of the result element to return.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser whose result is the `n`th element of the
  *     result of `p`.
  */
-export const nth = (p, n) => parser(ctx => {
-  ASSERT && assertParser('nth', p, ordParFormatter('1st'))
-  ASSERT && assertNumber('nth', n, ordNumFormatter('2nd'))
+export const nth = (p, n, m) => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && assertParser('nth', p, argParFormatter(1, true))
+  ASSERT && assertNumber('nth', n, argNumFormatter(2, true))
+  ASSERT && hasM && assertString('nth', m, argStrFormatter(3, true))
 
   const [prep, [pctx, pres]] = twin(p(ctx))
   if (pres.status !== Ok) return prep
 
   const v = pres.value
-  ASSERT && assertArray('nth', v, formatter('1st argument to return an array'))
+  ASSERT && assertArray(
+    'nth', v, formatter('first argument to return an array'),
+  )
 
   return ok(pctx, v[n])
 })
@@ -136,14 +143,23 @@ export const nth = (p, n) => parser(ctx => {
  * `p`.
  *
  * @param {Parser} p A parser whose result is an array.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser whose result is the first element of the
  *     result of `p`.
  */
-export const first = p => parser(ctx => {
-  ASSERT && assertParser('first', p)
+export const first = (p, m) => parser(ctx => {
+  const hasM = m != null
 
-  const [prep, [pctx, pres]] = twin(p(ctx))
-  if (pres.status !== Ok) return prep
+  ASSERT && assertParser('first', p, argParFormatter(1, hasM))
+  ASSERT && hasM && assertString('first', m, argStrFormatter(2, true))
+
+  const [pctx, pres] = p(ctx)
+  if (pres.status !== Ok) {
+    return maybeFatal(
+      pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors,
+    )
+  }
 
   const v = pres.value
   ASSERT && assertArray('first', v, formatter('argument to return an array'))
@@ -156,14 +172,23 @@ export const first = p => parser(ctx => {
  * `p`.
  *
  * @param {Parser} p A parser whose result is an array.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser whose result is the second element of the
  *     result of `p`.
  */
-export const second = p => parser(ctx => {
-  ASSERT && assertParser('second', p)
+export const second = (p, m) => parser(ctx => {
+  const hasM = m != null
 
-  const [prep, [pctx, pres]] = twin(p(ctx))
-  if (pres.status !== Ok) return prep
+  ASSERT && assertParser('second', p, argParFormatter(1, hasM))
+  ASSERT && hasM && assertString('second', m, argStrFormatter(2, true))
+
+  const [pctx, pres] = p(ctx)
+  if (pres.status !== Ok) {
+    return maybeFatal(
+      pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors,
+    )
+  }
 
   const v = pres.value
   ASSERT && assertArray('second', v, formatter('argument to return an array'))
@@ -176,14 +201,23 @@ export const second = p => parser(ctx => {
  * `p`.
  *
  * @param {Parser} p A parser whose result is an array.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser whose result is the third element of the
  *     result of `p`.
  */
-export const third = p => parser(ctx => {
-  ASSERT && assertParser('third', p)
+export const third = (p, m) => parser(ctx => {
+  const hasM = m != null
 
-  const [prep, [pctx, pres]] = twin(p(ctx))
-  if (pres.status !== Ok) return prep
+  ASSERT && assertParser('third', p, argParFormatter(1, hasM))
+  ASSERT && hasM && assertString('third', m, argStrFormatter(2, true))
+
+  const [pctx, pres] = p(ctx)
+  if (pres.status !== Ok) {
+    return maybeFatal(
+      pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors,
+    )
+  }
 
   const v = pres.value
   ASSERT && assertArray('third', v, formatter('argument to return an array'))
@@ -196,14 +230,23 @@ export const third = p => parser(ctx => {
  * `p`.
  *
  * @param {Parser} p A parser whose result is an array.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser whose result is the fourth element of the
  *     result of `p`.
  */
-export const fourth = p => parser(ctx => {
-  ASSERT && assertParser('fourth', p)
+export const fourth = (p, m) => parser(ctx => {
+  const hasM = m != null
 
-  const [prep, [pctx, pres]] = twin(p(ctx))
-  if (pres.status !== Ok) return prep
+  ASSERT && assertParser('fourth', p, argParFormatter(1, hasM))
+  ASSERT && hasM && assertString('fourth', m, argStrFormatter(2, true))
+
+  const [pctx, pres] = p(ctx)
+  if (pres.status !== Ok) {
+    return maybeFatal(
+      pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors,
+    )
+  }
 
   const v = pres.value
   ASSERT && assertArray('fourth', v, formatter('argument to return an array'))
@@ -216,14 +259,23 @@ export const fourth = p => parser(ctx => {
  * `p`.
  *
  * @param {Parser} p A parser whose result is an array.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser whose result is the fifth element of the
  *     result of `p`.
  */
-export const fifth = p => parser(ctx => {
-  ASSERT && assertParser('fifth', p)
+export const fifth = (p, m) => parser(ctx => {
+  const hasM = m != null
 
-  const [prep, [pctx, pres]] = twin(p(ctx))
-  if (pres.status !== Ok) return prep
+  ASSERT && assertParser('fifth', p, argParFormatter(1, hasM))
+  ASSERT && hasM && assertString('fifth', m, argStrFormatter(2, true))
+
+  const [pctx, pres] = p(ctx)
+  if (pres.status !== Ok) {
+    return maybeFatal(
+      pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors,
+    )
+  }
 
   const v = pres.value
   ASSERT && assertArray('fifth', v, formatter('argument to return an array'))
