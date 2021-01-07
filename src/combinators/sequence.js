@@ -507,30 +507,37 @@ export const sepBy1 = (p, s, m) => parser(ctx => {
 })
 
 /**
- * A parser that executes `p` zero or more times, executing `sep` in
+ * A parser that executes `p` zero or more times, executing `s` in
  * between each and optionally after the last match of `p`. The results
  * of `p` are gathered into an array and returned.
  *
  * This parser will not fail non-fatally, as matching `p` zero times is
- * valid. It can fail fatally if either `p` or `sep` ever fail fatally.
+ * valid. It can fail fatally if either `p` or `s` ever fail fatally.
  *
- * If `p` and `sep` both succeed without consuming content, that would
+ * If `p` and `s` both succeed without consuming content, that would
  * cause an infinite loop. In this case, an exception is thrown instead.
  *
  * @param {Parser} p A parser that will match the desired content when
  *     applied to the input.
- * @param {Parser} sep A parser that will match separators between the
+ * @param {Parser} s A parser that will match separators between the
  *     chunks of content.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser that results in an array of all of the
  *     content parser results, discarding the separator parser results.
  */
-export const sepEndBy = (p, sep) => parser(ctx => {
-  ASSERT && assertParser('sepEndBy', p, ordParFormatter('1st'))
-  ASSERT && assertParser('sepEndBy', sep, ordParFormatter('2nd'))
+export const sepEndBy = (p, s, m) => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && assertParser('sepEndBy', p, argParFormatter(1, true))
+  ASSERT && assertParser('sepEndBy', s, argParFormatter(2, true))
+  ASSERT && hasM && assertString('sepEndBy', m, argStrFormatter(3, true))
 
   let index = ctx.index
-  const [prep, [pctx, pres]] = twin(p(ctx))
-  if (pres.status === Fatal) return prep
+  const [pctx, pres] = p(ctx)
+  if (pres.status === Fatal) {
+    return fatal(pctx, hasM ? expected(m) : pres.errors)
+  }
   if (pres.status === Fail) return ok(pctx, [])
 
   const values = [pres.value]
@@ -539,48 +546,64 @@ export const sepEndBy = (p, sep) => parser(ctx => {
   while (true) {
     index = context.index
 
-    const [seprep, [sepctx, sepres]] = twin(sep(context))
-    context = sepctx
-    if (sepres.status === Fatal) return seprep
-    if (sepres.status === Fail) break
+    const [sctx, sres] = s(context)
+    context = sctx
+    if (sres.status === Fatal) {
+      return fatal(sctx, hasM ? expected(m) : sres.errors)
+    }
+    if (sres.status === Fail) break
 
-    const [prep, [pctx, pres]] = twin(p(context))
+    const [pctx, pres] = p(context)
     context = pctx
-    if (pres.status === Fatal) return prep
+    if (pres.status === Fatal) {
+      return fatal(pctx, hasM ? expected(m) : pres.errors)
+    }
     if (pres.status === Fail) break
 
     if (context.index === index) throw new TypeError(loopMessage('sepEndBy'))
     values.push(pres.value)
   }
-  const [seprep, [sepctx, sepres]] = twin(sep({ ...context, index }))
-  return sepres.status === Fatal ? seprep : ok(sepctx, values)
+  const [sctx, sres] = s({ ...context, index })
+  if (sres.status === Fatal) {
+    return fatal(sctx, hasM ? expected(m) : sres.errors)
+  }
+  return ok(sctx, values)
 })
 
 /**
- * A parser that executes `p` one or more times, executing `sep` in
+ * A parser that executes `p` one or more times, executing `s` in
  * between each and optionally after the last match of `p`. The results
  * of `p` are gathered into an array and returned.
  *
  * This parser will not fail if `p` doesn't succeed at least once. It
- * will fail fatally if either `p` or `sep` ever fail fatally.
+ * will fail fatally if either `p` or `s` ever fail fatally.
  *
- * If `p` and `sep` both succeed without consuming content, that would
+ * If `p` and `s` both succeed without consuming content, that would
  * cause an infinite loop. In this case, an exception is thrown instead.
  *
  * @param {Parser} p A parser that will match the desired content when
  *     applied to the input.
- * @param {Parser} sep A parser that will match separators between the
+ * @param {Parser} s A parser that will match separators between the
  *     chunks of content.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser that results in an array of all of the
  *     content parser results, discarding the separator parser results.
  */
-export const sepEndBy1 = (p, sep) => parser(ctx => {
-  ASSERT && assertParser('sepEndBy1', p, ordParFormatter('1st'))
-  ASSERT && assertParser('sepEndBy1', sep, ordParFormatter('2nd'))
+export const sepEndBy1 = (p, s, m) => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && assertParser('sepEndBy1', p, argParFormatter(1, true))
+  ASSERT && assertParser('sepEndBy1', s, argParFormatter(2, true))
+  ASSERT && hasM && assertString('sepEndBy1', m, argStrFormatter(3, true))
 
   let index = ctx.index
-  const [prep, [pctx, pres]] = twin(p(ctx))
-  if (pres.status !== Ok) return prep
+  const [pctx, pres] = p(ctx)
+  if (pres.status !== Ok) {
+    return maybeFatal(
+      pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors,
+    )
+  }
 
   const values = [pres.value]
   let context = pctx
@@ -588,21 +611,28 @@ export const sepEndBy1 = (p, sep) => parser(ctx => {
   while (true) {
     index = context.index
 
-    const [seprep, [sepctx, sepres]] = twin(sep(context))
-    context = sepctx
-    if (sepres.status === Fatal) return seprep
-    if (sepres.status === Fail) break
+    const [sctx, sres] = s(context)
+    context = sctx
+    if (sres.status === Fatal) {
+      return fatal(sctx, hasM ? expected(m) : sres.errors)
+    }
+    if (sres.status === Fail) break
 
-    const [prep, [pctx, pres]] = twin(p(context))
+    const [pctx, pres] = p(context)
     context = pctx
-    if (pres.status === Fatal) return prep
+    if (pres.status === Fatal) {
+      return fatal(pctx, hasM ? expected(m) : pres.errors)
+    }
     if (pres.status === Fail) break
 
     if (context.index === index) throw new TypeError(loopMessage('sepEndBy1'))
     values.push(pres.value)
   }
-  const [seprep, [sepctx, sepres]] = twin(sep({ ...context, index }))
-  return sepres.status === Fatal ? seprep : ok(sepctx, values)
+  const [sctx, sres] = s({ ...context, index })
+  if (sres.status === Fatal) {
+    return fatal(sctx, hasM ? expected(m) : sres.errors)
+  }
+  return ok(sctx, values)
 })
 
 /**
