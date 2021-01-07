@@ -2171,7 +2171,7 @@
 -->
 
 <blockquote>
-<p><code>skipMany1(p: Parser&lt;T&gt;): Parser&lt;null&gt;</code></p>
+<p><code>skipMany1(p: Parser, m?: string): Parser</code></p>
 </blockquote>
 <p>Applies a parser as many times as possible until it fails, discarding the parser's results.</p>
 <p><code>skipMany1</code> executes a parser one or more times, as long as it continues to succeed. When the parser fails, that does not mean that <code>skipMany1</code> fails (as long as the parser succeeded at least once); that signals that <code>skipMany1</code> is through executing.</p>
@@ -2202,6 +2202,7 @@
 <h4 id="parameters">Parameters</h4>
 <ul>
 <li><code>p</code>: The parser to apply repeatedly until it fails.</li>
+<li><code>m</code>: The optional expected error message that will take the place of the default error message.</li>
 </ul>
 <h4 id="success">Success</h4>
 <ul>

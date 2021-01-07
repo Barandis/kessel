@@ -318,19 +318,26 @@ export const skip = (p, m) => parser(ctx => {
  * fatally, then so will this parser.
  *
  * @param {Parser} p A parser to be applied zero or more times.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser that applies the supplied parser
  *     repeatedly until it fails. Successful results are discarded.
  */
-export const skipMany = p => parser(ctx => {
-  ASSERT && assertParser('skipMany', p)
+export const skipMany = (p, m) => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && assertParser('skipMany', p, argParFormatter(1, hasM))
+  ASSERT && hasM && assertString('skipMany', m, argStrFormatter(2, true))
 
   let context = ctx
 
   while (true) {
-    const [prep, [pctx, pres]] = twin(p(context))
+    const [pctx, pres] = p(context)
     context = pctx
 
-    if (pres.status === Fatal) return prep
+    if (pres.status === Fatal) {
+      return fatal(pctx, hasM ? expected(m) : pres.errors)
+    }
     if (pres.status === Fail) break
     if (context.index >= context.view.byteLength) break
   }
@@ -345,22 +352,33 @@ export const skipMany = p => parser(ctx => {
  * once. It can fail fatally if `p` ever fails fatally.
  *
  * @param {Parser} p A parser to be applied one or more times.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser that applies the supplied parser
  *     repeatedly until it fails. Successful results are discarded.
  */
-export const skipMany1 = p => parser(ctx => {
-  ASSERT && assertParser('skipMany1', p)
+export const skipMany1 = (p, m) => parser(ctx => {
+  const hasM = m != null
 
-  const [prep, [pctx, pres]] = twin(p(ctx))
-  if (pres.status !== Ok) return prep
+  ASSERT && assertParser('skipMany1', p, argParFormatter(1, hasM))
+  ASSERT && hasM && assertString('skipMany1', m, argStrFormatter(2, true))
+
+  const [pctx, pres] = p(ctx)
+  if (pres.status !== Ok) {
+    return maybeFatal(
+      pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors,
+    )
+  }
 
   let context = pctx
 
   while (true) {
-    const [prep, [pctx, pres]] = twin(p(context))
+    const [pctx, pres] = p(context)
     context = pctx
 
-    if (pres.status === Fatal) return prep
+    if (pres.status === Fatal) {
+      return fatal(pctx, hasM ? expected(m) : pres.errors)
+    }
     if (pres.status === Fail) break
     if (context.index >= context.view.byteLength) break
   }

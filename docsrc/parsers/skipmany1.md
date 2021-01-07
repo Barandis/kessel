@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `skipMany1(p: Parser<T>): Parser<null>`
+> `skipMany1(p: Parser, m?: string): Parser`
 
 Applies a parser as many times as possible until it fails, discarding the parser's results.
 
@@ -42,6 +42,7 @@ console.log(failure(t)) // Parse error at (line 1, column 2):
 #### Parameters
 
 * `p`: The parser to apply repeatedly until it fails.
+* `m`: The optional expected error message that will take the place of the default error message.
 
 #### Success
 
