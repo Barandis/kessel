@@ -4,6 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import {
+  argFnFormatter,
   argGenFormatter,
   argNumFormatter,
   argParFormatter,
@@ -12,9 +13,7 @@ import {
   assertGenFunction,
   assertNumber,
   assertParser,
-  assertParsers,
   assertString,
-  ordFnFormatter,
   ordParFormatter,
 } from 'kessel/assert'
 import { fatal, maybeFatal, ok, parser, Status } from 'kessel/core'
@@ -47,7 +46,7 @@ function loopMessage(name) {
  *     a time, in order, and fails if any of those parsers fail.
  */
 export const seq = (...args) => {
-  const ps = args
+  const ps = args.slice()
   const m = typeof args[args.length - 1] === 'string' ? ps.pop() : null
 
   return parser(ctx => {
@@ -794,33 +793,40 @@ export const manyTill = (p, e, m) => parser(ctx => {
  * `liftA2` if two parsers are passed in, `liftA3` if three are passed
  * in, etc.
  *
- * @param {...(Parser|function(...*):*)} args An array of parsers to be
- *     executed one at a time, in order, followed by a function which
- *     will receive as parameters the results of each parser. Its return
- *     value will become the result of this parser. A single function
- *     must be present and it must be the last parameter; all other
- *     parameters must be parsers.
+ * @param {...(Parser|function(...*):*|string)} args An array of parsers
+ *     to be executed one at a time, in order, followed by a function
+ *     which will receive as parameters the results of each parser. Its
+ *     return value will become the result of this parser. A single
+ *     function must be present and it must come after the parsers.
+ *     Optionally, a string may be the last argument; if it is present,
+ *     it replaces the default error message in the event that the
+ *     parser fails.
  * @returns {Parser} A parser that will execute its parsers in order,
  *     feed the results to its function, and result in the function's
  *     return value.
  */
 export const pipe = (...args) => {
   const ps = args.slice()
+  const m = typeof args[args.length - 1] === 'string' ? ps.pop() : null
   const fn = ps.pop()
 
   return parser(ctx => {
-    ASSERT && assertParsers('pipe', ps)
-    ASSERT && assertFunction('pipe', fn, ordFnFormatter(ordinal(ps.length + 1)))
+    const hasM = m != null
+
+    ASSERT && ps.forEach((p, i) => assertParser(
+      'pipe', p, argParFormatter(i + 1, true),
+    ))
+    ASSERT && assertFunction('pipe', fn, argFnFormatter(ps.length + 1, true))
 
     const index = ctx.index
     const values = []
     let context = ctx
-    let errors = []
+    let errors = hasM ? expected(m) : []
 
     for (const p of ps) {
       const [pctx, pres] = p(context)
       context = pctx
-      errors = pres.errors?.length ? merge(errors, pres.errors) : []
+      if (!hasM) errors = pres.errors?.length ? merge(errors, pres.errors) : []
 
       if (pres.status !== Ok) {
         return maybeFatal(context.index !== index, context, errors)

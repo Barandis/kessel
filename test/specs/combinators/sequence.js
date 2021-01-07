@@ -1398,26 +1398,39 @@ describe('Sequence combinators', () => {
   })
 
   describe('pipe', () => {
-    it('throws if its last argument is not a function', () => {
+    it('throws if its last argument is not a function or a string', () => {
       terror(
         pipe(any, any, 0),
         '',
-        '[pipe]: expected 3rd argument to be a function; found 0',
+        '[pipe]: expected third argument to be a function; found 0',
       )
       terror(
         pipe(any, any, any, any),
         '',
-        '[pipe]: expected 4th argument to be a function; found parser',
+        '[pipe]: expected fourth argument to be a function; found parser',
+      )
+    })
+    it('throws if string last arg is not preceded by a function', () => {
+      terror(
+        pipe(any, any, any, 'test'),
+        '',
+        '[pipe]: expected third argument to be a function; found parser',
       )
     })
     it('passes parser results to a single function', () => {
       tpass(pipe(letter, a => a.toUpperCase()), 'a', 'A')
       tpass(pipe(letter, digit, (a, b) => b + a), 'a1', '1a')
       tpass(pipe(letter, digit, letter, (a, b, c) => c + b + a), 'a1b', 'b1a')
+      tpass(pipe(letter, a => a.toUpperCase(), 'test'), 'a', 'A')
     })
     it('fails non-fatally if no input is consumed on failure', () => {
       tfail(pipe(letter, a => a), '1', {
         expected: 'a letter',
+        index: 0,
+        status: Fail,
+      })
+      tfail(pipe(letter, a => a, 'a single letter'), '1', {
+        expected: 'a single letter',
         index: 0,
         status: Fail,
       })
@@ -1426,10 +1439,20 @@ describe('Sequence combinators', () => {
         index: 0,
         status: Fail,
       })
+      tfail(pipe(eof, letter, (a, b) => b + a, 'something impossible'), '', {
+        expected: 'something impossible',
+        index: 0,
+        status: Fail,
+      })
     })
     it('fails fatally if input was consumed on failure', () => {
       tfail(pipe(letter, digit, (a, b) => b + a), 'aa', {
         expected: 'a digit',
+        index: 1,
+        status: Fatal,
+      })
+      tfail(pipe(letter, digit, (a, b) => b + a, 'letter, digit'), 'aa', {
+        expected: 'letter, digit',
         index: 1,
         status: Fatal,
       })

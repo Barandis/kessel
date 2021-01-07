@@ -32,7 +32,7 @@ const { Ok, Fail, Fatal } = Status
  *     one succeeds.
  */
 export const alt = (...args) => {
-  const ps = args
+  const ps = args.slice()
   const m = typeof args[args.length - 1] === 'string' ? ps.pop() : null
 
   return parser(ctx => {

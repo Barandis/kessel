@@ -2171,16 +2171,8 @@
 -->
 
 <blockquote>
-<p><code>pipe&lt;T&gt;(...ps: Parser[], fn: (...args: any[]) =&gt; T): Parser&lt;T&gt;</code></p>
+<p><code>pipe(...ps: Parser[], fn: Function, m?: string): Parser</code></p>
 </blockquote>
-<p>!!! warning "Not a real type"
-    The type given above is not a real type, because TypeScript/JavaScript does not have the ability to do rest arguments before other arguments. The "real" type is</p>
-<div class="highlight"><pre><span></span><code>`pipe&lt;T&gt;(...ps: (Parser&lt;any&gt; | ((...args: any[]) =&gt; T))[]): Parser&lt;T&gt;`
-
-The given type is more expressive and makes for better documentation, but even that one is imperfect. TypeScript cannot express as much information in this type as would be useful. Namely, the parsers in `ps` can all have different generic parameters, and the types of the parameters to `fn` should match those generic parameters in number and in order.
-
-A two-parser `pipe` can be expressed with `pipe&lt;T, U&gt;(p: Parser&lt;T&gt;, q: Parser&lt;U&gt;, fn: (a: T, b: U) =&gt; V): Parser&lt;V&gt;`. A three-parser version would have the type `pipe&lt;T, U, V&gt;(p: Parser&lt;T&gt;, q: Parser&lt;U&gt;, r: Parser&lt;V&gt;, fn: (a: T, b: U, c: V) =&gt; W): Parser&lt;W&gt;`, and so on. Unfortunately it&#39;s impossible to write a type with a variable number of arguments.
-</code></pre></div>
 <p>Applies some parsers in order, then returns the result of a function to which all of the parser results have been passed.</p>
 <p><code>fn</code> will be passed one argument for every member of <code>ps</code>. JavaScript does not enforce that there has to be a parameter for each passed argument, but likely you will want to provide an <code>fn</code> that has an arity equal to the number of parsers in <code>ps</code>.</p>
 <p>There is another version of this parser (<a href="../pipeb/"><code>pipeB</code></a>) that fails non-fatally and backtracks if the parser that fails does so non-fatally.</p>
@@ -2218,6 +2210,7 @@ apply(p, apply(q, always(b =&gt; a =&gt; fn(a, b)))) // applicative style
 <ul>
 <li><code>...ps</code>: Zero or more parsers, each of which is applied to the input in order.</li>
 <li><code>fn</code>: A function which receives the results of all of the parsers in <code>ps</code> if they all succeed. Its return value becomes the result of <code>pipe</code>.</li>
+<li><code>m</code>: The optional expected error message that will take the place of the default error message.</li>
 </ul>
 <h4 id="success">Success</h4>
 <ul>
@@ -2235,7 +2228,8 @@ apply(p, apply(q, always(b =&gt; a =&gt; fn(a, b)))) // applicative style
 </ul>
 <h4 id="throws">Throws</h4>
 <ul>
-<li>Throws an error if the last argument is not a non-parser function.</li>
+<li>Throws an error if the last argument is not a non-parser function or a string.</li>
+<li>Throws an error if the second-to-last argument is not a non-parser function if the last argument is a string.</li>
 <li>Throws an error if any other argument is not a parser.</li>
 </ul>
 <h4 id="see-also">See Also</h4>
