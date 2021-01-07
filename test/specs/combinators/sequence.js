@@ -1008,28 +1008,37 @@ describe('Sequence combinators', () => {
       terror(
         assocL(0, any),
         '',
-        '[assocL]: expected 1st argument to be a parser; found 0',
+        '[assocL]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
         assocL(any, 0),
         '',
-        '[assocL]: expected 2nd argument to be a parser; found 0',
+        '[assocL]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its second argument does not return a function', () => {
       terror(
         assocL(any, any, 0),
         'abc',
-        '[assocL]: expected 1st op parser to return a function; found "b"',
+        '[assocL]: expected first op parser to return a function; found "b"',
+      )
+    })
+    it('throws if its fourth argument exists and is not a string', () => {
+      terror(
+        assocL(any, any, 0, 0),
+        '',
+        '[assocL]: expected fourth argument to be a string; found 0',
       )
     })
     it('succeeds with a default value if there are no matches', () => {
       tpass(assocL(p, op, 0), '', { result: 0, index: 0 })
+      tpass(assocL(p, op, 0, 'test'), '', { result: 0, index: 0 })
     })
     it('succeeds with the first match if op never matches', () => {
       tpass(assocL(p, op, 0), '23', { result: 23, index: 2 })
+      tpass(assocL(p, op, 0, 'test'), '23', { result: 23, index: 2 })
     })
     it('succeeds with one match of op', () => {
       tpass(assocL(p, op, 0), '23+17', { result: 40, index: 5 })
@@ -1058,6 +1067,21 @@ describe('Sequence combinators', () => {
         index: 3,
         status: Fatal,
       })
+      tfail(assocL(seq(digit, digit), op, 0, 'an expression'), '1a', {
+        expected: 'an expression',
+        index: 1,
+        status: Fatal,
+      })
+      tfail(assocL(seq(digit, digit), op, 0, 'an expression'), '12+1a', {
+        expected: 'an expression',
+        index: 4,
+        status: Fatal,
+      })
+      tfail(assocL(p, seq(letter, letter), 0, 'an expression'), '23a1', {
+        expected: 'an expression',
+        index: 3,
+        status: Fatal,
+      })
     })
   })
 
@@ -1072,21 +1096,28 @@ describe('Sequence combinators', () => {
       terror(
         assoc1L(0, any),
         '',
-        '[assoc1L]: expected 1st argument to be a parser; found 0',
+        '[assoc1L]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
         assoc1L(any, 0),
         '',
-        '[assoc1L]: expected 2nd argument to be a parser; found 0',
+        '[assoc1L]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its second argument does not return a function', () => {
       terror(
         assoc1L(any, any),
         'abc',
-        '[assoc1L]: expected 1st op parser to return a function; found "b"',
+        '[assoc1L]: expected first op parser to return a function; found "b"',
+      )
+    })
+    it('throws if its third argument exists and is not a string', () => {
+      terror(
+        assoc1L(any, any, 0),
+        '',
+        '[assoc1L]: expected third argument to be a string; found 0',
       )
     })
     it('fails if there are no matches', () => {
@@ -1095,9 +1126,15 @@ describe('Sequence combinators', () => {
         index: 0,
         status: Fail,
       })
+      tfail(assoc1L(p, op, 'an expression'), '', {
+        expected: 'an expression',
+        index: 0,
+        status: Fail,
+      })
     })
     it('succeeds with the first match if op never matches', () => {
       tpass(assoc1L(p, op), '23', { result: 23, index: 2 })
+      tpass(assoc1L(p, op, 'test'), '23', { result: 23, index: 2 })
     })
     it('succeeds with one match of op', () => {
       tpass(assoc1L(p, op), '23+17', { result: 40, index: 5 })
@@ -1106,6 +1143,7 @@ describe('Sequence combinators', () => {
     it('succeeds left-associatively with more than one match of op', () => {
       tpass(assoc1L(p, op), '23+17-42', { result: -2, index: 8 })
       tpass(assoc1L(p, op), '23-17+42', { result: 48, index: 8 })
+      tpass(assoc1L(p, op, 'test'), '23+17-42', { result: -2, index: 8 })
     })
     it('ignores the last op if there is no p match after', () => {
       tpass(assoc1L(p, op), '23+17-', { result: 40, index: 5 })
@@ -1126,6 +1164,21 @@ describe('Sequence combinators', () => {
         index: 3,
         status: Fatal,
       })
+      tfail(assoc1L(seq(digit, digit), op, 'an expression'), '1a', {
+        expected: 'an expression',
+        index: 1,
+        status: Fatal,
+      })
+      tfail(assoc1L(seq(digit, digit), op, 'an expression'), '12+1a', {
+        expected: 'an expression',
+        index: 4,
+        status: Fatal,
+      })
+      tfail(assoc1L(p, seq(letter, letter), 'an expression'), '23a1', {
+        expected: 'an expression',
+        index: 3,
+        status: Fatal,
+      })
     })
   })
 
@@ -1140,28 +1193,37 @@ describe('Sequence combinators', () => {
       terror(
         assocR(0, any),
         '',
-        '[assocR]: expected 1st argument to be a parser; found 0',
+        '[assocR]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
         assocR(any, 0),
         '',
-        '[assocR]: expected 2nd argument to be a parser; found 0',
+        '[assocR]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its second argument does not return a function', () => {
       terror(
         assocR(any, any, 0),
         'abc',
-        '[assocR]: expected 1st op parser to return a function; found "b"',
+        '[assocR]: expected first op parser to return a function; found "b"',
+      )
+    })
+    it('throws if its fourth argument exists and is not a string', () => {
+      terror(
+        assocR(any, any, 0, 0),
+        '',
+        '[assocR]: expected fourth argument to be a string; found 0',
       )
     })
     it('succeeds with a default value if there are no matches', () => {
       tpass(assocR(p, op, 0), '', { result: 0, index: 0 })
+      tpass(assocR(p, op, 0, 'test'), '', { result: 0, index: 0 })
     })
     it('succeeds with the first match if op never matches', () => {
       tpass(assocR(p, op, 0), '23', { result: 23, index: 2 })
+      tpass(assocR(p, op, 0, 'test'), '23', { result: 23, index: 2 })
     })
     it('succeeds with one match of op', () => {
       tpass(assocR(p, op, 0), '23+17', { result: 40, index: 5 })
@@ -1191,6 +1253,21 @@ describe('Sequence combinators', () => {
         index: 3,
         status: Fatal,
       })
+      tfail(assocR(seq(digit, digit), op, 0, 'an expression'), '1a', {
+        expected: 'an expression',
+        index: 1,
+        status: Fatal,
+      })
+      tfail(assocR(seq(digit, digit), op, 0, 'an expression'), '12+1a', {
+        expected: 'an expression',
+        index: 4,
+        status: Fatal,
+      })
+      tfail(assocR(p, seq(letter, letter), 0, 'an expression'), '23a1', {
+        expected: 'an expression',
+        index: 3,
+        status: Fatal,
+      })
     })
   })
 
@@ -1205,21 +1282,28 @@ describe('Sequence combinators', () => {
       terror(
         assoc1R(0, any),
         '',
-        '[assoc1R]: expected 1st argument to be a parser; found 0',
+        '[assoc1R]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
         assoc1R(any, 0),
         '',
-        '[assoc1R]: expected 2nd argument to be a parser; found 0',
+        '[assoc1R]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its second argument does not return a function', () => {
       terror(
         assoc1R(any, any),
         'abc',
-        '[assoc1R]: expected 1st op parser to return a function; found "b"',
+        '[assoc1R]: expected first op parser to return a function; found "b"',
+      )
+    })
+    it('throws if its third argument exists and is not a string', () => {
+      terror(
+        assoc1R(any, any, 0),
+        '',
+        '[assoc1R]: expected third argument to be a string; found 0',
       )
     })
     it('fails if there are no matches', () => {
@@ -1228,9 +1312,15 @@ describe('Sequence combinators', () => {
         index: 0,
         status: Fail,
       })
+      tfail(assoc1R(p, op, 'an expression'), '', {
+        expected: 'an expression',
+        index: 0,
+        status: Fail,
+      })
     })
     it('succeeds with the first match if op never matches', () => {
       tpass(assoc1R(p, op), '23', { result: 23, index: 2 })
+      tpass(assoc1R(p, op, 'test'), '23', { result: 23, index: 2 })
     })
     it('succeeds with one match of op', () => {
       tpass(assoc1R(p, op), '23+17', { result: 40, index: 5 })
@@ -1256,6 +1346,21 @@ describe('Sequence combinators', () => {
       })
       tfail(assoc1R(p, seq(letter, letter)), '23a1', {
         expected: 'a letter',
+        index: 3,
+        status: Fatal,
+      })
+      tfail(assoc1R(seq(digit, digit), op, 'an expression'), '1a', {
+        expected: 'an expression',
+        index: 1,
+        status: Fatal,
+      })
+      tfail(assoc1R(seq(digit, digit), op, 'an expression'), '12+1a', {
+        expected: 'an expression',
+        index: 4,
+        status: Fatal,
+      })
+      tfail(assoc1R(p, seq(letter, letter), 'an expression'), '23a1', {
+        expected: 'an expression',
         index: 3,
         status: Fatal,
       })

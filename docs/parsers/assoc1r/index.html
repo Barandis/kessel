@@ -2171,12 +2171,12 @@
 -->
 
 <blockquote>
-<p><code>assoc1R&lt;T&gt;(p: Parser&lt;T&gt;, op: Parser&lt;(a: T, b: T) =&gt; T&gt;): Parser&lt;T&gt;</code></p>
+<p><code>assoc1R(p: Parser, o: Parser, m?: string): Parser</code></p>
 </blockquote>
 <p>Parses one or more occurrences of a content parser, separated by an operation parser, then applies the operations to the content right-associatively.</p>
-<p>The operation parser <code>op</code> must return a function that will be applied to the results of the content parser <code>p</code> that surround it. Most parsers return strings or arrays, so <code>op</code> must be <a href="../map/"><code>map</code></a>, <a href="../value/"><code>value</code></a>, or one of the other small number of parsers that can return arbitrary values.</p>
-<p><code>p</code> must be the last to match. If <code>op</code> succeeds but <code>p</code> fails after it, then the parser state is left at the location immediately after the last success of <code>p</code>. The result is constructed by applying the function returned by the first <code>op</code> to the values returned by the first two <code>p</code>s, then applying the function returned by the second <code>op</code> to that value and the value returned by the third <code>p</code>, and so on.</p>
-<p><code>assoc1R</code> fails if <code>p</code> never succeeds, but it is not required that <code>op</code> ever succeed. If <code>op</code> never succeeds but <code>p</code> succeeds once, that result from <code>p</code> is returned.</p>
+<p>The operation parser <code>o</code> must return a function that will be applied to the results of the content parser <code>p</code> that surround it. Most parsers return strings or arrays, so <code>o</code> must be <a href="../map/"><code>map</code></a>, <a href="../value/"><code>value</code></a>, or one of the other small number of parsers that can return arbitrary values.</p>
+<p><code>p</code> must be the last to match. If <code>o</code> succeeds but <code>p</code> fails after it, then the parser state is left at the location immediately after the last success of <code>p</code>. The result is constructed by applying the function returned by the first <code>o</code> to the values returned by the first two <code>p</code>s, then applying the function returned by the second <code>o</code> to that value and the value returned by the third <code>p</code>, and so on.</p>
+<p><code>assoc1R</code> fails if <code>p</code> never succeeds, but it is not required that <code>o</code> ever succeed. If <code>o</code> never succeeds but <code>p</code> succeeds once, that result from <code>p</code> is returned.</p>
 <h4 id="example">Example</h4>
 <div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">number</span> <span class="o">=</span> <span class="nx">map</span><span class="p">(</span><span class="nx">join</span><span class="p">(</span><span class="nx">many</span><span class="p">(</span><span class="nx">digit</span><span class="p">)),</span> <span class="nx">x</span> <span class="p">=&gt;</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">x</span><span class="p">))</span>
 <span class="kr">const</span> <span class="nx">op</span> <span class="o">=</span> <span class="nx">orElse</span><span class="p">(</span>
@@ -2201,11 +2201,12 @@
 <h4 id="parameters">Parameters</h4>
 <ul>
 <li><code>p</code>: The content parser.</li>
-<li><code>op</code>: The operation parser. This parser must return a function.</li>
+<li><code>o</code>: The operation parser. This parser must return a function.</li>
+<li><code>m</code>: The optional expected error message that will take the place of the default error message.</li>
 </ul>
 <h4 id="success">Success</h4>
 <ul>
-<li>Succeeds if <code>p</code> succeeds at least once and neither <code>p</code> nor <code>op</code> ever fail fatally. If <code>p</code> succeeds once and <code>op</code> does not, the result of <code>p</code> is returned. Otherwise, the left associative application of the results of <code>op</code> to the results of <code>p</code> is returned.</li>
+<li>Succeeds if <code>p</code> succeeds at least once and neither <code>p</code> nor <code>o</code> ever fail fatally. If <code>p</code> succeeds once and <code>o</code> does not, the result of <code>p</code> is returned. Otherwise, the left associative application of the results of <code>o</code> to the results of <code>p</code> is returned.</li>
 </ul>
 <h4 id="failure">Failure</h4>
 <ul>
@@ -2213,12 +2214,13 @@
 </ul>
 <h4 id="fatal-failure">Fatal Failure</h4>
 <ul>
-<li>Fails fatally if either <code>p</code> or <code>op</code> fail fatally.</li>
+<li>Fails fatally if either <code>p</code> or <code>o</code> fail fatally.</li>
 </ul>
 <h4 id="throws">Throws</h4>
 <ul>
-<li>Throws an error if either <code>p</code> or <code>op</code> are not parsers.</li>
-<li>Throws an error if any result of <code>op</code> is not a function.</li>
+<li>Throws an error if either <code>p</code> or <code>o</code> are not parsers.</li>
+<li>Throws an error if any result of <code>o</code> is not a function.</li>
+<li>Throws an error if <code>m</code> exists and is not a string.</li>
 </ul>
 <h4 id="see-also">See Also</h4>
 <ul>

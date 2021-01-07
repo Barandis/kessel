@@ -5,15 +5,15 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `assoc1R<T>(p: Parser<T>, op: Parser<(a: T, b: T) => T>): Parser<T>`
+> `assoc1R(p: Parser, o: Parser, m?: string): Parser`
 
 Parses one or more occurrences of a content parser, separated by an operation parser, then applies the operations to the content right-associatively.
 
-The operation parser `op` must return a function that will be applied to the results of the content parser `p` that surround it. Most parsers return strings or arrays, so `op` must be [`map`](map.md), [`value`](value.md), or one of the other small number of parsers that can return arbitrary values.
+The operation parser `o` must return a function that will be applied to the results of the content parser `p` that surround it. Most parsers return strings or arrays, so `o` must be [`map`](map.md), [`value`](value.md), or one of the other small number of parsers that can return arbitrary values.
 
-`p` must be the last to match. If `op` succeeds but `p` fails after it, then the parser state is left at the location immediately after the last success of `p`. The result is constructed by applying the function returned by the first `op` to the values returned by the first two `p`s, then applying the function returned by the second `op` to that value and the value returned by the third `p`, and so on.
+`p` must be the last to match. If `o` succeeds but `p` fails after it, then the parser state is left at the location immediately after the last success of `p`. The result is constructed by applying the function returned by the first `o` to the values returned by the first two `p`s, then applying the function returned by the second `o` to that value and the value returned by the third `p`, and so on.
 
-`assoc1R` fails if `p` never succeeds, but it is not required that `op` ever succeed. If `op` never succeeds but `p` succeeds once, that result from `p` is returned.
+`assoc1R` fails if `p` never succeeds, but it is not required that `o` ever succeed. If `o` never succeeds but `p` succeeds once, that result from `p` is returned.
 
 #### Example
 
@@ -43,11 +43,12 @@ See [`assocR`](assocr.md) for an explanation of the example. That example works 
 #### Parameters
 
 * `p`: The content parser.
-* `op`: The operation parser. This parser must return a function.
+* `o`: The operation parser. This parser must return a function.
+* `m`: The optional expected error message that will take the place of the default error message.
 
 #### Success
 
-* Succeeds if `p` succeeds at least once and neither `p` nor `op` ever fail fatally. If `p` succeeds once and `op` does not, the result of `p` is returned. Otherwise, the left associative application of the results of `op` to the results of `p` is returned.
+* Succeeds if `p` succeeds at least once and neither `p` nor `o` ever fail fatally. If `p` succeeds once and `o` does not, the result of `p` is returned. Otherwise, the left associative application of the results of `o` to the results of `p` is returned.
 
 #### Failure
 
@@ -55,12 +56,13 @@ See [`assocR`](assocr.md) for an explanation of the example. That example works 
 
 #### Fatal Failure
 
-* Fails fatally if either `p` or `op` fail fatally.
+* Fails fatally if either `p` or `o` fail fatally.
 
 #### Throws
 
-* Throws an error if either `p` or `op` are not parsers.
-* Throws an error if any result of `op` is not a function.
+* Throws an error if either `p` or `o` are not parsers.
+* Throws an error if any result of `o` is not a function.
+* Throws an error if `m` exists and is not a string.
 
 #### See Also
 

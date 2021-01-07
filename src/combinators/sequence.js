@@ -14,11 +14,10 @@ import {
   assertNumber,
   assertParser,
   assertString,
-  ordParFormatter,
 } from 'kessel/assert'
 import { fatal, maybeFatal, ok, parser, Status } from 'kessel/core'
 import { expected, merge } from 'kessel/error'
-import { ordinal, range, stringify, twin, wordinal } from 'kessel/util'
+import { range, stringify, twin, wordinal } from 'kessel/util'
 
 /** @typedef {import('kessel/core').Parser} Parser */
 
@@ -853,32 +852,39 @@ function opFormatter(ord) {
 
 /**
  * A parser that parses zero or more applications of `p`, each separated
- * by `op`. It results in the value obtained by left associative
+ * by `o`. It results in the value obtained by left associative
  * application of the functions that are the `op` results to the results
  * of `p`.
  *
  * The parser does not fail unless one of its two parsers fails fatally.
  * If there are zero matches of `p`, then the default value `x` becomes
- * the result. If there is one match of `p` but no matches of `op`, then
+ * the result. If there is one match of `p` but no matches of `o`, then
  * that result of `p` becomes the overall result.
  *
- * If any result of `op` is not a function, an error will be thrown.
+ * If any result of `o` is not a function, an error will be thrown.
  *
  * @param {Parser} p The content parser to match zero or more times.
- * @param {Parser} op The operation parser to match in between each
+ * @param {Parser} o The operation parser to match in between each
  *     application of `p`.
  * @param {*} x The default result if there are no matches of `p`.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser which will match zero or more occurences
- *     of `p` separated by `op` and result in the value obtained by
- *     applying the functions from `op` left associtively to the values
+ *     of `p` separated by `o` and result in the value obtained by
+ *     applying the functions from `o` left associtively to the values
  *     that result from `p`.
  */
-export const assocL = (p, op, x) => parser(ctx => {
-  ASSERT && assertParser('assocL', p, ordParFormatter('1st'))
-  ASSERT && assertParser('assocL', op, ordParFormatter('2nd'))
+export const assocL = (p, o, x, m) => parser(ctx => {
+  const hasM = m != null
 
-  const [prep, [pctx, pres]] = twin(p(ctx))
-  if (pres.status === Fatal) return prep
+  ASSERT && assertParser('assocL', p, argParFormatter(1, true))
+  ASSERT && assertParser('assocL', o, argParFormatter(2, true))
+  ASSERT && hasM && assertString('assocL', m, argStrFormatter(4, true))
+
+  const [pctx, pres] = p(ctx)
+  if (pres.status === Fatal) {
+    return fatal(pctx, hasM ? expected(m) : pres.errors)
+  }
   if (pres.status === Fail) return ok(pctx, x)
 
   const values = [pres.value]
@@ -888,21 +894,25 @@ export const assocL = (p, op, x) => parser(ctx => {
   let i = 0
 
   while (true) {
-    const [oprep, [opctx, opres]] = twin(op(context))
-    context = opctx
-    if (opres.status === Fatal) return oprep
-    if (opres.status === Fail) break
+    const [octx, ores] = o(context)
+    context = octx
+    if (ores.status === Fatal) {
+      return fatal(octx, hasM ? expected(m) : ores.errors)
+    }
+    if (ores.status === Fail) break
 
-    const [prep, [pctx, pres]] = twin(p(context))
+    const [pctx, pres] = p(context)
     context = pctx
-    if (pres.status === Fatal) return prep
+    if (pres.status === Fatal) {
+      return fatal(pctx, hasM ? expected(m) : pres.errors)
+    }
     if (pres.status === Fail) break
 
     ASSERT && assertFunction(
-      'assocL', opres.value, opFormatter(ordinal(i + 1)),
+      'assocL', ores.value, opFormatter(wordinal(i + 1)),
     )
 
-    ops.push(opres.value)
+    ops.push(ores.value)
     values.push(pres.value)
     index = context.index
     i++
@@ -917,30 +927,38 @@ export const assocL = (p, op, x) => parser(ctx => {
 
 /**
  * A parser that parses one or more applications of `p`, each separated
- * by `op`. It results in the value obtained by left associative
- * application of the functions that are the `op` results to the results
+ * by `o`. It results in the value obtained by left associative
+ * application of the functions that are the `o` results to the results
  * of `p`.
  *
  * This parser will fail non-fatally if `p` doesn't succeed at least
- * once. Otherwise it can only fail fatally if `p` or `op` fails
- * fatally.
+ * once. Otherwise it can only fail fatally if `p` or `o` fails fatally.
  *
- * If any result of `op` is not a function, an error will be thrown.
+ * If any result of `o` is not a function, an error will be thrown.
  *
  * @param {Parser} p The content parser to match zero or more times.
- * @param {Parser} op The operation parser to match in between each
+ * @param {Parser} o The operation parser to match in between each
  *     application of `p`.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser which will match zero or more occurences
- *     of `p` separated by `op` and result in the value obtained by
- *     applying the functions from `op` left associtively to the values
+ *     of `p` separated by `o` and result in the value obtained by
+ *     applying the functions from `o` left associtively to the values
  *     that result from `p`.
  */
-export const assoc1L = (p, op) => parser(ctx => {
-  ASSERT && assertParser('assoc1L', p, ordParFormatter('1st'))
-  ASSERT && assertParser('assoc1L', op, ordParFormatter('2nd'))
+export const assoc1L = (p, o, m) => parser(ctx => {
+  const hasM = m != null
 
-  const [prep, [pctx, pres]] = twin(p(ctx))
-  if (pres.status !== Ok) return prep
+  ASSERT && assertParser('assoc1L', p, argParFormatter(1, true))
+  ASSERT && assertParser('assoc1L', o, argParFormatter(2, true))
+  ASSERT && hasM && assertString('assoc1L', m, argStrFormatter(3, true))
+
+  const [pctx, pres] = p(ctx)
+  if (pres.status !== Ok) {
+    return maybeFatal(
+      pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors,
+    )
+  }
 
   const values = [pres.value]
   const ops = []
@@ -949,21 +967,25 @@ export const assoc1L = (p, op) => parser(ctx => {
   let i = 0
 
   while (true) {
-    const [oprep, [opctx, opres]] = twin(op(context))
-    context = opctx
-    if (opres.status === Fatal) return oprep
-    if (opres.status === Fail) break
+    const [octx, ores] = o(context)
+    context = octx
+    if (ores.status === Fatal) {
+      return fatal(octx, hasM ? expected(m) : ores.errors)
+    }
+    if (ores.status === Fail) break
 
-    const [prep, [pctx, pres]] = twin(p(context))
+    const [pctx, pres] = p(context)
     context = pctx
-    if (pres.status === Fatal) return prep
+    if (pres.status === Fatal) {
+      return fatal(pctx, hasM ? expected(m) : pres.errors)
+    }
     if (pres.status === Fail) break
 
     ASSERT && assertFunction(
-      'assoc1L', opres.value, opFormatter(ordinal(i + 1)),
+      'assoc1L', ores.value, opFormatter(wordinal(i + 1)),
     )
 
-    ops.push(opres.value)
+    ops.push(ores.value)
     values.push(pres.value)
     index = context.index
     i++
@@ -978,32 +1000,39 @@ export const assoc1L = (p, op) => parser(ctx => {
 
 /**
  * A parser that parses zero or more applications of `p`, each separated
- * by `op`. It results in the value obtained by right associative
- * application of the functions that are the `op` results to the results
+ * by `o`. It results in the value obtained by right associative
+ * application of the functions that are the `o` results to the results
  * of `p`.
  *
  * The parser does not fail unless one of its two parsers fails fatally.
  * If there are zero matches of `p`, then the default value `x` becomes
- * the result. If there is one match of `p` but no matches of `op`, then
+ * the result. If there is one match of `p` but no matches of `o`, then
  * that result of `p` becomes the overall result.
  *
- * If any result of `op` is not a function, an error will be thrown.
+ * If any result of `o` is not a function, an error will be thrown.
  *
  * @param {Parser} p The content parser to match zero or more times.
- * @param {Parser} op The operation parser to match in between each
+ * @param {Parser} o The operation parser to match in between each
  *     application of `p`.
  * @param {*} x The default result if there are no matches of `p`.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser which will match zero or more occurences
- *     of `p` separated by `op` and result in the value obtained by
- *     applying the functions from `op` right associtively to the values
+ *     of `p` separated by `o` and result in the value obtained by
+ *     applying the functions from `o` right associtively to the values
  *     that result from `p`.
  */
-export const assocR = (p, op, x) => parser(ctx => {
-  ASSERT && assertParser('assocR', p, ordParFormatter('1st'))
-  ASSERT && assertParser('assocR', op, ordParFormatter('2nd'))
+export const assocR = (p, o, x, m) => parser(ctx => {
+  const hasM = m != null
 
-  const [prep, [pctx, pres]] = twin(p(ctx))
-  if (pres.status === Fatal) return prep
+  ASSERT && assertParser('assocR', p, argParFormatter(1, true))
+  ASSERT && assertParser('assocR', o, argParFormatter(2, true))
+  ASSERT && hasM && assertString('assocR', m, argStrFormatter(4, true))
+
+  const [pctx, pres] = p(ctx)
+  if (pres.status === Fatal) {
+    return fatal(pctx, hasM ? expected(m) : pres.errors)
+  }
   if (pres.status === Fail) return ok(pctx, x)
 
   const values = [pres.value]
@@ -1013,21 +1042,25 @@ export const assocR = (p, op, x) => parser(ctx => {
   let i = 0
 
   while (true) {
-    const [oprep, [opctx, opres]] = twin(op(context))
-    context = opctx
-    if (opres.status === Fatal) return oprep
-    if (opres.status === Fail) break
+    const [octx, ores] = o(context)
+    context = octx
+    if (ores.status === Fatal) {
+      return fatal(octx, hasM ? expected(m) : ores.errors)
+    }
+    if (ores.status === Fail) break
 
-    const [prep, [pctx, pres]] = twin(p(context))
+    const [pctx, pres] = p(context)
     context = pctx
-    if (pres.status === Fatal) return prep
+    if (pres.status === Fatal) {
+      return fatal(pctx, hasM ? expected(m) : pres.errors)
+    }
     if (pres.status === Fail) break
 
     ASSERT && assertFunction(
-      'assocR', opres.value, opFormatter(ordinal(i + 1)),
+      'assocR', ores.value, opFormatter(wordinal(i + 1)),
     )
 
-    ops.push(opres.value)
+    ops.push(ores.value)
     values.push(pres.value)
     index = context.index
     i++
@@ -1042,30 +1075,38 @@ export const assocR = (p, op, x) => parser(ctx => {
 
 /**
  * A parser that parses one or more applications of `p`, each separated
- * by `op`. It results in the value obtained by right associative
- * application of the functions that are the `op` results to the results
+ * by `o`. It results in the value obtained by right associative
+ * application of the functions that are the `o` results to the results
  * of `p`.
  *
  * This parser will fail non-fatally if `p` doesn't succeed at least
- * once. Otherwise it can only fail fatally if `p` or `op` fails
- * fatally.
+ * once. Otherwise it can only fail fatally if `p` or `o` fails fatally.
  *
- * If any result of `op` is not a function, an error will be thrown.
+ * If any result of `o` is not a function, an error will be thrown.
  *
  * @param {Parser} p The content parser to match zero or more times.
- * @param {Parser} op The operation parser to match in between each
+ * @param {Parser} o The operation parser to match in between each
  *     application of `p`.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser which will match zero or more occurences
- *     of `p` separated by `op` and result in the value obtained by
- *     applying the functions from `op` right associtively to the values
+ *     of `p` separated by `o` and result in the value obtained by
+ *     applying the functions from `o` right associtively to the values
  *     that result from `p`.
  */
-export const assoc1R = (p, op) => parser(ctx => {
-  ASSERT && assertParser('assoc1R', p, ordParFormatter('1st'))
-  ASSERT && assertParser('assoc1R', op, ordParFormatter('2nd'))
+export const assoc1R = (p, o, m) => parser(ctx => {
+  const hasM = m != null
 
-  const [prep, [pctx, pres]] = twin(p(ctx))
-  if (pres.status !== Ok) return prep
+  ASSERT && assertParser('assoc1R', p, argParFormatter(1, true))
+  ASSERT && assertParser('assoc1R', o, argParFormatter(2, true))
+  ASSERT && hasM && assertString('assoc1R', m, argStrFormatter(3, true))
+
+  const [pctx, pres] = p(ctx)
+  if (pres.status !== Ok) {
+    return maybeFatal(
+      pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors,
+    )
+  }
 
   const values = [pres.value]
   const ops = []
@@ -1074,21 +1115,25 @@ export const assoc1R = (p, op) => parser(ctx => {
   let i = 0
 
   while (true) {
-    const [oprep, [opctx, opres]] = twin(op(context))
-    context = opctx
-    if (opres.status === Fatal) return oprep
-    if (opres.status === Fail) break
+    const [octx, ores] = o(context)
+    context = octx
+    if (ores.status === Fatal) {
+      return fatal(octx, hasM ? expected(m) : ores.errors)
+    }
+    if (ores.status === Fail) break
 
-    const [prep, [pctx, pres]] = twin(p(context))
+    const [pctx, pres] = p(context)
     context = pctx
-    if (pres.status === Fatal) return prep
+    if (pres.status === Fatal) {
+      return fatal(pctx, hasM ? expected(m) : pres.errors)
+    }
     if (pres.status === Fail) break
 
     ASSERT && assertFunction(
-      'assoc1R', opres.value, opFormatter(ordinal(i + 1)),
+      'assoc1R', ores.value, opFormatter(wordinal(i + 1)),
     )
 
-    ops.push(opres.value)
+    ops.push(ores.value)
     values.push(pres.value)
     index = context.index
     i++
