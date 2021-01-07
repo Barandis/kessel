@@ -8,6 +8,7 @@ import { expect } from 'chai'
 import {
   alt,
   char,
+  end,
   join,
   label,
   many,
@@ -15,8 +16,7 @@ import {
   noneOf,
   run,
   second,
-  sepBy,
-  sepEndBy,
+  sep,
   sequenceB,
   string,
   value,
@@ -31,12 +31,12 @@ const quotedCell = second(sequenceB(
 ))
 
 const cell = alt(quotedCell, join(many(noneOf(',\n\r'))))
-const line = sepBy(cell, char(','))
-const csv = sepEndBy(line, newline)
+const line = sep(cell, char(','))
+const csv = end(line, newline)
 
 const parseCsv = input => run(csv, input)
 
-const parseCsv1 = input => run(sepEndBy(sepBy(alt(
+const parseCsv1 = input => run(end(sep(alt(
   second(sequenceB(
     char('"'),
     join(many(alt(noneOf('"'), value(string('""'), '"')))),

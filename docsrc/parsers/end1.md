@@ -5,18 +5,18 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `sepEndBy1(p: Parser, s: Parser, m?: string): Parser`
+> `end1(p: Parser, s: Parser, m?: string): Parser`
 
 Parses one or more occurrences of a content parser, separated and optionally ended by a separator parser.
 
-`sepEndBy1` applies the content parser `p` one or more times as long as both it and the preceding separator parser `sep` match. The operation of the parser in EBNF is `p (s p)* s?`. Results of the separator parser are discarded, but results of the content parser are returned in an array.
+`end1` applies the content parser `p` one or more times as long as both it and the preceding separator parser `sep` match. The operation of the parser in EBNF is `p (s p)* s?`. Results of the separator parser are discarded, but results of the content parser are returned in an array.
 
 The content parser need not be the last to match. If the separator parser succeeds but the content parser fails after it, then the parser state is left at the location immediately after the last success of the separator parser.
 
 #### Example
 
 ```javascript
-const parser = sepEndBy1(count(letter, 3), char(','))
+const parser = end1(count(letter, 3), char(','))
 
 const s = parse(parser, 'aaa,bbb,ccc,')
 console.log(status(s))  // "ok"
@@ -65,5 +65,5 @@ console.log(failure(t)) // Parse error at (line 1, column 11):
 #### See Also
 
 * [`Parser`](../types/parser.md)
-* [`sepBy1`](sepby1.md)
-* [`sepEndBy`](sependby.md)
+* [`end`](end.md)
+* [`sep1`](sep1.md)

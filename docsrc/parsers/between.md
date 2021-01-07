@@ -73,4 +73,4 @@ The first failure case in the example (`f`) is non-fatal failure, because no cha
 
 * [`Parser`](../types/parser.md)
 * [`betweenB`](betweenb.md)
-* [`manyTill`](manytill.md)
+* [`until`](until.md)

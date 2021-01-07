@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `manyTill(p: Parser, e: Parser, m?: string): Parser`
+> `until(p: Parser, e: Parser, m?: string): Parser`
 
 Applies a content parser zero or more times as long as an end parser continues to fail. Once the end parser succeeds, the content parser's successes are collected into an array and returned.
 
@@ -16,7 +16,7 @@ The operation of this parser in EBNF is `(!e p)* e`.
 #### Example
 
 ```javascript
-const parser = manyTill(letter, char('>'))
+const parser = until(letter, char('>'))
 
 const s = parse(parser, 'abcd>')
 console.log(status(s))  // "ok"

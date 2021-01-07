@@ -104,14 +104,14 @@ Additionally, parsers are often said to *return* a value or to have a value as a
 | [`skip`](parsers/skip.md) | Executes a parser and discards the result. |
 | [`skipMany`](parsers/skipmany.md) | Executes a parser zero or more times until it fails, discarding the results. |
 | [`skipMany1`](parsers/skipmany1.md) | Executes a parser one or more times until it fails, discarding the results. |
-| [`sepBy`](parsers/sepby.md) | Executes a content parser zero or more times with an application of a separator parser between each. Returns the content parser results. |
-| [`sepBy1`](parsers/sepby1.md) | Executes a content parser one or more times with an application of a separator parser between each. Returns the content parser results. |
-| [`sepEndBy`](parsers/sependby.md) | Executes a content parser zero or more times with an application of a separator parser between each and optionally at the end. Returns the content parser results. |
-| [`sepEndBy1`](parsers/sependby1.md) | Executes a content parser one or more times with an application of a separator parser between each and optionally at the end. Returns the content parser results.  |
+| [`sep`](parsers/sep.md) | Executes a content parser zero or more times with an application of a separator parser between each. Returns the content parser results. |
+| [`sep1`](parsers/sep1.md) | Executes a content parser one or more times with an application of a separator parser between each. Returns the content parser results. |
+| [`end`](parsers/end.md) | Executes a content parser zero or more times with an application of a separator parser between each and optionally at the end. Returns the content parser results. |
+| [`end1`](parsers/end1.md) | Executes a content parser one or more times with an application of a separator parser between each and optionally at the end. Returns the content parser results.  |
 | [`repeat`](parsers/repeat.md) | Executes a parser a certain number of times, returning the results in an array. |
 | [`pipe`](parsers/pipe.md) | Executes a series of parsers in order, then passes the results as arguments to a function, then returns the result of that function. |
 | [`between`](parsers/between.md) | Executes a content parser between two other parsers, returning only the content parser's result. |
-| [`manyTill`](parsers/manytill.md) | Executes a content parser zero or more times until an end parser succeeds. Returns the content parser's results. |
+| [`until`](parsers/until.md) | Executes a content parser zero or more times until an end parser succeeds. Returns the content parser's results. |
 | [`assocL`](parsers/assocl.md) | Executes a content parser zero or more times with an application of an operator parser between each. Returns the value obtained by left associative application of all functions returned by the operator parser to the results returned by the content parser. |
 | [`assoc1L`](parsers/assoc1l.md) | Executes a content parser one or more times with an application of an operator parser between each. Returns the value obtained by left associative application of all functions returned by the operator parser to the results returned by the content parser.|
 | [`assocR`](parsers/assocr.md) | Executes a content parser zero or more times with an application of an operator parser between each. Returns the value obtained by right associative application of all functions returned by the operator parser to the results returned by the content parser.|

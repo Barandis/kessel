@@ -403,12 +403,12 @@ export const skipMany1 = (p, m) => parser(ctx => {
  * @returns {Parser} A parser that results in an array of all of the
  *     content parser results, discarding the separator parser results.
  */
-export const sepBy = (p, s, m) => parser(ctx => {
+export const sep = (p, s, m) => parser(ctx => {
   const hasM = m != null
 
-  ASSERT && assertParser('sepBy', p, argParFormatter(1, true))
-  ASSERT && assertParser('sepBy', s, argParFormatter(2, true))
-  ASSERT && hasM && assertString('sepBy', m, argStrFormatter(3, true))
+  ASSERT && assertParser('sep', p, argParFormatter(1, true))
+  ASSERT && assertParser('sep', s, argParFormatter(2, true))
+  ASSERT && hasM && assertString('sep', m, argStrFormatter(3, true))
 
   let index = ctx.index
   const [pctx, pres] = p(ctx)
@@ -437,7 +437,7 @@ export const sepBy = (p, s, m) => parser(ctx => {
     }
     if (pres.status === Fail) break
 
-    if (context.index === index) throw new TypeError(loopMessage('sepBy'))
+    if (context.index === index) throw new TypeError(loopMessage('sep'))
     values.push(pres.value)
   }
   return ok(context, values, index)
@@ -463,12 +463,12 @@ export const sepBy = (p, s, m) => parser(ctx => {
  * @returns {Parser} A parser that results in an array of all of the
  *     content parser results, discarding the separator parser results.
  */
-export const sepBy1 = (p, s, m) => parser(ctx => {
+export const sep1 = (p, s, m) => parser(ctx => {
   const hasM = m != null
 
-  ASSERT && assertParser('sepBy1', p, argParFormatter(1, true))
-  ASSERT && assertParser('sepBy1', s, argParFormatter(2, true))
-  ASSERT && hasM && assertString('sepBy1', m, argStrFormatter(3, true))
+  ASSERT && assertParser('sep1', p, argParFormatter(1, true))
+  ASSERT && assertParser('sep1', s, argParFormatter(2, true))
+  ASSERT && hasM && assertString('sep1', m, argStrFormatter(3, true))
 
   let index = ctx.index
   const [pctx, pres] = p(ctx)
@@ -498,7 +498,7 @@ export const sepBy1 = (p, s, m) => parser(ctx => {
     }
     if (pres.status === Fail) break
 
-    if (context.index === index) throw new TypeError(loopMessage('sepBy1'))
+    if (context.index === index) throw new TypeError(loopMessage('sep1'))
     values.push(pres.value)
   }
   return ok(context, values, index)
@@ -524,12 +524,12 @@ export const sepBy1 = (p, s, m) => parser(ctx => {
  * @returns {Parser} A parser that results in an array of all of the
  *     content parser results, discarding the separator parser results.
  */
-export const sepEndBy = (p, s, m) => parser(ctx => {
+export const end = (p, s, m) => parser(ctx => {
   const hasM = m != null
 
-  ASSERT && assertParser('sepEndBy', p, argParFormatter(1, true))
-  ASSERT && assertParser('sepEndBy', s, argParFormatter(2, true))
-  ASSERT && hasM && assertString('sepEndBy', m, argStrFormatter(3, true))
+  ASSERT && assertParser('end', p, argParFormatter(1, true))
+  ASSERT && assertParser('end', s, argParFormatter(2, true))
+  ASSERT && hasM && assertString('end', m, argStrFormatter(3, true))
 
   let index = ctx.index
   const [pctx, pres] = p(ctx)
@@ -558,7 +558,7 @@ export const sepEndBy = (p, s, m) => parser(ctx => {
     }
     if (pres.status === Fail) break
 
-    if (context.index === index) throw new TypeError(loopMessage('sepEndBy'))
+    if (context.index === index) throw new TypeError(loopMessage('end'))
     values.push(pres.value)
   }
   const [sctx, sres] = s({ ...context, index })
@@ -738,12 +738,12 @@ export const between = (s, e, p, m) => parser(ctx => {
  * @returns {Parser} A parser which will execute `p` zero or more times
  *     until `e` succeeds.
  */
-export const manyTill = (p, e, m) => parser(ctx => {
+export const until = (p, e, m) => parser(ctx => {
   const hasM = m != null
 
-  ASSERT && assertParser('manyTill', p, argParFormatter(1, true))
-  ASSERT && assertParser('manyTill', e, argParFormatter(2, true))
-  ASSERT && hasM && assertString('manyTill', m, argStrFormatter(3, true))
+  ASSERT && assertParser('until', p, argParFormatter(1, true))
+  ASSERT && assertParser('until', e, argParFormatter(2, true))
+  ASSERT && hasM && assertString('until', m, argStrFormatter(3, true))
 
   const index = ctx.index
   const values = []

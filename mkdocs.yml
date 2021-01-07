@@ -68,6 +68,8 @@ nav:
       - def: parsers/def.md
       - digit: parsers/digit.md
       - empty: parsers/empty.md
+      - end: parsers/end.md
+      - end1: parsers/end1.md
       - eof: parsers/eof.md
       - failFatally: parsers/failfatally.md
       - failNormally: parsers/failnormally.md
@@ -85,7 +87,6 @@ nav:
       - lowerU: parsers/loweru.md
       - many: parsers/many.md
       - many1: parsers/many1.md
-      - manyTill: parsers/manytill.md
       - manyTillB: parsers/manytillb.md
       - map: parsers/map.md
       - newline: parsers/newline.md
@@ -108,10 +109,8 @@ nav:
       - satisfy: parsers/satisfy.md
       - satisfyM: parsers/satisfym.md
       - second: parsers/second.md
-      - sepBy: parsers/sepby.md
-      - sepBy1: parsers/sepby1.md
-      - sepEndBy: parsers/sependby.md
-      - sepEndBy1: parsers/sependby1.md
+      - sep: parsers/sep.md
+      - sep1: parsers/sep1.md
       - seq: parsers/seq.md
       - sequenceB: parsers/sequenceb.md
       - skip: parsers/skip.md
@@ -126,6 +125,7 @@ nav:
       - string: parsers/string.md
       - stringI: parsers/stringi.md
       - third: parsers/third.md
+      - until: parsers/until.md
       - upper: parsers/upper.md
       - upperU: parsers/upperu.md
       - value: parsers/value.md
