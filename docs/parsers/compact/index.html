@@ -2135,12 +2135,12 @@
 -->
 
 <blockquote>
-<p><code>compact(p: Parser&lt;[T]&gt;): Parser&lt;[T]&gt;</code></p>
+<p><code>compact(p: Parser, m?: string): Parser</code></p>
 </blockquote>
 <p>Applies a parser and returns the elements of the resulting array except for any <code>null</code> or <code>undefined</code> elements.</p>
-<p>This combinator is useful in conjunction with parsers like <a href="../seq/"><code>seq</code></a> and <a href="../many/"><code>many</code></a>, which may return <code>null</code> values amongst their array elements, particularly if the <a href="../opt/"><code>opt</code></a> parser is used in their contained parsers. In a prior version of Kessel, <code>sequence</code> and <code>many</code> dropped their <code>null</code> values by default, but this was found to be less than ideal for a number of reasons. <code>compact</code> brings that behavior back when needed.</p>
+<p>This combinator is useful in conjunction with parsers like <a href="../seq/"><code>seq</code></a> and <a href="../many/"><code>many</code></a>, which may return <code>null</code> values amongst their array elements, particularly if the <a href="../opt/"><code>opt</code></a> parser is used in their contained parsers. In a prior version of Kessel, <code>seq</code> and <code>many</code> dropped their <code>null</code> values by default, but this was found to be less than ideal for a number of reasons. <code>compact</code> brings that behavior back when needed.</p>
 <h4 id="example">Example</h4>
-<div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">compact</span><span class="p">(</span><span class="nx">sequence</span><span class="p">(</span><span class="nx">opt</span><span class="p">(</span><span class="kr">char</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)),</span> <span class="nx">digit</span><span class="p">,</span> <span class="nx">digit</span><span class="p">))</span>
+<div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">compact</span><span class="p">(</span><span class="nx">seq</span><span class="p">(</span><span class="nx">opt</span><span class="p">(</span><span class="kr">char</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)),</span> <span class="nx">digit</span><span class="p">,</span> <span class="nx">digit</span><span class="p">))</span>
 
 <span class="kr">const</span> <span class="nx">s</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;-12&#39;</span><span class="p">)</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">status</span><span class="p">(</span><span class="nx">s</span><span class="p">))</span>  <span class="c1">// &quot;ok&quot;</span>
@@ -2161,6 +2161,7 @@
 <h4 id="parameters">Parameters</h4>
 <ul>
 <li><code>p</code>: The parser that is applied, which must return an array.</li>
+<li><code>m</code>: The optional expected error message that will take the place of the default error message.</li>
 </ul>
 <h4 id="success">Success</h4>
 <ul>
@@ -2178,6 +2179,7 @@
 <ul>
 <li>Throws an error if <code>p</code> is not a parser.</li>
 <li>Throws an error if <code>p</code> succeeds but does not return an array.</li>
+<li>Throws an error if <code>m</code> exists and is not a string.</li>
 </ul>
 <h4 id="see-also">See Also</h4>
 <ul>

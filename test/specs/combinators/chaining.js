@@ -77,7 +77,18 @@ describe('Chaining and piping combinators', () => {
 
   describe('compact', () => {
     it('throws if its argument is not a parser', () => {
-      terror(compact(0), '', '[compact]: expected a parser; found 0')
+      terror(
+        compact(0),
+        '',
+        '[compact]: expected argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument exists and is not a string', () => {
+      terror(
+        compact(any, 0),
+        '',
+        '[compact]: expected second argument to be a string; found 0',
+      )
     })
     it('throws if its argument does not return an array', () => {
       terror(
@@ -89,6 +100,7 @@ describe('Chaining and piping combinators', () => {
     it('drops null and undefined elements', () => {
       tpass(compact(always(['1', null, '3'])), '123', ['1', '3'])
       tpass(compact(always(['1', undefined, '3'])), '123', ['1', '3'])
+      tpass(compact(always(['1', null, '3']), 'test'), '123', ['1', '3'])
     })
     it('fails if its contained parser fails', () => {
       tfail(compact(many1(any)), '', {
@@ -97,6 +109,14 @@ describe('Chaining and piping combinators', () => {
       })
       tfail(compact(seq(letter, digit)), 'ab', {
         expected: 'a digit',
+        status: Fatal,
+      })
+      tfail(compact(many1(any), 'lots of characters'), '', {
+        expected: 'lots of characters',
+        status: Fail,
+      })
+      tfail(compact(seq(letter, digit), 'letter, digit'), 'ab', {
+        expected: 'letter, digit',
         status: Fatal,
       })
     })

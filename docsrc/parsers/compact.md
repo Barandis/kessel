@@ -5,16 +5,16 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `compact(p: Parser<[T]>): Parser<[T]>`
+> `compact(p: Parser, m?: string): Parser`
 
 Applies a parser and returns the elements of the resulting array except for any `null` or `undefined` elements.
 
-This combinator is useful in conjunction with parsers like [`seq`](seq.md) and [`many`](many.md), which may return `null` values amongst their array elements, particularly if the [`opt`](opt.md) parser is used in their contained parsers. In a prior version of Kessel, `sequence` and `many` dropped their `null` values by default, but this was found to be less than ideal for a number of reasons. `compact` brings that behavior back when needed.
+This combinator is useful in conjunction with parsers like [`seq`](seq.md) and [`many`](many.md), which may return `null` values amongst their array elements, particularly if the [`opt`](opt.md) parser is used in their contained parsers. In a prior version of Kessel, `seq` and `many` dropped their `null` values by default, but this was found to be less than ideal for a number of reasons. `compact` brings that behavior back when needed.
 
 #### Example
 
 ```javascript
-const parser = compact(sequence(opt(char('-')), digit, digit))
+const parser = compact(seq(opt(char('-')), digit, digit))
 
 const s = parse(parser, '-12')
 console.log(status(s))  // "ok"
@@ -36,6 +36,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 #### Parameters
 
 * `p`: The parser that is applied, which must return an array.
+* `m`: The optional expected error message that will take the place of the default error message.
 
 #### Success
 
@@ -53,6 +54,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 * Throws an error if `p` is not a parser.
 * Throws an error if `p` succeeds but does not return an array.
+* Throws an error if `m` exists and is not a string.
 
 #### See Also
 

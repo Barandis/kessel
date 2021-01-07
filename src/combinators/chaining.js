@@ -62,14 +62,23 @@ export const join = (p, m) => parser(ctx => {
  * array; an error will be thrown if it does not.
  *
  * @param {Parser} p A parser that is expected to return an array.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser that executes `p` and returns its results
  *     minus any `null` or `undefined` results.
  */
-export const compact = p => parser(ctx => {
-  ASSERT && assertParser('compact', p)
+export const compact = (p, m) => parser(ctx => {
+  const hasM = m != null
 
-  const [prep, [pctx, pres]] = twin(p(ctx))
-  if (pres.status !== Ok) return prep
+  ASSERT && assertParser('compact', p, argParFormatter(1, hasM))
+  ASSERT && hasM && assertString('compact', m, argStrFormatter(2, true))
+
+  const [pctx, pres] = p(ctx)
+  if (pres.status !== Ok) {
+    return maybeFatal(
+      pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors,
+    )
+  }
 
   const v = pres.value
   ASSERT && assertArray('compact', v, formatter('argument to return an array'))
