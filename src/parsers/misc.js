@@ -4,7 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import { assertString } from 'kessel/assert'
-import { fail, fatal, parser } from 'kessel/core'
+import { fail, fatal, ok, parser } from 'kessel/core'
 import { generic } from 'kessel/error'
 
 /** @typedef {import('kessel/core').Parser} Parser */
@@ -35,3 +35,18 @@ export const failFatally = msg => parser(ctx => {
   ASSERT && assertString('failFatally', msg)
   return fatal(ctx, generic(msg))
 })
+
+/**
+ * A parser which always succeeds with the supplied value.
+ *
+ * This serves as a primitive for both monads and applicatives. In
+ * Haskell terms, this function represents both `pure` in the
+ * `Applicative` class and `return` in the `Monad` class.
+ *
+ * In other words, it lifts an arbitrary value into a Parser context,
+ * turning it into a parser that returns that value.
+ *
+ * @param {*} x The value will result when this parser is applied.
+ * @returns {Parser} A parser that always succeeds with `value`.
+ */
+export const always = x => parser(ctx => ok(ctx, x))

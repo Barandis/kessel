@@ -23,11 +23,11 @@ import {
   sequenceB,
 } from 'kessel/combinators/backtracking'
 import { value } from 'kessel/combinators/misc'
-import { always } from 'kessel/combinators/primitive'
 import { left, many1, right, seq } from 'kessel/combinators/sequence'
 import { parse, Status } from 'kessel/core'
 import { ErrorType } from 'kessel/error'
 import { any, char, digit, eof, letter, noneOf } from 'kessel/parsers/char'
+import { always } from 'kessel/parsers/misc'
 import { space } from 'kessel/parsers/regex'
 import { string } from 'kessel/parsers/string'
 import { terror, tfail, tpass } from 'test/helper'

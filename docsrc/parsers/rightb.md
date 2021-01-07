@@ -67,7 +67,6 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 #### See Also
 
 * [`Parser`](../types/parser.md)
-* [`andThenB`](andthenb.md)
 * [`leftB`](leftb.md)
 * [`right`](rightb.md)
 * [`sequenceB`](sequenceb.md)

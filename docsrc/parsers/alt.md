@@ -80,5 +80,4 @@ The example shows *three* success cases, `s`, `r`, and `p`, one for each parser 
 
 * [`Parser`](../types/parser.md)
 * [`attempt`](attempt.md)
-* [`orElse`](orelse.md)
 * [`seq`](seq.md)

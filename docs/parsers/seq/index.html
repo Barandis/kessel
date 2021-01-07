@@ -532,30 +532,6 @@
 
 
   <li class="md-nav__item">
-    <a href="../andthen/" class="md-nav__link">
-      andThen
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../andthenb/" class="md-nav__link">
-      andThenB
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
     <a href="../any/" class="md-nav__link">
       any
     </a>
@@ -1158,18 +1134,6 @@
   <li class="md-nav__item">
     <a href="../opt/" class="md-nav__link">
       opt
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../orelse/" class="md-nav__link">
-      orElse
     </a>
   </li>
 
@@ -2177,7 +2141,6 @@
 <p><code>seq</code> will only succeed if <em>all</em> of its parsers succeed. If one of them fails, <code>seq</code> will fail fatally if it had consumed any input up to that point, even if the parser that failed did so non-fatally.</p>
 <p>There is another version of this parser (<a href="../sequenceb/"><code>sequenceB</code></a>) that fails non-fatally and backtracks if the parser that fails does so non-fatally.</p>
 <p>All of the results are gathered into an array.</p>
-<p>A two-parser <code>seq</code> is the same as <a href="../andthen/"><code>andThen</code></a>.</p>
 <h4 id="example">Example</h4>
 <div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">seq</span><span class="p">(</span><span class="nx">letter</span><span class="p">,</span> <span class="nx">digit</span><span class="p">,</span> <span class="nx">letter</span><span class="p">)</span>
 
@@ -2227,7 +2190,6 @@
 <h4 id="see-also">See Also</h4>
 <ul>
 <li><a href="../../types/parser/"><code>Parser</code></a></li>
-<li><a href="../andthen/"><code>andThen</code></a></li>
 <li><a href="../block/"><code>block</code></a></li>
 <li><a href="../left/"><code>left</code></a></li>
 <li><a href="../right/"><code>right</code></a></li>

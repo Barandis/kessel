@@ -3,21 +3,25 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
+import { opt } from 'kessel/combinators/alternative'
 import {
+  apply,
+  chain,
   compact,
   fifth,
   first,
   fourth,
   join,
+  map,
   nth,
   second,
   third,
   value,
 } from 'kessel/combinators/misc'
-import { always, map } from 'kessel/combinators/primitive'
 import { many, many1, seq } from 'kessel/combinators/sequence'
 import { Status } from 'kessel/core'
 import { any, char, digit, letter } from 'kessel/parsers/char'
+import { always } from 'kessel/parsers/misc'
 import { terror, tfail, tpass } from 'test/helper'
 
 const { Fail, Fatal } = Status
@@ -215,6 +219,142 @@ describe('Chaining and piping combinators', () => {
     })
     it('passes any parser failure through', () => {
       tfail(fifth(many1(any)), '', 'any character')
+    })
+  })
+
+  describe('map', () => {
+    it('throws if its first argument is not a parser', () => {
+      terror(
+        map(0, x => x),
+        '',
+        '[map]: expected 1st argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a function', () => {
+      terror(
+        map(any, 0),
+        '',
+        '[map]: expected 2nd argument to be a function; found 0',
+      )
+    })
+    it('succeeds with the return value of its function', () => {
+      tpass(map(any, c => c.toUpperCase()), 'abc', 'A')
+      tpass(map(seq(letter, digit), cs => cs.join('')), 'a1', 'a1')
+    })
+    it('propagates failed state if its parser fails', () => {
+      tfail(map(any, c => c.toUpperCase()), '', {
+        expected: 'any character',
+        status: Fail,
+      })
+      tfail(map(seq(letter, digit), cs => cs.join('')), 'ab', {
+        expected: 'a digit',
+        status: Fatal,
+        index: 1,
+      })
+    })
+  })
+
+  describe('apply', () => {
+    it('throws if its first argument is not a parser', () => {
+      terror(
+        apply(0, any),
+        '',
+        '[apply]: expected 1st argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a parser', () => {
+      terror(
+        apply(any, 0),
+        '',
+        '[apply]: expected 2nd argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument fails to return a function', () => {
+      terror(
+        apply(any, any),
+        'ab',
+        '[apply]: expected 2nd argument to return a function; found "b"',
+      )
+    })
+    it('returns the result of the function when passed the other value', () => {
+      tpass(apply(any, always(x => x.toUpperCase())), 'a', 'A')
+    })
+    it('fails without calling parser 2 if parser 1 fails', () => {
+      tfail(apply(char('a'), any), 'b', { expected: "'a'", status: Fail })
+    })
+    it('fails fatally if input is consumed before failure', () => {
+      tfail(apply(char('a'), char('b')), 'ac', {
+        expected: "'b'",
+        status: Fatal,
+      })
+    })
+    it('can be used to implement sequencing', () => {
+      // Applicative style for `andThen(char('a'), char('b'))`
+      const p = apply(char('a'), apply(char('b'), always(b => a => [a, b])))
+      tpass(p, 'ab', ['a', 'b'])
+      tfail(p, 'cd', { expected: "'a'", status: Fail })
+      tfail(p, 'ac', { expected: "'b'", status: Fatal })
+    })
+    it('adds opt error message if next parser fails', () => {
+      const parser = apply(opt(char('-')), value(digit, x => x))
+      tpass(parser, '-1', '-')
+      tpass(parser, '1', { value: null })
+      tfail(parser, 'a', "'-' or a digit")
+    })
+  })
+
+  describe('chain', () => {
+    it('throws if its first argument is not a parser', () => {
+      terror(
+        chain(0, x => x),
+        '',
+        '[chain]: expected 1st argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a function', () => {
+      terror(
+        chain(any, 0),
+        '',
+        '[chain]: expected 2nd argument to be a function; found 0',
+      )
+    })
+    it('throws if its second argument does not return a parser', () => {
+      terror(
+        chain(any, x => x),
+        'a',
+        '[chain]: expected the 2nd argument to return a parser; found "a"',
+      )
+    })
+    it('passes successful result to function to get the next parser', () => {
+      tpass(chain(any, c => char(c)), 'aa', { result: 'a', index: 2 })
+      tfail(chain(any, c => char(c)), 'ab', "'a'")
+    })
+    it('fails if its parser fails without calling the second parser', () => {
+      tfail(chain(char('a'), () => char('b')), 'bb', {
+        expected: "'a'",
+        index: 0,
+        status: Fail,
+      })
+    })
+    it('fails fatally if the second fails after the first consumes', () => {
+      tfail(chain(char('a'), () => char('b')), 'ac', {
+        expected: "'b'",
+        index: 1,
+        status: Fatal,
+      })
+    })
+    it('can be used to implement sequencing', () => {
+      // Monadic style for `andThen(char('a'), char('b'))`
+      const p = chain(char('a'), a => chain(char('b'), b => always([a, b])))
+      tpass(p, 'ab', ['a', 'b'])
+      tfail(p, 'cd', { expected: "'a'", status: Fail })
+      tfail(p, 'ac', { expected: "'b'", status: Fatal })
+    })
+    it('adds opt error message if next parser fails', () => {
+      const parser = chain(opt(char('-')), () => digit)
+      tpass(parser, '-1', '1')
+      tpass(parser, '1', '1')
+      tfail(parser, 'a', "'-' or a digit")
     })
   })
 })

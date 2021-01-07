@@ -43,8 +43,6 @@ nav:
       - alphaU: parsers/alphau.md
       - alt: parsers/alt.md
       - always: parsers/always.md
-      - andThen: parsers/andthen.md
-      - andThenB: parsers/andthenb.md
       - any: parsers/any.md
       - anyOf: parsers/anyof.md
       - anyString: parsers/anystring.md
@@ -96,7 +94,6 @@ nav:
       - nth: parsers/nth.md
       - octal: parsers/octal.md
       - opt: parsers/opt.md
-      - orElse: parsers/orelse.md
       - peek: parsers/peek.md
       - pipe: parsers/pipe.md
       - pipeB: parsers/pipeb.md

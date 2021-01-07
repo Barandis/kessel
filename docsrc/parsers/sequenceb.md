@@ -18,8 +18,6 @@ Applies a series of parsers in order, returning an array that contains each pars
 
 All of the results are gathered into an array.
 
-A two-parser `sequenceB` is the same as [`andThenB`](andthenb.md).
-
 #### Example
 
 ```javascript
@@ -75,7 +73,6 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 #### See Also
 
 * [`Parser`](../types/parser.md)
-* [`andThenB`](andthenb.md)
 * [`blockB`](blockb.md)
 * [`leftB`](leftb.md)
 * [`rightB`](rightb.md)

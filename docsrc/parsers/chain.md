@@ -74,7 +74,6 @@ In the case of `f`, `chain` fails fatally. This is because a character was consu
 #### See Also
 
 * [`Parser`](../types/parser.md)
-* [`andThen`](andthen.md)
 * [`apply`](apply.md)
 * [`chainB`](chainb.md)
 * [`map`](map.md)

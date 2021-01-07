@@ -77,27 +77,17 @@ Additionally, parsers are often said to *return* a value or to have a value as a
 
 | Parser | Description |
 |--------|-------------|
+| [`always`](parsers/always.md) | Always succeeds and returns a value. |
 | [`failNormally`](parsers/failnormally.md) | Fails with a generic message. |
 | [`failFatally`](parsers/failfatally.md) | Fails fatally with a generic message. |
 
-### Table 5: Primitive combinators
+### Table 5: Sequence combinators
 
 | Parser | Description |
 |--------|-------------|
-| [`always`](parsers/always.md) | Always succeeds and returns a value. |
-| [`map`](parsers/map.md) | Applies a parser, then applies a function to the result, then returns the result of that function. |
-| [`apply`](parsers/apply.md) | Parses content and a function, returning the result of the function when passed the content. |
-| [`chain`](parsers/chain.md) | Applies a parser, then applies a function to the result, then applies the parser returned by the function. |
-| [`orElse`](parsers/orelse.md) | Applies a parser and, if it fails, a second parser. |
-| [`andThen`](parsers/andthen.md) | Applies two parsers in order and returns their results in a tuple. |
-
-### Table 6: Sequence combinators
-
-| Parser | Description |
-|--------|-------------|
+| [`seq`](parsers/seq.md) | Executes a series of parsers in order, returning their results in an array. |
 | [`left`](parsers/left.md) | Executes two parsers in order and returns the result of the first one. |
 | [`right`](parsers/right.md) | Executes two parsers in order and returns the result of the second one. |
-| [`seq`](parsers/seq.md) | Executes a series of parsers in order, returning their results in an array. |
 | [`block`](parsers/block.md) | Runs a generator function. The generator can `yield` parsers, whose results will be returned as the result of the `yield` expressions. Returns the result of the generator. |
 | [`many`](parsers/many.md) | Executes a parser zero or more times until it fails, returning all of the results in an array. |
 | [`many1`](parsers/many1.md) | Executes a parser one or more times until it fails, returning all of the results in an array. |
@@ -117,7 +107,7 @@ Additionally, parsers are often said to *return* a value or to have a value as a
 | [`assocR`](parsers/assocr.md) | Executes a content parser zero or more times with an application of an operator parser between each. Returns the value obtained by right associative application of all functions returned by the operator parser to the results returned by the content parser.|
 | [`assoc1R`](parsers/assoc1r.md) | Executes a content parser one or more times with an application of an operator parser between each. Returns the value obtained by right associative application of all functions returned by the operator parser to the results returned by the content parser. |
 
-### Table 7: Alternative and conditional combinators
+### Table 6: Alternative and conditional combinators
 
 | Parser | Description |
 |--------|-------------|
@@ -128,7 +118,7 @@ Additionally, parsers are often said to *return* a value or to have a value as a
 | [`empty`](parsers/empty.md) | Executes a parser and fails if the parser succeeds but consumes input. |
 | [`not`](parsers/not.md) | Executes a parser and succeeds without consuming input if that parser fails. |
 
-### Table 8: Backtracking combinators
+### Table 7: Backtracking combinators
 
 | Parser | Description |
 |--------|-------------|
@@ -139,16 +129,18 @@ Additionally, parsers are often said to *return* a value or to have a value as a
 | [`chainB`](parsers/chainb.md) | Executes a parser, then applies a function to the result, then applies the parser returned by the function. Backtracks to where the first parser was applied if the parser returned by the function fails. | [`applyB`](parsers/applyb.md) | Parses content and a function, returning the result of the function when passed the content. Backtracks to where the first parser was applied if the second parser fails. |
 | [`leftB`](parsers/leftb.md) | Executes two parsers in order and returns the result of the first one. Backtracks to the location where the first parser was applied if the second one fails. |
 | [`rightB`](parsers/rightb.md) | Executes two parsers in order and returns the result of the second one. Backtracks to the location where the first parser was applied if the second one fails. |
-| [`andThenB`](parsers/andthenb.md) | Executes two parsers in order and returns the results of both in a tuple. Backtracks to the location where the first parser was applied if the second one fails. |
 | [`pipeB`](parsers/pipeb.md) | Executes a series of parsers in order, then passes the results as arguments to a function, then returns the result of that function. Backtracks to where the first parser was applied if any other parser fails. |
 | [`repeatB`](parsers/repeatb.md) | Executes a parser a certain number of times, returning the results in an array. Backtracks to where the first parser was applied if any other parser fails. |
 | [`manyTillB`](parsers/manytillb.md) | Executes a content parser zero or more times until an end parser succeeds. Returns the content parser's results. Backtracks to where the content parser was first applied if it fails before the end parser succeeds. |
 | [`betweenB`](parsers/betweenb.md) | Executes a content parser between two other parsers, returning only the content parser's result. Backtracks to where the first parser was applied if either other parser fails. |
 
-### Table 9: Miscellaneous combinators
+### Table 8: Chaining combinators
 
 | Parser | Description |
 |--------|-------------|
+| [`chain`](parsers/chain.md) | Applies a parser, then applies a function to the result, then applies the parser returned by the function. |
+| [`map`](parsers/map.md) | Applies a parser, then applies a function to the result, then returns the result of that function. |
+| [`apply`](parsers/apply.md) | Parses content and a function, returning the result of the function when passed the content. |
 | [`label`](parsers/label.md) | Executes a parser and replaces its errors with an expected error if that parser fails. |
 | [`value`](parsers/value.md) | Executes a parser and returns a value. |
 | [`nth`](parsers/nth.md) | Executes a parser and returns the nth element of the resulting array. |
@@ -164,7 +156,7 @@ Additionally, parsers are often said to *return* a value or to have a value as a
 
 Tools provide ways to run parsers and ways to write new parsers (if [`block`](parsers/block.md) isn't good enough). Regular users will use the functions in Table 10, but those in Tables 11 and 12 are going to be of interest only to parser authors.
 
-### Table 10: Running parsers
+### Table 9: Running parsers
 
 | Function | Description |
 |----------|-------------|
@@ -175,7 +167,7 @@ Tools provide ways to run parsers and ways to write new parsers (if [`block`](pa
 | [`failure`](tools/failure.md) | Returns the error message from a parser result if it failed. |
 | [`run`](tools/run.md) | Executes a parser and either returns a successful result or throws an error. |
 
-### Table 11: Error generation
+### Table 10: Error generation
 
 | Function | Description |
 |----------|-------------|
@@ -189,7 +181,7 @@ Tools provide ways to run parsers and ways to write new parsers (if [`block`](pa
 | [`formatErrors`](tools/formaterrors.md) | Generates an error message out of a parser context and result. |
 | [`getPosition`](tools/getposition.md) | Determines the line/column position of a given context. |
 
-### Table 12: Authoring parsers
+### Table 11: Authoring parsers
 
 | Function | Description |
 |----------|-------------|

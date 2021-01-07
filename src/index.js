@@ -25,6 +25,7 @@ export {
   upper,
 } from './parsers/char'
 export {
+  always,
   failNormally,
   failFatally,
 } from './parsers/misc'
@@ -78,24 +79,19 @@ export {
   sequenceB,
 } from './combinators/backtracking'
 export {
+  apply,
+  chain,
   compact,
   fifth,
   first,
   fourth,
   join,
+  map,
   nth,
   second,
   third,
   value,
 } from './combinators/misc'
-export {
-  always,
-  andThen,
-  apply,
-  chain,
-  map,
-  orElse,
-} from './combinators/primitive'
 export {
   assoc1L,
   assoc1R,

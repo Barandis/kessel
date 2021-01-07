@@ -15,8 +15,6 @@ There is another version of this parser ([`sequenceB`](sequenceb.md)) that fails
 
 All of the results are gathered into an array.
 
-A two-parser `seq` is the same as [`andThen`](andthen.md).
-
 #### Example
 
 ```javascript
@@ -69,7 +67,6 @@ console.log(failure(t)) // Parse error at (line 1, column 3):
 #### See Also
 
 * [`Parser`](../types/parser.md)
-* [`andThen`](andthen.md)
 * [`block`](block.md)
 * [`left`](left.md)
 * [`right`](right.md)

@@ -4,8 +4,8 @@
 // https://opensource.org/licenses/MIT
 
 import { Status } from 'kessel/core'
-import { failNormally, failFatally } from 'kessel/parsers/misc'
-import { terror, tfail } from 'test/helper'
+import { always, failNormally, failFatally } from 'kessel/parsers/misc'
+import { terror, tfail, tpass } from 'test/helper'
 
 const { Fail, Fatal } = Status
 
@@ -33,6 +33,14 @@ describe('Miscellaneous parsers', () => {
         index: 0,
         status: Fatal,
       })
+    })
+  })
+
+  describe('always', () => {
+    it('succeeds with the passed-in value', () => {
+      tpass(always('a'), '', 'a')
+      tpass(always(23), '', { result: 23, index: 0 })
+      tpass(always({ a: 1 }), '', { result: { a: 1 }, index: 0 })
     })
   })
 })

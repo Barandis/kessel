@@ -69,6 +69,5 @@ console.log(failure(t)) // Parse error at (line 1, column 2):
 
 * [`Parser`](../types/parser.md)
 * [`always`](always.md)
-* [`andThen`](andthen.md)
 * [`applyB`](applyb.md)
 * [`chain`](chain.md)

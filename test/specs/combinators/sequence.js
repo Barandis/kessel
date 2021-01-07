@@ -4,8 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import { alt, opt } from 'kessel/combinators/alternative'
-import { join, value } from 'kessel/combinators/misc'
-import { map } from 'kessel/combinators/primitive'
+import { join, map, value } from 'kessel/combinators/misc'
 import {
   assoc1L,
   assoc1R,
