@@ -2135,7 +2135,7 @@
 -->
 
 <blockquote>
-<p><code>join(p: Parser&lt;[string]&gt;): Parser&lt;string&gt;</code></p>
+<p><code>join(p: Parser, m?: string): Parser</code></p>
 </blockquote>
 <p>Applies a parser and returns the elements of the resulting array into a string.</p>
 <p>This combinator solves the problem in JavaScript that there is no separate character type, and therefore a string is not just a list/array of characters. (Parsec parsers, for example, can return arrays of characters which Haskell regards also as strings in their own right.) Parsers like <a href="../seq/"><code>seq</code></a> and <a href="../many/"><code>many</code></a> return arrays, and often they are arrays of single-character strings. <code>join</code> will turn these results into simple strings.</p>
@@ -2158,6 +2158,7 @@
 <h4 id="parameters">Parameters</h4>
 <ul>
 <li><code>p</code>: The parser that is applied, which must return an array.</li>
+<li><code>m</code>: The optional expected error message that will take the place of the default error message.</li>
 </ul>
 <h4 id="success">Success</h4>
 <ul>
@@ -2175,6 +2176,7 @@
 <ul>
 <li>Throws an error if <code>p</code> is not a parser.</li>
 <li>Throws an error if <code>p</code> succeeds but does not return an array.</li>
+<li>Throws an error if <code>m</code> exists and is not a string.</li>
 </ul>
 <h4 id="see-also">See Also</h4>
 <ul>

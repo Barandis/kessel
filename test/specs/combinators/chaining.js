@@ -17,7 +17,7 @@ import {
   second,
   third,
   value,
-} from 'kessel/combinators/misc'
+} from 'kessel/combinators/chaining'
 import { many, many1, seq } from 'kessel/combinators/sequence'
 import { Status } from 'kessel/core'
 import { any, char, digit, letter } from 'kessel/parsers/char'
@@ -28,8 +28,20 @@ const { Fail, Fatal } = Status
 
 describe('Chaining and piping combinators', () => {
   describe('join', () => {
-    it('throws if its argument is not a parser', () => {
-      terror(join(0), '', '[join]: expected a parser; found 0')
+    it('throws if its first argument is not a parser', () => {
+      terror(join(0), '', '[join]: expected argument to be a parser; found 0')
+      terror(
+        join(0, 'test'),
+        '',
+        '[join]: expected first argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument exists and is not a string', () => {
+      terror(
+        join(any, 0),
+        '',
+        '[join]: expected second argument to be a string; found 0',
+      )
     })
     it('throws if its argument does not return an array', () => {
       terror(
@@ -41,6 +53,7 @@ describe('Chaining and piping combinators', () => {
     it('joins array elements together into a resulting string', () => {
       tpass(join(many(any)), '123', '123')
       tpass(join(map(many(any), x => x.map(c => parseInt(c)))), '123', '123')
+      tpass(join(many(any), 'test'), '123', '123')
     })
     it('fails if its contained parser fails', () => {
       tfail(join(many1(any)), '', {
@@ -49,6 +62,14 @@ describe('Chaining and piping combinators', () => {
       })
       tfail(join(seq(letter, digit)), 'ab', {
         expected: 'a digit',
+        status: Fatal,
+      })
+      tfail(join(many1(any), 'a character'), '', {
+        expected: 'a character',
+        status: Fail,
+      })
+      tfail(join(seq(letter, digit), 'a letter and a digit'), 'ab', {
+        expected: 'a letter and a digit',
         status: Fatal,
       })
     })

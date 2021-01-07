@@ -91,7 +91,7 @@ export {
   second,
   third,
   value,
-} from './combinators/misc'
+} from './combinators/chaining'
 export {
   assoc1L,
   assoc1R,

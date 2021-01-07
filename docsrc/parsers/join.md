@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `join(p: Parser<[string]>): Parser<string>`
+> `join(p: Parser, m?: string): Parser`
 
 Applies a parser and returns the elements of the resulting array into a string.
 
@@ -34,6 +34,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 #### Parameters
 
 * `p`: The parser that is applied, which must return an array.
+* `m`: The optional expected error message that will take the place of the default error message.
 
 #### Success
 
@@ -51,6 +52,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 * Throws an error if `p` is not a parser.
 * Throws an error if `p` succeeds but does not return an array.
+* Throws an error if `m` exists and is not a string.
 
 #### See Also
 

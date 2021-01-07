@@ -4,20 +4,23 @@
 // https://opensource.org/licenses/MIT
 
 import {
+  argParFormatter,
+  argStrFormatter,
   assertArray,
   assertFunction,
   assertNumber,
   assertParser,
+  assertString,
   formatter,
   ordFnFormatter,
   ordNumFormatter,
   ordParFormatter,
 } from 'kessel/assert'
 import { maybeFatal, ok, parser, Status } from 'kessel/core'
-import { merge } from 'kessel/error'
+import { expected, merge } from 'kessel/error'
 import { twin } from 'kessel/util'
 
-const { Ok } = Status
+const { Ok, Fatal } = Status
 
 /** @typedef {import('kessel/core').Parser} Parser */
 
@@ -28,15 +31,24 @@ const { Ok } = Status
  *
  * @param {Parser} p A parser that is expected to return an array of
  *     strings.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser that executes `p` and returns a single
  *     string made from joining the elements of the array of strings
  *     returned by `p`.
  */
-export const join = p => parser(ctx => {
-  ASSERT && assertParser('join', p)
+export const join = (p, m) => parser(ctx => {
+  const hasM = m != null
 
-  const [prep, [pctx, pres]] = twin(p(ctx))
-  if (pres.status !== Ok) return prep
+  ASSERT && assertParser('join', p, argParFormatter(1, hasM))
+  ASSERT && hasM && assertString('join', m, argStrFormatter(2, true))
+
+  const [pctx, pres] = p(ctx)
+  if (pres.status !== Ok) {
+    return maybeFatal(
+      pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors,
+    )
+  }
 
   const v = pres.value
   ASSERT && assertArray('join', v, formatter('argument to return an array'))

@@ -22,7 +22,7 @@ import {
   rightB,
   sequenceB,
 } from 'kessel/combinators/backtracking'
-import { value } from 'kessel/combinators/misc'
+import { value } from 'kessel/combinators/chaining'
 import { left, many1, right, seq } from 'kessel/combinators/sequence'
 import { parse, Status } from 'kessel/core'
 import { ErrorType } from 'kessel/error'
