@@ -17,7 +17,7 @@ import {
 } from 'kessel/assert'
 import { maybeFatal, ok, parser, Status } from 'kessel/core'
 import { expected, merge } from 'kessel/error'
-import { twin } from 'kessel/util'
+import { dup } from 'kessel/util'
 
 const { Ok, Fatal } = Status
 
@@ -410,7 +410,7 @@ export const chain = (p, fn, m) => parser(ctx => {
     'chain', q, formatter('second argument to return a parser'),
   )
 
-  const [qrep, [qctx, qres]] = twin(q(pctx))
+  const [qrep, [qctx, qres]] = dup(q(pctx))
   if (qres.status !== Ok) {
     return maybeFatal(
       qctx.index !== index,

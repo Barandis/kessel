@@ -18,7 +18,7 @@ import {
 } from 'kessel/assert'
 import { fail, fatal, ok, parser, Status } from 'kessel/core'
 import { compound, ErrorType, expected, merge, nested } from 'kessel/error'
-import { ordinal, range, stringify, twin } from 'kessel/util'
+import { dup, ordinal, range, stringify } from 'kessel/util'
 
 const { Ok, Fail, Fatal } = Status
 
@@ -43,7 +43,7 @@ export const label = (p, msg) => parser(ctx => {
   ASSERT && assertParser('label', p, ordParFormatter('1st'))
   ASSERT && assertString('label', msg, ordStrFormatter('2nd'))
 
-  const [prep, [pctx, pres]] = twin(p(ctx))
+  const [prep, [pctx, pres]] = dup(p(ctx))
   return pres.status === Fail ? pass(pctx, pres, expected(msg)) : prep
 })
 
@@ -65,7 +65,7 @@ export const attempt = p => parser(ctx => {
   ASSERT && assertParser('attempt', p)
 
   const index = ctx.index
-  const [prep, [pctx, pres]] = twin(p(ctx))
+  const [prep, [pctx, pres]] = dup(p(ctx))
   if (pres.status === Ok) return prep
 
   const err = index === pctx.index ? pres.errors : nested(pctx, pres.errors)
@@ -95,7 +95,7 @@ export const attemptM = (p, msg) => parser(ctx => {
   ASSERT && assertParser('attemptM', p, ordParFormatter('1st'))
   ASSERT && assertString('attemptM', msg, ordStrFormatter('2nd'))
 
-  const [prep, [pctx, pres]] = twin(p(ctx))
+  const [prep, [pctx, pres]] = dup(p(ctx))
   if (pres.status === Ok) return prep
   if (pres.status === Fail) {
     if (pres.errors.length === 1 && pres.errors[0].type === ErrorType.Nested) {
@@ -130,7 +130,7 @@ export const sequenceB = (...ps) => parser(ctx => {
   let errors = []
 
   for (const p of ps) {
-    const [prep, [pctx, pres]] = twin(p(context))
+    const [prep, [pctx, pres]] = dup(p(context))
     context = pctx
     errors = pres.errors?.length ? merge(errors, pres.errors) : []
 
@@ -168,7 +168,7 @@ export const chainB = (p, fn) => parser(ctx => {
 
   const index = ctx.index
 
-  const [prep, [pctx, pres]] = twin(p(ctx))
+  const [prep, [pctx, pres]] = dup(p(ctx))
   if (pres.status !== Ok) return prep
 
   const q = fn(pres.value)
@@ -176,7 +176,7 @@ export const chainB = (p, fn) => parser(ctx => {
     'chainB', q, formatter('the 2nd argument to return a parser'),
   )
 
-  const [qrep, [qctx, qres]] = twin(q(pctx))
+  const [qrep, [qctx, qres]] = dup(q(pctx))
   if (qres.status === Ok) return qrep
   const errors = merge(pres.errors, qres.errors)
   if (qres.status === Fatal) return fatal(qctx, errors)
@@ -204,7 +204,7 @@ export const applyB = (p, q) => parser(ctx => {
 
   const index = ctx.index
 
-  const [prep, [pctx, pres]] = twin(p(ctx))
+  const [prep, [pctx, pres]] = dup(p(ctx))
   if (pres.status !== Ok) return prep
 
   const [qctx, qres] = q(pctx)
@@ -240,7 +240,7 @@ export const leftB = (p, q) => parser(ctx => {
 
   const index = ctx.index
 
-  const [prep, [pctx, pres]] = twin(p(ctx))
+  const [prep, [pctx, pres]] = dup(p(ctx))
   if (pres.status !== Ok) return prep
 
   const [qctx, qres] = q(pctx)
@@ -271,10 +271,10 @@ export const rightB = (p, q) => parser(ctx => {
 
   const index = ctx.index
 
-  const [prep, [pctx, pres]] = twin(p(ctx))
+  const [prep, [pctx, pres]] = dup(p(ctx))
   if (pres.status !== Ok) return prep
 
-  const [qrep, [qctx, qres]] = twin(q(pctx))
+  const [qrep, [qctx, qres]] = dup(q(pctx))
   if (qres.status === Ok) return qrep
 
   const errors = merge(pres.errors, qres.errors)
@@ -302,7 +302,7 @@ export const andThenB = (p, q) => parser(ctx => {
 
   const index = ctx.index
 
-  const [prep, [pctx, pres]] = twin(p(ctx))
+  const [prep, [pctx, pres]] = dup(p(ctx))
   if (pres.status !== Ok) return prep
 
   const [qctx, qres] = q(pctx)
@@ -337,7 +337,7 @@ export const repeatB = (p, n) => parser(ctx => {
   let context = ctx
 
   for (const _ of range(n)) {
-    const [prep, [pctx, pres]] = twin(p(context))
+    const [prep, [pctx, pres]] = dup(p(context))
     context = pctx
     if (pres.status === Fatal) return prep
     if (pres.status === Fail) {
@@ -377,12 +377,12 @@ export const manyTillB = (p, end) => parser(ctx => {
   let context = ctx
 
   while (true) {
-    const [endrep, [endctx, endres]] = twin(end(context))
+    const [endrep, [endctx, endres]] = dup(end(context))
     context = endctx
     if (endres.status === Fatal) return endrep
     if (endres.status === Ok) break
 
-    const [prep, [pctx, pres]] = twin(p(context))
+    const [prep, [pctx, pres]] = dup(p(context))
     context = pctx
     if (pres.status === Fatal) return prep
     if (pres.status === Fail) {
@@ -518,7 +518,7 @@ export const betweenB = (pre, post, p) => parser(ctx => {
 
   const index = ctx.index
 
-  const [prerep, [prectx, preres]] = twin(pre(ctx))
+  const [prerep, [prectx, preres]] = dup(pre(ctx))
   if (preres.status !== Ok) return prerep
 
   const [pctx, pres] = p(prectx)

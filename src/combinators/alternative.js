@@ -11,7 +11,7 @@ import {
 } from 'kessel/assert'
 import { fail, fatal, ok, parser, Status } from 'kessel/core'
 import { compound, expected, merge, nested } from 'kessel/error'
-import { twin } from 'kessel/util'
+import { dup } from 'kessel/util'
 
 const { Ok, Fail, Fatal } = Status
 
@@ -44,7 +44,7 @@ export const alt = (...args) => {
     let errors = hasM ? expected(m) : []
 
     for (const p of ps) {
-      const [prep, [pctx, pres]] = twin(p(ctx))
+      const [prep, [pctx, pres]] = dup(p(ctx))
       if (pres.status === Ok) return prep
 
       if (!hasM) errors = merge(errors, pres.errors)
@@ -72,7 +72,7 @@ export const opt = (p, m) => parser(ctx => {
   ASSERT && assertParser('opt', p, argParFormatter(1, hasM))
   ASSERT && hasM && assertString('opt', m, argStrFormatter(2, true))
 
-  const [prep, [pctx, pres]] = twin(p(ctx))
+  const [prep, [pctx, pres]] = dup(p(ctx))
   if (pres.status === Ok) return prep
   const errors = hasM ? expected(m) : pres.errors
   if (pres.status === Fatal) return fatal(pctx, errors)
@@ -106,7 +106,7 @@ export const def = (p, x, m) => parser(ctx => {
   ASSERT && assertParser('def', p, argParFormatter(1, true))
   ASSERT && hasM && assertString('def', m, argStrFormatter(3, true))
 
-  const [prep, [pctx, pres]] = twin(p(ctx))
+  const [prep, [pctx, pres]] = dup(p(ctx))
   if (pres.status === Ok) return prep
   if (pres.status === Fail) return ok(pctx, x)
   return fatal(pctx, hasM ? expected(m) : pres.errors)

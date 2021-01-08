@@ -6,7 +6,7 @@
 import { assertNumber, assertString } from 'kessel/assert'
 import { fail, ok, parser, Status } from 'kessel/core'
 import { expecteds } from 'kessel/messages'
-import { charLength, nextChars, twin, viewToString } from 'kessel/util'
+import { charLength, dup, nextChars, viewToString } from 'kessel/util'
 
 const { Ok } = Status
 
@@ -58,7 +58,7 @@ const stringParser = (length, fn) => parser(ctx => {
 export const string = str => parser(ctx => {
   ASSERT && assertString('string', str)
 
-  const [sprep, [spctx, spres]] = twin(stringParser(
+  const [sprep, [spctx, spres]] = dup(stringParser(
     charLength(str), chars => str === chars,
   )(ctx))
   return spres.status === Ok ? sprep : fail(spctx, expecteds.string(str))
@@ -80,7 +80,7 @@ export const string = str => parser(ctx => {
 export const stringI = str => parser(ctx => {
   ASSERT && assertString('stringI', str)
 
-  const [sprep, [spctx, spres]] = twin(stringParser(
+  const [sprep, [spctx, spres]] = dup(stringParser(
     charLength(str), chars => str.toLowerCase() === chars.toLowerCase(),
   )(ctx))
   return spres.status === Ok ? sprep : fail(spctx, expecteds.stringI(str))
@@ -110,6 +110,6 @@ export const all = parser(ctx => {
 export const anyString = n => parser(ctx => {
   ASSERT && assertNumber('anyString', n)
 
-  const [sprep, [spctx, spres]] = twin(stringParser(n, () => true)(ctx))
+  const [sprep, [spctx, spres]] = dup(stringParser(n, () => true)(ctx))
   return spres.status === Ok ? sprep : fail(spctx, expecteds.anyString(n))
 })

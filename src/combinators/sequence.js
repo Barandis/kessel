@@ -17,7 +17,7 @@ import {
 } from 'kessel/assert'
 import { fatal, maybeFatal, ok, parser, Status } from 'kessel/core'
 import { expected, merge } from 'kessel/error'
-import { range, stringify, twin, wordinal } from 'kessel/util'
+import { dup, range, stringify, wordinal } from 'kessel/util'
 
 /** @typedef {import('kessel/core').Parser} Parser */
 
@@ -140,7 +140,7 @@ export const right = (p, q, m) => parser(ctx => {
     return maybeFatal(pres.status === Fatal, pctx, hasM ? merror : pres.errors)
   }
 
-  const [qrep, [qctx, qres]] = twin(q(pctx))
+  const [qrep, [qctx, qres]] = dup(q(pctx))
   const errors = hasM ? merror : merge(pres.errors, qres.errors)
   return qres.status === Ok
     ? qrep

@@ -267,7 +267,7 @@ export function quote(str) {
  * @returns {[Reply, Reply]} An array containing two copies of the
  *     reply. One can be destructured while the other is retained whole.
  */
-export function twin(value) {
+export function dup(value) {
   return [value, value]
 }
 

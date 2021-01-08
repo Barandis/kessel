@@ -15,7 +15,7 @@ import {
 import { fail, ok, parser, Status } from 'kessel/core'
 import { expected } from 'kessel/error'
 import { expecteds } from 'kessel/messages'
-import { nextChar, twin } from 'kessel/util'
+import { dup, nextChar } from 'kessel/util'
 
 const { Ok } = Status
 
@@ -58,7 +58,7 @@ const charParser = fn => parser(ctx => {
 export const char = c => parser(ctx => {
   ASSERT && assertChar('char', c)
 
-  const [cprep, [cpctx, cpres]] = twin(charParser(ch => c === ch)(ctx))
+  const [cprep, [cpctx, cpres]] = dup(charParser(ch => c === ch)(ctx))
   return cpres.status === Ok ? cprep : fail(cpctx, expecteds.char(c))
 })
 
@@ -76,7 +76,7 @@ export const char = c => parser(ctx => {
 export const charI = c => parser(ctx => {
   ASSERT && assertChar('charI', c)
 
-  const [cprep, [cpctx, cpres]] = twin(charParser(
+  const [cprep, [cpctx, cpres]] = dup(charParser(
     ch => c.toLowerCase() === ch.toLowerCase(),
   )(ctx))
   return cpres.status === Ok ? cprep : fail(cpctx, expecteds.charI(c))
@@ -123,7 +123,7 @@ export const satisfyM = (fn, message) => parser(ctx => {
   ASSERT && assertFunction('satisfyM', fn, ordFnFormatter('1st'))
   ASSERT && assertString('satisfyM', message, ordStrFormatter('2nd'))
 
-  const [cprep, [cpctx, cpres]] = twin(charParser(fn)(ctx))
+  const [cprep, [cpctx, cpres]] = dup(charParser(fn)(ctx))
   return cpres.status === Ok ? cprep : fail(cpctx, expected(message))
 })
 
@@ -148,7 +148,7 @@ export const range = (s, e) => parser(ctx => {
   ASSERT && assertChar('range', e, ordCharFormatter('2nd'))
 
   const fn = c => c >= s && c <= e
-  const [cprep, [cpctx, cpres]] = twin(charParser(fn)(ctx))
+  const [cprep, [cpctx, cpres]] = dup(charParser(fn)(ctx))
   return cpres.status === Ok ? cprep : fail(cpctx, expecteds.range(s, e))
 })
 
@@ -234,7 +234,7 @@ export const noneOf = cs => parser(ctx => {
  */
 export const digit = parser(ctx => {
   const fn = c => c >= '0' && c <= '9'
-  const [cprep, [cpctx, cpres]] = twin(charParser(fn)(ctx))
+  const [cprep, [cpctx, cpres]] = dup(charParser(fn)(ctx))
   return cpres.status === Ok ? cprep : fail(cpctx, expecteds.digit)
 })
 
@@ -248,7 +248,7 @@ export const hex = parser(ctx => {
   const fn = c => c >= '0' && c <= '9'
     || c >= 'a' && c <= 'f'
     || c >= 'A' && c <= 'F'
-  const [cprep, [cpctx, cpres]] = twin(charParser(fn)(ctx))
+  const [cprep, [cpctx, cpres]] = dup(charParser(fn)(ctx))
   return cpres.status === Ok ? cprep : fail(cpctx, expecteds.hex)
 })
 
@@ -260,7 +260,7 @@ export const hex = parser(ctx => {
  */
 export const octal = parser(ctx => {
   const fn = c => c >= '0' && c <= '7'
-  const [cprep, [cpctx, cpres]] = twin(charParser(fn)(ctx))
+  const [cprep, [cpctx, cpres]] = dup(charParser(fn)(ctx))
   return cpres.status === Ok ? cprep : fail(cpctx, expecteds.octal)
 })
 
@@ -272,7 +272,7 @@ export const octal = parser(ctx => {
  */
 export const letter = parser(ctx => {
   const fn = c => c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z'
-  const [cprep, [cpctx, cpres]] = twin(charParser(fn)(ctx))
+  const [cprep, [cpctx, cpres]] = dup(charParser(fn)(ctx))
   return cpres.status === Ok ? cprep : fail(cpctx, expecteds.letter)
 })
 
@@ -286,7 +286,7 @@ export const alpha = parser(ctx => {
   const fn = c => c >= 'a' && c <= 'z'
     || c >= 'A' && c <= 'Z'
     || c >= '0' && c <= '9'
-  const [cprep, [cpctx, cpres]] = twin(charParser(fn)(ctx))
+  const [cprep, [cpctx, cpres]] = dup(charParser(fn)(ctx))
   return cpres.status === Ok ? cprep : fail(cpctx, expecteds.alpha)
 })
 
@@ -298,7 +298,7 @@ export const alpha = parser(ctx => {
  */
 export const upper = parser(ctx => {
   const fn = c => c >= 'A' && c <= 'Z'
-  const [cprep, [cpctx, cpres]] = twin(charParser(fn)(ctx))
+  const [cprep, [cpctx, cpres]] = dup(charParser(fn)(ctx))
   return cpres.status === Ok ? cprep : fail(cpctx, expecteds.upper)
 })
 
@@ -310,6 +310,6 @@ export const upper = parser(ctx => {
  */
 export const lower = parser(ctx => {
   const fn = c => c >= 'a' && c <= 'z'
-  const [cprep, [cpctx, cpres]] = twin(charParser(fn)(ctx))
+  const [cprep, [cpctx, cpres]] = dup(charParser(fn)(ctx))
   return cpres.status === Ok ? cprep : fail(cpctx, expecteds.lower)
 })

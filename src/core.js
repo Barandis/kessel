@@ -4,7 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import { formatErrors } from './error'
-import { stringToView, track, twin } from './util'
+import { dup, stringToView, track } from './util'
 
 /** @typedef {import('./error.js').ErrorList} ErrorList */
 
@@ -300,7 +300,7 @@ export function failure(reply) {
  *     detailed record of where the error occurred.
  */
 export function run(parser, input) {
-  const [reply, [_, result]] = twin(parser(context(input)))
+  const [reply, [_, result]] = dup(parser(context(input)))
   if (result.status === Status.Ok) {
     return result.value
   }
