@@ -1303,8 +1303,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../parsers/sequenceb/" class="md-nav__link">
-      sequenceB
+    <a href="../parsers/seqb/" class="md-nav__link">
+      seqB
     </a>
   </li>
 
@@ -1982,12 +1982,12 @@
 <div class="tabbed-set" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">Parser Code</label><div class="tabbed-content">
 <div class="highlight"><pre><span></span><code><span class="kr">import</span> <span class="p">{</span> 
   <span class="nx">alt</span><span class="p">,</span> <span class="kr">char</span><span class="p">,</span> <span class="nx">end</span><span class="p">,</span> <span class="nx">join</span><span class="p">,</span> <span class="nx">many</span><span class="p">,</span> <span class="nx">newline</span><span class="p">,</span> <span class="nx">noneOf</span><span class="p">,</span> <span class="nx">run</span><span class="p">,</span> <span class="nx">second</span><span class="p">,</span> <span class="nx">sep</span><span class="p">,</span>
-  <span class="nx">sequenceB</span><span class="p">,</span> <span class="nx">string</span><span class="p">,</span> <span class="nx">value</span><span class="p">,</span>
+  <span class="nx">seqB</span><span class="p">,</span> <span class="nx">string</span><span class="p">,</span> <span class="nx">value</span><span class="p">,</span>
 <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;@barandis/kessel&#39;</span>
 
 <span class="kr">const</span> <span class="nx">quotedChar</span> <span class="o">=</span> <span class="nx">alt</span><span class="p">(</span><span class="nx">noneOf</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">),</span> <span class="nx">value</span><span class="p">(</span><span class="nx">string</span><span class="p">(</span><span class="s1">&#39;&quot;&quot;&#39;</span><span class="p">),</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">))</span>
 
-<span class="kr">const</span> <span class="nx">quotedCell</span> <span class="o">=</span> <span class="nx">second</span><span class="p">(</span><span class="nx">sequenceB</span><span class="p">(</span>
+<span class="kr">const</span> <span class="nx">quotedCell</span> <span class="o">=</span> <span class="nx">second</span><span class="p">(</span><span class="nx">seqB</span><span class="p">(</span>
   <span class="kr">char</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">),</span>
   <span class="nx">join</span><span class="p">(</span><span class="nx">many</span><span class="p">(</span><span class="nx">quotedChar</span><span class="p">)),</span>
   <span class="kr">char</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="s1">&#39;quote at end of cell&#39;</span><span class="p">),</span>

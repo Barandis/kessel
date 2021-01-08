@@ -11,7 +11,7 @@
 
 Types are given in the descriptions for each of the parsers and functions listed below. These are contained in TypeScript definition files in the project that can be used either for writing TypeScript programs that use Kessel or just in providing signature information for your IDE.
 
-It should however be noted that some of the type information is incomplete because TypeScript leaves no way to express complete information in the case where there are variable numbers of arguments that can have different generic parameter types. There are notes to that effect in [`alt`](parsers/alt.md), [`pipe`](parsers/pipe.md), [`pipeB`](parsers/pipeb.md), [`seq`](parsers/seq.md), and [`sequenceB`](parsers/sequenceb.md).
+It should however be noted that some of the type information is incomplete because TypeScript leaves no way to express complete information in the case where there are variable numbers of arguments that can have different generic parameter types. There are notes to that effect in [`alt`](parsers/alt.md), [`pipe`](parsers/pipe.md), [`pipeB`](parsers/pipeb.md), [`seq`](parsers/seq.md), and [`seqB`](parsers/seqb.md).
 
 However, there are shortcomings in other parsers that are not explicity marked. For example, TypeScript has no way to say that a string should be one character long, or that an array of strings should have elements that are all one character long. This affects the parameters in [`anyOf`](parsers/anyof.md), [`char`](parsers/char.md), [`charI`](parsers/chari.md), [`noneOf`](parsers/noneof.md), and [`range`](parsers/range.md).
 
@@ -123,7 +123,7 @@ Additionally, parsers are often said to *return* a value or to have a value as a
 | Parser | Description |
 |--------|-------------|
 | [`attempt`](parsers/attempt.md) | Executes a parser, backtracking to its original position if the parser fails and consumes input. |
-| [`sequenceB`](parsers/sequenceb.md) | Executes a series of parsers in order, returning their results in an array. Backtracks to where the first parser was applied if any other of its parsers fails. |
+| [`seqB`](parsers/seqb.md) | Executes a series of parsers in order, returning their results in an array. Backtracks to where the first parser was applied if any other of its parsers fails. |
 | [`blockB`](parsers/blockb.md) | Runs a generator function. The generator can `yield` parsers, whose results will be returned as the result of the `yield` expressions. Returns the result of the generator. Backtracks to where the first yielded parser was applied if any later parser fails. |
 | [`chainB`](parsers/chainb.md) | Executes a parser, then applies a function to the result, then applies the parser returned by the function. Backtracks to where the first parser was applied if the parser returned by the function fails. |
 | [`applyB`](parsers/applyb.md) | Parses content and a function, returning the result of the function when passed the content. Backtracks to where the first parser was applied if the second parser fails. |

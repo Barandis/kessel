@@ -17,7 +17,7 @@ import {
   pipeB,
   repeatB,
   rightB,
-  sequenceB,
+  seqB,
 } from 'kessel/combinators/backtracking'
 import { value } from 'kessel/combinators/chaining'
 import { left, many1, right, seq } from 'kessel/combinators/sequence'
@@ -108,59 +108,78 @@ describe('Backtracking and error handling combinators', () => {
     })
   })
 
-  describe('sequenceB', () => {
-    const parser = sequenceB(string('abc'), string('def'), string('ghi'))
+  describe('seqB', () => {
+    const parser = seqB(string('abc'), string('def'), string('ghi'))
+    const parserm = seqB(
+      string('abc'), string('def'), string('ghi'), 'abc,def,ghi',
+    )
 
     it('throws if any of its arguments is not a parser', () => {
       terror(
-        sequenceB(any, 0),
+        seqB(any, 0),
         '',
-        '[sequenceB]: expected 2nd argument to be a parser; found 0',
+        '[seqB]: expected second argument to be a parser; found 0',
       )
       terror(
-        sequenceB(any, letter, digit, {}),
+        seqB(any, letter, digit, {}),
         '',
-        '[sequenceB]: expected 4th argument to be a parser; found {}',
+        '[seqB]: expected fourth argument to be a parser; found {}',
       )
     })
     it('fails if any of its parsers fail', () => {
-      const [ctx1, result1] = parse(parser, 'abd')
-      expect(ctx1.index).to.equal(0)
-      expect(result1.errors[0].label).to.equal("'abc'")
-
-      const [ctx2, result2] = parse(parser, 'abcdf')
-      const err2 = result2.errors[0]
-      expect(ctx2.index).to.equal(0)
-      expect(err2.ctx.index).to.equal(3)
-      expect(err2.errors[0].label).to.equal("'def'")
-
-      const [ctx3, result3] = parse(parser, 'abcdefh')
-      const err3 = result3.errors[0]
-      expect(ctx3.index).to.equal(0)
-      expect(err3.ctx.index).to.equal(6)
-      expect(err3.errors[0].label).to.equal("'ghi'")
+      tfail(parser, 'abd', {
+        expected: "'abc'",
+        index: 0,
+      })
+      tfail(parser, 'abcdf', {
+        nested: "'def'",
+        index: 0,
+        ctxindex: 3,
+      })
+      tfail(parser, 'abcdefh', {
+        nested: "'ghi'",
+        index: 0,
+        ctxindex: 6,
+      })
+    })
+    it('fails with a new message if the message is included', () => {
+      tfail(parserm, 'abd', {
+        expected: 'abc,def,ghi',
+        index: 0,
+      })
+      tfail(parserm, 'abcdf', {
+        compound: 'abc,def,ghi',
+        index: 0,
+        ctxindex: 3,
+      })
+      tfail(parserm, 'abcdefh', {
+        compound: 'abc,def,ghi',
+        index: 0,
+        ctxindex: 6,
+      })
     })
     it('succeeds if all of its parsers succeed', () => {
       tpass(parser, 'abcdefghi', { result: ['abc', 'def', 'ghi'], index: 9 })
+      tpass(parserm, 'abcdefghi', { result: ['abc', 'def', 'ghi'], index: 9 })
     })
     it('adds null to results', () => {
-      tpass(sequenceB(string('abc'), eof), 'abc', {
+      tpass(seqB(string('abc'), eof), 'abc', {
         result: ['abc', null],
         index: 3,
       })
     })
     it('still fails fatally if any of its parsers does', () => {
-      const parser = sequenceB(seq(letter, digit), letter, digit)
+      const parser = seqB(seq(letter, digit), letter, digit)
       tfail(parser, 'aaa1', { expected: 'a digit', index: 1, status: Fatal })
     })
     it('gives opt error messages if later parsers fail', () => {
-      const parser = sequenceB(opt(char('+')), opt(char('-')), digit)
+      const parser = seqB(opt(char('+')), opt(char('-')), digit)
       tpass(parser, '+-1', ['+', '-', '1'])
       tpass(parser, '1', [null, null, '1'])
       tfail(parser, 'a', "'+', '-', or a digit")
     })
     it('ignores opt error messages if a later parser succeeds', () => {
-      const parser = sequenceB(opt(char('-')), digit, digit)
+      const parser = seqB(opt(char('-')), digit, digit)
       tpass(parser, '-12', ['-', '1', '2'])
       tpass(parser, '12', [null, '1', '2'])
       tfail(parser, 'ab', "'-' or a digit")

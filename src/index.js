@@ -73,7 +73,7 @@ export {
   pipeB,
   repeatB,
   rightB,
-  sequenceB,
+  seqB,
 } from './combinators/backtracking'
 export {
   apply,

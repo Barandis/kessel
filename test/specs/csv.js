@@ -16,14 +16,14 @@ import {
   run,
   second,
   sep,
-  sequenceB,
+  seqB,
   string,
   value,
 } from 'kessel'
 
 const quotedChar = alt(noneOf('"'), value(string('""'), '"'))
 
-const quotedCell = second(sequenceB(
+const quotedCell = second(seqB(
   char('"'),
   join(many(quotedChar)),
   char('"', 'quote at end of cell'),
@@ -36,7 +36,7 @@ const csv = end(line, newline)
 const parseCsv = input => run(csv, input)
 
 const parseCsv1 = input => run(end(sep(alt(
-  second(sequenceB(
+  second(seqB(
     char('"'),
     join(many(alt(noneOf('"'), value(string('""'), '"')))),
     char('"', 'quote at end of cell'),

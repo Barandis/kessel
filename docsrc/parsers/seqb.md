@@ -5,23 +5,18 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `sequenceB(...ps: Parser[]): Parser<any[]>`
-
-!!! warning "Inexpressive type"
-    TypeScript cannot express as much information in this type as would be useful. Namely, the parsers in `ps` can all have different generic parameters, and the generic parameter of the return value is an array with each of those types in order, potentially missing members that are `null`.
-
-    Unfortunately it's impossible to write a signature that can handle a variable number of arguments of variable generic types, and it's also impossible to write a signature that allows for a member of an array type to be non-existent in some cases.
+> `seqB(...ps: Parser[], m?: string): Parser`
 
 Applies a series of parsers in order, returning an array that contains each parser's result.
 
-`sequenceB` will only succeed if *all* of its parsers succeed. If one of them fails, `sequenceB` will also fail. If input was consumed before the failure occurred, `sequenceB` will backtrack to the location where its first parser was applied.
+`seqB` will only succeed if *all* of its parsers succeed. If one of them fails, `seqB` will also fail. If input was consumed before the failure occurred, `seqB` will backtrack to the location where its first parser was applied.
 
 All of the results are gathered into an array.
 
 #### Example
 
 ```javascript
-const parser = sequenceB(letter, digit, letter)
+const parser = seqB(letter, digit, letter)
 
 const s = parse(parser, 'a1b')
 console.log(status(s))  // "ok"
@@ -53,6 +48,7 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 #### Parameters
 
 * `...ps`: A series of parsers to apply to the input, one at a time, in order.
+* `m`: An optional message to be used as the expected error message in the event of failure, in place of the collected expected error messages of the parsers in `ps`.
 
 #### Success
 

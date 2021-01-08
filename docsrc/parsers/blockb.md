@@ -80,4 +80,4 @@ See [`block`](#block) for a detailed breakdown of the example. That example work
 
 * [`Parser`](../types/parser.md)
 * [`block`](block.md)
-* [`sequenceB`](sequenceb.md)
+* [`seqB`](seqb.md)

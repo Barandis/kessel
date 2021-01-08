@@ -146,6 +146,9 @@ export function tfail(parser, test, error = {}) {
     if ('compound' in error) {
       expect(result.errors[0].label).to.equal(error.compound)
     }
+    if ('ctxindex' in error) {
+      expect(result.errors[0].ctx.index).to.equal(error.ctxindex)
+    }
   }
 }
 

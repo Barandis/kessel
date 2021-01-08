@@ -18,7 +18,7 @@
     
     
       
-        <title>sequenceB - Kessel</title>
+        <title>seqB - Kessel</title>
       
     
     
@@ -91,7 +91,7 @@
           </span>
           <span class="md-header-nav__topic md-ellipsis">
             
-              sequenceB
+              seqB
             
           </span>
         </div>
@@ -1307,12 +1307,12 @@
     
     
       <label class="md-nav__link md-nav__link--active" for="__toc">
-        sequenceB
+        seqB
         <span class="md-nav__icon md-icon"></span>
       </label>
     
     <a href="./" class="md-nav__link md-nav__link--active">
-      sequenceB
+      seqB
     </a>
     
       
@@ -2089,7 +2089,7 @@
               
                 
                 
-                  <h1>sequenceB</h1>
+                  <h1>seqB</h1>
                 
                 <!--
  Copyright (c) 2020 Thomas J. Otterson
@@ -2099,17 +2099,13 @@
 -->
 
 <blockquote>
-<p><code>sequenceB(...ps: Parser[]): Parser&lt;any[]&gt;</code></p>
+<p><code>seqB(...ps: Parser[], m?: string): Parser</code></p>
 </blockquote>
-<p>!!! warning "Inexpressive type"
-    TypeScript cannot express as much information in this type as would be useful. Namely, the parsers in <code>ps</code> can all have different generic parameters, and the generic parameter of the return value is an array with each of those types in order, potentially missing members that are <code>null</code>.</p>
-<div class="highlight"><pre><span></span><code>Unfortunately it&#39;s impossible to write a signature that can handle a variable number of arguments of variable generic types, and it&#39;s also impossible to write a signature that allows for a member of an array type to be non-existent in some cases.
-</code></pre></div>
 <p>Applies a series of parsers in order, returning an array that contains each parser's result.</p>
-<p><code>sequenceB</code> will only succeed if <em>all</em> of its parsers succeed. If one of them fails, <code>sequenceB</code> will also fail. If input was consumed before the failure occurred, <code>sequenceB</code> will backtrack to the location where its first parser was applied.</p>
+<p><code>seqB</code> will only succeed if <em>all</em> of its parsers succeed. If one of them fails, <code>seqB</code> will also fail. If input was consumed before the failure occurred, <code>seqB</code> will backtrack to the location where its first parser was applied.</p>
 <p>All of the results are gathered into an array.</p>
 <h4 id="example">Example</h4>
-<div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">sequenceB</span><span class="p">(</span><span class="nx">letter</span><span class="p">,</span> <span class="nx">digit</span><span class="p">,</span> <span class="nx">letter</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">seqB</span><span class="p">(</span><span class="nx">letter</span><span class="p">,</span> <span class="nx">digit</span><span class="p">,</span> <span class="nx">letter</span><span class="p">)</span>
 
 <span class="kr">const</span> <span class="nx">s</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;a1b&#39;</span><span class="p">)</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">status</span><span class="p">(</span><span class="nx">s</span><span class="p">))</span>  <span class="c1">// &quot;ok&quot;</span>
@@ -2140,6 +2136,7 @@
 <h4 id="parameters">Parameters</h4>
 <ul>
 <li><code>...ps</code>: A series of parsers to apply to the input, one at a time, in order.</li>
+<li><code>m</code>: An optional message to be used as the expected error message in the event of failure, in place of the collected expected error messages of the parsers in <code>ps</code>.</li>
 </ul>
 <h4 id="success">Success</h4>
 <ul>

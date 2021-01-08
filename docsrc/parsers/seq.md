@@ -11,7 +11,7 @@ Applies a series of parsers in order, returning an array that contains each pars
 
 `seq` will only succeed if *all* of its parsers succeed. If one of them fails, `seq` will fail fatally if it had consumed any input up to that point, even if the parser that failed did so non-fatally.
 
-There is another version of this parser ([`sequenceB`](sequenceb.md)) that fails non-fatally and backtracks if the parser that fails does so non-fatally.
+There is another version of this parser ([`seqB`](seqb.md)) that fails non-fatally and backtracks if the parser that fails does so non-fatally.
 
 All of the results are gathered into an array.
 
@@ -70,4 +70,4 @@ console.log(failure(t)) // Parse error at (line 1, column 3):
 * [`block`](block.md)
 * [`left`](left.md)
 * [`right`](right.md)
-* [`sequenceB`](sequenceb.md)
+* [`seqB`](seqb.md)

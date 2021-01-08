@@ -107,7 +107,7 @@ nav:
       - sep: parsers/sep.md
       - sep1: parsers/sep1.md
       - seq: parsers/seq.md
-      - sequenceB: parsers/sequenceb.md
+      - seqB: parsers/seqb.md
       - skip: parsers/skip.md
       - skipMany: parsers/skipmany.md
       - skipMany1: parsers/skipmany1.md
