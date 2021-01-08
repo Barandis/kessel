@@ -5,11 +5,11 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `applyB<T, U>(p: Parser<T>, f: Parser<(arg: T) => U>): Parser<U>`
+> `applyB(p: Parser, q: Parser, m?: string): Parser`
 
 Applies two parsers, the second of which must return a function. Returns the result of that function when the result of the other parser is passed to it.
 
-If `p` succeeds but `f` fails, the parser will backtrack to the location where `p` was originally applied and `applyB` will fail non-fatally.
+If `p` succeeds but `q` fails, the parser will backtrack to the location where `p` was originally applied and `applyB` will fail non-fatally.
 
 #### Example
 
@@ -45,25 +45,27 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 
 #### Parameters
 
-* `p`: A parser whose result is passed to the function that results from `f`.
-* `f`: A parser that returns a function.
+* `p`: A parser whose result is passed to the function that results from `q`.
+* `q`: A parser that returns a function.
+* `m`: The optional expected error message that will take the place of the default error message.
 
 #### Success
 
-* Succeeds if both `p` and `f` succeed. Returns the result of the function returned by `f` when applied to the result of `p`.
+* Succeeds if both `p` and `q` succeed. Returns the result of the function returned by `q` when applied to the result of `p`.
 
 #### Failure
 
-* Fails if `p` or `f` fails.
+* Fails if `p` or `q` fails.
 
 #### Fatal Failure
 
-* Fails fatally if either `p` or `f` fails fatally.
+* Fails fatally if either `p` or `q` fails fatally.
 
 #### Throws
 
-* Throws an error if either `p` or `f` are not parsers.
-* Throws an error if `f` succeeds but does not return a non-parser function.
+* Throws an error if either `p` or `q` are not parsers.
+* Throws an error if `m` exists and is not a string.
+* Throws an error if `q` succeeds but does not return a non-parser function.
 
 #### See Also
 

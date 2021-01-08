@@ -11,7 +11,7 @@ import {
 } from 'kessel/assert'
 import { failReply, fatalReply, okReply, parser, Status } from 'kessel/core'
 import { expected, merge } from 'kessel/error'
-import { back, dup, nonback, replyFn } from 'kessel/util'
+import { dup, ferror, nerror, replyFn } from 'kessel/util'
 
 const { Ok, Fail, Fatal } = Status
 
@@ -109,7 +109,7 @@ export const def = (p, x, m) => parser(ctx => {
   const [prep, [pctx, pres]] = dup(p(ctx))
   if (pres.status === Ok) return prep
   if (pres.status === Fail) return okReply(pctx, x)
-  return fatalReply(pctx, nonback(m, pres.errors))
+  return fatalReply(pctx, ferror(m, pres.errors))
 })
 
 /**
@@ -137,11 +137,11 @@ export const peek = (p, m) => parser(ctx => {
   const [pctx, pres] = p(ctx)
   if (pres.status === Ok) return okReply(pctx, pres.value, index)
   if (pres.status === Fail) {
-    return failReply(pctx, nonback(m, pres.errors), index)
+    return failReply(pctx, ferror(m, pres.errors), index)
   }
   // This parser implements automatic backtracking, so if its parser
   // fails fatally, it has to track that through a nested error
-  return failReply(pctx, back(m, pctx, pres.errors), index)
+  return failReply(pctx, nerror(m, pctx, pres.errors), index)
 })
 
 /**
@@ -170,7 +170,7 @@ export const empty = (p, m) => parser(ctx => {
   const [pctx, pres] = p(ctx)
   if (pres.status === Ok && pctx.index === index) return okReply(pctx, null)
   const fn = replyFn(pres.status === Fatal)
-  return fn(pctx, nonback(m, pres.errors))
+  return fn(pctx, ferror(m, pres.errors))
 })
 
 /**
@@ -197,6 +197,6 @@ export const not = (p, m) => parser(ctx => {
   const index = ctx.index
   const [pctx, pres] = p(ctx)
   return pres.status === Ok
-    ? failReply(pctx, nonback(m, undefined), index)
+    ? failReply(pctx, ferror(m, undefined), index)
     : okReply(pctx, null, index)
 })

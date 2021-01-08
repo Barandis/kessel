@@ -21,10 +21,10 @@ import {
 import { failReply, fatalReply, okReply, parser, Status } from 'kessel/core'
 import { compound, ErrorType, expected, merge, nested } from 'kessel/error'
 import {
-  back,
-  combined,
+  berror,
   dup,
-  nonback,
+  ferror,
+  nerror,
   ordinal,
   range,
   replyFn,
@@ -63,7 +63,7 @@ export const attempt = (p, m) => parser(ctx => {
   const [prep, [pctx, pres]] = dup(p(ctx))
   if (pres.status === Ok) return prep
   if (pres.status === Fatal || pctx.index !== index) {
-    return failReply(pctx, back(m, pctx, pres.errors), index)
+    return failReply(pctx, nerror(m, pctx, pres.errors), index)
   }
   if (hasM) {
     if (pres.errors.length === 1 && pres.errors[0].type === ErrorType.Nested) {
@@ -112,11 +112,11 @@ export const seqB = (...args) => {
       errors = pres.errors?.length ? merge(errors, pres.errors) : []
 
       if (pres.status === Fatal) {
-        return fatalReply(pctx, nonback(m, pres.errors))
+        return fatalReply(pctx, ferror(m, pres.errors))
       }
       if (pres.status === Fail) {
-        const err = combined(pctx.index !== index, m, pctx, errors)
-        return failReply(pctx, err, index)
+        const error = berror(pctx.index !== index, m, pctx, errors)
+        return failReply(pctx, error, index)
       }
       values.push(pres.value)
     }
@@ -155,7 +155,7 @@ export const chainB = (p, fn, m) => parser(ctx => {
   const [pctx, pres] = p(ctx)
   if (pres.status !== Ok) {
     const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, nonback(m, pres.errors))
+    return fn(pctx, ferror(m, pres.errors))
   }
 
   const q = fn(pres.value)
@@ -167,9 +167,9 @@ export const chainB = (p, fn, m) => parser(ctx => {
   if (qres.status === Ok) return qrep
 
   const errors = merge(pres.errors, qres.errors)
-  if (qres.status === Fatal) return fatalReply(qctx, nonback(m, errors))
-  const err = combined(qctx.index !== index, m, qctx, errors)
-  return failReply(qctx, err, index)
+  if (qres.status === Fatal) return fatalReply(qctx, ferror(m, errors))
+  const error = berror(qctx.index !== index, m, qctx, errors)
+  return failReply(qctx, error, index)
 })
 
 /**
@@ -182,30 +182,37 @@ export const chainB = (p, fn, m) => parser(ctx => {
  * @param {Parser} p A parser whose result will be passed to the
  *     function returned by `q`.
  * @param {Parser} q A parser which provides a function.
+ * @param {string} [m] The error message to use if the parser fails.
  * @returns {Parser} A parser that executes `p` and `q` and results in
  *     the return value of the function returned by `q` when the value
  *     returned by `p` is passed into it.
  */
-export const applyB = (p, q) => parser(ctx => {
-  ASSERT && assertParser('applyB', p, ordParFormatter('1st'))
-  ASSERT && assertParser('applyB', q, ordParFormatter('2nd'))
+export const applyB = (p, q, m) => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && assertParser('applyB', p, argParFormatter(1, true))
+  ASSERT && assertParser('applyB', q, argParFormatter(2, true))
+  ASSERT && hasM && assertString('applyB', m, argStrFormatter(3, true))
 
   const index = ctx.index
 
-  const [prep, [pctx, pres]] = dup(p(ctx))
-  if (pres.status !== Ok) return prep
+  const [pctx, pres] = p(ctx)
+  if (pres.status !== Ok) {
+    const fn = replyFn(pres.status === Fatal)
+    return fn(pctx, ferror(m, pres.errors))
+  }
 
   const [qctx, qres] = q(pctx)
   const errors = merge(pres.errors, qres.errors)
-  if (qres.status === Fatal) return fatalReply(qctx, errors)
+  if (qres.status === Fatal) return fatalReply(qctx, ferror(m, errors))
   if (qres.status === Fail) {
-    const err = index === qctx.index ? errors : nested(qctx, errors)
-    return failReply(qctx, err, index)
+    const error = berror(qctx.index !== index, m, qctx, errors)
+    return failReply(qctx, error, index)
   }
 
   const fn = qres.value
   ASSERT && assertFunction(
-    'applyB', fn, formatter('2nd argument to return a function'),
+    'applyB', fn, formatter('second argument to return a function'),
   )
   return okReply(qctx, fn(pres.value))
 })

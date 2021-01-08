@@ -294,32 +294,49 @@ describe('Backtracking and error handling combinators', () => {
       terror(
         applyB(0, any),
         '',
-        '[applyB]: expected 1st argument to be a parser; found 0',
+        '[applyB]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
         applyB(any, 0),
         '',
-        '[applyB]: expected 2nd argument to be a parser; found 0',
+        '[applyB]: expected second argument to be a parser; found 0',
+      )
+    })
+    it('throws if its third argument exists and is not a string', () => {
+      terror(
+        applyB(any, any, 0),
+        '',
+        '[applyB]: expected third argument to be a string; found 0',
       )
     })
     it('throws if its second argument fails to return a function', () => {
       terror(
         applyB(any, any),
         'ab',
-        '[applyB]: expected 2nd argument to return a function; found "b"',
+        '[applyB]: expected second argument to return a function; found "b"',
       )
     })
     it('returns the result of the function when passed the other value', () => {
       tpass(applyB(any, always(x => x.toUpperCase())), 'a', 'A')
+      tpass(applyB(any, always(x => x.toUpperCase()), 'test'), 'a', 'A')
     })
     it('fails without calling parser 2 if parser 1 fails', () => {
       tfail(applyB(char('a'), any), 'b', { expected: "'a'", status: Fail })
+      tfail(applyB(char('a'), any, "'a' and a character"), 'b', {
+        expected: "'a' and a character",
+        status: Fail,
+      })
     })
     it('backtracks if input is consumed before failure', () => {
       tfail(applyB(char('a'), char('b')), 'ac', {
         nested: "'b'",
+        index: 0,
+        status: Fail,
+      })
+      tfail(applyB(char('a'), char('b'), 'a then b'), 'ac', {
+        compound: 'a then b',
         index: 0,
         status: Fail,
       })
@@ -330,8 +347,18 @@ describe('Backtracking and error handling combinators', () => {
         index: 1,
         status: Fatal,
       })
+      tfail(applyB(left(letter, letter), char('b'), '\\w\\wb'), 'a1b', {
+        expected: '\\w\\wb',
+        index: 1,
+        status: Fatal,
+      })
       tfail(applyB(char('a'), left(letter, letter)), 'ab1', {
         expected: 'a letter',
+        index: 2,
+        status: Fatal,
+      })
+      tfail(applyB(char('a'), left(letter, letter), 'a\\w\\w'), 'ab1', {
+        expected: 'a\\w\\w',
         index: 2,
         status: Fatal,
       })

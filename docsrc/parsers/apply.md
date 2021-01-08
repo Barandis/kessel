@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `apply(p: Parser, f: Parser, m?: string): Parser`
+> `apply(p: Parser, q: Parser, m?: string): Parser`
 
 Applies two parsers, the second of which must return a function. Returns the result of that function when the result of the other parser is passed to it.
 
@@ -13,7 +13,7 @@ This parser is the applicative-style counterpart of the monadic-style [`chain`](
 
 As this parser requires that one of its parser return a function, [`always`](always.md) is often used to provide that parser.
 
-There is another version of this parser ([`applyB`](applyb.md)) that will backtrack and fail non-fatally if `f` fails non-fatally.
+There is another version of this parser ([`applyB`](applyb.md)) that will backtrack and fail non-fatally if `q` fails non-fatally.
 
 #### Example
 
@@ -43,29 +43,29 @@ console.log(failure(t)) // Parse error at (line 1, column 2):
 
 #### Parameters
 
-* `p`: A parser whose result is passed to the function that results from `f`.
-* `f`: A parser that returns a function.
+* `p`: A parser whose result is passed to the function that results from `q`.
+* `q`: A parser that returns a function.
 * `m`: The optional expected error message that will take the place of the default error message.
 
 #### Success
 
-* Succeeds if both `p` and `f` succeed. Returns the result of the function returned by `f` when applied to the result of `p`.
+* Succeeds if both `p` and `q` succeed. Returns the result of the function returned by `q` when applied to the result of `p`.
 
 #### Failure
 
 * Fails if `p` fails.
-* Fails if `f` fails after `p` succeeds without consuming any input.
+* Fails if `q` fails after `p` succeeds without consuming any input.
 
 #### Fatal Failure
 
-* Fails fatally if either `p` or `f` fails fatally.
-* Fails if `f` fails after `p` succeeds while consuming some input.
+* Fails fatally if either `p` or `q` fails fatally.
+* Fails if `q` fails after `p` succeeds while consuming some input.
 
 #### Throws
 
-* Throws an error if either `p` or `f` are not parsers.
+* Throws an error if either `p` or `q` are not parsers.
 * Throws an error if `m` exists and is not a string.
-* Throws an error if `f` succeeds but does not return a non-parser function.
+* Throws an error if `q` succeeds but does not return a non-parser function.
 
 #### See Also
 

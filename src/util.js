@@ -450,7 +450,8 @@ export function replyFn(condition) {
 
 /**
  * Generates an error list for non-backtracked errors from underlying
- * parsers.
+ * parsers. The 'f' is for 'flat'; this function produces a non-nested
+ * error whose message is based upon whether `m` exists or not.
  *
  * @param {string} m The message used to create the new error. This will
  *     only be used if it's actually present.
@@ -459,13 +460,14 @@ export function replyFn(condition) {
  * @returns {ErrorList} A new error list that does not take backtracking
  *     into account.
  */
-export function nonback(m, errors) {
+export function ferror(m, errors) {
   return m == null ? errors : expected(m)
 }
 
 /**
  * Generates an error list for backtracked errors from underlying
- * parsers.
+ * parsers. The 'n' is for nested; this function produces a nested
+ * error that instead be a compound error if `m` exists.
  *
  * @param {string} m The message used to create the new error. This will
  *     only be used if it's actually present.
@@ -476,7 +478,7 @@ export function nonback(m, errors) {
  * @returns {ErrorList} A new error list that takes backtracking into
  *     account.
  */
-export function back(m, ctx, errors) {
+export function nerror(m, ctx, errors) {
   return m == null ? nested(ctx, errors) : compound(m, ctx, errors)
 }
 
@@ -494,6 +496,6 @@ export function back(m, ctx, errors) {
  *     parser.
  * @returns {ErrorList} A new error list.
  */
-export function combined(cond, m, ctx, errors) {
-  return cond ? back(m, ctx, errors) : nonback(m, errors)
+export function berror(cond, m, ctx, errors) {
+  return cond ? nerror(m, ctx, errors) : ferror(m, errors)
 }
