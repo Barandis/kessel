@@ -628,7 +628,7 @@ describe('Parse errors', () => {
         const exp = 'Parse error at (line 1, column 1):\n\n'
           + 'tesl\n'
           + '^\n\n'
-          + "The word 'test' could not be parsed because:\n\n"
+          + "Could not parse the word 'test' because:\n\n"
           + '  Parse error at (line 1, column 4):\n\n'
           + '  tesl\n'
           + '     ^\n'

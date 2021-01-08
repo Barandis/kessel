@@ -580,9 +580,7 @@ function formatNested(nesteds, tabSize, maxWidth, indent) {
   const nestedMsgs = nesteds.map(n => {
     const { index, view } = n.ctx
     const label = n.label
-      ? `\n${sp}${n.label[0].toUpperCase()}${
-        n.label.substring(1)
-      } could not be parsed because:\n\n`
+      ? `\n${sp}Could not parse ${n.label} because:\n\n`
       : `\n${sp}The parser backtracked after:\n\n`
     return label + format(n.errors, index, view, tabSize, maxWidth, indent + 2)
   })
