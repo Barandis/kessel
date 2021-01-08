@@ -226,26 +226,33 @@ export const applyB = (p, q, m) => parser(ctx => {
  *
  * @param {Parser} p The first parser to execute.
  * @param {Parser} q The second parser to execute.
+ * @param {string} [m] The error message to use if the parser fails.
  * @returns {Parser} A parser that executes `p` and `q` and returns the
  *     result of the first.
  */
-export const leftB = (p, q) => parser(ctx => {
-  ASSERT && assertParser('leftB', p, ordParFormatter('1st'))
-  ASSERT && assertParser('leftB', q, ordParFormatter('2nd'))
+export const leftB = (p, q, m) => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && assertParser('leftB', p, argParFormatter(1, true))
+  ASSERT && assertParser('leftB', q, argParFormatter(2, true))
+  ASSERT && hasM && assertString('leftB', m, argStrFormatter(3, true))
 
   const index = ctx.index
 
-  const [prep, [pctx, pres]] = dup(p(ctx))
-  if (pres.status !== Ok) return prep
+  const [pctx, pres] = p(ctx)
+  if (pres.status !== Ok) {
+    const fn = replyFn(pres.status === Fatal)
+    return fn(pctx, ferror(m, pres.errors))
+  }
 
   const [qctx, qres] = q(pctx)
   if (qres.status === Ok) return okReply(qctx, pres.value)
 
   const errors = merge(pres.errors, qres.errors)
-  if (qres.status === Fatal) return fatalReply(qctx, errors)
+  if (qres.status === Fatal) return fatalReply(qctx, ferror(m, errors))
 
-  const err = index === qctx.index ? errors : nested(qctx, errors)
-  return failReply(qctx, err, index)
+  const error = berror(qctx.index !== index, m, qctx, errors)
+  return failReply(qctx, error, index)
 })
 
 /**
@@ -257,26 +264,33 @@ export const leftB = (p, q) => parser(ctx => {
  *
  * @param {Parser} p The first parser to execute.
  * @param {Parser} q The second parser to execute.
+ * @param {string} [m] The error message to use if the parser fails.
  * @returns {Parser} A parser that executes `p` and `q` and returns the
  *     result of the second.
  */
-export const rightB = (p, q) => parser(ctx => {
-  ASSERT && assertParser('rightB', p, ordParFormatter('1st'))
-  ASSERT && assertParser('rightB', q, ordParFormatter('2nd'))
+export const rightB = (p, q, m) => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && assertParser('rightB', p, argParFormatter(1, true))
+  ASSERT && assertParser('rightB', q, argParFormatter(2, true))
+  ASSERT && hasM && assertString('rightB', m, argStrFormatter(3, true))
 
   const index = ctx.index
 
-  const [prep, [pctx, pres]] = dup(p(ctx))
-  if (pres.status !== Ok) return prep
+  const [pctx, pres] = p(ctx)
+  if (pres.status !== Ok) {
+    const fn = replyFn(pres.status === Fatal)
+    return fn(pctx, ferror(m, pres.errors))
+  }
 
   const [qrep, [qctx, qres]] = dup(q(pctx))
   if (qres.status === Ok) return qrep
 
   const errors = merge(pres.errors, qres.errors)
-  if (qres.status === Fatal) return fatalReply(qctx, errors)
+  if (qres.status === Fatal) return fatalReply(qctx, ferror(m, errors))
 
-  const err = index === qctx.index ? errors : nested(qctx, errors)
-  return failReply(qctx, err, index)
+  const error = berror(qctx.index !== index, m, qctx, errors)
+  return failReply(qctx, error, index)
 })
 
 /**

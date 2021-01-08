@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `rightB(p: Parser<T>, q: Parser<U>): Parser<U>`
+> `rightB(p: Parser, q: Parser, m?: string): Parser`
 
 Applies two parsers in order, returning the result of the second one.
 
@@ -47,6 +47,7 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 
 * `p`: The first parser to apply. This parser's result will be discarded.
 * `q`: The second parser to apply. If both parsers succeed, this parser's result will be `rightB`'s result.
+* `m`: The optional expected error message that will take the place of the default error message.
 
 #### Success
 
@@ -63,6 +64,7 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 #### Throws
 
 * Throws an error if either `p` or `q` are not parsers.
+* Throws an error if `m` exists and is not a string.
 
 #### See Also
 

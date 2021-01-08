@@ -2099,7 +2099,7 @@
 -->
 
 <blockquote>
-<p><code>rightB(p: Parser&lt;T&gt;, q: Parser&lt;U&gt;): Parser&lt;U&gt;</code></p>
+<p><code>rightB(p: Parser, q: Parser, m?: string): Parser</code></p>
 </blockquote>
 <p>Applies two parsers in order, returning the result of the second one.</p>
 <p>The result of the first parser is discarded. If either parser fails, then the entire <code>rightB</code> parser also fails. If input was consumed by either parser and one of them fails, backtracking will take the state back to where it was before <code>p</code> was applied.</p>
@@ -2136,6 +2136,7 @@
 <ul>
 <li><code>p</code>: The first parser to apply. This parser's result will be discarded.</li>
 <li><code>q</code>: The second parser to apply. If both parsers succeed, this parser's result will be <code>rightB</code>'s result.</li>
+<li><code>m</code>: The optional expected error message that will take the place of the default error message.</li>
 </ul>
 <h4 id="success">Success</h4>
 <ul>
@@ -2152,6 +2153,7 @@
 <h4 id="throws">Throws</h4>
 <ul>
 <li>Throws an error if either <code>p</code> or <code>q</code> are not parsers.</li>
+<li>Throws an error if <code>m</code> exists and is not a string.</li>
 </ul>
 <h4 id="see-also">See Also</h4>
 <ul>

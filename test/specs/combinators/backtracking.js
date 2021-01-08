@@ -384,31 +384,52 @@ describe('Backtracking and error handling combinators', () => {
       terror(
         leftB(0, any),
         '',
-        '[leftB]: expected 1st argument to be a parser; found 0',
+        '[leftB]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
         leftB(any, 0),
         '',
-        '[leftB]: expected 2nd argument to be a parser; found 0',
+        '[leftB]: expected second argument to be a parser; found 0',
+      )
+    })
+    it('throws if its third argument exists and is not a string', () => {
+      terror(
+        leftB(any, any, 0),
+        '',
+        '[leftB]: expected third argument to be a string; found 0',
       )
     })
     it('returns the result of its left parser if both pass', () => {
       tpass(leftB(letter, digit), 'a1', 'a')
+      tpass(leftB(letter, digit, 'test'), 'a1', 'a')
     })
     it('fails non-fatally if one parser fails and no input is consumed', () => {
       tfail(leftB(letter, digit), '1', { expected: 'a letter', status: Fail })
+      tfail(leftB(letter, digit, 'letter then digit'), '1', {
+        expected: 'letter then digit',
+        status: Fail,
+      })
       tfail(leftB(eof, char('a')), '', { expected: "'a'", status: Fail })
+      tfail(leftB(eof, char('a'), 'something impossible'), '', {
+        expected: 'something impossible',
+        status: Fail,
+      })
     })
     it('fails non-fatally on non-fatal errors after consumption', () => {
-      const [ctx, result] = parse(leftB(letter, digit), 'aa')
-      const err = result.errors[0]
-
-      expect(ctx.index).to.equal(0)
-      expect(result.status).to.equal(Fail)
-      expect(err.ctx.index).to.equal(1)
-      expect(err.errors[0].label).to.equal('a digit')
+      tfail(leftB(letter, digit), 'aa', {
+        nested: 'a digit',
+        index: 0,
+        ctxindex: 1,
+        status: Fail,
+      })
+      tfail(leftB(letter, digit, 'letter then digit'), 'aa', {
+        compound: 'letter then digit',
+        index: 0,
+        ctxindex: 1,
+        status: Fail,
+      })
     })
     it('still fails fatally if either parser fails fatally', () => {
       tfail(leftB(seq(letter, letter), digit), 'a11', {
@@ -416,8 +437,18 @@ describe('Backtracking and error handling combinators', () => {
         index: 1,
         status: Fatal,
       })
+      tfail(leftB(seq(letter, letter), digit, '\\w\\w\\d'), 'a11', {
+        expected: '\\w\\w\\d',
+        index: 1,
+        status: Fatal,
+      })
       tfail(leftB(letter, seq(letter, digit)), 'aab', {
         expected: 'a digit',
+        index: 2,
+        status: Fatal,
+      })
+      tfail(leftB(letter, seq(letter, digit), '\\w\\w\\d'), 'aab', {
+        expected: '\\w\\w\\d',
         index: 2,
         status: Fatal,
       })
@@ -436,31 +467,52 @@ describe('Backtracking and error handling combinators', () => {
       terror(
         rightB(0, any),
         '',
-        '[rightB]: expected 1st argument to be a parser; found 0',
+        '[rightB]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
         rightB(any, 0),
         '',
-        '[rightB]: expected 2nd argument to be a parser; found 0',
+        '[rightB]: expected second argument to be a parser; found 0',
+      )
+    })
+    it('throws if its third argument exists and is not a string', () => {
+      terror(
+        rightB(any, any, 0),
+        '',
+        '[rightB]: expected third argument to be a string; found 0',
       )
     })
     it('returns the result of its right parser if both pass', () => {
       tpass(rightB(letter, digit), 'a1', '1')
+      tpass(rightB(letter, digit, 'test'), 'a1', '1')
     })
     it('fails non-fatally if one parser fails and no input is consumed', () => {
       tfail(rightB(letter, digit), '1', { expected: 'a letter', status: Fail })
+      tfail(rightB(letter, digit, 'letter then digit'), '1', {
+        expected: 'letter then digit',
+        status: Fail,
+      })
       tfail(rightB(eof, char('a')), '', { expected: "'a'", status: Fail })
+      tfail(rightB(eof, char('a'), 'something impossible'), '', {
+        expected: 'something impossible',
+        status: Fail,
+      })
     })
     it('fails non-fatally on non-fatal errors after consumption', () => {
-      const [ctx, result] = parse(rightB(letter, digit), 'aa')
-      const err = result.errors[0]
-
-      expect(ctx.index).to.equal(0)
-      expect(result.status).to.equal(Fail)
-      expect(err.ctx.index).to.equal(1)
-      expect(err.errors[0].label).to.equal('a digit')
+      tfail(rightB(letter, digit), 'aa', {
+        nested: 'a digit',
+        index: 0,
+        ctxindex: 1,
+        status: Fail,
+      })
+      tfail(rightB(letter, digit, 'letter then digit'), 'aa', {
+        compound: 'letter then digit',
+        index: 0,
+        ctxindex: 1,
+        status: Fail,
+      })
     })
     it('still fails fatally if either parser fails fatally', () => {
       tfail(rightB(seq(letter, letter), digit), 'a11', {
@@ -468,8 +520,18 @@ describe('Backtracking and error handling combinators', () => {
         index: 1,
         status: Fatal,
       })
+      tfail(rightB(seq(letter, letter), digit, '\\w\\w\\d'), 'a11', {
+        expected: '\\w\\w\\d',
+        index: 1,
+        status: Fatal,
+      })
       tfail(rightB(letter, seq(letter, digit)), 'aab', {
         expected: 'a digit',
+        index: 2,
+        status: Fatal,
+      })
+      tfail(rightB(letter, seq(letter, digit), '\\w\\w\\d'), 'aab', {
+        expected: '\\w\\w\\d',
         index: 2,
         status: Fatal,
       })
