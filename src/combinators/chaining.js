@@ -15,13 +15,11 @@ import {
   assertString,
   formatter,
 } from 'kessel/assert'
-import { failReply, fatalReply, okReply, parser, Status } from 'kessel/core'
+import { okReply, parser, Status } from 'kessel/core'
 import { expected, merge } from 'kessel/error'
-import { dup } from 'kessel/util'
+import { dup, replyFn } from 'kessel/util'
 
 const { Ok, Fatal } = Status
-
-const replyFn = cond => cond ? fatalReply : failReply
 
 /** @typedef {import('kessel/core').Parser} Parser */
 

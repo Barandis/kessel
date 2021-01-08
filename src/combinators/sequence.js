@@ -17,7 +17,7 @@ import {
 } from 'kessel/assert'
 import { failReply, fatalReply, okReply, parser, Status } from 'kessel/core'
 import { expected, merge } from 'kessel/error'
-import { dup, range, stringify, wordinal } from 'kessel/util'
+import { dup, range, replyFn, stringify, wordinal } from 'kessel/util'
 
 /** @typedef {import('kessel/core').Parser} Parser */
 
@@ -27,8 +27,6 @@ function loopMessage(name) {
   return `[${name}]: infinite loop detected; `
     + 'neither content nor separator parser consumed input'
 }
-
-const replyFn = cond => cond ? fatalReply : failReply
 
 /**
  * A parser that implements a sequence. Each supplied parser is executed
