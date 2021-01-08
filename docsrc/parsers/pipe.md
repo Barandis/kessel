@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `pipe(...ps: Parser[], fn: Function, m?: string): Parser`
+> `pipe(...ps: Parser[], fn: function, m?: string): Parser`
 
 Applies some parsers in order, then returns the result of a function to which all of the parser results have been passed.
 

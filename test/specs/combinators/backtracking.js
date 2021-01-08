@@ -192,22 +192,42 @@ describe('Backtracking and error handling combinators', () => {
       terror(
         chainB(0, x => x),
         '',
-        '[chainB]: expected 1st argument to be a parser; found 0',
+        '[chainB]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a function', () => {
       terror(
         chainB(any, 0),
         '',
-        '[chainB]: expected 2nd argument to be a function; found 0',
+        '[chainB]: expected second argument to be a function; found 0',
+      )
+    })
+    it('throws if its third argument exists and is not a string', () => {
+      terror(
+        chainB(any, x => x, 0),
+        '',
+        '[chainB]: expected third argument to be a string; found 0',
+      )
+    })
+    it('throws if the function does not return a parser', () => {
+      terror(
+        chainB(any, x => x),
+        'abc',
+        '[chainB]: expected second argument to return a parser; found "a"',
       )
     })
     it('passes successful result to function to get the next parser', () => {
       tpass(chainB(any, c => char(c)), 'aa', { result: 'a', index: 2 })
+      tpass(chainB(any, c => char(c), 'test'), 'aa', { result: 'a', index: 2 })
     })
     it('fails if its parser fails without calling the second parser', () => {
       tfail(chainB(char('a'), () => char('b')), 'bb', {
         expected: "'a'",
+        index: 0,
+        status: Fail,
+      })
+      tfail(chainB(char('a'), () => char('b'), 'a then b'), 'bb', {
+        expected: 'a then b',
         index: 0,
         status: Fail,
       })
@@ -218,16 +238,25 @@ describe('Backtracking and error handling combinators', () => {
         index: 0,
         status: Fail,
       })
+      tfail(chainB(peek(char('a')), () => char('b'), 'a then b'), 'a', {
+        expected: 'a then b',
+        index: 0,
+        status: Fail,
+      })
     })
     it('fails non-fatally if the second fails after the first consumes', () => {
-      const parser = chainB(char('a'), () => char('b'))
-      const [ctx, result] = parse(parser, 'ac')
-      const err = result.errors[0]
-
-      expect(ctx.index).to.equal(0)
-      expect(result.status).to.equal(Fail)
-      expect(err.ctx.index).to.equal(1)
-      expect(err.errors[0].label).to.equal("'b'")
+      tfail(chainB(char('a'), () => char('b')), 'ac', {
+        nested: "'b'",
+        index: 0,
+        ctxindex: 1,
+        status: Fail,
+      })
+      tfail(chainB(char('a'), () => char('b'), 'a then b'), 'ac', {
+        compound: 'a then b',
+        index: 0,
+        ctxindex: 1,
+        status: Fail,
+      })
     })
     it('still fails fatally if either parser fails fatally', () => {
       tfail(chainB(seq(letter, digit), () => letter), 'aaa', {
@@ -235,8 +264,18 @@ describe('Backtracking and error handling combinators', () => {
         index: 1,
         status: Fatal,
       })
+      tfail(chainB(seq(letter, digit), () => letter, '\\w\\d\\w'), 'aaa', {
+        expected: '\\w\\d\\w',
+        index: 1,
+        status: Fatal,
+      })
       tfail(chainB(letter, c => seq(char(c), char(c))), 'aab', {
         expected: "'a'",
+        index: 2,
+        status: Fatal,
+      })
+      tfail(chainB(letter, c => seq(char(c), char(c)), 'letter, cc'), 'aab', {
+        expected: 'letter, cc',
         index: 2,
         status: Fatal,
       })

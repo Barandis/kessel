@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `chainB<T>(p: Parser<T>, fn: (arg: T) => Parser<U>): Parser<U>`
+> `chainB(p: Parser, fn: function, m?: string): Parser`
 
 Applies a parser to the input, passes its result to a function, and then applies the parser that function returns to the input.
 
@@ -48,6 +48,7 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 
 * `p`: The parser which is applied first and whose result is passed into `fn`.
 * `fn`: A function which, when passed the result of `p`, should return a second parser to be applied to the input.
+* `m`: The optional expected error message that will take the place of the default error message.
 
 #### Success
 
@@ -65,6 +66,7 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 
 * Throws an error if `p` is not a parser.
 * Throws an error if `fn` is not a non-parser function.
+* Throws an error if `m` exists and is not a string.
 * Throws an error if `p` succeeds and the value returned by `fn` is not a parser.
 
 #### See Also

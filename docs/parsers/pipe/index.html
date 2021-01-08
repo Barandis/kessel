@@ -2099,7 +2099,7 @@
 -->
 
 <blockquote>
-<p><code>pipe(...ps: Parser[], fn: Function, m?: string): Parser</code></p>
+<p><code>pipe(...ps: Parser[], fn: function, m?: string): Parser</code></p>
 </blockquote>
 <p>Applies some parsers in order, then returns the result of a function to which all of the parser results have been passed.</p>
 <p><code>fn</code> will be passed one argument for every member of <code>ps</code>. JavaScript does not enforce that there has to be a parameter for each passed argument, but likely you will want to provide an <code>fn</code> that has an arity equal to the number of parsers in <code>ps</code>.</p>

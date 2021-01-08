@@ -2099,7 +2099,7 @@
 -->
 
 <blockquote>
-<p><code>chainB&lt;T&gt;(p: Parser&lt;T&gt;, fn: (arg: T) =&gt; Parser&lt;U&gt;): Parser&lt;U&gt;</code></p>
+<p><code>chainB(p: Parser, fn: function, m?: string): Parser</code></p>
 </blockquote>
 <p>Applies a parser to the input, passes its result to a function, and then applies the parser that function returns to the input.</p>
 <p>If <code>p</code> succeeds but the parser that is returned by <code>fn</code> fails, the state will backtrack to the location where <code>p</code> was originally applied and <code>chainB</code> will fail non-fatally.</p>
@@ -2137,6 +2137,7 @@
 <ul>
 <li><code>p</code>: The parser which is applied first and whose result is passed into <code>fn</code>.</li>
 <li><code>fn</code>: A function which, when passed the result of <code>p</code>, should return a second parser to be applied to the input.</li>
+<li><code>m</code>: The optional expected error message that will take the place of the default error message.</li>
 </ul>
 <h4 id="success">Success</h4>
 <ul>
@@ -2154,6 +2155,7 @@
 <ul>
 <li>Throws an error if <code>p</code> is not a parser.</li>
 <li>Throws an error if <code>fn</code> is not a non-parser function.</li>
+<li>Throws an error if <code>m</code> exists and is not a string.</li>
 <li>Throws an error if <code>p</code> succeeds and the value returned by <code>fn</code> is not a parser.</li>
 </ul>
 <h4 id="see-also">See Also</h4>
