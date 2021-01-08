@@ -15,7 +15,7 @@ import {
   assertString,
   formatter,
 } from 'kessel/assert'
-import { maybeFatal, ok, parser, Status } from 'kessel/core'
+import { maybeFatal, okReply, parser, Status } from 'kessel/core'
 import { expected, merge } from 'kessel/error'
 import { dup } from 'kessel/util'
 
@@ -52,7 +52,7 @@ export const join = (p, m) => parser(ctx => {
   const v = pres.value
   ASSERT && assertArray('join', v, formatter('argument to return an array'))
 
-  return ok(pctx, v.join(''))
+  return okReply(pctx, v.join(''))
 })
 
 /**
@@ -82,7 +82,7 @@ export const compact = (p, m) => parser(ctx => {
   const v = pres.value
   ASSERT && assertArray('compact', v, formatter('argument to return an array'))
 
-  return ok(pctx, v.filter(x => x != null))
+  return okReply(pctx, v.filter(x => x != null))
 })
 
 /**
@@ -104,7 +104,7 @@ export const value = (p, x, m) => parser(ctx => {
 
   const [pctx, pres] = p(ctx)
   return pres.status === Ok
-    ? ok(pctx, x)
+    ? okReply(pctx, x)
     : maybeFatal(pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors)
 })
 
@@ -138,7 +138,7 @@ export const nth = (p, n, m) => parser(ctx => {
     'nth', v, formatter('first argument to return an array'),
   )
 
-  return ok(pctx, v[n])
+  return okReply(pctx, v[n])
 })
 
 /**
@@ -167,7 +167,7 @@ export const first = (p, m) => parser(ctx => {
   const v = pres.value
   ASSERT && assertArray('first', v, formatter('argument to return an array'))
 
-  return ok(pctx, v[0])
+  return okReply(pctx, v[0])
 })
 
 /**
@@ -196,7 +196,7 @@ export const second = (p, m) => parser(ctx => {
   const v = pres.value
   ASSERT && assertArray('second', v, formatter('argument to return an array'))
 
-  return ok(pctx, v[1])
+  return okReply(pctx, v[1])
 })
 
 /**
@@ -225,7 +225,7 @@ export const third = (p, m) => parser(ctx => {
   const v = pres.value
   ASSERT && assertArray('third', v, formatter('argument to return an array'))
 
-  return ok(pctx, v[2])
+  return okReply(pctx, v[2])
 })
 
 /**
@@ -254,7 +254,7 @@ export const fourth = (p, m) => parser(ctx => {
   const v = pres.value
   ASSERT && assertArray('fourth', v, formatter('argument to return an array'))
 
-  return ok(pctx, v[3])
+  return okReply(pctx, v[3])
 })
 
 /**
@@ -283,7 +283,7 @@ export const fifth = (p, m) => parser(ctx => {
   const v = pres.value
   ASSERT && assertArray('fifth', v, formatter('argument to return an array'))
 
-  return ok(pctx, v[4])
+  return okReply(pctx, v[4])
 })
 
 /**
@@ -313,7 +313,7 @@ export const map = (p, fn, m) => parser(ctx => {
 
   const [pctx, pres] = p(ctx)
   return pres.status === Ok
-    ? ok(pctx, fn(pres.value))
+    ? okReply(pctx, fn(pres.value))
     : maybeFatal(pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors)
 })
 
@@ -364,7 +364,7 @@ export const apply = (p, q, m) => parser(ctx => {
   ASSERT && assertFunction(
     'apply', fn, formatter('second argument to return a function'),
   )
-  return ok(qctx, fn(pres.value))
+  return okReply(qctx, fn(pres.value))
 })
 
 /**

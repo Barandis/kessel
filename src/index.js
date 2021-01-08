@@ -121,11 +121,11 @@ export {
 
 export {
   Status,
-  fail,
+  failReply,
   failure,
-  fatal,
+  fatalReply,
   maybeFatal,
-  ok,
+  okReply,
   parse,
   parser,
   run,

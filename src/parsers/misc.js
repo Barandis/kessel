@@ -4,7 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import { assertString } from 'kessel/assert'
-import { fail, fatal, ok, parser } from 'kessel/core'
+import { failReply, fatalReply, okReply, parser } from 'kessel/core'
 import { generic } from 'kessel/error'
 
 /** @typedef {import('kessel/core').Parser} Parser */
@@ -19,7 +19,7 @@ import { generic } from 'kessel/error'
  */
 export const failNormally = msg => parser(ctx => {
   ASSERT && assertString('failNormally', msg)
-  return fail(ctx, generic(msg))
+  return failReply(ctx, generic(msg))
 })
 
 /**
@@ -33,7 +33,7 @@ export const failNormally = msg => parser(ctx => {
  */
 export const failFatally = msg => parser(ctx => {
   ASSERT && assertString('failFatally', msg)
-  return fatal(ctx, generic(msg))
+  return fatalReply(ctx, generic(msg))
 })
 
 /**
@@ -49,4 +49,4 @@ export const failFatally = msg => parser(ctx => {
  * @param {*} x The value will result when this parser is applied.
  * @returns {Parser} A parser that always succeeds with `value`.
  */
-export const always = x => parser(ctx => ok(ctx, x))
+export const always = x => parser(ctx => okReply(ctx, x))

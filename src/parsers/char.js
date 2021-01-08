@@ -12,7 +12,7 @@ import {
   ordFnFormatter,
   ordStrFormatter,
 } from 'kessel/assert'
-import { fail, ok, parser, Status } from 'kessel/core'
+import { failReply, okReply, parser, Status } from 'kessel/core'
 import { expected } from 'kessel/error'
 import { expecteds } from 'kessel/messages'
 import { dup, nextChar } from 'kessel/util'
@@ -39,10 +39,10 @@ const { Ok } = Status
  */
 const charParser = fn => parser(ctx => {
   const { index, view } = ctx
-  if (index >= view.byteLength) return fail(ctx)
+  if (index >= view.byteLength) return failReply(ctx)
 
   const { width, next } = nextChar(index, view)
-  return fn(next) ? ok(ctx, next, index + width) : fail(ctx)
+  return fn(next) ? okReply(ctx, next, index + width) : failReply(ctx)
 })
 
 /**
@@ -59,7 +59,7 @@ export const char = c => parser(ctx => {
   ASSERT && assertChar('char', c)
 
   const [cprep, [cpctx, cpres]] = dup(charParser(ch => c === ch)(ctx))
-  return cpres.status === Ok ? cprep : fail(cpctx, expecteds.char(c))
+  return cpres.status === Ok ? cprep : failReply(cpctx, expecteds.char(c))
 })
 
 /**
@@ -79,7 +79,7 @@ export const charI = c => parser(ctx => {
   const [cprep, [cpctx, cpres]] = dup(charParser(
     ch => c.toLowerCase() === ch.toLowerCase(),
   )(ctx))
-  return cpres.status === Ok ? cprep : fail(cpctx, expecteds.charI(c))
+  return cpres.status === Ok ? cprep : failReply(cpctx, expecteds.charI(c))
 })
 
 /**
@@ -124,7 +124,7 @@ export const satisfyM = (fn, message) => parser(ctx => {
   ASSERT && assertString('satisfyM', message, ordStrFormatter('2nd'))
 
   const [cprep, [cpctx, cpres]] = dup(charParser(fn)(ctx))
-  return cpres.status === Ok ? cprep : fail(cpctx, expected(message))
+  return cpres.status === Ok ? cprep : failReply(cpctx, expected(message))
 })
 
 /**
@@ -149,7 +149,7 @@ export const range = (s, e) => parser(ctx => {
 
   const fn = c => c >= s && c <= e
   const [cprep, [cpctx, cpres]] = dup(charParser(fn)(ctx))
-  return cpres.status === Ok ? cprep : fail(cpctx, expecteds.range(s, e))
+  return cpres.status === Ok ? cprep : failReply(cpctx, expecteds.range(s, e))
 })
 
 /**
@@ -160,10 +160,10 @@ export const range = (s, e) => parser(ctx => {
  */
 export const any = parser(ctx => {
   const { index, view } = ctx
-  if (index >= view.byteLength) return fail(ctx, expecteds.any)
+  if (index >= view.byteLength) return failReply(ctx, expecteds.any)
 
   const { width, next } = nextChar(index, view)
-  return ok(ctx, next, index + width)
+  return okReply(ctx, next, index + width)
 })
 
 /**
@@ -175,7 +175,9 @@ export const any = parser(ctx => {
  */
 export const eof = parser(ctx => {
   const { index, view } = ctx
-  return index >= view.byteLength ? ok(ctx, null) : fail(ctx, expecteds.eof)
+  return index >= view.byteLength
+    ? okReply(ctx, null)
+    : failReply(ctx, expecteds.eof)
 })
 
 /**
@@ -198,8 +200,8 @@ export const anyOf = cs => parser(ctx => {
   const arr = [...cs]
 
   return arr.includes(next)
-    ? ok(ctx, next, index + width)
-    : fail(ctx, expecteds.anyOf(arr))
+    ? okReply(ctx, next, index + width)
+    : failReply(ctx, expecteds.anyOf(arr))
 })
 
 /**
@@ -222,8 +224,8 @@ export const noneOf = cs => parser(ctx => {
   const arr = [...cs]
 
   return arr.includes(next)
-    ? fail(ctx, expecteds.noneOf(arr))
-    : ok(ctx, next, index + width)
+    ? failReply(ctx, expecteds.noneOf(arr))
+    : okReply(ctx, next, index + width)
 })
 
 /**
@@ -235,7 +237,7 @@ export const noneOf = cs => parser(ctx => {
 export const digit = parser(ctx => {
   const fn = c => c >= '0' && c <= '9'
   const [cprep, [cpctx, cpres]] = dup(charParser(fn)(ctx))
-  return cpres.status === Ok ? cprep : fail(cpctx, expecteds.digit)
+  return cpres.status === Ok ? cprep : failReply(cpctx, expecteds.digit)
 })
 
 /**
@@ -249,7 +251,7 @@ export const hex = parser(ctx => {
     || c >= 'a' && c <= 'f'
     || c >= 'A' && c <= 'F'
   const [cprep, [cpctx, cpres]] = dup(charParser(fn)(ctx))
-  return cpres.status === Ok ? cprep : fail(cpctx, expecteds.hex)
+  return cpres.status === Ok ? cprep : failReply(cpctx, expecteds.hex)
 })
 
 /**
@@ -261,7 +263,7 @@ export const hex = parser(ctx => {
 export const octal = parser(ctx => {
   const fn = c => c >= '0' && c <= '7'
   const [cprep, [cpctx, cpres]] = dup(charParser(fn)(ctx))
-  return cpres.status === Ok ? cprep : fail(cpctx, expecteds.octal)
+  return cpres.status === Ok ? cprep : failReply(cpctx, expecteds.octal)
 })
 
 /**
@@ -273,7 +275,7 @@ export const octal = parser(ctx => {
 export const letter = parser(ctx => {
   const fn = c => c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z'
   const [cprep, [cpctx, cpres]] = dup(charParser(fn)(ctx))
-  return cpres.status === Ok ? cprep : fail(cpctx, expecteds.letter)
+  return cpres.status === Ok ? cprep : failReply(cpctx, expecteds.letter)
 })
 
 /**
@@ -287,7 +289,7 @@ export const alpha = parser(ctx => {
     || c >= 'A' && c <= 'Z'
     || c >= '0' && c <= '9'
   const [cprep, [cpctx, cpres]] = dup(charParser(fn)(ctx))
-  return cpres.status === Ok ? cprep : fail(cpctx, expecteds.alpha)
+  return cpres.status === Ok ? cprep : failReply(cpctx, expecteds.alpha)
 })
 
 /**
@@ -299,7 +301,7 @@ export const alpha = parser(ctx => {
 export const upper = parser(ctx => {
   const fn = c => c >= 'A' && c <= 'Z'
   const [cprep, [cpctx, cpres]] = dup(charParser(fn)(ctx))
-  return cpres.status === Ok ? cprep : fail(cpctx, expecteds.upper)
+  return cpres.status === Ok ? cprep : failReply(cpctx, expecteds.upper)
 })
 
 /**
@@ -311,5 +313,5 @@ export const upper = parser(ctx => {
 export const lower = parser(ctx => {
   const fn = c => c >= 'a' && c <= 'z'
   const [cprep, [cpctx, cpres]] = dup(charParser(fn)(ctx))
-  return cpres.status === Ok ? cprep : fail(cpctx, expecteds.lower)
+  return cpres.status === Ok ? cprep : failReply(cpctx, expecteds.lower)
 })

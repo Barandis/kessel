@@ -4,7 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import { assertNumber, assertString } from 'kessel/assert'
-import { fail, ok, parser, Status } from 'kessel/core'
+import { failReply, okReply, parser, Status } from 'kessel/core'
 import { expecteds } from 'kessel/messages'
 import { charLength, dup, nextChars, viewToString } from 'kessel/util'
 
@@ -30,15 +30,15 @@ const { Ok } = Status
  *     the predicate function.
  */
 const stringParser = (length, fn) => parser(ctx => {
-  if (length < 1) return ok(ctx, '')
+  if (length < 1) return okReply(ctx, '')
 
   const { index, view } = ctx
-  if (index >= view.byteLength) return fail(ctx)
+  if (index >= view.byteLength) return failReply(ctx)
 
   const { width, next } = nextChars(index, view, length)
   return charLength(next) !== length || !fn(next)
-    ? fail(ctx)
-    : ok(ctx, next, index + width)
+    ? failReply(ctx)
+    : okReply(ctx, next, index + width)
 })
 
 /**
@@ -61,7 +61,7 @@ export const string = str => parser(ctx => {
   const [sprep, [spctx, spres]] = dup(stringParser(
     charLength(str), chars => str === chars,
   )(ctx))
-  return spres.status === Ok ? sprep : fail(spctx, expecteds.string(str))
+  return spres.status === Ok ? sprep : failReply(spctx, expecteds.string(str))
 })
 
 /**
@@ -83,7 +83,7 @@ export const stringI = str => parser(ctx => {
   const [sprep, [spctx, spres]] = dup(stringParser(
     charLength(str), chars => str.toLowerCase() === chars.toLowerCase(),
   )(ctx))
-  return spres.status === Ok ? sprep : fail(spctx, expecteds.stringI(str))
+  return spres.status === Ok ? sprep : failReply(spctx, expecteds.stringI(str))
 })
 
 /**
@@ -95,7 +95,7 @@ export const stringI = str => parser(ctx => {
 export const all = parser(ctx => {
   const { index, view } = ctx
   const width = view.byteLength - index
-  return ok(ctx, viewToString(index, width, view), index + width)
+  return okReply(ctx, viewToString(index, width, view), index + width)
 })
 
 /**
@@ -111,5 +111,5 @@ export const anyString = n => parser(ctx => {
   ASSERT && assertNumber('anyString', n)
 
   const [sprep, [spctx, spres]] = dup(stringParser(n, () => true)(ctx))
-  return spres.status === Ok ? sprep : fail(spctx, expecteds.anyString(n))
+  return spres.status === Ok ? sprep : failReply(spctx, expecteds.anyString(n))
 })

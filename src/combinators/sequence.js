@@ -15,7 +15,7 @@ import {
   assertParser,
   assertString,
 } from 'kessel/assert'
-import { fatal, maybeFatal, ok, parser, Status } from 'kessel/core'
+import { fatalReply, maybeFatal, okReply, parser, Status } from 'kessel/core'
 import { expected, merge } from 'kessel/error'
 import { dup, range, stringify, wordinal } from 'kessel/util'
 
@@ -69,7 +69,7 @@ export const seq = (...args) => {
       }
       values.push(pres.value)
     }
-    return ok(context, values)
+    return okReply(context, values)
   })
 }
 
@@ -106,7 +106,7 @@ export const left = (p, q, m) => parser(ctx => {
   const [qctx, qres] = q(pctx)
   const errors = hasM ? merror : merge(pres.errors, qres.errors)
   return qres.status === Ok
-    ? ok(qctx, pres.value)
+    ? okReply(qctx, pres.value)
     : maybeFatal(qctx.index !== index, qctx, errors)
 })
 
@@ -187,7 +187,7 @@ export const block = (g, m) => parser(ctx => {
 
   while (true) {
     const { value, done } = gen.next(nextValue)
-    if (done) return ok(context, value)
+    if (done) return okReply(context, value)
 
     ASSERT && assertParser('block', value, v => `expected ${
       wordinal(i + 1)
@@ -233,13 +233,13 @@ export const many = (p, m) => parser(ctx => {
     context = pctx
 
     if (pres.status === Fatal) {
-      return fatal(pctx, hasM ? expected(m) : pres.errors)
+      return fatalReply(pctx, hasM ? expected(m) : pres.errors)
     }
     if (pres.status === Fail) break
     values.push(pres.value)
     if (context.index >= context.view.byteLength) break
   }
-  return ok(context, values)
+  return okReply(context, values)
 })
 
 /**
@@ -276,12 +276,14 @@ export const many1 = (p, m) => parser(ctx => {
     const [pctx, pres] = p(context)
     context = pctx
 
-    if (pres.status === Fatal) return fatal(pctx, hasM ? merror : pres.errors)
+    if (pres.status === Fatal) {
+      return fatalReply(pctx, hasM ? merror : pres.errors)
+    }
     if (pres.status === Fail) break
     values.push(pres.value)
     if (context.index >= context.view.byteLength) break
   }
-  return ok(context, values)
+  return okReply(context, values)
 })
 
 /**
@@ -302,7 +304,7 @@ export const skip = (p, m) => parser(ctx => {
 
   const [pctx, pres] = p(ctx)
   return pres.status === Ok
-    ? ok(pctx, null)
+    ? okReply(pctx, null)
     : maybeFatal(pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors)
 })
 
@@ -332,12 +334,12 @@ export const skipMany = (p, m) => parser(ctx => {
     context = pctx
 
     if (pres.status === Fatal) {
-      return fatal(pctx, hasM ? expected(m) : pres.errors)
+      return fatalReply(pctx, hasM ? expected(m) : pres.errors)
     }
     if (pres.status === Fail) break
     if (context.index >= context.view.byteLength) break
   }
-  return ok(context, null)
+  return okReply(context, null)
 })
 
 /**
@@ -372,11 +374,13 @@ export const skipMany1 = (p, m) => parser(ctx => {
     const [pctx, pres] = p(context)
     context = pctx
 
-    if (pres.status === Fatal) return fatal(pctx, hasM ? merror : pres.errors)
+    if (pres.status === Fatal) {
+      return fatalReply(pctx, hasM ? merror : pres.errors)
+    }
     if (pres.status === Fail) break
     if (context.index >= context.view.byteLength) break
   }
-  return ok(context, null)
+  return okReply(context, null)
 })
 
 /**
@@ -410,8 +414,10 @@ export const sep = (p, s, m) => parser(ctx => {
   const merror = expected(m)
 
   const [pctx, pres] = p(ctx)
-  if (pres.status === Fatal) return fatal(pctx, hasM ? merror : pres.errors)
-  if (pres.status === Fail) return ok(pctx, [])
+  if (pres.status === Fatal) {
+    return fatalReply(pctx, hasM ? merror : pres.errors)
+  }
+  if (pres.status === Fail) return okReply(pctx, [])
 
   const values = [pres.value]
   let context = pctx
@@ -421,18 +427,22 @@ export const sep = (p, s, m) => parser(ctx => {
 
     const [sctx, sres] = s(context)
     context = sctx
-    if (sres.status === Fatal) return fatal(sctx, hasM ? merror : sres.errors)
+    if (sres.status === Fatal) {
+      return fatalReply(sctx, hasM ? merror : sres.errors)
+    }
     if (sres.status === Fail) break
 
     const [pctx, pres] = p(context)
     context = pctx
-    if (pres.status === Fatal) return fatal(pctx, hasM ? merror : pres.errors)
+    if (pres.status === Fatal) {
+      return fatalReply(pctx, hasM ? merror : pres.errors)
+    }
     if (pres.status === Fail) break
 
     if (context.index === index) throw new TypeError(loopMessage('sep'))
     values.push(pres.value)
   }
-  return ok(context, values, index)
+  return okReply(context, values, index)
 })
 
 /**
@@ -478,18 +488,22 @@ export const sep1 = (p, s, m) => parser(ctx => {
 
     const [sctx, sres] = s(context)
     context = sctx
-    if (sres.status === Fatal) return fatal(sctx, hasM ? merror : sres.errors)
+    if (sres.status === Fatal) {
+      return fatalReply(sctx, hasM ? merror : sres.errors)
+    }
     if (sres.status === Fail) break
 
     const [pctx, pres] = p(context)
     context = pctx
-    if (pres.status === Fatal) return fatal(pctx, hasM ? merror : pres.errors)
+    if (pres.status === Fatal) {
+      return fatalReply(pctx, hasM ? merror : pres.errors)
+    }
     if (pres.status === Fail) break
 
     if (context.index === index) throw new TypeError(loopMessage('sep1'))
     values.push(pres.value)
   }
-  return ok(context, values, index)
+  return okReply(context, values, index)
 })
 
 /**
@@ -523,8 +537,10 @@ export const end = (p, s, m) => parser(ctx => {
   const merror = expected(m)
 
   const [pctx, pres] = p(ctx)
-  if (pres.status === Fatal) return fatal(pctx, hasM ? merror : pres.errors)
-  if (pres.status === Fail) return ok(pctx, [])
+  if (pres.status === Fatal) {
+    return fatalReply(pctx, hasM ? merror : pres.errors)
+  }
+  if (pres.status === Fail) return okReply(pctx, [])
 
   const values = [pres.value]
   let context = pctx
@@ -534,20 +550,26 @@ export const end = (p, s, m) => parser(ctx => {
 
     const [sctx, sres] = s(context)
     context = sctx
-    if (sres.status === Fatal) return fatal(sctx, hasM ? merror : sres.errors)
+    if (sres.status === Fatal) {
+      return fatalReply(sctx, hasM ? merror : sres.errors)
+    }
     if (sres.status === Fail) break
 
     const [pctx, pres] = p(context)
     context = pctx
-    if (pres.status === Fatal) return fatal(pctx, hasM ? merror : pres.errors)
+    if (pres.status === Fatal) {
+      return fatalReply(pctx, hasM ? merror : pres.errors)
+    }
     if (pres.status === Fail) break
 
     if (context.index === index) throw new TypeError(loopMessage('end'))
     values.push(pres.value)
   }
   const [sctx, sres] = s({ ...context, index })
-  if (sres.status === Fatal) return fatal(sctx, hasM ? merror : sres.errors)
-  return ok(sctx, values)
+  if (sres.status === Fatal) {
+    return fatalReply(sctx, hasM ? merror : sres.errors)
+  }
+  return okReply(sctx, values)
 })
 
 /**
@@ -593,20 +615,26 @@ export const sepEndBy1 = (p, s, m) => parser(ctx => {
 
     const [sctx, sres] = s(context)
     context = sctx
-    if (sres.status === Fatal) return fatal(sctx, hasM ? merror : sres.errors)
+    if (sres.status === Fatal) {
+      return fatalReply(sctx, hasM ? merror : sres.errors)
+    }
     if (sres.status === Fail) break
 
     const [pctx, pres] = p(context)
     context = pctx
-    if (pres.status === Fatal) return fatal(pctx, hasM ? merror : pres.errors)
+    if (pres.status === Fatal) {
+      return fatalReply(pctx, hasM ? merror : pres.errors)
+    }
     if (pres.status === Fail) break
 
     if (context.index === index) throw new TypeError(loopMessage('sepEndBy1'))
     values.push(pres.value)
   }
   const [sctx, sres] = s({ ...context, index })
-  if (sres.status === Fatal) return fatal(sctx, hasM ? merror : sres.errors)
-  return ok(sctx, values)
+  if (sres.status === Fatal) {
+    return fatalReply(sctx, hasM ? merror : sres.errors)
+  }
+  return okReply(sctx, values)
 })
 
 /**
@@ -644,7 +672,7 @@ export const repeat = (p, n, m) => parser(ctx => {
     }
     values.push(pres.value)
   }
-  return ok(context, values)
+  return okReply(context, values)
 })
 
 /**
@@ -690,7 +718,7 @@ export const between = (s, e, p, m) => parser(ctx => {
 
   const [ectx, eres] = e(pctx)
   return eres.status === Ok
-    ? ok(ectx, pres.value)
+    ? okReply(ectx, pres.value)
     : maybeFatal(
       ectx.index !== index, ectx, hasM ? errors : merge(errors, eres.errors),
     )
@@ -729,12 +757,16 @@ export const until = (p, e, m) => parser(ctx => {
   while (true) {
     const [ectx, eres] = e(context)
     context = ectx
-    if (eres.status === Fatal) return fatal(ectx, hasM ? merror : eres.errors)
+    if (eres.status === Fatal) {
+      return fatalReply(ectx, hasM ? merror : eres.errors)
+    }
     if (eres.status === Ok) break
 
     const [pctx, pres] = p(context)
     context = pctx
-    if (pres.status === Fatal) return fatal(pctx, hasM ? merror : pres.errors)
+    if (pres.status === Fatal) {
+      return fatalReply(pctx, hasM ? merror : pres.errors)
+    }
     if (pres.status === Fail) {
       return maybeFatal(
         context.index !== index,
@@ -744,7 +776,7 @@ export const until = (p, e, m) => parser(ctx => {
     }
     values.push(pres.value)
   }
-  return ok(context, values)
+  return okReply(context, values)
 })
 
 /**
@@ -805,7 +837,7 @@ export const pipe = (...args) => {
       }
       values.push(pres.value)
     }
-    return ok(context, fn(...values))
+    return okReply(context, fn(...values))
   })
 }
 
@@ -857,8 +889,10 @@ export const assocL = (p, o, x, m) => parser(ctx => {
   const merror = expected(m)
 
   const [pctx, pres] = p(ctx)
-  if (pres.status === Fatal) return fatal(pctx, hasM ? merror : pres.errors)
-  if (pres.status === Fail) return ok(pctx, x)
+  if (pres.status === Fatal) {
+    return fatalReply(pctx, hasM ? merror : pres.errors)
+  }
+  if (pres.status === Fail) return okReply(pctx, x)
 
   const values = [pres.value]
   const ops = []
@@ -869,12 +903,16 @@ export const assocL = (p, o, x, m) => parser(ctx => {
   while (true) {
     const [octx, ores] = o(context)
     context = octx
-    if (ores.status === Fatal) return fatal(octx, hasM ? merror : ores.errors)
+    if (ores.status === Fatal) {
+      return fatalReply(octx, hasM ? merror : ores.errors)
+    }
     if (ores.status === Fail) break
 
     const [pctx, pres] = p(context)
     context = pctx
-    if (pres.status === Fatal) return fatal(pctx, hasM ? merror : pres.errors)
+    if (pres.status === Fatal) {
+      return fatalReply(pctx, hasM ? merror : pres.errors)
+    }
     if (pres.status === Fail) break
 
     ASSERT && assertFunction(
@@ -891,7 +929,7 @@ export const assocL = (p, o, x, m) => parser(ctx => {
   for (const i of range(ops.length)) {
     value = ops[i](value, values[i + 1])
   }
-  return ok(context, value, index)
+  return okReply(context, value, index)
 })
 
 /**
@@ -938,12 +976,16 @@ export const assoc1L = (p, o, m) => parser(ctx => {
   while (true) {
     const [octx, ores] = o(context)
     context = octx
-    if (ores.status === Fatal) return fatal(octx, hasM ? merror : ores.errors)
+    if (ores.status === Fatal) {
+      return fatalReply(octx, hasM ? merror : ores.errors)
+    }
     if (ores.status === Fail) break
 
     const [pctx, pres] = p(context)
     context = pctx
-    if (pres.status === Fatal) return fatal(pctx, hasM ? merror : pres.errors)
+    if (pres.status === Fatal) {
+      return fatalReply(pctx, hasM ? merror : pres.errors)
+    }
     if (pres.status === Fail) break
 
     ASSERT && assertFunction(
@@ -960,7 +1002,7 @@ export const assoc1L = (p, o, m) => parser(ctx => {
   for (const i of range(ops.length)) {
     value = ops[i](value, values[i + 1])
   }
-  return ok(context, value, index)
+  return okReply(context, value, index)
 })
 
 /**
@@ -997,8 +1039,10 @@ export const assocR = (p, o, x, m) => parser(ctx => {
   const merror = expected(m)
 
   const [pctx, pres] = p(ctx)
-  if (pres.status === Fatal) return fatal(pctx, hasM ? merror : pres.errors)
-  if (pres.status === Fail) return ok(pctx, x)
+  if (pres.status === Fatal) {
+    return fatalReply(pctx, hasM ? merror : pres.errors)
+  }
+  if (pres.status === Fail) return okReply(pctx, x)
 
   const values = [pres.value]
   const ops = []
@@ -1009,12 +1053,16 @@ export const assocR = (p, o, x, m) => parser(ctx => {
   while (true) {
     const [octx, ores] = o(context)
     context = octx
-    if (ores.status === Fatal) return fatal(octx, hasM ? merror : ores.errors)
+    if (ores.status === Fatal) {
+      return fatalReply(octx, hasM ? merror : ores.errors)
+    }
     if (ores.status === Fail) break
 
     const [pctx, pres] = p(context)
     context = pctx
-    if (pres.status === Fatal) return fatal(pctx, hasM ? merror : pres.errors)
+    if (pres.status === Fatal) {
+      return fatalReply(pctx, hasM ? merror : pres.errors)
+    }
     if (pres.status === Fail) break
 
     ASSERT && assertFunction(
@@ -1031,7 +1079,7 @@ export const assocR = (p, o, x, m) => parser(ctx => {
   for (const i of range(ops.length - 1, -1)) {
     value = ops[i](values[i], value)
   }
-  return ok(context, value, index)
+  return okReply(context, value, index)
 })
 
 /**
@@ -1078,12 +1126,16 @@ export const assoc1R = (p, o, m) => parser(ctx => {
   while (true) {
     const [octx, ores] = o(context)
     context = octx
-    if (ores.status === Fatal) return fatal(octx, hasM ? merror : ores.errors)
+    if (ores.status === Fatal) {
+      return fatalReply(octx, hasM ? merror : ores.errors)
+    }
     if (ores.status === Fail) break
 
     const [pctx, pres] = p(context)
     context = pctx
-    if (pres.status === Fatal) return fatal(pctx, hasM ? merror : pres.errors)
+    if (pres.status === Fatal) {
+      return fatalReply(pctx, hasM ? merror : pres.errors)
+    }
     if (pres.status === Fail) break
 
     ASSERT && assertFunction(
@@ -1100,5 +1152,5 @@ export const assoc1R = (p, o, m) => parser(ctx => {
   for (const i of range(ops.length - 1, -1)) {
     value = ops[i](values[i], value)
   }
-  return ok(context, value, index)
+  return okReply(context, value, index)
 })

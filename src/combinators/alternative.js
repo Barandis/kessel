@@ -9,7 +9,7 @@ import {
   assertParser,
   assertString,
 } from 'kessel/assert'
-import { fail, fatal, ok, parser, Status } from 'kessel/core'
+import { failReply, fatalReply, okReply, parser, Status } from 'kessel/core'
 import { compound, expected, merge, nested } from 'kessel/error'
 import { dup } from 'kessel/util'
 
@@ -48,9 +48,9 @@ export const alt = (...args) => {
       if (pres.status === Ok) return prep
 
       if (!hasM) errors = merge(errors, pres.errors)
-      if (pres.status === Fatal) return fatal(pctx, errors)
+      if (pres.status === Fatal) return fatalReply(pctx, errors)
     }
-    return fail(ctx, errors)
+    return failReply(ctx, errors)
   })
 }
 
@@ -75,13 +75,13 @@ export const opt = (p, m) => parser(ctx => {
   const [prep, [pctx, pres]] = dup(p(ctx))
   if (pres.status === Ok) return prep
   const errors = hasM ? expected(m) : pres.errors
-  if (pres.status === Fatal) return fatal(pctx, errors)
+  if (pres.status === Fatal) return fatalReply(pctx, errors)
 
   // If the optional parser fails, we add the error message even though
   // the end result of `opt` is success. This lets sequencing parsers
   // add the opt parser's expected to error messages if a later parser
   // in the sequence fails.
-  const reply = ok(pctx, null)
+  const reply = okReply(pctx, null)
   reply[1].errors = errors
   return reply
 })
@@ -108,8 +108,8 @@ export const def = (p, x, m) => parser(ctx => {
 
   const [prep, [pctx, pres]] = dup(p(ctx))
   if (pres.status === Ok) return prep
-  if (pres.status === Fail) return ok(pctx, x)
-  return fatal(pctx, hasM ? expected(m) : pres.errors)
+  if (pres.status === Fail) return okReply(pctx, x)
+  return fatalReply(pctx, hasM ? expected(m) : pres.errors)
 })
 
 /**
@@ -135,13 +135,13 @@ export const peek = (p, m) => parser(ctx => {
 
   const index = ctx.index
   const [pctx, pres] = p(ctx)
-  if (pres.status === Ok) return ok(pctx, pres.value, index)
+  if (pres.status === Ok) return okReply(pctx, pres.value, index)
   if (pres.status === Fail) {
-    return fail(pctx, hasM ? expected(m) : pres.errors, index)
+    return failReply(pctx, hasM ? expected(m) : pres.errors, index)
   }
   // This parser implements automatic backtracking, so if its parser
   // fails fatally, it has to track that through a nested error
-  return fail(
+  return failReply(
     pctx,
     hasM ? compound(m, pctx, pres.errors) : nested(pctx, pres.errors),
     index,
@@ -172,10 +172,10 @@ export const empty = (p, m) => parser(ctx => {
 
   const index = ctx.index
   const [pctx, pres] = p(ctx)
-  if (pres.status === Ok && pctx.index === index) return ok(pctx, null)
+  if (pres.status === Ok && pctx.index === index) return okReply(pctx, null)
   const errors = hasM ? expected(m) : pres.errors
-  if (pres.status === Fatal) return fatal(pctx, errors)
-  return fail(pctx, errors)
+  if (pres.status === Fatal) return fatalReply(pctx, errors)
+  return failReply(pctx, errors)
 })
 
 /**
@@ -202,5 +202,7 @@ export const not = (p, m) => parser(ctx => {
   const index = ctx.index
   const errors = hasM ? expected(m) : undefined
   const [pctx, pres] = p(ctx)
-  return pres.status === Ok ? fail(pctx, errors, index) : ok(pctx, null, index)
+  return pres.status === Ok
+    ? failReply(pctx, errors, index)
+    : okReply(pctx, null, index)
 })

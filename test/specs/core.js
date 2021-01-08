@@ -7,11 +7,11 @@ import { expect } from 'chai'
 
 import { seq } from 'kessel/combinators/sequence'
 import {
-  fail,
+  failReply,
   failure,
-  fatal,
+  fatalReply,
   maybeFatal,
-  ok,
+  okReply,
   parse,
   run,
   Status,
@@ -55,13 +55,13 @@ describe('Core functionality', () => {
     describe('updating successful parser state', () => {
       it('creates new objects', () => {
         const [state, result] = parse(string('123'), '123')
-        const [ustate, uresult] = ok(state, result.value)
+        const [ustate, uresult] = okReply(state, result.value)
         expect(state).to.not.equal(ustate)
         expect(result).to.deep.equal(uresult)
       })
       it('can update result and/or index properties', () => {
         const [state, result] = parse(string('123'), '123')
-        const [ustate, uresult] = ok(state, '456', 0)
+        const [ustate, uresult] = okReply(state, '456', 0)
         expect(result.value).to.equal('123')
         expect(uresult.value).to.equal('456')
         expect(state.index).to.equal(3)
@@ -72,16 +72,16 @@ describe('Core functionality', () => {
     describe('updated failure parser state', () => {
       it('creates a new object', () => {
         const [state, result] = parse(string('123'), 'abc')
-        const [ustate, uresult] = fail(state, result.errors)
+        const [ustate, uresult] = failReply(state, result.errors)
         expect(state).to.not.equal(ustate)
         expect(result).to.deep.equal(uresult)
       })
       it('can update errors and/or index properties', () => {
         const [state, result] = parse(string('123'), 'abc')
-        const [ustate1, uresult1] = fail(state, merge(
+        const [ustate1, uresult1] = failReply(state, merge(
           result.errors, unexpected("'z'"),
         ))
-        const [ustate2, uresult2] = fail(state)
+        const [ustate2, uresult2] = failReply(state)
 
         expect(result.errors).to.deep.equal([
           { type: ErrorType.Expected, label: "'123'" },
@@ -100,16 +100,16 @@ describe('Core functionality', () => {
     describe('updated fatal failure parser state', () => {
       it('creates a new object', () => {
         const [state, result] = parse(seq(char('a'), char('1')), 'abc')
-        const [ustate, uresult] = fatal(state, result.errors)
+        const [ustate, uresult] = fatalReply(state, result.errors)
         expect(state).to.not.equal(ustate)
         expect(result).to.deep.equal(uresult)
       })
       it('can update errors and/or index properties', () => {
         const [state, result] = parse(seq(char('a'), char('1')), 'abc')
-        const [ustate1, uresult1] = fatal(state, merge(
+        const [ustate1, uresult1] = fatalReply(state, merge(
           result.errors, unexpected("'z'"),
         ), 17)
-        const [ustate2, uresult2] = fatal(state)
+        const [ustate2, uresult2] = fatalReply(state)
 
         expect(result.errors).to.deep.equal([
           { type: ErrorType.Expected, label: "'1'" },

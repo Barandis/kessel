@@ -151,8 +151,7 @@ export function context(input) {
 export const parser = track(fn => fn)
 
 /**
- * Produces a new `Result` indicating that a parse succeeded, as well as
- * a `Context` potentially with an updated `index`.
+ * Produces a new reply indicating that a parse succeeded.
  *
  * @param {Context} ctx The context prior to the parser being applied.
  * @param {*} [value=null] The new result of the parser application.
@@ -161,52 +160,52 @@ export const parser = track(fn => fn)
  * @returns {Reply} A new object representing the context and result
  *     after the latest parser succeeded.
  */
-export function ok(ctx, value = null, index = ctx.index) {
+export function okReply(ctx, value = null, index = ctx.index) {
   return [{ ...ctx, index }, { status: Status.Ok, value }]
 }
 
 /**
- * Produces a new `Result` indicating that a parse failed without
- * consuming input, as well as a copy of `Context`.
+ * Produces a new reply indicating that a parse failed without consuming
+ * input.
  *
  * @param {Context} ctx The context prior to the parser being applied.
- * @param {ErrorList} [errors=[]] The errors associated with the
- *     context after the latest parser was applied.
+ * @param {ErrorList} [errors=[]] The errors associated with the context
+ *     after the latest parser was applied.
  * @param {number} [index=ctx.index] The updated index after the latest
  *     parser was applied.
  * @returns {Reply} A new object representing the context and result
  *     after the latest parser failed.
  */
-export function fail(ctx, errors = [], index = ctx.index) {
+export function failReply(ctx, errors = [], index = ctx.index) {
   return [{ ...ctx, index }, { status: Status.Fail, errors }]
 }
 
 /**
- * Produces a new `Result` indicating that a parse failed while
- * consuming input, as well as a new `Context` with an updated `index`.
+ * Produces a new reply indicating that a parse failed while consuming
+ * input.
  *
  * @param {Context} ctx The context prior to the parser being applied.
- * @param {ErrorList} [errors=[] The errors associated with the
- *     context after the latest parser was applied.
+ * @param {ErrorList} [errors=[] The errors associated with the context
+ *     after the latest parser was applied.
  * @param {number} [index=ctx.index] The updated index after the latest
  *     parser was applied.
  * @returns {Reply} A new object representing the context and result
  *     after the latest parser failed.
  */
-export function fatal(ctx, errors = [], index = ctx.index) {
+export function fatalReply(ctx, errors = [], index = ctx.index) {
   return [{ ...ctx, index }, { status: Status.Fatal, errors }]
 }
 
 /**
- * Produces a new `Result` indicating that a parser applicatoin failed.
+ * Produces a new reply indicating that a parser applicatoin failed.
  * Whether this is a fatal error or not depends on whether `test` is
  * `true` (fatal) or `false` (non-fatal).
  *
  * @param {boolean} test Used to determine whether the produced result
  *     represents a fatal error (`true`) or not (`false`).
  * @param {Context} ctx The context prior to the parser being applied.
- * @param {ErrorList} [errors=[] The errors associated with the
- *     context after the latest parser was applied.
+ * @param {ErrorList} [errors=[] The errors associated with the context
+ *     after the latest parser was applied.
  * @param {number} [index=ctx.index] The updated index after the latest
  *     parser was applied.
  * @returns {Reply} A new object representing the context and result
