@@ -2135,7 +2135,7 @@
 -->
 
 <blockquote>
-<p><code>apply&lt;T, U&gt;(p: Parser&lt;T&gt;, f: Parser&lt;(arg: T) =&gt; U&gt;): Parser&lt;U&gt;</code></p>
+<p><code>apply(p: Parser, f: Parser, m?: string): Parser</code></p>
 </blockquote>
 <p>Applies two parsers, the second of which must return a function. Returns the result of that function when the result of the other parser is passed to it.</p>
 <p>This parser is the applicative-style counterpart of the monadic-style <a href="../chain/"><code>chain</code></a>. It corresponds to the <code>&lt;*&gt;</code> member of the <code>Applicative</code> type class in Haskell, which basically means that it's used for applying functions that are already "inside" a parser. As with <code>chain</code> it's not likely to see a lot of use, as none of the Kessel parsers are actually implemented in terms of it, but it's available should anyone feel the need to write parsers in an applicative style (or the JavaScript equivalent, which is certainly not as intuitive).</p>
@@ -2168,6 +2168,7 @@
 <ul>
 <li><code>p</code>: A parser whose result is passed to the function that results from <code>f</code>.</li>
 <li><code>f</code>: A parser that returns a function.</li>
+<li><code>m</code>: The optional expected error message that will take the place of the default error message.</li>
 </ul>
 <h4 id="success">Success</h4>
 <ul>
@@ -2186,6 +2187,7 @@
 <h4 id="throws">Throws</h4>
 <ul>
 <li>Throws an error if either <code>p</code> or <code>f</code> are not parsers.</li>
+<li>Throws an error if <code>m</code> exists and is not a string.</li>
 <li>Throws an error if <code>f</code> succeeds but does not return a non-parser function.</li>
 </ul>
 <h4 id="see-also">See Also</h4>

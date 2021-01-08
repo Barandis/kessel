@@ -357,19 +357,27 @@ describe('Chaining and piping combinators', () => {
       terror(
         map(0, x => x),
         '',
-        '[map]: expected 1st argument to be a parser; found 0',
+        '[map]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a function', () => {
       terror(
         map(any, 0),
         '',
-        '[map]: expected 2nd argument to be a function; found 0',
+        '[map]: expected second argument to be a function; found 0',
+      )
+    })
+    it('throws if its third argument exists and is not a string', () => {
+      terror(
+        map(any, x => x, 0),
+        '',
+        '[map]: expected third argument to be a string; found 0',
       )
     })
     it('succeeds with the return value of its function', () => {
       tpass(map(any, c => c.toUpperCase()), 'abc', 'A')
       tpass(map(seq(letter, digit), cs => cs.join('')), 'a1', 'a1')
+      tpass(map(any, c => c.toUpperCase(), 'test'), 'abc', 'A')
     })
     it('propagates failed state if its parser fails', () => {
       tfail(map(any, c => c.toUpperCase()), '', {
@@ -381,6 +389,15 @@ describe('Chaining and piping combinators', () => {
         status: Fatal,
         index: 1,
       })
+      tfail(map(any, c => c.toUpperCase(), 'a char'), '', {
+        expected: 'a char',
+        status: Fail,
+      })
+      tfail(map(seq(letter, digit), cs => cs.join(''), 'letter, digit'), 'ab', {
+        expected: 'letter, digit',
+        status: Fatal,
+        index: 1,
+      })
     })
   })
 
@@ -389,32 +406,48 @@ describe('Chaining and piping combinators', () => {
       terror(
         apply(0, any),
         '',
-        '[apply]: expected 1st argument to be a parser; found 0',
+        '[apply]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
         apply(any, 0),
         '',
-        '[apply]: expected 2nd argument to be a parser; found 0',
+        '[apply]: expected second argument to be a parser; found 0',
+      )
+    })
+    it('throws if its third argument exists and is not a string', () => {
+      terror(
+        apply(any, any, 0),
+        '',
+        '[apply]: expected third argument to be a string; found 0',
       )
     })
     it('throws if its second argument fails to return a function', () => {
       terror(
         apply(any, any),
         'ab',
-        '[apply]: expected 2nd argument to return a function; found "b"',
+        '[apply]: expected second argument to return a function; found "b"',
       )
     })
     it('returns the result of the function when passed the other value', () => {
       tpass(apply(any, always(x => x.toUpperCase())), 'a', 'A')
+      tpass(apply(any, always(x => x.toUpperCase()), 'test'), 'a', 'A')
     })
     it('fails without calling parser 2 if parser 1 fails', () => {
       tfail(apply(char('a'), any), 'b', { expected: "'a'", status: Fail })
+      tfail(apply(char('a'), any, "an 'a'"), 'b', {
+        expected: "an 'a'",
+        status: Fail,
+      })
     })
     it('fails fatally if input is consumed before failure', () => {
       tfail(apply(char('a'), char('b')), 'ac', {
         expected: "'b'",
+        status: Fatal,
+      })
+      tfail(apply(char('a'), char('b'), "'a' then 'b'"), 'ac', {
+        expected: "'a' then 'b'",
         status: Fatal,
       })
     })
@@ -438,26 +471,39 @@ describe('Chaining and piping combinators', () => {
       terror(
         chain(0, x => x),
         '',
-        '[chain]: expected 1st argument to be a parser; found 0',
+        '[chain]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a function', () => {
       terror(
         chain(any, 0),
         '',
-        '[chain]: expected 2nd argument to be a function; found 0',
+        '[chain]: expected second argument to be a function; found 0',
+      )
+    })
+    it('throws if its third argument exists and is not a string', () => {
+      terror(
+        chain(any, x => x, 0),
+        '',
+        '[chain]: expected third argument to be a string; found 0',
       )
     })
     it('throws if its second argument does not return a parser', () => {
       terror(
         chain(any, x => x),
         'a',
-        '[chain]: expected the 2nd argument to return a parser; found "a"',
+        '[chain]: expected second argument to return a parser; found "a"',
       )
     })
     it('passes successful result to function to get the next parser', () => {
       tpass(chain(any, c => char(c)), 'aa', { result: 'a', index: 2 })
+      tpass(chain(any, c => char(c), 'test'), 'aa', { result: 'a', index: 2 })
       tfail(chain(any, c => char(c)), 'ab', "'a'")
+      tfail(
+        chain(any, c => char(c), 'a double letter'),
+        'ab',
+        'a double letter',
+      )
     })
     it('fails if its parser fails without calling the second parser', () => {
       tfail(chain(char('a'), () => char('b')), 'bb', {
@@ -465,10 +511,20 @@ describe('Chaining and piping combinators', () => {
         index: 0,
         status: Fail,
       })
+      tfail(chain(char('a'), () => char('b'), "'a' then 'b'"), 'bb', {
+        expected: "'a' then 'b'",
+        index: 0,
+        status: Fail,
+      })
     })
     it('fails fatally if the second fails after the first consumes', () => {
       tfail(chain(char('a'), () => char('b')), 'ac', {
         expected: "'b'",
+        index: 1,
+        status: Fatal,
+      })
+      tfail(chain(char('a'), () => char('b'), "'a' then 'b'"), 'ac', {
+        expected: "'a' then 'b'",
         index: 1,
         status: Fatal,
       })

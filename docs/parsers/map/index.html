@@ -2135,7 +2135,7 @@
 -->
 
 <blockquote>
-<p><code>map(p: Parser&lt;T&gt;, fn: (arg: T) =&gt; U): Parser&lt;U&gt;</code></p>
+<p><code>map(p: Parser, fn: function, m?: string): Parser</code></p>
 </blockquote>
 <p>Applies a parser and returns the value that a function returns when passed the parser's result.</p>
 <p><code>fn</code> can return anything, so <code>map</code> is one of the few combinators that can return something other than a string.</p>
@@ -2160,6 +2160,7 @@
 <ul>
 <li><code>p</code>: A parser to apply to the input.</li>
 <li><code>fn</code>: A function of one argument which gets passed the result of <code>p</code>. Its return value becomes <code>map</code>'s result.</li>
+<li><code>m</code>: The optional expected error message that will take the place of the default error message.</li>
 </ul>
 <h4 id="success">Success</h4>
 <ul>
@@ -2177,6 +2178,7 @@
 <ul>
 <li>Throws an error if <code>p</code> is not a parser.</li>
 <li>Throws an error if <code>fn</code> is not a non-parser function.</li>
+<li>Throws an error if <code>m</code> exists and is not a string.</li>
 </ul>
 <h4 id="see-also">See Also</h4>
 <ul>

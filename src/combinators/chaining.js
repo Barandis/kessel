@@ -4,6 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import {
+  argFnFormatter,
   argNumFormatter,
   argParFormatter,
   argStrFormatter,
@@ -13,8 +14,6 @@ import {
   assertParser,
   assertString,
   formatter,
-  ordFnFormatter,
-  ordParFormatter,
 } from 'kessel/assert'
 import { maybeFatal, ok, parser, Status } from 'kessel/core'
 import { expected, merge } from 'kessel/error'
@@ -127,8 +126,12 @@ export const nth = (p, n, m) => parser(ctx => {
   ASSERT && assertNumber('nth', n, argNumFormatter(2, true))
   ASSERT && hasM && assertString('nth', m, argStrFormatter(3, true))
 
-  const [prep, [pctx, pres]] = twin(p(ctx))
-  if (pres.status !== Ok) return prep
+  const [pctx, pres] = p(ctx)
+  if (pres.status !== Ok) {
+    return maybeFatal(
+      pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors,
+    )
+  }
 
   const v = pres.value
   ASSERT && assertArray(
@@ -295,16 +298,23 @@ export const fifth = (p, m) => parser(ctx => {
  * @param {function(*):*} fn A mapping function that is passed the
  *     result of `p` and whose return value will be the result of the
  *     created parser.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser which will apply its contained parser,
  *     pass the result to the supplied function, and succeed with that
  *     return value as its result.
  */
-export const map = (p, fn) => parser(ctx => {
-  ASSERT && assertParser('map', p, ordParFormatter('1st'))
-  ASSERT && assertFunction('map', fn, ordFnFormatter('2nd'))
+export const map = (p, fn, m) => parser(ctx => {
+  const hasM = m != null
 
-  const [prep, [pctx, pres]] = twin(p(ctx))
-  return pres.status === Ok ? ok(pctx, fn(pres.value)) : prep
+  ASSERT && assertParser('map', p, argParFormatter(1, true))
+  ASSERT && assertFunction('map', fn, argFnFormatter(2, true))
+  ASSERT && hasM && assertString('map', m, argStrFormatter(3, true))
+
+  const [pctx, pres] = p(ctx)
+  return pres.status === Ok
+    ? ok(pctx, fn(pres.value))
+    : maybeFatal(pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors)
 })
 
 /**
@@ -320,29 +330,39 @@ export const map = (p, fn) => parser(ctx => {
  * @param {Parser} p A parser whose result will be passed to the
  *     function returned by `q`.
  * @param {Parser} q A parser which provides a function.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser that applies `p` and `q` and results in
  *     the return value of the function returned by `q` when the value
  *     returned by `p` is passed into it.
  */
-export const apply = (p, q) => parser(ctx => {
-  ASSERT && assertParser('apply', p, ordParFormatter('1st'))
-  ASSERT && assertParser('apply', q, ordParFormatter('2nd'))
+export const apply = (p, q, m) => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && assertParser('apply', p, argParFormatter(1, true))
+  ASSERT && assertParser('apply', q, argParFormatter(2, true))
+  ASSERT && hasM && assertString('apply', m, argStrFormatter(3, true))
 
   const index = ctx.index
+  const merror = expected(m)
 
-  const [prep, [pctx, pres]] = twin(p(ctx))
-  if (pres.status !== Ok) return prep
+  const [pctx, pres] = p(ctx)
+  if (pres.status !== Ok) {
+    return maybeFatal(pres.status === Fatal, pctx, hasM ? merror : pres.errors)
+  }
 
   const [qctx, qres] = q(pctx)
   if (qres.status !== Ok) {
     return maybeFatal(
-      qctx.index !== index, qctx, merge(pres.errors, qres.errors),
+      qctx.index !== index,
+      qctx,
+      hasM ? merror : merge(pres.errors, qres.errors),
     )
   }
 
   const fn = qres.value
   ASSERT && assertFunction(
-    'apply', fn, formatter('2nd argument to return a function'),
+    'apply', fn, formatter('second argument to return a function'),
   )
   return ok(qctx, fn(pres.value))
 })
@@ -364,26 +384,39 @@ export const apply = (p, q) => parser(ctx => {
  *     the first parser's successful application as its sole argument.
  *     It uses this result to determine a second parser, which it
  *     returns.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser which will apply its contained parser,
  *     pass the result to the supplied function, and use that function's
  *     return value as a second parser to apply the input to.
  */
-export const chain = (p, fn) => parser(ctx => {
-  ASSERT && assertParser('chain', p, ordParFormatter('1st'))
-  ASSERT && assertFunction('chain', fn, ordFnFormatter('2nd'))
+export const chain = (p, fn, m) => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && assertParser('chain', p, argParFormatter(1, true))
+  ASSERT && assertFunction('chain', fn, argFnFormatter(2, true))
+  ASSERT && hasM && assertString('chain', m, argStrFormatter(3, true))
 
   const index = ctx.index
+  const merror = expected(m)
 
-  const [prep, [pctx, pres]] = twin(p(ctx))
-  if (pres.status !== Ok) return prep
+  const [pctx, pres] = p(ctx)
+  if (pres.status !== Ok) {
+    return maybeFatal(pres.status === Fatal, pctx, hasM ? merror : pres.errors)
+  }
 
   const q = fn(pres.value)
   ASSERT && assertParser(
-    'chain', q, formatter('the 2nd argument to return a parser'),
+    'chain', q, formatter('second argument to return a parser'),
   )
 
   const [qrep, [qctx, qres]] = twin(q(pctx))
-  return qres.status === Ok
-    ? qrep
-    : maybeFatal(qctx.index !== index, qctx, merge(pres.errors, qres.errors))
+  if (qres.status !== Ok) {
+    return maybeFatal(
+      qctx.index !== index,
+      qctx,
+      hasM ? merror : merge(pres.errors, qres.errors),
+    )
+  }
+  return qrep
 })

@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `map(p: Parser<T>, fn: (arg: T) => U): Parser<U>`
+> `map(p: Parser, fn: function, m?: string): Parser`
 
 Applies a parser and returns the value that a function returns when passed the parser's result.
 
@@ -37,6 +37,7 @@ In this example, a `lower` parser is used to read a lowercase letter. That chara
 
 * `p`: A parser to apply to the input.
 * `fn`: A function of one argument which gets passed the result of `p`. Its return value becomes `map`'s result.
+* `m`: The optional expected error message that will take the place of the default error message.
 
 #### Success
 
@@ -54,6 +55,7 @@ In this example, a `lower` parser is used to read a lowercase letter. That chara
 
 * Throws an error if `p` is not a parser.
 * Throws an error if `fn` is not a non-parser function.
+* Throws an error if `m` exists and is not a string.
 
 #### See Also
 
