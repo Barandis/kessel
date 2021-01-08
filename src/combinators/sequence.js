@@ -96,15 +96,15 @@ export const left = (p, q, m) => parser(ctx => {
   ASSERT && hasM && assertString('left', m, argStrFormatter(3, true))
 
   const index = ctx.index
+  const merror = expected(m)
 
   const [pctx, pres] = p(ctx)
   if (pres.status !== Status.Ok) {
-    const errors = hasM ? expected(m) : pres.errors
-    return maybeFatal(pres.status === Fatal, pctx, errors)
+    return maybeFatal(pres.status === Fatal, pctx, hasM ? merror : pres.errors)
   }
 
   const [qctx, qres] = q(pctx)
-  const errors = hasM ? expected(m) : merge(pres.errors, qres.errors)
+  const errors = hasM ? merror : merge(pres.errors, qres.errors)
   return qres.status === Ok
     ? ok(qctx, pres.value)
     : maybeFatal(qctx.index !== index, qctx, errors)
@@ -133,15 +133,15 @@ export const right = (p, q, m) => parser(ctx => {
   ASSERT && hasM && assertString('right', m, argStrFormatter(3, true))
 
   const index = ctx.index
+  const merror = expected(m)
 
   const [pctx, pres] = p(ctx)
   if (pres.status !== Status.Ok) {
-    const errors = hasM ? expected(m) : pres.errors
-    return maybeFatal(pres.status === Fatal, pctx, errors)
+    return maybeFatal(pres.status === Fatal, pctx, hasM ? merror : pres.errors)
   }
 
   const [qrep, [qctx, qres]] = twin(q(pctx))
-  const errors = hasM ? expected(m) : merge(pres.errors, qres.errors)
+  const errors = hasM ? merror : merge(pres.errors, qres.errors)
   return qres.status === Ok
     ? qrep
     : maybeFatal(qctx.index !== index, qctx, errors)
@@ -262,11 +262,11 @@ export const many1 = (p, m) => parser(ctx => {
   ASSERT && assertParser('many1', p, argParFormatter(1, hasM))
   ASSERT && hasM && assertString('many1', m, argStrFormatter(2, true))
 
+  const merror = expected(m)
+
   const [pctx, pres] = p(ctx)
   if (pres.status !== Ok) {
-    return maybeFatal(
-      pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors,
-    )
+    return maybeFatal(pres.status === Fatal, pctx, hasM ? merror : pres.errors)
   }
 
   let context = pctx
@@ -276,9 +276,7 @@ export const many1 = (p, m) => parser(ctx => {
     const [pctx, pres] = p(context)
     context = pctx
 
-    if (pres.status === Fatal) {
-      return fatal(pctx, hasM ? expected(m) : pres.errors)
-    }
+    if (pres.status === Fatal) return fatal(pctx, hasM ? merror : pres.errors)
     if (pres.status === Fail) break
     values.push(pres.value)
     if (context.index >= context.view.byteLength) break
@@ -361,11 +359,11 @@ export const skipMany1 = (p, m) => parser(ctx => {
   ASSERT && assertParser('skipMany1', p, argParFormatter(1, hasM))
   ASSERT && hasM && assertString('skipMany1', m, argStrFormatter(2, true))
 
+  const merror = expected(m)
+
   const [pctx, pres] = p(ctx)
   if (pres.status !== Ok) {
-    return maybeFatal(
-      pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors,
-    )
+    return maybeFatal(pres.status === Fatal, pctx, hasM ? merror : pres.errors)
   }
 
   let context = pctx
@@ -374,9 +372,7 @@ export const skipMany1 = (p, m) => parser(ctx => {
     const [pctx, pres] = p(context)
     context = pctx
 
-    if (pres.status === Fatal) {
-      return fatal(pctx, hasM ? expected(m) : pres.errors)
-    }
+    if (pres.status === Fatal) return fatal(pctx, hasM ? merror : pres.errors)
     if (pres.status === Fail) break
     if (context.index >= context.view.byteLength) break
   }
@@ -411,10 +407,10 @@ export const sep = (p, s, m) => parser(ctx => {
   ASSERT && hasM && assertString('sep', m, argStrFormatter(3, true))
 
   let index = ctx.index
+  const merror = expected(m)
+
   const [pctx, pres] = p(ctx)
-  if (pres.status === Fatal) {
-    return fatal(pctx, hasM ? expected(m) : pres.errors)
-  }
+  if (pres.status === Fatal) return fatal(pctx, hasM ? merror : pres.errors)
   if (pres.status === Fail) return ok(pctx, [])
 
   const values = [pres.value]
@@ -425,16 +421,12 @@ export const sep = (p, s, m) => parser(ctx => {
 
     const [sctx, sres] = s(context)
     context = sctx
-    if (sres.status === Fatal) {
-      return fatal(sctx, hasM ? expected(m) : sres.errors)
-    }
+    if (sres.status === Fatal) return fatal(sctx, hasM ? merror : sres.errors)
     if (sres.status === Fail) break
 
     const [pctx, pres] = p(context)
     context = pctx
-    if (pres.status === Fatal) {
-      return fatal(pctx, hasM ? expected(m) : pres.errors)
-    }
+    if (pres.status === Fatal) return fatal(pctx, hasM ? merror : pres.errors)
     if (pres.status === Fail) break
 
     if (context.index === index) throw new TypeError(loopMessage('sep'))
@@ -471,11 +463,11 @@ export const sep1 = (p, s, m) => parser(ctx => {
   ASSERT && hasM && assertString('sep1', m, argStrFormatter(3, true))
 
   let index = ctx.index
+  const merror = expected(m)
+
   const [pctx, pres] = p(ctx)
   if (pres.status !== Ok) {
-    return maybeFatal(
-      pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors,
-    )
+    return maybeFatal(pres.status === Fatal, pctx, hasM ? merror : pres.errors)
   }
 
   const values = [pres.value]
@@ -486,16 +478,12 @@ export const sep1 = (p, s, m) => parser(ctx => {
 
     const [sctx, sres] = s(context)
     context = sctx
-    if (sres.status === Fatal) {
-      return fatal(sctx, hasM ? expected(m) : sres.errors)
-    }
+    if (sres.status === Fatal) return fatal(sctx, hasM ? merror : sres.errors)
     if (sres.status === Fail) break
 
     const [pctx, pres] = p(context)
     context = pctx
-    if (pres.status === Fatal) {
-      return fatal(pctx, hasM ? expected(m) : pres.errors)
-    }
+    if (pres.status === Fatal) return fatal(pctx, hasM ? merror : pres.errors)
     if (pres.status === Fail) break
 
     if (context.index === index) throw new TypeError(loopMessage('sep1'))
@@ -532,10 +520,10 @@ export const end = (p, s, m) => parser(ctx => {
   ASSERT && hasM && assertString('end', m, argStrFormatter(3, true))
 
   let index = ctx.index
+  const merror = expected(m)
+
   const [pctx, pres] = p(ctx)
-  if (pres.status === Fatal) {
-    return fatal(pctx, hasM ? expected(m) : pres.errors)
-  }
+  if (pres.status === Fatal) return fatal(pctx, hasM ? merror : pres.errors)
   if (pres.status === Fail) return ok(pctx, [])
 
   const values = [pres.value]
@@ -546,25 +534,19 @@ export const end = (p, s, m) => parser(ctx => {
 
     const [sctx, sres] = s(context)
     context = sctx
-    if (sres.status === Fatal) {
-      return fatal(sctx, hasM ? expected(m) : sres.errors)
-    }
+    if (sres.status === Fatal) return fatal(sctx, hasM ? merror : sres.errors)
     if (sres.status === Fail) break
 
     const [pctx, pres] = p(context)
     context = pctx
-    if (pres.status === Fatal) {
-      return fatal(pctx, hasM ? expected(m) : pres.errors)
-    }
+    if (pres.status === Fatal) return fatal(pctx, hasM ? merror : pres.errors)
     if (pres.status === Fail) break
 
     if (context.index === index) throw new TypeError(loopMessage('end'))
     values.push(pres.value)
   }
   const [sctx, sres] = s({ ...context, index })
-  if (sres.status === Fatal) {
-    return fatal(sctx, hasM ? expected(m) : sres.errors)
-  }
+  if (sres.status === Fatal) return fatal(sctx, hasM ? merror : sres.errors)
   return ok(sctx, values)
 })
 
@@ -596,11 +578,11 @@ export const sepEndBy1 = (p, s, m) => parser(ctx => {
   ASSERT && hasM && assertString('sepEndBy1', m, argStrFormatter(3, true))
 
   let index = ctx.index
+  const merror = expected(m)
+
   const [pctx, pres] = p(ctx)
   if (pres.status !== Ok) {
-    return maybeFatal(
-      pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors,
-    )
+    return maybeFatal(pres.status === Fatal, pctx, hasM ? merror : pres.errors)
   }
 
   const values = [pres.value]
@@ -611,25 +593,19 @@ export const sepEndBy1 = (p, s, m) => parser(ctx => {
 
     const [sctx, sres] = s(context)
     context = sctx
-    if (sres.status === Fatal) {
-      return fatal(sctx, hasM ? expected(m) : sres.errors)
-    }
+    if (sres.status === Fatal) return fatal(sctx, hasM ? merror : sres.errors)
     if (sres.status === Fail) break
 
     const [pctx, pres] = p(context)
     context = pctx
-    if (pres.status === Fatal) {
-      return fatal(pctx, hasM ? expected(m) : pres.errors)
-    }
+    if (pres.status === Fatal) return fatal(pctx, hasM ? merror : pres.errors)
     if (pres.status === Fail) break
 
     if (context.index === index) throw new TypeError(loopMessage('sepEndBy1'))
     values.push(pres.value)
   }
   const [sctx, sres] = s({ ...context, index })
-  if (sres.status === Fatal) {
-    return fatal(sctx, hasM ? expected(m) : sres.errors)
-  }
+  if (sres.status === Fatal) return fatal(sctx, hasM ? merror : sres.errors)
   return ok(sctx, values)
 })
 
@@ -748,25 +724,22 @@ export const until = (p, e, m) => parser(ctx => {
   const index = ctx.index
   const values = []
   let context = ctx
+  const merror = expected(m)
 
   while (true) {
     const [ectx, eres] = e(context)
     context = ectx
-    if (eres.status === Fatal) {
-      return fatal(ectx, hasM ? expected(m) : eres.errors)
-    }
+    if (eres.status === Fatal) return fatal(ectx, hasM ? merror : eres.errors)
     if (eres.status === Ok) break
 
     const [pctx, pres] = p(context)
     context = pctx
-    if (pres.status === Fatal) {
-      return fatal(pctx, hasM ? expected(m) : pres.errors)
-    }
+    if (pres.status === Fatal) return fatal(pctx, hasM ? merror : pres.errors)
     if (pres.status === Fail) {
       return maybeFatal(
         context.index !== index,
         context,
-        hasM ? expected(m) : merge(pres.errors, eres.errors),
+        hasM ? merror : merge(pres.errors, eres.errors),
       )
     }
     values.push(pres.value)
@@ -881,10 +854,10 @@ export const assocL = (p, o, x, m) => parser(ctx => {
   ASSERT && assertParser('assocL', o, argParFormatter(2, true))
   ASSERT && hasM && assertString('assocL', m, argStrFormatter(4, true))
 
+  const merror = expected(m)
+
   const [pctx, pres] = p(ctx)
-  if (pres.status === Fatal) {
-    return fatal(pctx, hasM ? expected(m) : pres.errors)
-  }
+  if (pres.status === Fatal) return fatal(pctx, hasM ? merror : pres.errors)
   if (pres.status === Fail) return ok(pctx, x)
 
   const values = [pres.value]
@@ -896,16 +869,12 @@ export const assocL = (p, o, x, m) => parser(ctx => {
   while (true) {
     const [octx, ores] = o(context)
     context = octx
-    if (ores.status === Fatal) {
-      return fatal(octx, hasM ? expected(m) : ores.errors)
-    }
+    if (ores.status === Fatal) return fatal(octx, hasM ? merror : ores.errors)
     if (ores.status === Fail) break
 
     const [pctx, pres] = p(context)
     context = pctx
-    if (pres.status === Fatal) {
-      return fatal(pctx, hasM ? expected(m) : pres.errors)
-    }
+    if (pres.status === Fatal) return fatal(pctx, hasM ? merror : pres.errors)
     if (pres.status === Fail) break
 
     ASSERT && assertFunction(
@@ -953,11 +922,11 @@ export const assoc1L = (p, o, m) => parser(ctx => {
   ASSERT && assertParser('assoc1L', o, argParFormatter(2, true))
   ASSERT && hasM && assertString('assoc1L', m, argStrFormatter(3, true))
 
+  const merror = expected(m)
+
   const [pctx, pres] = p(ctx)
   if (pres.status !== Ok) {
-    return maybeFatal(
-      pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors,
-    )
+    return maybeFatal(pres.status === Fatal, pctx, hasM ? merror : pres.errors)
   }
 
   const values = [pres.value]
@@ -969,16 +938,12 @@ export const assoc1L = (p, o, m) => parser(ctx => {
   while (true) {
     const [octx, ores] = o(context)
     context = octx
-    if (ores.status === Fatal) {
-      return fatal(octx, hasM ? expected(m) : ores.errors)
-    }
+    if (ores.status === Fatal) return fatal(octx, hasM ? merror : ores.errors)
     if (ores.status === Fail) break
 
     const [pctx, pres] = p(context)
     context = pctx
-    if (pres.status === Fatal) {
-      return fatal(pctx, hasM ? expected(m) : pres.errors)
-    }
+    if (pres.status === Fatal) return fatal(pctx, hasM ? merror : pres.errors)
     if (pres.status === Fail) break
 
     ASSERT && assertFunction(
@@ -1029,10 +994,10 @@ export const assocR = (p, o, x, m) => parser(ctx => {
   ASSERT && assertParser('assocR', o, argParFormatter(2, true))
   ASSERT && hasM && assertString('assocR', m, argStrFormatter(4, true))
 
+  const merror = expected(m)
+
   const [pctx, pres] = p(ctx)
-  if (pres.status === Fatal) {
-    return fatal(pctx, hasM ? expected(m) : pres.errors)
-  }
+  if (pres.status === Fatal) return fatal(pctx, hasM ? merror : pres.errors)
   if (pres.status === Fail) return ok(pctx, x)
 
   const values = [pres.value]
@@ -1044,16 +1009,12 @@ export const assocR = (p, o, x, m) => parser(ctx => {
   while (true) {
     const [octx, ores] = o(context)
     context = octx
-    if (ores.status === Fatal) {
-      return fatal(octx, hasM ? expected(m) : ores.errors)
-    }
+    if (ores.status === Fatal) return fatal(octx, hasM ? merror : ores.errors)
     if (ores.status === Fail) break
 
     const [pctx, pres] = p(context)
     context = pctx
-    if (pres.status === Fatal) {
-      return fatal(pctx, hasM ? expected(m) : pres.errors)
-    }
+    if (pres.status === Fatal) return fatal(pctx, hasM ? merror : pres.errors)
     if (pres.status === Fail) break
 
     ASSERT && assertFunction(
@@ -1101,11 +1062,11 @@ export const assoc1R = (p, o, m) => parser(ctx => {
   ASSERT && assertParser('assoc1R', o, argParFormatter(2, true))
   ASSERT && hasM && assertString('assoc1R', m, argStrFormatter(3, true))
 
+  const merror = expected(m)
+
   const [pctx, pres] = p(ctx)
   if (pres.status !== Ok) {
-    return maybeFatal(
-      pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors,
-    )
+    return maybeFatal(pres.status === Fatal, pctx, hasM ? merror : pres.errors)
   }
 
   const values = [pres.value]
@@ -1117,16 +1078,12 @@ export const assoc1R = (p, o, m) => parser(ctx => {
   while (true) {
     const [octx, ores] = o(context)
     context = octx
-    if (ores.status === Fatal) {
-      return fatal(octx, hasM ? expected(m) : ores.errors)
-    }
+    if (ores.status === Fatal) return fatal(octx, hasM ? merror : ores.errors)
     if (ores.status === Fail) break
 
     const [pctx, pres] = p(context)
     context = pctx
-    if (pres.status === Fatal) {
-      return fatal(pctx, hasM ? expected(m) : pres.errors)
-    }
+    if (pres.status === Fatal) return fatal(pctx, hasM ? merror : pres.errors)
     if (pres.status === Fail) break
 
     ASSERT && assertFunction(
