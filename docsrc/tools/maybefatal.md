@@ -11,7 +11,7 @@ Creates a reply object representing a failing parse. That failure may be fatal o
 
 If `test` is true, then this will create a fatal reply (one with a `status` of `Status.Fatal`). Otherwise it will create a failing reply (one with a `status` of `Status.Fail`).
 
-Once this determination of the type is made, this function works in all respects exactly like [`fatal`](fatal.md) or [`fail`](fail.md).
+Once this determination of the type is made, this function works in all respects exactly like [`fatalReply`](fatalreply.md) or [`failReply`](failreply.md).
 
 #### Parameters
 
@@ -29,6 +29,6 @@ Once this determination of the type is made, this function works in all respects
 * [`Context`](../types/context.md)
 * [`ErrorList`](../types/errorlist.md)
 * [`Reply`](../types/reply.md)
-* [`fail`](fail.md)
-* [`fatal`](fatal.md)
-* [`ok`](ok.md)
+* [`failReply`](failreply.md)
+* [`fatalReply`](fatalreply.md)
+* [`okReply`](okreply.md)

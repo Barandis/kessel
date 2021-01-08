@@ -1683,7 +1683,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../../tools/ok/" class="md-nav__link">
+    <a href="../../tools/ok.md" class="md-nav__link">
       ok
     </a>
   </li>
@@ -2070,7 +2070,7 @@
 <p>A <code>Context</code> is used to keep record of the input being parsed and the current parsing position within that input.</p>
 <p>The <code>view</code> is the actual input, transformed into an array of bytes wrapped in a <code>DataView</code>. Kessel deals in UTF-8 characters, which may be anywhere between one and four bytes per character, and using an array of bytes to represent the input lets Kessel deal with the variable-length characters in the most flexible manner.</p>
 <p>The <code>index</code> is a byte-based index (as opposed to the output of error messages, which is character-based). Kessel ensures that, as long as the byte array is properly formed (i.e., that someone didn't pass in bytes that don't actually represent real characters), it will always have <code>index</code> pointing at the first byte of the next character.</p>
-<p>Contexts should be created using the functions <a href="../../tools/ok/"><code>ok</code></a>, <a href="../../tools/fail/"><code>fail</code></a>, <a href="../../tools/fatal/"><code>fatal</code></a>, and <a href="../../tools/maybefatal/"><code>maybeFatal</code></a> because they ensure that no older contexts are overwritten (which can become important in nested and compound errors, which keep multiple contexts).</p>
+<p>Contexts should be created using the functions <a href="../../tools/okreply/"><code>okReply</code></a>, <a href="../../tools/failreply/"><code>failReply</code></a>, <a href="../../tools/fatalreply/"><code>fatalReply</code></a>, and <a href="../../tools/maybefatal/"><code>maybeFatal</code></a> because they ensure that no older contexts are overwritten (which can become important in nested and compound errors, which keep multiple contexts).</p>
 <h4 id="properties">Properties</h4>
 <ul>
 <li><code>view</code>: A <code>DataView</code> representing the input text. This view is created by the parsing functions <a href="../../tools/parse/"><code>parse</code></a> and <a href="../../tools/run/"><code>run</code></a> from any of the legal types of input.</li>
@@ -2079,10 +2079,10 @@
 <h4 id="see-also">See Also</h4>
 <ul>
 <li><a href="../reply/"><code>Reply</code></a></li>
-<li><a href="../../tools/fail/"><code>fail</code></a></li>
-<li><a href="../../tools/fatal/"><code>fatal</code></a></li>
+<li><a href="../../tools/failreply/"><code>failReply</code></a></li>
+<li><a href="../../tools/fatalreply/"><code>fatalReply</code></a></li>
 <li><a href="../../tools/maybefatal/"><code>maybeFatal</code></a></li>
-<li><a href="../../tools/ok/"><code>ok</code></a></li>
+<li><a href="../../tools/okreply/"><code>Reply</code></a></li>
 <li><a href="../../tools/parse/"><code>parse</code></a></li>
 <li><a href="../../tools/run/"><code>run</code></a></li>
 </ul>

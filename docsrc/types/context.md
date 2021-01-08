@@ -13,7 +13,7 @@ The `view` is the actual input, transformed into an array of bytes wrapped in a 
 
 The `index` is a byte-based index (as opposed to the output of error messages, which is character-based). Kessel ensures that, as long as the byte array is properly formed (i.e., that someone didn't pass in bytes that don't actually represent real characters), it will always have `index` pointing at the first byte of the next character.
 
-Contexts should be created using the functions [`ok`](../tools/ok.md), [`fail`](../tools/fail.md), [`fatal`](../tools/fatal.md), and [`maybeFatal`](../tools/maybefatal.md) because they ensure that no older contexts are overwritten (which can become important in nested and compound errors, which keep multiple contexts).
+Contexts should be created using the functions [`okReply`](../tools/okreply.md), [`failReply`](../tools/failreply.md), [`fatalReply`](../tools/fatalreply.md), and [`maybeFatal`](../tools/maybefatal.md) because they ensure that no older contexts are overwritten (which can become important in nested and compound errors, which keep multiple contexts).
 
 #### Properties
 
@@ -23,9 +23,9 @@ Contexts should be created using the functions [`ok`](../tools/ok.md), [`fail`](
 #### See Also
 
 * [`Reply`](reply.md)
-* [`fail`](../tools/fail.md)
-* [`fatal`](../tools/fatal.md)
+* [`failReply`](../tools/failreply.md)
+* [`fatalReply`](../tools/fatalreply.md)
 * [`maybeFatal`](../tools/maybefatal.md)
-* [`ok`](../tools/ok.md)
+* [`Reply`](../tools/okreply.md)
 * [`parse`](../tools/parse.md)
 * [`run`](../tools/run.md)

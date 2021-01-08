@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `ok(ctx: Context, value?: T, index?: number): Reply<T>`
+> `okReply(ctx: Context, value?: *, index?: number): Reply`
 
 Creates a reply object representing a successful parse.
 
@@ -27,6 +27,6 @@ This function should always be used to create a successful reply, since it will 
 
 * [`Context`](../types/context.md)
 * [`Reply`](../types/reply.md)
-* [`fail`](fail.md)
-* [`fatal`](fatal.md)
+* [`failReply`](failreply.md)
+* [`fatalReply`](fatalreply.md)
 * [`maybeFatal`](maybefatal.md)

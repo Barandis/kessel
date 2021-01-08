@@ -1683,7 +1683,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../../tools/ok/" class="md-nav__link">
+    <a href="../../tools/ok.md" class="md-nav__link">
       ok
     </a>
   </li>
@@ -2054,7 +2054,7 @@
 <p><code>type Reply&lt;T&gt; = [Context, Result&lt;T&gt;]</code></p>
 </blockquote>
 <p>The type representing a reply from a parser. Each parser returns a value of this type, and <a href="../../tools/parse/"><code>parse</code></a> does as well.</p>
-<p><code>Reply</code> objects should be produced by <a href="../../tools/ok/"><code>ok</code></a>, <a href="../../tools/fail/"><code>fail</code></a>, <a href="../../tools/fatal/"><code>fatal</code></a>, and <a href="../../tools/maybefatal/"><code>maybeFatal</code></a> rather than being produced by hand. This ensures that the context is copied so that there aren't accidental overwrites of the indexes of older contexts.</p>
+<p><code>Reply</code> objects should be produced by <a href="../../tools/okreply/"><code>okReply</code></a>, <a href="../../tools/failreply/"><code>failReply</code></a>, <a href="../../tools/fatalreply/"><code>fatalReply</code></a>, and <a href="../../tools/maybefatal/"><code>maybeFatal</code></a> rather than being produced by hand. This ensures that the context is copied so that there aren't accidental overwrites of the indexes of older contexts.</p>
 <p>A reply contains all of the information necessary to get a result and, if that result is a failure, to know what the failure was and where it happened.</p>
 <h4 id="see-also">See Also</h4>
 <ul>

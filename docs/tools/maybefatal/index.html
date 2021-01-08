@@ -1733,7 +1733,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../ok/" class="md-nav__link">
+    <a href="../ok.md" class="md-nav__link">
       ok
     </a>
   </li>
@@ -2083,7 +2083,7 @@
 </blockquote>
 <p>Creates a reply object representing a failing parse. That failure may be fatal or non-fatal, depending on the value of the <code>test</code> parameter.</p>
 <p>If <code>test</code> is true, then this will create a fatal reply (one with a <code>status</code> of <code>Status.Fatal</code>). Otherwise it will create a failing reply (one with a <code>status</code> of <code>Status.Fail</code>).</p>
-<p>Once this determination of the type is made, this function works in all respects exactly like <a href="../fatal/"><code>fatal</code></a> or <a href="../fail/"><code>fail</code></a>.</p>
+<p>Once this determination of the type is made, this function works in all respects exactly like <a href="../fatalreply/"><code>fatalReply</code></a> or <a href="../failreply/"><code>failReply</code></a>.</p>
 <h4 id="parameters">Parameters</h4>
 <ul>
 <li><code>test</code>: A boolean telling whether this reply should represent a fatal failure.</li>
@@ -2100,9 +2100,9 @@
 <li><a href="../../types/context/"><code>Context</code></a></li>
 <li><a href="../../types/errorlist/"><code>ErrorList</code></a></li>
 <li><a href="../../types/reply/"><code>Reply</code></a></li>
-<li><a href="../fail/"><code>fail</code></a></li>
-<li><a href="../fatal/"><code>fatal</code></a></li>
-<li><a href="../ok/"><code>ok</code></a></li>
+<li><a href="../failreply/"><code>failReply</code></a></li>
+<li><a href="../fatalreply/"><code>fatalReply</code></a></li>
+<li><a href="../okreply/"><code>okReply</code></a></li>
 </ul>
                 
               

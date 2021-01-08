@@ -9,7 +9,7 @@
 
 The type representing a reply from a parser. Each parser returns a value of this type, and [`parse`](../tools/parse.md) does as well.
 
-`Reply` objects should be produced by [`ok`](../tools/ok.md), [`fail`](../tools/fail.md), [`fatal`](../tools/fatal.md), and [`maybeFatal`](../tools/maybefatal.md) rather than being produced by hand. This ensures that the context is copied so that there aren't accidental overwrites of the indexes of older contexts.
+`Reply` objects should be produced by [`okReply`](../tools/okreply.md), [`failReply`](../tools/failreply.md), [`fatalReply`](../tools/fatalreply.md), and [`maybeFatal`](../tools/maybefatal.md) rather than being produced by hand. This ensures that the context is copied so that there aren't accidental overwrites of the indexes of older contexts.
 
 A reply contains all of the information necessary to get a result and, if that result is a failure, to know what the failure was and where it happened.
 

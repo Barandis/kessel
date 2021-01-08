@@ -186,9 +186,9 @@ Tools provide ways to run parsers and ways to write new parsers (if [`block`](pa
 | Function | Description |
 |----------|-------------|
 | [`parser`](tools/parser.md) | Creates a new parser. |
-| [`ok`](tools/ok.md) | Generates a reply representing a success. |
-| [`fail`](tools/fail.md) | Generates a reply representing a failure. |
-| [`fatal`](tools/fatal.md) | Generates a reply representing a fatal failure. |
+| [`okReply`](tools/okreply.md) | Generates a reply representing a success. |
+| [`failReply`](tools/failreply.md) | Generates a reply representing a failure. |
+| [`fatalReply`](tools/fatalreply.md) | Generates a reply representing a fatal failure. |
 | [`maybeFatal`](tools/maybefatal.md) | Generates a reply representing either a failure or a fatal failure, depending on a boolean value. |
 
 ## Types
