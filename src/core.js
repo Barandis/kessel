@@ -197,28 +197,6 @@ export function fatalReply(ctx, errors = [], index = ctx.index) {
 }
 
 /**
- * Produces a new reply indicating that a parser applicatoin failed.
- * Whether this is a fatal error or not depends on whether `test` is
- * `true` (fatal) or `false` (non-fatal).
- *
- * @param {boolean} test Used to determine whether the produced result
- *     represents a fatal error (`true`) or not (`false`).
- * @param {Context} ctx The context prior to the parser being applied.
- * @param {ErrorList} [errors=[] The errors associated with the context
- *     after the latest parser was applied.
- * @param {number} [index=ctx.index] The updated index after the latest
- *     parser was applied.
- * @returns {Reply} A new object representing the context and result
- *     after the latest parser failed.
- */
-export function maybeFatal(test, ctx, errors = [], index = ctx.index) {
-  return [
-    { ...ctx, index },
-    { status: test ? Status.Fatal : Status.Fail, errors },
-  ]
-}
-
-/**
  * Applies a parser to input. This input can be a string, a typed array,
  * an array buffer, or a data view. The return value is the final parser
  * context returned by the parser after being run.

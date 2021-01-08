@@ -17,4 +17,3 @@ An `ErrorList` is simply an array of errors of mixed types. Unsuccessful results
 * [`Result`](result.md)
 * [`failReply`](../tools/failreply.md)
 * [`fatalReply`](../tools/fatalreply.md)
-* [`maybeFatal`](../tools/maybefatal.md)

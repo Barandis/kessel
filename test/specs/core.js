@@ -10,7 +10,6 @@ import {
   failReply,
   failure,
   fatalReply,
-  maybeFatal,
   okReply,
   parse,
   run,
@@ -127,8 +126,8 @@ describe('Core functionality', () => {
 
     describe('updating fatal/non-fatal parser state', () => {
       const state = { view: stringToView('test'), index: 0 }
-      const fatal = maybeFatal(true, state)
-      const nonFatal = maybeFatal(false, state)
+      const fatal = fatalReply(state)
+      const nonFatal = failReply(state)
 
       it('can set fatal state with a test', () => {
         const [_, result] = fatal

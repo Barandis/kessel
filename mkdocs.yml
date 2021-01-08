@@ -129,16 +129,15 @@ nav:
     - Tools:
       - compound: tools/compound.md
       - expected: tools/expected.md
-      - fail: tools/fail.md
+      - failReply: tools/failreply.md
       - failure: tools/failure.md
-      - fatal: tools/fatal.md
+      - fatalReply: tools/fatalreply.md
       - formatErrors: tools/formaterrors.md
       - generic: tools/generic.md
       - getPosition: tools/getposition.md
-      - maybeFatal: tools/maybefatal.md
       - merge: tools/merge.md
       - nested: tools/nested.md
-      - ok: tools/ok.md
+      - okReply: tools/okreply.md
       - other: tools/other.md
       - parse: tools/parse.md
       - parser: tools/parser.md

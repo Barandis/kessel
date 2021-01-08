@@ -29,4 +29,3 @@ This function should always be used to create a successful reply, since it will 
 * [`Reply`](../types/reply.md)
 * [`failReply`](failreply.md)
 * [`fatalReply`](fatalreply.md)
-* [`maybeFatal`](maybefatal.md)

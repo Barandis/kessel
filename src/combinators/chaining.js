@@ -15,11 +15,13 @@ import {
   assertString,
   formatter,
 } from 'kessel/assert'
-import { maybeFatal, okReply, parser, Status } from 'kessel/core'
+import { failReply, fatalReply, okReply, parser, Status } from 'kessel/core'
 import { expected, merge } from 'kessel/error'
 import { dup } from 'kessel/util'
 
 const { Ok, Fatal } = Status
+
+const replyFn = cond => cond ? fatalReply : failReply
 
 /** @typedef {import('kessel/core').Parser} Parser */
 
@@ -44,9 +46,8 @@ export const join = (p, m) => parser(ctx => {
 
   const [pctx, pres] = p(ctx)
   if (pres.status !== Ok) {
-    return maybeFatal(
-      pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors,
-    )
+    const fn = replyFn(pres.status === Fatal)
+    return fn(pctx, hasM ? expected(m) : pres.errors)
   }
 
   const v = pres.value
@@ -74,9 +75,8 @@ export const compact = (p, m) => parser(ctx => {
 
   const [pctx, pres] = p(ctx)
   if (pres.status !== Ok) {
-    return maybeFatal(
-      pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors,
-    )
+    const fn = replyFn(pres.status === Fatal)
+    return fn(pctx, hasM ? expected(m) : pres.errors)
   }
 
   const v = pres.value
@@ -103,9 +103,11 @@ export const value = (p, x, m) => parser(ctx => {
   ASSERT && hasM && assertString('value', m, argStrFormatter(3, true))
 
   const [pctx, pres] = p(ctx)
-  return pres.status === Ok
-    ? okReply(pctx, x)
-    : maybeFatal(pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors)
+  if (pres.status !== Ok) {
+    const fn = replyFn(pres.status === Fatal)
+    return fn(pctx, hasM ? expected(m) : pres.errors)
+  }
+  return okReply(pctx, x)
 })
 
 /**
@@ -128,9 +130,8 @@ export const nth = (p, n, m) => parser(ctx => {
 
   const [pctx, pres] = p(ctx)
   if (pres.status !== Ok) {
-    return maybeFatal(
-      pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors,
-    )
+    const fn = replyFn(pres.status === Fatal)
+    return fn(pctx, hasM ? expected(m) : pres.errors)
   }
 
   const v = pres.value
@@ -159,9 +160,8 @@ export const first = (p, m) => parser(ctx => {
 
   const [pctx, pres] = p(ctx)
   if (pres.status !== Ok) {
-    return maybeFatal(
-      pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors,
-    )
+    const fn = replyFn(pres.status === Fatal)
+    return fn(pctx, hasM ? expected(m) : pres.errors)
   }
 
   const v = pres.value
@@ -188,9 +188,8 @@ export const second = (p, m) => parser(ctx => {
 
   const [pctx, pres] = p(ctx)
   if (pres.status !== Ok) {
-    return maybeFatal(
-      pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors,
-    )
+    const fn = replyFn(pres.status === Fatal)
+    return fn(pctx, hasM ? expected(m) : pres.errors)
   }
 
   const v = pres.value
@@ -217,9 +216,8 @@ export const third = (p, m) => parser(ctx => {
 
   const [pctx, pres] = p(ctx)
   if (pres.status !== Ok) {
-    return maybeFatal(
-      pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors,
-    )
+    const fn = replyFn(pres.status === Fatal)
+    return fn(pctx, hasM ? expected(m) : pres.errors)
   }
 
   const v = pres.value
@@ -246,9 +244,8 @@ export const fourth = (p, m) => parser(ctx => {
 
   const [pctx, pres] = p(ctx)
   if (pres.status !== Ok) {
-    return maybeFatal(
-      pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors,
-    )
+    const fn = replyFn(pres.status === Fatal)
+    return fn(pctx, hasM ? expected(m) : pres.errors)
   }
 
   const v = pres.value
@@ -275,9 +272,8 @@ export const fifth = (p, m) => parser(ctx => {
 
   const [pctx, pres] = p(ctx)
   if (pres.status !== Ok) {
-    return maybeFatal(
-      pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors,
-    )
+    const fn = replyFn(pres.status === Fatal)
+    return fn(pctx, hasM ? expected(m) : pres.errors)
   }
 
   const v = pres.value
@@ -312,9 +308,11 @@ export const map = (p, fn, m) => parser(ctx => {
   ASSERT && hasM && assertString('map', m, argStrFormatter(3, true))
 
   const [pctx, pres] = p(ctx)
-  return pres.status === Ok
-    ? okReply(pctx, fn(pres.value))
-    : maybeFatal(pres.status === Fatal, pctx, hasM ? expected(m) : pres.errors)
+  if (pres.status !== Ok) {
+    const fn = replyFn(pres.status === Fatal)
+    return fn(pctx, hasM ? expected(m) : pres.errors)
+  }
+  return okReply(pctx, fn(pres.value))
 })
 
 /**
@@ -348,16 +346,14 @@ export const apply = (p, q, m) => parser(ctx => {
 
   const [pctx, pres] = p(ctx)
   if (pres.status !== Ok) {
-    return maybeFatal(pres.status === Fatal, pctx, hasM ? merror : pres.errors)
+    const fn = replyFn(pres.status === Fatal)
+    return fn(pctx, hasM ? merror : pres.errors)
   }
 
   const [qctx, qres] = q(pctx)
   if (qres.status !== Ok) {
-    return maybeFatal(
-      qctx.index !== index,
-      qctx,
-      hasM ? merror : merge(pres.errors, qres.errors),
-    )
+    const fn = replyFn(qres.status === Fatal || qctx.index !== index)
+    return fn(qctx, hasM ? merror : merge(pres.errors, qres.errors))
   }
 
   const fn = qres.value
@@ -402,7 +398,8 @@ export const chain = (p, fn, m) => parser(ctx => {
 
   const [pctx, pres] = p(ctx)
   if (pres.status !== Ok) {
-    return maybeFatal(pres.status === Fatal, pctx, hasM ? merror : pres.errors)
+    const fn = replyFn(pres.status === Fatal)
+    return fn(pctx, hasM ? merror : pres.errors)
   }
 
   const q = fn(pres.value)
@@ -412,11 +409,8 @@ export const chain = (p, fn, m) => parser(ctx => {
 
   const [qrep, [qctx, qres]] = dup(q(pctx))
   if (qres.status !== Ok) {
-    return maybeFatal(
-      qctx.index !== index,
-      qctx,
-      hasM ? merror : merge(pres.errors, qres.errors),
-    )
+    const fn = replyFn(qres.status === Fatal || qctx.index !== index)
+    return fn(qctx, hasM ? merror : merge(pres.errors, qres.errors))
   }
   return qrep
 })

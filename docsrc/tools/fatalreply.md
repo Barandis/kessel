@@ -28,5 +28,4 @@ This function should always be used to create a fatally failing reply, since it 
 * [`Context`](../types/context.md)
 * [`ErrorList`](../types/errorlist.md)
 * [`failReply`](failreply.md)
-* [`maybeFatal`](maybefatal.md)
 * [`okReply`](okreply.md)

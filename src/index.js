@@ -124,7 +124,6 @@ export {
   failReply,
   failure,
   fatalReply,
-  maybeFatal,
   okReply,
   parse,
   parser,
