@@ -650,18 +650,6 @@
 
 
   <li class="md-nav__item">
-    <a href="../../parsers/attemptm/" class="md-nav__link">
-      attemptM
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
     <a href="../../parsers/between/" class="md-nav__link">
       between
     </a>
@@ -916,18 +904,6 @@
   <li class="md-nav__item">
     <a href="../../parsers/join/" class="md-nav__link">
       join
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../../parsers/label/" class="md-nav__link">
-      label
     </a>
   </li>
 
@@ -2059,7 +2035,7 @@
 <p>A compound error results from backtracking. The context changes when backtracking happens, which would lead to loss if information about the error that <em>caused</em> the backtracking if that information wasn't saved. That's the purpose of the nested error; it saves its own copy of the context where the error actually happened so that information can be put into an error message even after backtracking.</p>
 <p>A compound error has its own error list, which is where the error(s) which caused the backtracking will be. It also has a message which is used as a header to explain the backtracking. The compound error will then be in the error list returned by the result of the failed parse.</p>
 <p>Compound errors always have the type <code>ErrorType.Compound</code>.</p>
-<p>The <a href="../../parsers/attemptm/"><code>attemptM</code></a> parser produces a compound error when it backtracks.</p>
+<p>The <a href="../../parsers/attempt/"><code>attempt</code></a> parser produces a compound error when it backtracks if an error message is provided to it.</p>
 <h4 id="properties">Properties</h4>
 <ul>
 <li><code>type</code>: The type of the error. This is always <code>ErrorType.Compound</code> for compound errors.</li>
@@ -2074,7 +2050,7 @@
 <li><a href="../errortype/"><code>ErrorType</code></a></li>
 <li><a href="../localerror/"><code>LocalError</code></a></li>
 <li><a href="../nestederror/"><code>NestedError</code></a></li>
-<li><a href="../../parsers/attemptm/"><code>attemptM</code></a></li>
+<li><a href="../../parsers/attempt/"><code>attempt</code></a></li>
 <li><a href="../../tools/compound/"><code>compound</code></a></li>
 </ul>
                 

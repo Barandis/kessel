@@ -9,7 +9,7 @@
 
 Parses a character for which the predicate `fn` returns `true` when passed that character.
 
-Since the parser cannot reasonably figure out what conditions cause `fn` to pass, it does not generate an error message on failure.  To provide an error message, either wrap the parser with [`label`](label.md) or use [`satisfyM`](satisfym.md).
+Since the parser cannot reasonably figure out what conditions cause `fn` to pass, it does not generate an error message on failure by default. To provide a useful error message, supply that message as the optional second argument.
 
 #### Example
 
@@ -49,7 +49,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 #### See Also
 
 * [`Parser`](../types/parser.md)
-* [`label`](label.md)
 * [`range`](range.md)
 * [`regex`](regex.md)
 * [`satisfyM`](satisfym.md)

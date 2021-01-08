@@ -15,7 +15,7 @@ A compound error has its own error list, which is where the error(s) which cause
 
 Compound errors always have the type `ErrorType.Compound`.
 
-The [`attemptM`](../parsers/attemptm.md) parser produces a compound error when it backtracks.
+The [`attempt`](../parsers/attempt.md) parser produces a compound error when it backtracks if an error message is provided to it.
 
 #### Properties
 
@@ -31,5 +31,5 @@ The [`attemptM`](../parsers/attemptm.md) parser produces a compound error when i
 * [`ErrorType`](errortype.md)
 * [`LocalError`](localerror.md)
 * [`NestedError`](nestederror.md)
-* [`attemptM`](../parsers/attemptm.md)
+* [`attempt`](../parsers/attempt.md)
 * [`compound`](../tools/compound.md)

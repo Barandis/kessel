@@ -5,16 +5,13 @@
 
 import { expect } from 'chai'
 
-import { alt, opt, peek } from 'kessel/combinators/alternative'
+import { opt, peek } from 'kessel/combinators/alternative'
 import {
-  andThenB,
   applyB,
   attempt,
-  attemptM,
   betweenB,
   blockB,
   chainB,
-  label,
   leftB,
   manyTillB,
   pipeB,
@@ -35,104 +32,39 @@ import { terror, tfail, tpass } from 'test/helper'
 const { Fail, Fatal } = Status
 
 describe('Backtracking and error handling combinators', () => {
-  describe('label', () => {
-    it('throws if its first argument is not a parser', () => {
-      terror(
-        label(0, 'test'),
-        '',
-        '[label]: expected 1st argument to be a parser; found 0',
-      )
-    })
-    it('throws if its second argument is not a string', () => {
-      terror(
-        label(char('a'), 0),
-        '',
-        '[label]: expected 2nd argument to be a string; found 0',
-      )
-    })
-    it('does nothing if its parser succeeds', () => {
-      const r1 = parse(char('a'), 'abc')
-      const r2 = parse(label(char('a'), 'test'), 'abc')
-      expect(r1).to.deep.equal(r2)
-    })
-    it('changes the expected message if its parser fails', () => {
-      tfail(char('a'), 'bcd', "'a'")
-      tfail(label(char('a'), 'letter a'), 'bcd', 'letter a')
-    })
-    it('does not change the expected message on a fatal error', () => {
-      tfail(seq(char('a'), char('b')), 'a1', "'b'")
-      tfail(label(seq(char('a'), char('b')), 'letter b'), 'a1', "'b'")
-    })
-    it('overwrites all of multiple expected messages', () => {
-      const parser = alt(char('a'), char('b'), char('c'))
-      tfail(parser, 'def', "'a', 'b', or 'c'")
-      tfail(label(parser, 'a, b, or c'), 'def', 'a, b, or c')
-    })
-  })
-
-  describe('attemptM', () => {
-    it('throws if its first argument is not a parser', () => {
-      terror(
-        attemptM(0, 'test'),
-        '',
-        '[attemptM]: expected 1st argument to be a parser; found 0',
-      )
-    })
-    it('throws if its second argument is not a string', () => {
-      terror(
-        attemptM(char('a'), 0),
-        '',
-        '[attemptM]: expected 2nd argument to be a string; found 0',
-      )
-    })
-    it('does nothing if its parser succeeds', () => {
-      const r1 = parse(char('a'), 'abc')
-      const r2 = parse(attemptM(char('a'), 'test'), 'abc')
-      expect(r1).to.deep.equal(r2)
-    })
-    it('changes the expected if its parser fails without consuming', () => {
-      tfail(char('a'), 'bcd', "'a'")
-      tfail(attemptM(char('a'), 'letter a'), 'bcd', 'letter a')
-    })
-    it('adds a compound error if its parser fails while consuming', () => {
-      const [ctx, result] = parse(
-        attemptM(seq(char('a'), char('b')), 'test'), 'a1',
-      )
-      const error = result.errors[0]
-
-      expect(result.status).to.equal(Status.Fail)
-      expect(ctx.index).to.equal(0)
-      expect(error.ctx.index).to.equal(1)
-      expect(error.label).to.equal('test')
-      expect(error.errors[0].label).to.equal("'b'")
-    })
-    it('collapses the nested error from backtracking', () => {
-      const [ctx, result] = parse(
-        attemptM(attempt(right(char('a'), char('b'))), 'test'), 'a1',
-      )
-      const error = result.errors[0]
-
-      expect(result.status).to.equal(Status.Fail)
-      expect(ctx.index).to.equal(0)
-      expect(error.ctx.index).to.equal(1)
-      expect(error.label).to.equal('test')
-      expect(error.errors[0].label).to.equal("'b'")
-    })
-  })
-
   describe('attempt', () => {
-    it('throws if its argument is not a parser', () => {
-      terror(attempt(0), '', '[attempt]: expected a parser; found 0')
+    it('throws if its first argument is not a parser', () => {
+      terror(
+        attempt(0),
+        '',
+        '[attempt]: expected argument to be a parser; found 0',
+      )
+      terror(
+        attempt(0, 'test'),
+        '',
+        '[attempt]: expected first argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument exists and is not a string', () => {
+      terror(
+        attempt(any, 0),
+        '',
+        '[attempt]: expected second argument to be a string; found 0',
+      )
     })
     it('does nothing if its parser succeeds', () => {
       const r1 = parse(char('a'), 'abc')
       const r2 = parse(attempt(char('a')), 'abc')
-      expect(r1).to.deep.equal(r2)
+      const r3 = parse(attempt(char('a'), 'test'), 'abc')
+      expect(r1).to.deep.equal(r2).to.deep.equal(r3)
     })
-    it('does nothing if its parser fails without consuming input', () => {
+    it('does nothing if its parser fails and no message is provided', () => {
       const r1 = parse(char('a'), 'bcd')
       const r2 = parse(attempt(char('a')), 'bcd')
       expect(r1).to.deep.equal(r2)
+    })
+    it('changes the message if it exists and the parser fails', () => {
+      tfail(attempt(char('a'), 'letter a'), 'bcd', 'letter a')
     })
     it('resets the index if its parser fails with consuming input', () => {
       const parser = seq(string('te'), string('st'))
@@ -149,6 +81,30 @@ describe('Backtracking and error handling combinators', () => {
       expect(error.ctx.index).to.equal(2)
       expect(error.errors[0].type).to.equal(ErrorType.Expected)
       expect(error.errors[0].label).to.equal("'st'")
+    })
+    it('adds a compound error if its parser fails while consuming', () => {
+      const [ctx, result] = parse(
+        attempt(seq(char('a'), char('b')), 'test'), 'a1',
+      )
+      const error = result.errors[0]
+
+      expect(result.status).to.equal(Status.Fail)
+      expect(ctx.index).to.equal(0)
+      expect(error.ctx.index).to.equal(1)
+      expect(error.label).to.equal('test')
+      expect(error.errors[0].label).to.equal("'b'")
+    })
+    it('collapses the nested error from backtracking', () => {
+      const [ctx, result] = parse(
+        attempt(attempt(right(char('a'), char('b'))), 'test'), 'a1',
+      )
+      const error = result.errors[0]
+
+      expect(result.status).to.equal(Status.Fail)
+      expect(ctx.index).to.equal(0)
+      expect(error.ctx.index).to.equal(1)
+      expect(error.label).to.equal('test')
+      expect(error.errors[0].label).to.equal("'b'")
     })
   })
 
@@ -437,61 +393,6 @@ describe('Backtracking and error handling combinators', () => {
       const parser = rightB(opt(char('-')), digit)
       tpass(parser, '-1', '1')
       tpass(parser, '1', '1')
-      tfail(parser, 'a', "'-' or a digit")
-      tfail(parser, '-a', { nested: 'a digit' })
-    })
-  })
-
-  describe('andThenB', () => {
-    it('throws if its first argument is not a parser', () => {
-      terror(
-        andThenB(0, any),
-        '',
-        '[andThenB]: expected 1st argument to be a parser; found 0',
-      )
-    })
-    it('throws if its second argument is not a parser', () => {
-      terror(
-        andThenB(any, 0),
-        '',
-        '[andThenB]: expected 2nd argument to be a parser; found 0',
-      )
-    })
-    it('returns the result of its right parser if both pass', () => {
-      tpass(andThenB(letter, digit), 'a1', ['a', '1'])
-    })
-    it('fails non-fatally if one parser fails and no input is consumed', () => {
-      tfail(andThenB(letter, digit), '1', {
-        expected: 'a letter',
-        status: Fail,
-      })
-      tfail(andThenB(eof, char('a')), '', { expected: "'a'", status: Fail })
-    })
-    it('fails non-fatally on non-fatal errors after consumption', () => {
-      const [ctx, result] = parse(andThenB(letter, digit), 'aa')
-      const err = result.errors[0]
-
-      expect(ctx.index).to.equal(0)
-      expect(result.status).to.equal(Fail)
-      expect(err.ctx.index).to.equal(1)
-      expect(err.errors[0].label).to.equal('a digit')
-    })
-    it('still fails fatally if either parser fails fatally', () => {
-      tfail(andThenB(seq(letter, letter), digit), 'a11', {
-        expected: 'a letter',
-        index: 1,
-        status: Fatal,
-      })
-      tfail(andThenB(letter, seq(letter, digit)), 'aab', {
-        expected: 'a digit',
-        index: 2,
-        status: Fatal,
-      })
-    })
-    it('adds opt message if next parser fails', () => {
-      const parser = andThenB(opt(char('-')), digit)
-      tpass(parser, '-1', ['-', '1'])
-      tpass(parser, '1', [null, '1'])
       tfail(parser, 'a', "'-' or a digit")
       tfail(parser, '-a', { nested: 'a digit' })
     })

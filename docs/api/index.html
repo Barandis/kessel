@@ -811,18 +811,6 @@
 
 
   <li class="md-nav__item">
-    <a href="../parsers/attemptm/" class="md-nav__link">
-      attemptM
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
     <a href="../parsers/between/" class="md-nav__link">
       between
     </a>
@@ -1077,18 +1065,6 @@
   <li class="md-nav__item">
     <a href="../parsers/join/" class="md-nav__link">
       join
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../parsers/label/" class="md-nav__link">
-      label
     </a>
   </li>
 
@@ -2628,10 +2604,6 @@
 <td>Executes a parser, backtracking to its original position if the parser fails and consumes input.</td>
 </tr>
 <tr>
-<td><a href="../parsers/attemptm/"><code>attemptM</code></a></td>
-<td>Executes a parser and replaces its errors with an expected error if that parser fails. Backtracks to where the parser was applied and adds additional information to the error message if that parser consumes input.</td>
-</tr>
-<tr>
 <td><a href="../parsers/sequenceb/"><code>sequenceB</code></a></td>
 <td>Executes a series of parsers in order, returning their results in an array. Backtracks to where the first parser was applied if any other of its parsers fails.</td>
 </tr>
@@ -2642,6 +2614,10 @@
 <tr>
 <td><a href="../parsers/chainb/"><code>chainB</code></a></td>
 <td>Executes a parser, then applies a function to the result, then applies the parser returned by the function. Backtracks to where the first parser was applied if the parser returned by the function fails.</td>
+</tr>
+<tr>
+<td><a href="../parsers/applyb/"><code>applyB</code></a></td>
+<td>Parses content and a function, returning the result of the function when passed the content. Backtracks to where the first parser was applied if the second parser fails.</td>
 </tr>
 <tr>
 <td><a href="../parsers/leftb/"><code>leftB</code></a></td>
@@ -2689,10 +2665,6 @@
 <tr>
 <td><a href="../parsers/apply/"><code>apply</code></a></td>
 <td>Parses content and a function, returning the result of the function when passed the content.</td>
-</tr>
-<tr>
-<td><a href="../parsers/label/"><code>label</code></a></td>
-<td>Executes a parser and replaces its errors with an expected error if that parser fails.</td>
 </tr>
 <tr>
 <td><a href="../parsers/value/"><code>value</code></a></td>

@@ -123,10 +123,10 @@ Additionally, parsers are often said to *return* a value or to have a value as a
 | Parser | Description |
 |--------|-------------|
 | [`attempt`](parsers/attempt.md) | Executes a parser, backtracking to its original position if the parser fails and consumes input. |
-| [`attemptM`](parsers/attemptm.md) | Executes a parser and replaces its errors with an expected error if that parser fails. Backtracks to where the parser was applied and adds additional information to the error message if that parser consumes input. |
 | [`sequenceB`](parsers/sequenceb.md) | Executes a series of parsers in order, returning their results in an array. Backtracks to where the first parser was applied if any other of its parsers fails. |
 | [`blockB`](parsers/blockb.md) | Runs a generator function. The generator can `yield` parsers, whose results will be returned as the result of the `yield` expressions. Returns the result of the generator. Backtracks to where the first yielded parser was applied if any later parser fails. |
-| [`chainB`](parsers/chainb.md) | Executes a parser, then applies a function to the result, then applies the parser returned by the function. Backtracks to where the first parser was applied if the parser returned by the function fails. | [`applyB`](parsers/applyb.md) | Parses content and a function, returning the result of the function when passed the content. Backtracks to where the first parser was applied if the second parser fails. |
+| [`chainB`](parsers/chainb.md) | Executes a parser, then applies a function to the result, then applies the parser returned by the function. Backtracks to where the first parser was applied if the parser returned by the function fails. |
+| [`applyB`](parsers/applyb.md) | Parses content and a function, returning the result of the function when passed the content. Backtracks to where the first parser was applied if the second parser fails. |
 | [`leftB`](parsers/leftb.md) | Executes two parsers in order and returns the result of the first one. Backtracks to the location where the first parser was applied if the second one fails. |
 | [`rightB`](parsers/rightb.md) | Executes two parsers in order and returns the result of the second one. Backtracks to the location where the first parser was applied if the second one fails. |
 | [`pipeB`](parsers/pipeb.md) | Executes a series of parsers in order, then passes the results as arguments to a function, then returns the result of that function. Backtracks to where the first parser was applied if any other parser fails. |
@@ -141,7 +141,6 @@ Additionally, parsers are often said to *return* a value or to have a value as a
 | [`chain`](parsers/chain.md) | Applies a parser, then applies a function to the result, then applies the parser returned by the function. |
 | [`map`](parsers/map.md) | Applies a parser, then applies a function to the result, then returns the result of that function. |
 | [`apply`](parsers/apply.md) | Parses content and a function, returning the result of the function when passed the content. |
-| [`label`](parsers/label.md) | Executes a parser and replaces its errors with an expected error if that parser fails. |
 | [`value`](parsers/value.md) | Executes a parser and returns a value. |
 | [`nth`](parsers/nth.md) | Executes a parser and returns the nth element of the resulting array. |
 | [`first`](parsers/first.md) | Executes a parser and returns the first element of the resulting array. |

@@ -10,7 +10,6 @@ import {
   char,
   end,
   join,
-  label,
   many,
   newline,
   noneOf,
@@ -27,7 +26,7 @@ const quotedChar = alt(noneOf('"'), value(string('""'), '"'))
 const quotedCell = second(sequenceB(
   char('"'),
   join(many(quotedChar)),
-  label(char('"'), 'quote at end of cell'),
+  char('"', 'quote at end of cell'),
 ))
 
 const cell = alt(quotedCell, join(many(noneOf(',\n\r'))))
@@ -40,7 +39,7 @@ const parseCsv1 = input => run(end(sep(alt(
   second(sequenceB(
     char('"'),
     join(many(alt(noneOf('"'), value(string('""'), '"')))),
-    label(char('"'), 'quote at end of cell'),
+    char('"', 'quote at end of cell'),
   )), join(many(noneOf(',\n\r'))),
 ), char(',')), newline), input)
 

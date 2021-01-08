@@ -4,6 +4,8 @@
 // https://opensource.org/licenses/MIT
 
 import {
+  argParFormatter,
+  argStrFormatter,
   assertFunction,
   assertGenFunction,
   assertNumber,
@@ -14,7 +16,6 @@ import {
   ordFnFormatter,
   ordNumFormatter,
   ordParFormatter,
-  ordStrFormatter,
 } from 'kessel/assert'
 import { failReply, fatalReply, okReply, parser, Status } from 'kessel/core'
 import { compound, ErrorType, expected, merge, nested } from 'kessel/error'
@@ -24,87 +25,48 @@ const { Ok, Fail, Fatal } = Status
 
 /** @typedef {import('kessel/core').Parser} Parser */
 
-function pass(ctx, result, errors) {
-  return [{ ...ctx }, { ...result, errors }]
-}
-
-/**
- * A parser that passes through the result of its embedded parser,
- * except that it will change that parser's expected error message to
- * the one provided.
- *
- * @param {Parser} p The parser to be executed.
- * @param {string} msg The new expected error message if `p` fails.
- * @returns {Parser} A parser that executes `p` and passes its results
- *     through except for changing its expected error message upon
- *     failure.
- */
-export const label = (p, msg) => parser(ctx => {
-  ASSERT && assertParser('label', p, ordParFormatter('1st'))
-  ASSERT && assertString('label', msg, ordStrFormatter('2nd'))
-
-  const [prep, [pctx, pres]] = dup(p(ctx))
-  return pres.status === Fail ? pass(pctx, pres, expected(msg)) : prep
-})
-
 /**
  * A parser that backtracks when its contained parser fails fatally and
  * transforms that fatal failure into a non-fatal one.
  *
- * This is the only way (along with the similar `attemptM`) to cause a
- * contained parser to backtrack after a fatal failure. All of the `B`
- * backtracking parsers backtrack only if the fatal failure was caused
- * by a contained parser's non-fatal failure.
+ * This is one of the few ways to cause a contained parser to backtrack
+ * after a fatal failure (`peek` also does that as a side effect, etc.).
+ * All of the `B` backtracking parsers backtrack only if the fatal
+ * failure was caused by a contained parser's non-fatal failure.
  *
  * @param {Parser} p The parser whose fatal failures will be converted
  *     into non-fatal failures.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails. If the parser backtracks, this instead becomes the text of
+ *     the generated compound error message.
  * @returns {Parser} A parser that cannot fail fatally. If its contained
  *     parser fails fatally, this one will instead fail non-fatally.
  */
-export const attempt = p => parser(ctx => {
-  ASSERT && assertParser('attempt', p)
+export const attempt = (p, m) => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && assertParser('attempt', p, argParFormatter(1, hasM))
+  ASSERT && hasM && assertString('attempt', m, argStrFormatter(2, true))
 
   const index = ctx.index
-  const [prep, [pctx, pres]] = dup(p(ctx))
-  if (pres.status === Ok) return prep
-
-  const err = index === pctx.index ? pres.errors : nested(pctx, pres.errors)
-  return failReply(pctx, err, index)
-})
-
-/**
- * A parser that backtracks when its contained parser fails fatally and
- * transforms that fatal failure into a non-fatal one. The error message
- * is then replaced with the supplied one.
- *
- * If the contained parser fails non-fatally, this acts just like
- * `label` and simply replaces the expected error message. If that
- * parser fails fatally however, this parser will backtrack to the point
- * where that parser was executed and will use the supplied error
- * message as a header to a nested error message detailing the
- * backtracking.
- *
- * @param {Parser} p The parser to be applied.
- * @param {string} msg The new error message to be used. This will be an
- *     `Expected` error if no input was consumed, or a `Compound` error
- *     if it was.
- * @returns {Parser} A parser that applies `p` and changes the error as
- *     appropriate if `p` fails.
- */
-export const attemptM = (p, msg) => parser(ctx => {
-  ASSERT && assertParser('attemptM', p, ordParFormatter('1st'))
-  ASSERT && assertString('attemptM', msg, ordStrFormatter('2nd'))
 
   const [prep, [pctx, pres]] = dup(p(ctx))
   if (pres.status === Ok) return prep
-  if (pres.status === Fail) {
+  if (pres.status === Fatal || pctx.index !== index) {
+    return failReply(
+      pctx,
+      hasM ? compound(m, pctx, pres.errors) : nested(pctx, pres.errors),
+      index,
+    )
+  }
+  if (hasM) {
     if (pres.errors.length === 1 && pres.errors[0].type === ErrorType.Nested) {
       const { ctx, errors } = pres.errors[0]
-      return pass(pctx, pres, compound(msg, ctx, errors))
+      return failReply(pctx, compound(m, ctx, errors), index)
     }
-    return pass(pctx, pres, expected(msg))
+    return failReply(pctx, expected(m), index)
   }
-  return failReply(ctx, compound(msg, pctx, pres.errors))
+  return failReply(pctx, pres.errors, index)
 })
 
 /**
@@ -276,37 +238,6 @@ export const rightB = (p, q) => parser(ctx => {
 
   const [qrep, [qctx, qres]] = dup(q(pctx))
   if (qres.status === Ok) return qrep
-
-  const errors = merge(pres.errors, qres.errors)
-  if (qres.status === Fatal) return fatalReply(qctx, errors)
-
-  const err = index === qctx.index ? errors : nested(qctx, errors)
-  return failReply(qctx, err, index)
-})
-
-/**
- * A parser that will execute the parsers `p` and `q` in sequence and
- * then return the result of both in an array.
- *
- * If `p` succeeds and `q` fails, this parser will backtrack to the
- * point where `p` was executed and fail non-fatally.
- *
- * @param {Parser} p The first parser to execute.
- * @param {Parser} q The second parser to execute.
- * @returns {Parser} A parser that executes both `p` and `q` and returns
- *     the results of both parsers in an array.
- */
-export const andThenB = (p, q) => parser(ctx => {
-  ASSERT && assertParser('andThenB', p, ordParFormatter('1st'))
-  ASSERT && assertParser('andThenB', q, ordParFormatter('2nd'))
-
-  const index = ctx.index
-
-  const [prep, [pctx, pres]] = dup(p(ctx))
-  if (pres.status !== Ok) return prep
-
-  const [qctx, qres] = q(pctx)
-  if (qres.status === Ok) return okReply(qctx, [pres.value, qres.value])
 
   const errors = merge(pres.errors, qres.errors)
   if (qres.status === Fatal) return fatalReply(qctx, errors)

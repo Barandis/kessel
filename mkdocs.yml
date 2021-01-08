@@ -53,7 +53,6 @@ nav:
       - assocL: parsers/assocl.md
       - assocR: parsers/assocr.md
       - attempt: parsers/attempt.md
-      - attemptM: parsers/attemptm.md
       - between: parsers/between.md
       - betweenB: parsers/betweenb.md
       - block: parsers/block.md
@@ -76,7 +75,6 @@ nav:
       - fourth: parsers/fourth.md
       - hex: parsers/hex.md
       - join: parsers/join.md
-      - label: parsers/label.md
       - left: parsers/left.md
       - leftB: parsers/leftb.md
       - letter: parsers/letter.md

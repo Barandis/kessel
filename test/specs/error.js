@@ -5,7 +5,7 @@
 
 import { expect } from 'chai'
 
-import { attemptM, sequenceB } from 'kessel/combinators/backtracking'
+import { attempt, sequenceB } from 'kessel/combinators/backtracking'
 import { seq } from 'kessel/combinators/sequence'
 import { context, parse, Status } from 'kessel/core'
 import {
@@ -620,7 +620,7 @@ describe('Parse errors', () => {
         expect(errorMsg).to.equal(exp)
       })
       it('formats compound errors from backlabel', () => {
-        const parser = attemptM(
+        const parser = attempt(
           seq(char('t'), char('e'), char('s'), char('t')),
           "the word 'test'",
         )

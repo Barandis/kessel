@@ -63,14 +63,11 @@ export {
   peek,
 } from './combinators/alternative'
 export {
-  andThenB,
   applyB,
   attempt,
-  attemptM,
   betweenB,
   blockB,
   chainB,
-  label,
   leftB,
   manyTillB,
   pipeB,
