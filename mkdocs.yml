@@ -109,8 +109,6 @@ nav:
       - seq: parsers/seq.md
       - seqB: parsers/seqb.md
       - skip: parsers/skip.md
-      - skipMany: parsers/skipmany.md
-      - skipMany1: parsers/skipmany1.md
       - space: parsers/space.md
       - spaces: parsers/spaces.md
       - spaces1: parsers/spaces1.md

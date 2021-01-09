@@ -25,8 +25,6 @@ import {
   sepEndBy1,
   seq,
   skip,
-  skipMany,
-  skipMany1,
 } from 'kessel/combinators/sequence'
 import { Status } from 'kessel/core'
 import { any, char, digit, eof, letter, noneOf } from 'kessel/parsers/char'
@@ -372,102 +370,6 @@ describe('Sequence combinators', () => {
       })
       tfail(skip(seq(string('ab'), string('cd')), "'abcd'"), 'abce', {
         expected: "'abcd'",
-        status: Fatal,
-      })
-    })
-  })
-
-  describe('skipMany', () => {
-    it('throws if its first argument is not a parser', () => {
-      terror(
-        skipMany(0),
-        '',
-        '[skipMany]: expected argument to be a parser; found 0',
-      )
-      terror(
-        skipMany(0, 'test'),
-        '',
-        '[skipMany]: expected first argument to be a parser; found 0',
-      )
-    })
-    it('throws if its second argument exists and is not a parser', () => {
-      terror(
-        skipMany(any, 0),
-        '',
-        '[skipMany]: expected second argument to be a string; found 0',
-      )
-    })
-    it('succeeds zero times without consuming input', () => {
-      tpass(skipMany(digit), 'abc123', { result: null, index: 0 })
-      tpass(skipMany(digit), '', { result: null, index: 0 })
-      tpass(skipMany(digit, 'test'), 'abc123', { result: null, index: 0 })
-    })
-    it('succeeds with all results until a non-match', () => {
-      tpass(skipMany(digit), '123abc', { result: null, index: 3 })
-      tpass(skipMany(digit), '123abc456', { result: null, index: 3 })
-      tpass(skipMany(digit, 'test'), '123abc', { result: null, index: 3 })
-    })
-    it('succeeds until EOF if matches continue until then', () => {
-      tpass(skipMany(digit), '123', { result: null, index: 3 })
-      tpass(skipMany(digit, 'test'), '123', { result: null, index: 3 })
-    })
-    it('fails if its parser consumes while failing', () => {
-      tfail(skipMany(seq(char('a'), char('b'))), 'ababac', {
-        expected: "'b'",
-        index: 5,
-        status: Fatal,
-      })
-      tfail(skipMany(seq(char('a'), char('b')), 'lots of ab'), 'ababac', {
-        expected: 'lots of ab',
-        index: 5,
-        status: Fatal,
-      })
-    })
-  })
-
-  describe('skipMany1', () => {
-    it('throws if its argument is not a parser', () => {
-      terror(
-        skipMany1(0),
-        '',
-        '[skipMany1]: expected argument to be a parser; found 0',
-      )
-      terror(
-        skipMany1(0, 'test'),
-        '',
-        '[skipMany1]: expected first argument to be a parser; found 0',
-      )
-    })
-    it('throws if its second argument exists and is not a parser', () => {
-      terror(
-        skipMany1(any, 0),
-        '',
-        '[skipMany1]: expected second argument to be a string; found 0',
-      )
-    })
-    it('fails if its parser does not match at least once', () => {
-      tfail(skipMany1(digit), 'abc123', 'a digit')
-      tfail(skipMany1(digit), '', 'a digit')
-      tfail(skipMany1(digit, 'lots of digits'), 'abc123', 'lots of digits')
-    })
-    it('succeeds with all results until a non-match', () => {
-      tpass(skipMany1(digit), '123abc', { result: null, index: 3 })
-      tpass(skipMany1(digit), '123abc456', { result: null, index: 3 })
-      tpass(skipMany1(digit, 'test'), '123abc', { result: null, index: 3 })
-    })
-    it('succeeds until EOF if matches continue until then', () => {
-      tpass(skipMany1(digit), '123', { result: null, index: 3 })
-      tpass(skipMany1(digit, 'test'), '123', { result: null, index: 3 })
-    })
-    it('fails if its parser consumes while failing', () => {
-      tfail(skipMany1(seq(char('a'), char('b'))), 'ababac', {
-        expected: "'b'",
-        index: 5,
-        status: Fatal,
-      })
-      tfail(skipMany1(seq(char('a'), char('b')), 'lots of ab'), 'ababac', {
-        expected: 'lots of ab',
-        index: 5,
         status: Fatal,
       })
     })

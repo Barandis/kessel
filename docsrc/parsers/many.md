@@ -53,4 +53,3 @@ The failure case in this example shows the only way that `many` can fail: its un
 
 * [`Parser`](../types/parser.md)
 * [`many1`](many1.md)
-* [`skipMany`](skipmany.md)

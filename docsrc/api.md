@@ -92,8 +92,6 @@ Additionally, parsers are often said to *return* a value or to have a value as a
 | [`many`](parsers/many.md) | Executes a parser zero or more times until it fails, returning all of the results in an array. |
 | [`many1`](parsers/many1.md) | Executes a parser one or more times until it fails, returning all of the results in an array. |
 | [`skip`](parsers/skip.md) | Executes a parser and discards the result. |
-| [`skipMany`](parsers/skipmany.md) | Executes a parser zero or more times until it fails, discarding the results. |
-| [`skipMany1`](parsers/skipmany1.md) | Executes a parser one or more times until it fails, discarding the results. |
 | [`sep`](parsers/sep.md) | Executes a content parser zero or more times with an application of a separator parser between each. Returns the content parser results. |
 | [`sep1`](parsers/sep1.md) | Executes a content parser one or more times with an application of a separator parser between each. Returns the content parser results. |
 | [`end`](parsers/end.md) | Executes a content parser zero or more times with an application of a separator parser between each and optionally at the end. Returns the content parser results. |

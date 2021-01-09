@@ -108,8 +108,6 @@ export {
   sepEndBy1,
   seq,
   skip,
-  skipMany,
-  skipMany1,
   until,
 } from './combinators/sequence'
 
