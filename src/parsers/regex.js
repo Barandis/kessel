@@ -3,10 +3,15 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { assertStringOrRegExp } from 'kessel/assert'
+import {
+  argStrFormatter,
+  argStrRegFormatter,
+  assertString,
+  assertStringOrRegExp,
+} from 'kessel/assert'
 import { failReply, okReply, parser, Status } from 'kessel/core'
 import { expecteds } from 'kessel/messages'
-import { dup, stringToView, viewToString } from 'kessel/util'
+import { dup, ferror, stringToView, viewToString } from 'kessel/util'
 
 const { Ok } = Status
 
@@ -80,18 +85,23 @@ const regexParser = re => parser(ctx => {
  * match will be considered anyway. These two rules ensure that the
  * match is only attempted at the beginning of the current text.
  *
- * @param {(string|RegExp)} re The regular expression to match against
+ * @param {(string|RegExp)} r The regular expression to match against
  *     the input text. If this is a string, it will be converted into a
  *     regular expression with no flags.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser that attempts to match the regular
  *     expression against the input at its current position and succeeds
  *     if a match is found.
  */
-export const regex = re => parser(ctx => {
-  ASSERT && assertStringOrRegExp('regex', re)
+export const regex = (r, m) => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && assertStringOrRegExp('regex', r, argStrRegFormatter(1, hasM))
+  ASSERT && hasM && assertString('regex', m, argStrFormatter(2, true))
 
   // First, convert to a regular expression if it's a string
-  let regex = typeof re === 'string' ? new RegExp(re) : re
+  let regex = typeof r === 'string' ? new RegExp(r) : r
 
   // Next, make sure the regular expression starts with a ^ anchor
   const { source, flags } = regex
@@ -101,8 +111,10 @@ export const regex = re => parser(ctx => {
     regex = new RegExp(newSource, flags)
   }
 
-  const [rprep, [rpctx, rpres]] = dup(regexParser(regex)(ctx))
-  return rpres.status === Ok ? rprep : failReply(rpctx, expecteds.regex(regex))
+  const [rrep, [rctx, rres]] = dup(regexParser(regex)(ctx))
+  return rres.status === Ok
+    ? rrep
+    : failReply(rctx, ferror(m, expecteds.regex(regex)))
 })
 
 /**

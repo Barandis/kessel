@@ -26,43 +26,70 @@ describe('Regular expression parsers', () => {
       terror(
         regex(0),
         '',
-        '[regex]: expected a string or a regular expression; found 0',
+        '[regex]: expected argument to be a string or a regular expression; '
+          + 'found 0',
+      )
+      terror(
+        regex(0, 'test'),
+        '',
+        '[regex]: expected first argument to be a string or a regular '
+          + 'expression; found 0',
+      )
+    })
+    it('throws if second argument exists and is not a string', () => {
+      terror(
+        regex(/abc/, 0),
+        '',
+        '[regex]: expected second argument to be a string; found 0',
       )
     })
     it('accepts a string as input', () => {
       tpass(regex('^\\w{3}'), 'Onomatopoeia', 'Ono')
+      tpass(regex('^\\w{3}', 'test'), 'Onomatopoeia', 'Ono')
     })
     it('accepts a regular expression as input', () => {
       tpass(regex(/^\w{3}/i), 'onomatopoeia', 'ono')
+      tpass(regex(/^\w{3}/i, 'test'), 'onomatopoeia', 'ono')
     })
     it('is anchored even if an anchor is not in the regex', () => {
       tfail(regex(/poe/), 'Onomatopoeia', 'a string matching /^poe/')
+      tfail(regex(/poe/, 'test'), 'Onomatopoeia', 'test')
     })
     it('fails if the input is at its end', () => {
       tfail(regex(/^./), '', 'a string matching /^./')
+      tfail(regex(/^./, 'test'), '', 'test')
     })
     it('succeeds at EOF if the match can be zero-length', () => {
       tpass(regex(/^.*/), '', '')
+      tpass(regex(/^.*/, 'test'), '', '')
     })
     it('matches 1-byte characters', () => {
       tpass(regex(/^Onoma/), 'Onomatopoeia', 'Onoma')
       tpass(regex(/^.{5}/), 'Onomatopoeia', 'Onoma')
+      tpass(regex(/^.{5}/, 'test'), 'Onomatopoeia', 'Onoma')
       tfail(regex(/^\d/), 'Onomatopoeia', 'a string matching /^\\d/')
+      tfail(regex(/^\d/, 'test'), 'Onomatopoeia', 'test')
     })
     it('matches 2-byte characters', () => {
       tpass(regex(/^Звуко/), 'Звукоподражание', 'Звуко')
       tpass(regex(/^.{5}/), 'Звукоподражание', 'Звуко')
+      tpass(regex(/^.{5}/, 'test'), 'Звукоподражание', 'Звуко')
       tfail(regex(/^\d/), 'Звукоподражание', 'a string matching /^\\d/')
+      tfail(regex(/^\d/, 'test'), 'Звукоподражание', 'test')
     })
     it('matches 3-byte characters (with the u flag)', () => {
       tpass(regex(/^คำเลี/u), 'คำเลียนเสียง', 'คำเลี')
       tpass(regex(/^.{5}/u), 'คำเลียนเสียง', 'คำเลี')
+      tpass(regex(/^.{5}/u, 'test'), 'คำเลียนเสียง', 'คำเลี')
       tfail(regex(/^\d/u), 'คำเลียนเสียง', 'a string matching /^\\d/u')
+      tfail(regex(/^\d/u, 'test'), 'คำเลียนเสียง', 'test')
     })
     it('matches 4-byte characters (with the u flag)', () => {
       tpass(regex(/^𝑂𝑛𝑜𝑚𝑎/u), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', '𝑂𝑛𝑜𝑚𝑎')
       tpass(regex(/^.{5}/u), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', '𝑂𝑛𝑜𝑚𝑎')
+      tpass(regex(/^.{5}/u, 'test'), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', '𝑂𝑛𝑜𝑚𝑎')
       tfail(regex(/^\d/u), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', 'a string matching /^\\d/u')
+      tfail(regex(/^\d/u, 'test'), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', 'test')
     })
   })
 

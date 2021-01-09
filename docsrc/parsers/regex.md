@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `regex(pattern: string | RegExp): Parser<string>`
+> `regex(r: string | RegExp, m?: string): Parser`
 
 Matches the current input location against a regular expression pattern.
 
@@ -29,7 +29,8 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### Parameters
 
-* `pattern`: The regular expression pattern to match against the current input location. This pattern can be either a `RegExp` object or a string (which is automatically converted into a `RegExp` object without flags). It will have an `^` anchor added to it if it doesn't already have one; all `regex` matches are done against the beginning of the input (based on its current state). No flags are removed, but the `g` flag is ignored because there can be only one match because of the `^` anchor.
+* `r`: The regular expression pattern to match against the current input location. This pattern can be either a `RegExp` object or a string (which is automatically converted into a `RegExp` object without flags). It will have an `^` anchor added to it if it doesn't already have one; all `regex` matches are done against the beginning of the input (based on its current state). No flags are removed, but the `g` flag is ignored because there can be only one match because of the `^` anchor.
+* `m`: The optional expected error message that will take the place of the default error message.
 
 #### Success
 
@@ -41,8 +42,9 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### Throws
 
-* Throws an error if `pattern` is neither a `RegExp` object or a string.
-* Throws an error if `pattern` is a string and cannot be converted into a `RegExp` object because it is not a valid regular expression pattern.
+* Throws an error if `r` is neither a `RegExp` object or a string.
+* Throws an error if `r` is a string and cannot be converted into a `RegExp` object because it is not a valid regular expression pattern.
+* Throws an error if `m` exists and is not a string.
 
 #### See Also
 

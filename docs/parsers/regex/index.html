@@ -2049,7 +2049,7 @@
 -->
 
 <blockquote>
-<p><code>regex(pattern: string | RegExp): Parser&lt;string&gt;</code></p>
+<p><code>regex(r: string | RegExp, m?: string): Parser</code></p>
 </blockquote>
 <p>Matches the current input location against a regular expression pattern.</p>
 <h4 id="example">Example</h4>
@@ -2069,7 +2069,8 @@
 </code></pre></div>
 <h4 id="parameters">Parameters</h4>
 <ul>
-<li><code>pattern</code>: The regular expression pattern to match against the current input location. This pattern can be either a <code>RegExp</code> object or a string (which is automatically converted into a <code>RegExp</code> object without flags). It will have an <code>^</code> anchor added to it if it doesn't already have one; all <code>regex</code> matches are done against the beginning of the input (based on its current state). No flags are removed, but the <code>g</code> flag is ignored because there can be only one match because of the <code>^</code> anchor.</li>
+<li><code>r</code>: The regular expression pattern to match against the current input location. This pattern can be either a <code>RegExp</code> object or a string (which is automatically converted into a <code>RegExp</code> object without flags). It will have an <code>^</code> anchor added to it if it doesn't already have one; all <code>regex</code> matches are done against the beginning of the input (based on its current state). No flags are removed, but the <code>g</code> flag is ignored because there can be only one match because of the <code>^</code> anchor.</li>
+<li><code>m</code>: The optional expected error message that will take the place of the default error message.</li>
 </ul>
 <h4 id="success">Success</h4>
 <ul>
@@ -2081,8 +2082,9 @@
 </ul>
 <h4 id="throws">Throws</h4>
 <ul>
-<li>Throws an error if <code>pattern</code> is neither a <code>RegExp</code> object or a string.</li>
-<li>Throws an error if <code>pattern</code> is a string and cannot be converted into a <code>RegExp</code> object because it is not a valid regular expression pattern.</li>
+<li>Throws an error if <code>r</code> is neither a <code>RegExp</code> object or a string.</li>
+<li>Throws an error if <code>r</code> is a string and cannot be converted into a <code>RegExp</code> object because it is not a valid regular expression pattern.</li>
+<li>Throws an error if <code>m</code> exists and is not a string.</li>
 </ul>
 <h4 id="see-also">See Also</h4>
 <ul>

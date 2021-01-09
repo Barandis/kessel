@@ -57,6 +57,8 @@ export const argStrFormatter = (order = 1, multiple = false) =>
   argFormatter('a string', order, multiple)
 export const argStrArrFormatter = (order = 1, multiple = false) =>
   argFormatter('a string or an array of characters', order, multiple)
+export const argStrRegFormatter = (order = 1, multiple = false) =>
+  argFormatter('a string or a regular expression', order, multiple)
 
 /**
  * Generates a formatter function out of a type and a position.
