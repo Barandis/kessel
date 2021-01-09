@@ -60,7 +60,7 @@ describe('Chaining and piping combinators', () => {
         expected: 'any character',
         status: Fail,
       })
-      tfail(join(seq(letter, digit)), 'ab', {
+      tfail(join(seq(letter, digit())), 'ab', {
         expected: 'a digit',
         status: Fatal,
       })
@@ -68,7 +68,7 @@ describe('Chaining and piping combinators', () => {
         expected: 'a character',
         status: Fail,
       })
-      tfail(join(seq(letter, digit), 'a letter and a digit'), 'ab', {
+      tfail(join(seq(letter, digit()), 'a letter and a digit'), 'ab', {
         expected: 'a letter and a digit',
         status: Fatal,
       })
@@ -107,7 +107,7 @@ describe('Chaining and piping combinators', () => {
         expected: 'any character',
         status: Fail,
       })
-      tfail(compact(seq(letter, digit)), 'ab', {
+      tfail(compact(seq(letter, digit())), 'ab', {
         expected: 'a digit',
         status: Fatal,
       })
@@ -115,7 +115,7 @@ describe('Chaining and piping combinators', () => {
         expected: 'lots of characters',
         status: Fail,
       })
-      tfail(compact(seq(letter, digit), 'letter, digit'), 'ab', {
+      tfail(compact(seq(letter, digit()), 'letter, digit'), 'ab', {
         expected: 'letter, digit',
         status: Fatal,
       })
@@ -139,7 +139,7 @@ describe('Chaining and piping combinators', () => {
     })
     it('returns its constant when its parser succeeds', () => {
       tpass(value(letter, '!'), 'a', '!')
-      tpass(value(digit, 10), '1', { result: 10 })
+      tpass(value(digit(), 10), '1', { result: 10 })
       tpass(value(letter, '!', 'letter?'), 'a', '!')
     })
     it('passes failures through', () => {
@@ -376,7 +376,7 @@ describe('Chaining and piping combinators', () => {
     })
     it('succeeds with the return value of its function', () => {
       tpass(map(any(), c => c.toUpperCase()), 'abc', 'A')
-      tpass(map(seq(letter, digit), cs => cs.join('')), 'a1', 'a1')
+      tpass(map(seq(letter, digit()), cs => cs.join('')), 'a1', 'a1')
       tpass(map(any(), c => c.toUpperCase(), 'test'), 'abc', 'A')
     })
     it('propagates failed state if its parser fails', () => {
@@ -384,7 +384,7 @@ describe('Chaining and piping combinators', () => {
         expected: 'any character',
         status: Fail,
       })
-      tfail(map(seq(letter, digit), cs => cs.join('')), 'ab', {
+      tfail(map(seq(letter, digit()), cs => cs.join('')), 'ab', {
         expected: 'a digit',
         status: Fatal,
         index: 1,
@@ -393,7 +393,9 @@ describe('Chaining and piping combinators', () => {
         expected: 'a char',
         status: Fail,
       })
-      tfail(map(seq(letter, digit), cs => cs.join(''), 'letter, digit'), 'ab', {
+      tfail(map(
+        seq(letter, digit()), cs => cs.join(''), 'letter, digit',
+      ), 'ab', {
         expected: 'letter, digit',
         status: Fatal,
         index: 1,
@@ -459,7 +461,7 @@ describe('Chaining and piping combinators', () => {
       tfail(p, 'ac', { expected: "'b'", status: Fatal })
     })
     it('adds opt error message if next parser fails', () => {
-      const parser = apply(opt(char('-')), value(digit, x => x))
+      const parser = apply(opt(char('-')), value(digit(), x => x))
       tpass(parser, '-1', '-')
       tpass(parser, '1', { value: null })
       tfail(parser, 'a', "'-' or a digit")
@@ -537,7 +539,7 @@ describe('Chaining and piping combinators', () => {
       tfail(p, 'ac', { expected: "'b'", status: Fatal })
     })
     it('adds opt error message if next parser fails', () => {
-      const parser = chain(opt(char('-')), () => digit)
+      const parser = chain(opt(char('-')), () => digit())
       tpass(parser, '-1', '1')
       tpass(parser, '1', '1')
       tfail(parser, 'a', "'-' or a digit")

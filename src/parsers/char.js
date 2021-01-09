@@ -263,38 +263,59 @@ export const noneof = (cs, m) => parser(ctx => {
  * A parser that reads a character and succeeds with that character if
  * it is an ASCII digit.
  *
- * @type {Parser}
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
+ * @returns {Parser} A parser that succeeds if the next character is a
+ *     digit.
  */
-export const digit = parser(ctx => {
+export const digit = m => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && hasM && assertString('digit', m, argStrFormatter())
+
   const fn = c => c >= '0' && c <= '9'
-  const [cprep, [cpctx, cpres]] = dup(charParser(fn)(ctx))
-  return cpres.status === Ok ? cprep : failReply(cpctx, expecteds.digit)
+  const [crep, [cctx, cres]] = dup(charParser(fn)(ctx))
+  return cres.status === Ok ? crep : failReply(cctx, ferror(m, expecteds.digit))
 })
 
 /**
  * A parser that reads a character and succeeds with that character if
  * it is a hexadecimal digit. This parser is not case sensitive.
  *
- * @type {Parser}
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
+ * @returns {Parser} A parser that succeeds if the next character is a
+ *     hexadecimal digit.
  */
-export const hex = parser(ctx => {
+export const hex = m => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && hasM && assertString('hex', m, argStrFormatter())
+
   const fn = c => c >= '0' && c <= '9'
     || c >= 'a' && c <= 'f'
     || c >= 'A' && c <= 'F'
-  const [cprep, [cpctx, cpres]] = dup(charParser(fn)(ctx))
-  return cpres.status === Ok ? cprep : failReply(cpctx, expecteds.hex)
+  const [crep, [cctx, cres]] = dup(charParser(fn)(ctx))
+  return cres.status === Ok ? crep : failReply(cctx, ferror(m, expecteds.hex))
 })
 
 /**
  * A parser that reads a character and succeeds with that character if
  * it is an octal digit.
  *
- * @type {Parser}
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
+ * @returns {Parser} A parser that succeeds if the next character is an
+ *     octal digit.
  */
-export const octal = parser(ctx => {
+export const octal = m => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && hasM && assertString('octal', m, argStrFormatter())
+
   const fn = c => c >= '0' && c <= '7'
-  const [cprep, [cpctx, cpres]] = dup(charParser(fn)(ctx))
-  return cpres.status === Ok ? cprep : failReply(cpctx, expecteds.octal)
+  const [crep, [cctx, cres]] = dup(charParser(fn)(ctx))
+  return cres.status === Ok ? crep : failReply(cctx, ferror(m, expecteds.octal))
 })
 
 /**

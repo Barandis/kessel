@@ -121,7 +121,7 @@ describe('Backtracking and error handling combinators', () => {
         '[seqB]: expected second argument to be a parser; found 0',
       )
       terror(
-        seqB(any(), letter, digit, {}),
+        seqB(any(), letter, digit(), {}),
         '',
         '[seqB]: expected fourth argument to be a parser; found {}',
       )
@@ -169,17 +169,17 @@ describe('Backtracking and error handling combinators', () => {
       })
     })
     it('still fails fatally if any of its parsers does', () => {
-      const parser = seqB(seq(letter, digit), letter, digit)
+      const parser = seqB(seq(letter, digit()), letter, digit())
       tfail(parser, 'aaa1', { expected: 'a digit', index: 1, status: Fatal })
     })
     it('gives opt error messages if later parsers fail', () => {
-      const parser = seqB(opt(char('+')), opt(char('-')), digit)
+      const parser = seqB(opt(char('+')), opt(char('-')), digit())
       tpass(parser, '+-1', ['+', '-', '1'])
       tpass(parser, '1', [null, null, '1'])
       tfail(parser, 'a', "'+', '-', or a digit")
     })
     it('ignores opt error messages if a later parser succeeds', () => {
-      const parser = seqB(opt(char('-')), digit, digit)
+      const parser = seqB(opt(char('-')), digit(), digit())
       tpass(parser, '-12', ['-', '1', '2'])
       tpass(parser, '12', [null, '1', '2'])
       tfail(parser, 'ab', "'-' or a digit")
@@ -262,12 +262,12 @@ describe('Backtracking and error handling combinators', () => {
       })
     })
     it('still fails fatally if either parser fails fatally', () => {
-      tfail(chainB(seq(letter, digit), () => letter), 'aaa', {
+      tfail(chainB(seq(letter, digit()), () => letter), 'aaa', {
         expected: 'a digit',
         index: 1,
         status: Fatal,
       })
-      tfail(chainB(seq(letter, digit), () => letter, '\\w\\d\\w'), 'aaa', {
+      tfail(chainB(seq(letter, digit()), () => letter, '\\w\\d\\w'), 'aaa', {
         expected: '\\w\\d\\w',
         index: 1,
         status: Fatal,
@@ -284,7 +284,7 @@ describe('Backtracking and error handling combinators', () => {
       })
     })
     it('adds opt error message if next parser fails', () => {
-      const parser = chainB(opt(char('-')), () => digit)
+      const parser = chainB(opt(char('-')), () => digit())
       tpass(parser, '-1', '1')
       tpass(parser, '1', '1')
       tfail(parser, 'a', "'-' or a digit")
@@ -374,7 +374,7 @@ describe('Backtracking and error handling combinators', () => {
       tfail(p, 'ac', { nested: "'b'", status: Fail })
     })
     it('adds opt error message if next parser fails', () => {
-      const parser = applyB(opt(char('-')), value(digit, x => x))
+      const parser = applyB(opt(char('-')), value(digit(), x => x))
       tpass(parser, '-1', '-')
       tpass(parser, '1', { value: null })
       tfail(parser, 'a', "'-' or a digit")
@@ -405,12 +405,12 @@ describe('Backtracking and error handling combinators', () => {
       )
     })
     it('returns the result of its left parser if both pass', () => {
-      tpass(leftB(letter, digit), 'a1', 'a')
-      tpass(leftB(letter, digit, 'test'), 'a1', 'a')
+      tpass(leftB(letter, digit()), 'a1', 'a')
+      tpass(leftB(letter, digit(), 'test'), 'a1', 'a')
     })
     it('fails non-fatally if one parser fails and no input is consumed', () => {
-      tfail(leftB(letter, digit), '1', { expected: 'a letter', status: Fail })
-      tfail(leftB(letter, digit, 'letter then digit'), '1', {
+      tfail(leftB(letter, digit()), '1', { expected: 'a letter', status: Fail })
+      tfail(leftB(letter, digit(), 'letter then digit'), '1', {
         expected: 'letter then digit',
         status: Fail,
       })
@@ -421,13 +421,13 @@ describe('Backtracking and error handling combinators', () => {
       })
     })
     it('fails non-fatally on non-fatal errors after consumption', () => {
-      tfail(leftB(letter, digit), 'aa', {
+      tfail(leftB(letter, digit()), 'aa', {
         nested: 'a digit',
         index: 0,
         ctxindex: 1,
         status: Fail,
       })
-      tfail(leftB(letter, digit, 'letter then digit'), 'aa', {
+      tfail(leftB(letter, digit(), 'letter then digit'), 'aa', {
         compound: 'letter then digit',
         index: 0,
         ctxindex: 1,
@@ -435,29 +435,29 @@ describe('Backtracking and error handling combinators', () => {
       })
     })
     it('still fails fatally if either parser fails fatally', () => {
-      tfail(leftB(seq(letter, letter), digit), 'a11', {
+      tfail(leftB(seq(letter, letter), digit()), 'a11', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
-      tfail(leftB(seq(letter, letter), digit, '\\w\\w\\d'), 'a11', {
+      tfail(leftB(seq(letter, letter), digit(), '\\w\\w\\d'), 'a11', {
         expected: '\\w\\w\\d',
         index: 1,
         status: Fatal,
       })
-      tfail(leftB(letter, seq(letter, digit)), 'aab', {
+      tfail(leftB(letter, seq(letter, digit())), 'aab', {
         expected: 'a digit',
         index: 2,
         status: Fatal,
       })
-      tfail(leftB(letter, seq(letter, digit), '\\w\\w\\d'), 'aab', {
+      tfail(leftB(letter, seq(letter, digit()), '\\w\\w\\d'), 'aab', {
         expected: '\\w\\w\\d',
         index: 2,
         status: Fatal,
       })
     })
     it('adds opt message if next parser fails', () => {
-      const parser = leftB(opt(char('-')), digit)
+      const parser = leftB(opt(char('-')), digit())
       tpass(parser, '-1', '-')
       tpass(parser, '1', { result: null })
       tfail(parser, 'a', "'-' or a digit")
@@ -488,12 +488,15 @@ describe('Backtracking and error handling combinators', () => {
       )
     })
     it('returns the result of its right parser if both pass', () => {
-      tpass(rightB(letter, digit), 'a1', '1')
-      tpass(rightB(letter, digit, 'test'), 'a1', '1')
+      tpass(rightB(letter, digit()), 'a1', '1')
+      tpass(rightB(letter, digit(), 'test'), 'a1', '1')
     })
     it('fails non-fatally if one parser fails and no input is consumed', () => {
-      tfail(rightB(letter, digit), '1', { expected: 'a letter', status: Fail })
-      tfail(rightB(letter, digit, 'letter then digit'), '1', {
+      tfail(rightB(letter, digit()), '1', {
+        expected: 'a letter',
+        status: Fail,
+      })
+      tfail(rightB(letter, digit(), 'letter then digit'), '1', {
         expected: 'letter then digit',
         status: Fail,
       })
@@ -504,13 +507,13 @@ describe('Backtracking and error handling combinators', () => {
       })
     })
     it('fails non-fatally on non-fatal errors after consumption', () => {
-      tfail(rightB(letter, digit), 'aa', {
+      tfail(rightB(letter, digit()), 'aa', {
         nested: 'a digit',
         index: 0,
         ctxindex: 1,
         status: Fail,
       })
-      tfail(rightB(letter, digit, 'letter then digit'), 'aa', {
+      tfail(rightB(letter, digit(), 'letter then digit'), 'aa', {
         compound: 'letter then digit',
         index: 0,
         ctxindex: 1,
@@ -518,29 +521,29 @@ describe('Backtracking and error handling combinators', () => {
       })
     })
     it('still fails fatally if either parser fails fatally', () => {
-      tfail(rightB(seq(letter, letter), digit), 'a11', {
+      tfail(rightB(seq(letter, letter), digit()), 'a11', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
-      tfail(rightB(seq(letter, letter), digit, '\\w\\w\\d'), 'a11', {
+      tfail(rightB(seq(letter, letter), digit(), '\\w\\w\\d'), 'a11', {
         expected: '\\w\\w\\d',
         index: 1,
         status: Fatal,
       })
-      tfail(rightB(letter, seq(letter, digit)), 'aab', {
+      tfail(rightB(letter, seq(letter, digit())), 'aab', {
         expected: 'a digit',
         index: 2,
         status: Fatal,
       })
-      tfail(rightB(letter, seq(letter, digit), '\\w\\w\\d'), 'aab', {
+      tfail(rightB(letter, seq(letter, digit()), '\\w\\w\\d'), 'aab', {
         expected: '\\w\\w\\d',
         index: 2,
         status: Fatal,
       })
     })
     it('adds opt message if next parser fails', () => {
-      const parser = rightB(opt(char('-')), digit)
+      const parser = rightB(opt(char('-')), digit())
       tpass(parser, '-1', '1')
       tpass(parser, '1', '1')
       tfail(parser, 'a', "'-' or a digit")
@@ -647,25 +650,25 @@ describe('Backtracking and error handling combinators', () => {
       tpass(untilB(any(), letter, 'test'), 'abc', [])
     })
     it('fails if the content parser fails before the end', () => {
-      tfail(untilB(digit, letter), '.123abc', {
+      tfail(untilB(digit(), letter), '.123abc', {
         expected: 'a digit or a letter',
         index: 0,
         status: Fail,
       })
-      tfail(untilB(digit, letter, 'digit then letter'), '.123abc', {
+      tfail(untilB(digit(), letter, 'digit then letter'), '.123abc', {
         expected: 'digit then letter',
         index: 0,
         status: Fail,
       })
     })
     it('backtracks if input is consumed before content parser fails', () => {
-      tfail(untilB(digit, letter), '123.abc', {
+      tfail(untilB(digit(), letter), '123.abc', {
         nested: 'a digit',
         index: 0,
         ctxindex: 3,
         status: Fail,
       })
-      tfail(untilB(digit, letter, 'digit then letter'), '123.abc', {
+      tfail(untilB(digit(), letter, 'digit then letter'), '123.abc', {
         compound: 'digit then letter',
         index: 0,
         ctxindex: 3,
@@ -673,17 +676,17 @@ describe('Backtracking and error handling combinators', () => {
       })
     })
     it('fails fatally if either of its parsers fail fatally', () => {
-      tfail(untilB(digit, seq(letter, digit)), '123abc', {
+      tfail(untilB(digit(), seq(letter, digit())), '123abc', {
         expected: 'a digit',
         index: 4,
         status: Fatal,
       })
-      tfail(untilB(digit, seq(letter, digit), '\\d\\w\\d'), '123abc', {
+      tfail(untilB(digit(), seq(letter, digit()), '\\d\\w\\d'), '123abc', {
         expected: '\\d\\w\\d',
         index: 4,
         status: Fatal,
       })
-      tfail(untilB(seq(letter, digit), digit, '\\w\\d\\d'), 'a1b2cc3', {
+      tfail(untilB(seq(letter, digit()), digit(), '\\w\\d\\d'), 'a1b2cc3', {
         expected: '\\w\\d\\d',
         index: 5,
         status: Fatal,
@@ -791,7 +794,7 @@ describe('Backtracking and error handling combinators', () => {
       const parser = blockB(function *() {
         yield opt(char('+'))
         yield opt(char('-'))
-        return yield digit
+        return yield digit()
       })
       tpass(parser, '+-1', '1')
       tpass(parser, '1', '1')
@@ -800,8 +803,8 @@ describe('Backtracking and error handling combinators', () => {
     it('ignores opt error messages if a later parser succeeds', () => {
       const parser = blockB(function *() {
         yield opt(char('-'))
-        const a = yield digit
-        const b = yield digit
+        const a = yield digit()
+        const b = yield digit()
         return a + b
       })
       tpass(parser, '-12', '12')
@@ -833,9 +836,11 @@ describe('Backtracking and error handling combinators', () => {
     })
     it('passes parser results to a single function', () => {
       tpass(pipeB(letter, a => a.toUpperCase()), 'a', 'A')
-      tpass(pipeB(letter, digit, (a, b) => b + a), 'a1', '1a')
-      tpass(pipeB(letter, digit, letter, (a, b, c) => c + b + a), 'a1b', 'b1a')
-      tpass(pipeB(letter, digit, (a, b) => b + a, 'test'), 'a1', '1a')
+      tpass(pipeB(letter, digit(), (a, b) => b + a), 'a1', '1a')
+      tpass(pipeB(
+        letter, digit(), letter, (a, b, c) => c + b + a,
+      ), 'a1b', 'b1a')
+      tpass(pipeB(letter, digit(), (a, b) => b + a, 'test'), 'a1', '1a')
     })
     it('fails non-fatally if no input is consumed on failure', () => {
       tfail(pipeB(letter, a => a), '1', {
@@ -860,12 +865,12 @@ describe('Backtracking and error handling combinators', () => {
       })
     })
     it('fails non-fatally if input was consumed on non-fatal failure', () => {
-      tfail(pipeB(letter, digit, (a, b) => b + a), 'aa', {
+      tfail(pipeB(letter, digit(), (a, b) => b + a), 'aa', {
         nested: 'a digit',
         index: 0,
         status: Fail,
       })
-      tfail(pipeB(letter, digit, (a, b) => b + a, 'letter, digit'), 'aa', {
+      tfail(pipeB(letter, digit(), (a, b) => b + a, 'letter, digit'), 'aa', {
         compound: 'letter, digit',
         index: 0,
         status: Fail,
@@ -873,25 +878,27 @@ describe('Backtracking and error handling combinators', () => {
     })
     it('fails fatally if one of its parsers fails fatally', () => {
       tfail(
-        pipeB(letter, seq(digit, digit), (a, [b1, b2]) => b1 + b2 + a),
+        pipeB(letter, seq(digit(), digit()), (a, [b1, b2]) => b1 + b2 + a),
         'a1b',
         { expected: 'a digit', index: 2, status: Fatal },
       )
       tfail(
-        pipeB(letter, seq(digit, digit), (a, [b1, b2]) => b1 + b2 + a, 'test'),
+        pipeB(
+          letter, seq(digit(), digit()), (a, [b1, b2]) => b1 + b2 + a, 'test',
+        ),
         'a1b',
         { expected: 'test', index: 2, status: Fatal },
       )
     })
     it('includes opt message if next parser fails', () => {
-      const parser = pipeB(opt(char('-')), digit, digit, (s, a, b) =>
+      const parser = pipeB(opt(char('-')), digit(), digit(), (s, a, b) =>
         parseInt(a + b) * (s ? -1 : 1))
       tpass(parser, '-12', { result: -12 })
       tpass(parser, '12', { result: 12 })
       tfail(parser, 'a1', "'-' or a digit")
     })
     it('does not include opt message if next parser succeeds', () => {
-      const parser = pipeB(opt(char('-')), digit, digit, (s, a, b) =>
+      const parser = pipeB(opt(char('-')), digit(), digit(), (s, a, b) =>
         parseInt(a + b) * (s ? -1 : 1))
       tpass(parser, '-12', { result: -12 })
       tpass(parser, '12', { result: 12 })
@@ -996,17 +1003,17 @@ describe('Backtracking and error handling combinators', () => {
       )
     })
     it('gives opt error message if next parser fails', () => {
-      const parser = betweenB(opt(char('-')), char('-'), digit)
+      const parser = betweenB(opt(char('-')), char('-'), digit())
       tpass(parser, '-1-', '1')
       tpass(parser, '1-', '1')
       tfail(parser, 'a', "'-' or a digit")
     })
     it('gives two opt error messages if post parser fails', () => {
-      const parser = betweenB(opt(char('-')), char('&'), opt(digit))
+      const parser = betweenB(opt(char('-')), char('&'), opt(digit()))
       tfail(parser, '+', "'-', a digit, or '&'")
     })
     it('gives no opt message if next parser succeeds', () => {
-      const parser = betweenB(opt(char('-')), char('-'), digit)
+      const parser = betweenB(opt(char('-')), char('-'), digit())
       tpass(parser, '-1-', '1')
       tfail(parser, 'a', "'-' or a digit")
       tfail(parser, '1+', { nested: "'-'" })

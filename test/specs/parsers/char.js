@@ -593,40 +593,58 @@ describe('Character parsers', () => {
   })
 
   describe('digit', () => {
+    it('throws if its argument exists and is not a string', () => {
+      terror(digit(0), '', '[digit]: expected argument to be a string; found 0')
+    })
     it('succeeds on any single decimal digit', () => {
-      tpass(digit, '123', '1')
+      tpass(digit(), '123', '1')
+      tpass(digit('test'), '123', '1')
     })
     it('fails on any other character', () => {
-      tfail(digit, 'abc', 'a digit')
+      tfail(digit(), 'abc', 'a digit')
+      tfail(digit('test'), 'abc', 'test')
     })
     it('fails at EOF', () => {
-      tfail(digit, '', 'a digit')
+      tfail(digit(), '', 'a digit')
+      tfail(digit('test'), '', 'test')
     })
   })
 
   describe('hex', () => {
+    it('throws if its argument exists and is not a string', () => {
+      terror(hex(0), '', '[hex]: expected argument to be a string; found 0')
+    })
     it('succeeds on any single decimal digit', () => {
-      tpass(hex, '123', '1')
-      tpass(hex, 'abc', 'a')
+      tpass(hex(), '123', '1')
+      tpass(hex(), 'abc', 'a')
+      tpass(hex('test'), 'abc', 'a')
     })
     it('fails on any other character', () => {
-      tfail(hex, 'ghi', 'a hexadecimal digit')
+      tfail(hex(), 'ghi', 'a hexadecimal digit')
+      tfail(hex('test'), 'ghi', 'test')
     })
     it('fails at EOF', () => {
-      tfail(hex, '', 'a hexadecimal digit')
+      tfail(hex(), '', 'a hexadecimal digit')
+      tfail(hex('test'), '', 'test')
     })
   })
 
   describe('octal', () => {
+    it('throws if its argument exists and is not a string', () => {
+      terror(octal(0), '', '[octal]: expected argument to be a string; found 0')
+    })
     it('succeeds on any single octal digit', () => {
-      tpass(octal, '123', '1')
+      tpass(octal(), '123', '1')
+      tpass(octal('test'), '123', '1')
     })
     it('fails on any other character', () => {
-      tfail(octal, '890', 'an octal digit')
-      tfail(octal, 'abc', 'an octal digit')
+      tfail(octal(), '890', 'an octal digit')
+      tfail(octal(), 'abc', 'an octal digit')
+      tfail(octal('test'), 'abc', 'test')
     })
     it('fails at EOF', () => {
-      tfail(octal, '', 'an octal digit')
+      tfail(octal(), '', 'an octal digit')
+      tfail(octal('test'), '', 'test')
     })
   })
 

@@ -271,11 +271,11 @@ describe('Alternative and conditional combinators', () => {
     })
     it('succeeds without changing state if its parser fails', () => {
       tpass(not(letter), '123', { result: null, index: 0 })
-      tpass(not(seq(letter, digit)), 'abc', {
+      tpass(not(seq(letter, digit())), 'abc', {
         result: null, index: 0,
       })
       tpass(not(letter, 'test'), '123', { result: null, index: 0 })
-      tpass(not(seq(letter, digit), 'test'), 'abc', {
+      tpass(not(seq(letter, digit()), 'test'), 'abc', {
         result: null, index: 0,
       })
     })

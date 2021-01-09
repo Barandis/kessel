@@ -5,14 +5,14 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `hex: Parser<string>`
+> `hex(m?: string): Parser`
 
 Parses a hexadecimal digit (`0-9`, `a-f`, or `A-F`).
 
 #### Example
 
 ```javascript
-const parser = hex
+const parser = hex()
 
 const s = parse(parser, 'cafe')
 console.log(status(s))  // "ok"
@@ -27,6 +27,10 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Expected a hexadecimal digit
 ```
 
+#### Parameters
+
+* `m`: The optional expected error message that will take the place of the default error message.
+
 #### Success
 
 * Succeeds if the next character is a hexadecimal digit (`0-9`, `a-f`, or `A-F`). Consumes and returns that character.
@@ -34,6 +38,10 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 #### Failure
 
 * Fails if the next character is any other character.
+
+#### Throws
+
+* Throws an error if `m` exists and is not a string.
 
 #### See Also
 

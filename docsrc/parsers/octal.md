@@ -5,14 +5,14 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `octal: Parser<string>`
+> `octal(m?: string): Parser`
 
 Parses an octal digit (`0-7`).
 
 #### Example
 
 ```javascript
-const parser = octal
+const parser = octal()
 
 const s = parse(parser, '123')
 console.log(status(s))  // "ok"
@@ -27,6 +27,10 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Expected an octal digit
 ```
 
+#### Parameters
+
+* `m`: The optional expected error message that will take the place of the default error message.
+
 #### Success
 
 * Succeeds if the next character is an octal digit (`0-7`). Consumes and returns that character.
@@ -34,6 +38,10 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 #### Failure
 
 * Fails if the next character is any other character.
+
+#### Throws
+
+* Throws an error if `m` exists and is not a string.
 
 #### See Also
 
