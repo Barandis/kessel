@@ -13,10 +13,8 @@ import {
   assertGenFunction,
   assertNumber,
   assertParser,
-  assertParsers,
   assertString,
   formatter,
-  ordFnFormatter,
   ordParFormatter,
 } from 'kessel/assert'
 import { failReply, fatalReply, okReply, parser, Status } from 'kessel/core'
@@ -26,7 +24,6 @@ import {
   dup,
   ferror,
   nerror,
-  ordinal,
   range,
   replyFn,
   stringify,
@@ -458,13 +455,14 @@ export const blockB = (g, m) => parser(ctx => {
  */
 export const pipeB = (...args) => {
   const ps = args.slice()
+  const m = typeof ps[ps.length - 1] === 'string' ? ps.pop() : null
   const fn = ps.pop()
 
   return parser(ctx => {
-    ASSERT && assertParsers('pipeB', ps)
-    ASSERT && assertFunction(
-      'pipeB', fn, ordFnFormatter(ordinal(ps.length + 1)),
-    )
+    ASSERT && ps.forEach((p, i) => assertParser(
+      'pipeB', p, argParFormatter(i + 1, true),
+    ))
+    ASSERT && assertFunction('pipeB', fn, argFnFormatter(ps.length + 1, true))
 
     const index = ctx.index
     const values = []
@@ -476,10 +474,10 @@ export const pipeB = (...args) => {
       context = pctx
       errors = pres.errors?.length ? merge(errors, pres.errors) : []
 
-      if (pres.status === Fatal) return fatalReply(context, errors)
+      if (pres.status === Fatal) return fatalReply(pctx, ferror(m, errors))
       if (pres.status === Fail) {
-        const err = index === context.index ? errors : nested(context, errors)
-        return failReply(context, err, index)
+        const error = berror(pctx.index !== index, m, pctx, errors)
+        return failReply(pctx, error, index)
       }
       values.push(pres.value)
     }

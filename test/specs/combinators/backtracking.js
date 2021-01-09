@@ -808,18 +808,26 @@ describe('Backtracking and error handling combinators', () => {
       terror(
         pipeB(any, any, 0),
         '',
-        '[pipeB]: expected 3rd argument to be a function; found 0',
+        '[pipeB]: expected third argument to be a function; found 0',
       )
       terror(
         pipeB(any, any, any, any),
         '',
-        '[pipeB]: expected 4th argument to be a function; found parser',
+        '[pipeB]: expected fourth argument to be a function; found parser',
+      )
+    })
+    it('throws if string last arg is not preceded by a function', () => {
+      terror(
+        pipeB(any, any, any, 'test'),
+        '',
+        '[pipeB]: expected third argument to be a function; found parser',
       )
     })
     it('passes parser results to a single function', () => {
       tpass(pipeB(letter, a => a.toUpperCase()), 'a', 'A')
       tpass(pipeB(letter, digit, (a, b) => b + a), 'a1', '1a')
       tpass(pipeB(letter, digit, letter, (a, b, c) => c + b + a), 'a1b', 'b1a')
+      tpass(pipeB(letter, digit, (a, b) => b + a, 'test'), 'a1', '1a')
     })
     it('fails non-fatally if no input is consumed on failure', () => {
       tfail(pipeB(letter, a => a), '1', {
@@ -827,8 +835,18 @@ describe('Backtracking and error handling combinators', () => {
         index: 0,
         status: Fail,
       })
+      tfail(pipeB(letter, a => a, 'some letter'), '1', {
+        expected: 'some letter',
+        index: 0,
+        status: Fail,
+      })
       tfail(pipeB(eof, letter, (a, b) => b + a), '', {
         expected: 'a letter',
+        index: 0,
+        status: Fail,
+      })
+      tfail(pipeB(eof, letter, (a, b) => b + a, 'something impossible'), '', {
+        expected: 'something impossible',
         index: 0,
         status: Fail,
       })
@@ -839,12 +857,22 @@ describe('Backtracking and error handling combinators', () => {
         index: 0,
         status: Fail,
       })
+      tfail(pipeB(letter, digit, (a, b) => b + a, 'letter, digit'), 'aa', {
+        compound: 'letter, digit',
+        index: 0,
+        status: Fail,
+      })
     })
     it('fails fatally if one of its parsers fails fatally', () => {
       tfail(
         pipeB(letter, seq(digit, digit), (a, [b1, b2]) => b1 + b2 + a),
         'a1b',
         { expected: 'a digit', index: 2, status: Fatal },
+      )
+      tfail(
+        pipeB(letter, seq(digit, digit), (a, [b1, b2]) => b1 + b2 + a, 'test'),
+        'a1b',
+        { expected: 'test', index: 2, status: Fatal },
       )
     })
     it('includes opt message if next parser fails', () => {

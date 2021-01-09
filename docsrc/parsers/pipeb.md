@@ -5,16 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `pipeB<T>(...ps: Parser[], fn: (...args: any[]) => T): Parser<T>`
-
-!!! warning "Not a real type"
-    The type given above is not a real type, because TypeScript/JavaScript does not have the ability to do rest arguments before other arguments. The "real" type is
-
-    `pipeB<T>(...ps: (Parser<any> | ((...args: any[]) => T))[]): Parser<T>`
-
-    The given type is more expressive and makes for better documentation, but even that one is imperfect. TypeScript cannot express as much information in this type as would be useful. Namely, the parsers in `ps` can all have different generic parameters, and the types of the parameters to `fn` should match those generic parameters in number and in order.
-
-    A two-parser `pipeB` can be expressed with `pipeB<T, U>(p: Parser<T>, q: Parser<U>, fn: (a: T, b: U) => V): Parser<V>`. A three-parser version would have the type `pipeB<T, U, V>(p: Parser<T>, q: Parser<U>, r: Parser<V>, fn: (a: T, b: U, c: V) => W): Parser<W>`, and so on. Unfortunately it's impossible to write a type with a variable number of arguments.
+> `pipeB(...ps: Parser[], fn: function, m?: string: Parser`
 
 Applies some parsers in order, then returns the result of a function to which all of the parser results have been passed.
 
@@ -62,6 +53,7 @@ See [`pipe`](pipe.md) for an explanation of this example. It's identical except 
 
 * `...ps`: Zero or more parsers, each of which is applied to the input in order.
 * `fn`: A function which receives the results of all of the parsers in `ps` if they all succeed. Its return value becomes the result of `pipe`.
+* `m`: The optional expected error message that will take the place of the default error message.
 
 #### Success
 
