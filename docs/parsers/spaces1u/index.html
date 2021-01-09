@@ -1370,6 +1370,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#parameters" class="md-nav__link">
+    Parameters
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#success" class="md-nav__link">
     Success
   </a>
@@ -1379,6 +1386,13 @@
         <li class="md-nav__item">
   <a href="#failure" class="md-nav__link">
     Failure
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#throws" class="md-nav__link">
+    Throws
   </a>
   
 </li>
@@ -1978,6 +1992,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#parameters" class="md-nav__link">
+    Parameters
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#success" class="md-nav__link">
     Success
   </a>
@@ -1987,6 +2008,13 @@
         <li class="md-nav__item">
   <a href="#failure" class="md-nav__link">
     Failure
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#throws" class="md-nav__link">
+    Throws
   </a>
   
 </li>
@@ -2021,12 +2049,12 @@
 -->
 
 <blockquote>
-<p><code>spaces1U: Parser&lt;null&gt;</code></p>
+<p><code>spaces1U(m?: string): Parser</code></p>
 </blockquote>
 <p>Parses one or more Unicode whitespace characters and discards them.</p>
 <p>A character is a Unicode whitespace character if it has the Unicode <code>White_Space</code> binary property. There are around 25 of these characters.</p>
 <h4 id="example">Example</h4>
-<div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">spaces1U</span>
+<div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">spaces1U</span><span class="p">()</span>
 
 <span class="kr">const</span> <span class="nx">s</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;   abc&#39;</span><span class="p">)</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">status</span><span class="p">(</span><span class="nx">s</span><span class="p">))</span>  <span class="c1">// &quot;ok&quot;</span>
@@ -2040,6 +2068,10 @@
                         <span class="c1">// ^</span>
                         <span class="c1">// Expected one or more Unicode whitespace characters</span>
 </code></pre></div>
+<h4 id="parameters">Parameters</h4>
+<ul>
+<li><code>m</code>: The optional expected error message that will take the place of the default error message.</li>
+</ul>
 <h4 id="success">Success</h4>
 <ul>
 <li>Succeeds if at least one Unicode whitespace character is read. All Unicode whitespace characters until the next non-whitespace character are consumed and discarded.</li>
@@ -2047,6 +2079,10 @@
 <h4 id="failure">Failure</h4>
 <ul>
 <li>Fails if the next character is not a Unicode whitespace character.</li>
+</ul>
+<h4 id="throws">Throws</h4>
+<ul>
+<li>Throws an error if <code>m</code> exists and is not a string.</li>
 </ul>
 <h4 id="see-also">See Also</h4>
 <ul>

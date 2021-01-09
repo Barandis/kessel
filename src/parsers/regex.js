@@ -208,11 +208,18 @@ export const lowerU = m => parser(ctx => {
  * recognizes are space, tab, and any conventional newline (`\r`, `\n`,
  * or `\r\n`).
  *
- * @type {Parser}
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
+ * @returns {Parser} A parser that succeeds if the next character is an
+ *     ASCII whitespace character.
  */
-export const space = parser(ctx => {
-  const [rprep, [rpctx, rpres]] = dup(regexParser(reSpace)(ctx))
-  return rpres.status === Ok ? rprep : failReply(rpctx, expecteds.space)
+export const space = m => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && hasM && assertString('space', m, argStrFormatter())
+
+  const [rrep, [rctx, rres]] = dup(regexParser(reSpace)(ctx))
+  return rres.status === Ok ? rrep : failReply(rctx, ferror(m, expecteds.space))
 })
 
 /**
@@ -223,11 +230,20 @@ export const space = parser(ctx => {
  * This parser will also recognize the two-character combination `\r\n`
  * as a single instance of whitespace.
  *
- * @type {Parser}
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
+ * @returns {Parser} A parser that succeeds if the next character is a
+ *     Unicode whitespace character.
  */
-export const spaceU = parser(ctx => {
-  const [rprep, [rpctx, rpres]] = dup(regexParser(reUspace)(ctx))
-  return rpres.status === Ok ? rprep : failReply(rpctx, expecteds.spaceU)
+export const spaceU = m => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && hasM && assertString('spaceU', m, argStrFormatter())
+
+  const [rrep, [rctx, rres]] = dup(regexParser(reUspace)(ctx))
+  return rres.status === Ok
+    ? rrep
+    : failReply(rctx, ferror(m, expecteds.spaceU))
 })
 
 /**
@@ -237,11 +253,12 @@ export const spaceU = parser(ctx => {
  * though it will not move the index in that case. This parser skips the
  * whitespace and does not produde a result.
  *
- * @type {Parser}
+ * @returns {Parser} A parser that always succeeds and skips over any
+ *     number of ASCII whitespace characters.
  */
-export const spaces = parser(ctx => {
-  const [rpctx, _] = regexParser(reSpaces)(ctx)
-  return okReply(rpctx, null)
+export const spaces = () => parser(ctx => {
+  const [rctx, _] = regexParser(reSpaces)(ctx)
+  return okReply(rctx, null)
 })
 
 /**
@@ -251,11 +268,12 @@ export const spaces = parser(ctx => {
  * index in that case. This parser skips the whitespace and does not
  * produde a result.
  *
- * @type {Parser}
+ * @returns {Parser} A parser that always succeeds and skips over any
+ *     number of Unicode whitespace characters.
  */
-export const spacesU = parser(ctx => {
-  const [rpctx, _] = regexParser(reUspaces)(ctx)
-  return okReply(rpctx, null)
+export const spacesU = () => parser(ctx => {
+  const [rctx, _] = regexParser(reUspaces)(ctx)
+  return okReply(rctx, null)
 })
 
 /**
@@ -264,13 +282,20 @@ export const spacesU = parser(ctx => {
  * only fail if there is not at least one whitespace character read. On
  * success, it skips the whitespace and does not produde a result.
  *
- * @type {Parser}
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
+ * @returns {Parser} A parser that skips one or more ASCII whitespace
+ *     characters.
  */
-export const spaces1 = parser(ctx => {
-  const [rpctx, rpres] = regexParser(reSpaces1)(ctx)
-  return rpres.status === Ok
-    ? okReply(rpctx, null)
-    : failReply(rpctx, expecteds.spaces1)
+export const spaces1 = m => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && hasM && assertString('spaces1', m, argStrFormatter())
+
+  const [rctx, rres] = regexParser(reSpaces1)(ctx)
+  return rres.status === Ok
+    ? okReply(rctx, null)
+    : failReply(rctx, ferror(m, expecteds.spaces1))
 })
 
 /**
@@ -279,13 +304,20 @@ export const spaces1 = parser(ctx => {
  * not at least one whitespace character read. On success, it skips the
  * whitespace and does not produde a result.
  *
- * @type {Parser}
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
+ * @returns {Parser} A parser that skips one or more Unicode whitespace
+ *     characters.
  */
-export const spaces1U = parser(ctx => {
-  const [rpctx, rpres] = regexParser(reUspaces1)(ctx)
-  return rpres.status === Ok
-    ? okReply(rpctx, null)
-    : failReply(rpctx, expecteds.spaces1U)
+export const spaces1U = m => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && hasM && assertString('spaces1U', m, argStrFormatter())
+
+  const [rctx, rres] = regexParser(reUspaces1)(ctx)
+  return rres.status === Ok
+    ? okReply(rctx, null)
+    : failReply(rctx, ferror(m, expecteds.spaces1U))
 })
 
 /**

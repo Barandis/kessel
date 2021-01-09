@@ -2007,12 +2007,12 @@
 -->
 
 <blockquote>
-<p><code>spaces: Parser&lt;null&gt;</code></p>
+<p><code>spaces(): Parser</code></p>
 </blockquote>
 <p>Parses zero or more ASCII whitespace characters and discards them.</p>
 <p>ASCII whitespace characters include any ASCII newline (<code>\r</code>, <code>\n</code>, or <code>\r\n</code>) along with a space (<code></code>) or a horizontal tab (<code>\t</code>).</p>
 <h4 id="example">Example</h4>
-<div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">spaces</span>
+<div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">spaces</span><span class="p">()</span>
 
 <span class="kr">const</span> <span class="nx">s</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;   abc&#39;</span><span class="p">)</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">status</span><span class="p">(</span><span class="nx">s</span><span class="p">))</span>  <span class="c1">// &quot;ok&quot;</span>

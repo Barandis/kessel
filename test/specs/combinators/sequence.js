@@ -107,17 +107,17 @@ describe('Sequence combinators', () => {
   describe('block', () => {
     const parser = block(function *() {
       yield string('abc')
-      yield space
+      yield space()
       const c = yield any()
-      yield space
+      yield space()
 
       return c
     })
     const parserm = block(function *() {
       yield string('abc')
-      yield space
+      yield space()
       const c = yield any()
-      yield space
+      yield space()
 
       return c
     }, "a character after 'abc'")
@@ -896,7 +896,7 @@ describe('Sequence combinators', () => {
     })
     it('adds null to the results', () => {
       tpass(
-        until(alt(letter(), skip(space)), digit()),
+        until(alt(letter(), skip(space())), digit()),
         'a b c 1',
         ['a', null, 'b', null, 'c', null],
       )

@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `spacesU: Parser<null>`
+> `spacesU(): Parser`
 
 Parses zero or more Unicode whitespace characters and discards them.
 
@@ -14,7 +14,7 @@ A character is a Unicode whitespace character if it has the Unicode `White_Space
 #### Example
 
 ```javascript
-const parser = spacesU
+const parser = spacesU()
 
 const s = parse(parser, '   abc')
 console.log(status(s))  // "ok"

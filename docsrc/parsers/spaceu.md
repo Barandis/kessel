@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `spaceU: Parser<string>`
+> `spaceU(m?: string): Parser`
 
 Parse a Unicode whitespace character.
 
@@ -14,7 +14,7 @@ A character is a Unicode whitespace character if it has the Unicode `White_Space
 #### Example
 
 ```javascript
-const parser = spaceU
+const parser = spaceU()
 
 const s = parse(parser, '   abc')
 console.log(status(s))  // "ok"
@@ -29,6 +29,10 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Expected a Unicode whitespace character
 ```
 
+#### Parameters
+
+* `m`: The optional expected error message that will take the place of the default error message.
+
 #### Success
 
 * Succeeds if the next character is a Unicode whitespace character. Consumes and returns that character.
@@ -36,6 +40,10 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 #### Failure
 
 * Fails if the next character is any other character.
+
+#### Throws
+
+* Throws an error if `m` exists and is not a string.
 
 #### See Also
 

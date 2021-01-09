@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `spaces: Parser<null>`
+> `spaces(): Parser`
 
 Parses zero or more ASCII whitespace characters and discards them.
 
@@ -14,7 +14,7 @@ ASCII whitespace characters include any ASCII newline (`\r`, `\n`, or `\r\n`) al
 #### Example
 
 ```javascript
-const parser = spaces
+const parser = spaces()
 
 const s = parse(parser, '   abc')
 console.log(status(s))  // "ok"

@@ -702,9 +702,9 @@ describe('Backtracking and error handling combinators', () => {
   describe('blockB', () => {
     const g = function *() {
       yield seq(char('a'), char('b'), char('c'))
-      yield space
+      yield space()
       const c = yield any()
-      yield space
+      yield space()
 
       return c
     }
