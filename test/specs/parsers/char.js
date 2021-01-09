@@ -370,19 +370,24 @@ describe('Character parsers', () => {
 
   describe('any', () => {
     it('results in the next 1-byte character', () => {
-      tpass(any, 'Onomatopoeia', { result: 'O', index: 1 })
+      tpass(any(), 'Onomatopoeia', { result: 'O', index: 1 })
+      tpass(any('test'), 'Onomatopoeia', { result: 'O', index: 1 })
     })
     it('results in the next 2-byte character', () => {
-      tpass(any, 'Звукоподражание', { result: 'З', index: 2 })
+      tpass(any(), 'Звукоподражание', { result: 'З', index: 2 })
+      tpass(any('test'), 'Звукоподражание', { result: 'З', index: 2 })
     })
     it('results in the next 3-byte character', () => {
-      tpass(any, 'คำเลียนเสียง', { result: 'ค', index: 3 })
+      tpass(any(), 'คำเลียนเสียง', { result: 'ค', index: 3 })
+      tpass(any('test'), 'คำเลียนเสียง', { result: 'ค', index: 3 })
     })
     it('results in the next 4-byte character', () => {
-      tpass(any, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂', index: 4 })
+      tpass(any(), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂', index: 4 })
+      tpass(any('test'), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂', index: 4 })
     })
     it('fails at EOF', () => {
-      tfail(any, '', 'any character')
+      tfail(any(), '', 'any character')
+      tfail(any('test'), '', 'test')
     })
   })
 

@@ -162,11 +162,19 @@ export const range = (s, e, m) => parser(ctx => {
  * A parser that reads a single input character and then succeeds with
  * that character. Fails only if there is no input left to read.
  *
- * @type {Parser}
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
+ * @returns {Parser} A parser that matches any character.
  */
-export const any = parser(ctx => {
+export const any = m => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && hasM && assertString('any', m, argStrFormatter(1, true))
+
   const { index, view } = ctx
-  if (index >= view.byteLength) return failReply(ctx, expecteds.any)
+  if (index >= view.byteLength) {
+    return failReply(ctx, ferror(m, expecteds.any))
+  }
 
   const { width, next } = nextChar(index, view)
   return okReply(ctx, next, index + width)

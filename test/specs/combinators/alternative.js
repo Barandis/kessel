@@ -36,20 +36,20 @@ describe('Alternative and conditional combinators', () => {
 
     it('throws if any of its arguments are not parsers', () => {
       terror(
-        alt(any, 0),
+        alt(any(), 0),
         'abc',
         '[alt]: expected second argument to be a parser; found 0',
       )
       terror(
-        alt(any, letter, () => letter),
+        alt(any(), letter, () => letter),
         'abc',
         '[alt]: expected third argument to be a parser; found function',
       )
     })
     it('does not throw if the last argument only is a string', () => {
-      tpass(alt(any, 'test'), 'abc', 'a')
+      tpass(alt(any(), 'test'), 'abc', 'a')
       terror(
-        alt(any, 'test', letter),
+        alt(any(), 'test', letter),
         'abc',
         '[alt]: expected second argument to be a parser; found "test"',
       )

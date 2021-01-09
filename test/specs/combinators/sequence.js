@@ -46,12 +46,12 @@ describe('Sequence combinators', () => {
 
     it('throws if any of its arguments is not a parser', () => {
       terror(
-        seq(any, 0),
+        seq(any(), 0),
         '',
         '[seq]: expected second argument to be a parser; found 0',
       )
       terror(
-        seq(any, letter, digit, {}),
+        seq(any(), letter, digit, {}),
         '',
         '[seq]: expected fourth argument to be a parser; found {}',
       )
@@ -59,7 +59,7 @@ describe('Sequence combinators', () => {
     it('does not throw if the last argument only is a string', () => {
       tpass(seq(letter, letter, 'test'), 'abc', ['a', 'b'])
       terror(
-        seq(any, 'test', letter),
+        seq(any(), 'test', letter),
         'abc',
         '[seq]: expected second argument to be a parser; found "test"',
       )
@@ -108,7 +108,7 @@ describe('Sequence combinators', () => {
     const parser = block(function *() {
       yield string('abc')
       yield space
-      const c = yield any
+      const c = yield any()
       yield space
 
       return c
@@ -116,7 +116,7 @@ describe('Sequence combinators', () => {
     const parserm = block(function *() {
       yield string('abc')
       yield space
-      const c = yield any
+      const c = yield any()
       yield space
 
       return c
@@ -148,12 +148,17 @@ describe('Sequence combinators', () => {
     })
     it('throws if it yields something other than a parser', () => {
       terror(
-        block(function *() { yield any; yield 0; return 0 }),
+        block(function *() { yield any(); yield 0; return 0 }),
         'abc',
         '[block]: expected second yield to be to a parser; found 0',
       )
       terror(
-        block(function *() { yield any; yield any; yield x => x; return 0 }),
+        block(function *() {
+          yield any()
+          yield any()
+          yield x => x
+          return 0
+        }),
         'abc',
         '[block]: expected third yield to be to a parser; found function',
       )
@@ -236,7 +241,7 @@ describe('Sequence combinators', () => {
     })
     it('throws if its second argument exists and is not a string', () => {
       terror(
-        many(any, 0),
+        many(any(), 0),
         '',
         '[many]: expected second argument to be a string; found 0',
       )
@@ -287,7 +292,7 @@ describe('Sequence combinators', () => {
     })
     it('throws if its second argument exists and is not a string', () => {
       terror(
-        many1(any, 0),
+        many1(any(), 0),
         '',
         '[many1]: expected second argument to be a string; found 0',
       )
@@ -348,7 +353,7 @@ describe('Sequence combinators', () => {
     })
     it('throws if its second argument exists and is not a parser', () => {
       terror(
-        skip(any, 0),
+        skip(any(), 0),
         '',
         '[skip]: expected second argument to be a string; found 0',
       )
@@ -381,21 +386,21 @@ describe('Sequence combinators', () => {
 
     it('throws if its first argument is not a parser', () => {
       terror(
-        sep(0, any),
+        sep(0, any()),
         '',
         '[sep]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
-        sep(any, 0),
+        sep(any(), 0),
         '',
         '[sep]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its third argument is not a string', () => {
       terror(
-        sep(any, any, 0),
+        sep(any(), any(), 0),
         '',
         '[sep]: expected third argument to be a string; found 0',
       )
@@ -470,21 +475,21 @@ describe('Sequence combinators', () => {
 
     it('throws if its first argument is not a parser', () => {
       terror(
-        sep1(0, any),
+        sep1(0, any()),
         '',
         '[sep1]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
-        sep1(any, 0),
+        sep1(any(), 0),
         '',
         '[sep1]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its third argument is not a string', () => {
       terror(
-        sep1(any, any, 0),
+        sep1(any(), any(), 0),
         '',
         '[sep1]: expected third argument to be a string; found 0',
       )
@@ -567,21 +572,21 @@ describe('Sequence combinators', () => {
 
     it('throws if its first argument is not a parser', () => {
       terror(
-        end(0, any),
+        end(0, any()),
         '',
         '[end]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
-        end(any, 0),
+        end(any(), 0),
         '',
         '[end]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its third argument is not a parser', () => {
       terror(
-        end(any, any, 0),
+        end(any(), any(), 0),
         '',
         '[end]: expected third argument to be a string; found 0',
       )
@@ -656,21 +661,21 @@ describe('Sequence combinators', () => {
 
     it('throws if its first argument is not a parser', () => {
       terror(
-        end1(0, any),
+        end1(0, any()),
         '',
         '[end1]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
-        end1(any, 0),
+        end1(any(), 0),
         '',
         '[end1]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its third argument is not a parser', () => {
       terror(
-        end1(any, any, 0),
+        end1(any(), any(), 0),
         '',
         '[end1]: expected third argument to be a string; found 0',
       )
@@ -757,14 +762,14 @@ describe('Sequence combinators', () => {
     })
     it('throws if its second argument is not a number', () => {
       terror(
-        repeat(any, '3'),
+        repeat(any(), '3'),
         '',
         '[repeat]: expected second argument to be a number; found "3"',
       )
     })
     it('throws if its third argument exists and is not a string', () => {
       terror(
-        repeat(any, 3, 0),
+        repeat(any(), 3, 0),
         '',
         '[repeat]: expected third argument to be a string; found 0',
       )
@@ -816,32 +821,32 @@ describe('Sequence combinators', () => {
   describe('until', () => {
     it('throws if its first argument is not a parser', () => {
       terror(
-        until(0, any),
+        until(0, any()),
         '',
         '[until]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
-        until(any, 0),
+        until(any(), 0),
         '',
         '[until]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its third argument exists and is not a string', () => {
       terror(
-        until(any, any, 0),
+        until(any(), any(), 0),
         '',
         '[until]: expected third argument to be a string; found 0',
       )
     })
     it('succeeds with content parser results before the end', () => {
-      tpass(until(any, letter), '12./abc', ['1', '2', '.', '/'])
-      tpass(until(any, letter, 'test'), '12./abc', ['1', '2', '.', '/'])
+      tpass(until(any(), letter), '12./abc', ['1', '2', '.', '/'])
+      tpass(until(any(), letter, 'test'), '12./abc', ['1', '2', '.', '/'])
     })
     it('can succeed with zero successes', () => {
-      tpass(until(any, letter), 'abc', [])
-      tpass(until(any, letter, 'test'), 'abc', [])
+      tpass(until(any(), letter), 'abc', [])
+      tpass(until(any(), letter, 'test'), 'abc', [])
     })
     it('fails if the content parser fails before the end', () => {
       tfail(until(digit, letter), '.123abc', {
@@ -907,28 +912,28 @@ describe('Sequence combinators', () => {
 
     it('throws if its first argument is not a parser', () => {
       terror(
-        assocL(0, any),
+        assocL(0, any()),
         '',
         '[assocL]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
-        assocL(any, 0),
+        assocL(any(), 0),
         '',
         '[assocL]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its second argument does not return a function', () => {
       terror(
-        assocL(any, any, 0),
+        assocL(any(), any(), 0),
         'abc',
         '[assocL]: expected first op parser to return a function; found "b"',
       )
     })
     it('throws if its fourth argument exists and is not a string', () => {
       terror(
-        assocL(any, any, 0, 0),
+        assocL(any(), any(), 0, 0),
         '',
         '[assocL]: expected fourth argument to be a string; found 0',
       )
@@ -995,28 +1000,28 @@ describe('Sequence combinators', () => {
 
     it('throws if its first argument is not a parser', () => {
       terror(
-        assoc1L(0, any),
+        assoc1L(0, any()),
         '',
         '[assoc1L]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
-        assoc1L(any, 0),
+        assoc1L(any(), 0),
         '',
         '[assoc1L]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its second argument does not return a function', () => {
       terror(
-        assoc1L(any, any),
+        assoc1L(any(), any()),
         'abc',
         '[assoc1L]: expected first op parser to return a function; found "b"',
       )
     })
     it('throws if its third argument exists and is not a string', () => {
       terror(
-        assoc1L(any, any, 0),
+        assoc1L(any(), any(), 0),
         '',
         '[assoc1L]: expected third argument to be a string; found 0',
       )
@@ -1092,28 +1097,28 @@ describe('Sequence combinators', () => {
 
     it('throws if its first argument is not a parser', () => {
       terror(
-        assocR(0, any),
+        assocR(0, any()),
         '',
         '[assocR]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
-        assocR(any, 0),
+        assocR(any(), 0),
         '',
         '[assocR]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its second argument does not return a function', () => {
       terror(
-        assocR(any, any, 0),
+        assocR(any(), any(), 0),
         'abc',
         '[assocR]: expected first op parser to return a function; found "b"',
       )
     })
     it('throws if its fourth argument exists and is not a string', () => {
       terror(
-        assocR(any, any, 0, 0),
+        assocR(any(), any(), 0, 0),
         '',
         '[assocR]: expected fourth argument to be a string; found 0',
       )
@@ -1181,28 +1186,28 @@ describe('Sequence combinators', () => {
 
     it('throws if its first argument is not a parser', () => {
       terror(
-        assoc1R(0, any),
+        assoc1R(0, any()),
         '',
         '[assoc1R]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
-        assoc1R(any, 0),
+        assoc1R(any(), 0),
         '',
         '[assoc1R]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its second argument does not return a function', () => {
       terror(
-        assoc1R(any, any),
+        assoc1R(any(), any()),
         'abc',
         '[assoc1R]: expected first op parser to return a function; found "b"',
       )
     })
     it('throws if its third argument exists and is not a string', () => {
       terror(
-        assoc1R(any, any, 0),
+        assoc1R(any(), any(), 0),
         '',
         '[assoc1R]: expected third argument to be a string; found 0',
       )
@@ -1271,21 +1276,21 @@ describe('Sequence combinators', () => {
   describe('left', () => {
     it('throws if its first argument is not a parser', () => {
       terror(
-        left(0, any),
+        left(0, any()),
         '',
         '[left]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
-        left(any, 0),
+        left(any(), 0),
         '',
         '[left]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its third argumeent exists and is not a string', () => {
       terror(
-        left(any, any, 0),
+        left(any(), any(), 0),
         '',
         '[left]: expected third argument to be a string; found 0',
       )
@@ -1345,21 +1350,21 @@ describe('Sequence combinators', () => {
   describe('right', () => {
     it('throws if its first argument is not a parser', () => {
       terror(
-        right(0, any),
+        right(0, any()),
         '',
         '[right]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
-        right(any, 0),
+        right(any(), 0),
         '',
         '[right]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its third argumeent exists and is not a string', () => {
       terror(
-        right(any, any, 0),
+        right(any(), any(), 0),
         '',
         '[right]: expected third argument to be a string; found 0',
       )
@@ -1406,19 +1411,19 @@ describe('Sequence combinators', () => {
   describe('pipe', () => {
     it('throws if its last argument is not a function or a string', () => {
       terror(
-        pipe(any, any, 0),
+        pipe(any(), any(), 0),
         '',
         '[pipe]: expected third argument to be a function; found 0',
       )
       terror(
-        pipe(any, any, any, any),
+        pipe(any(), any(), any(), any()),
         '',
         '[pipe]: expected fourth argument to be a function; found parser',
       )
     })
     it('throws if string last arg is not preceded by a function', () => {
       terror(
-        pipe(any, any, any, 'test'),
+        pipe(any(), any(), any(), 'test'),
         '',
         '[pipe]: expected third argument to be a function; found parser',
       )
@@ -1486,28 +1491,28 @@ describe('Sequence combinators', () => {
 
     it('throws if its first argument is not a parser', () => {
       terror(
-        between(0, any, any),
+        between(0, any(), any()),
         '',
         '[between]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
-        between(any, 0, any),
+        between(any(), 0, any()),
         '',
         '[between]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its third argument is not a parser', () => {
       terror(
-        between(any, any, 0),
+        between(any(), any(), 0),
         '',
         '[between]: expected third argument to be a parser; found 0',
       )
     })
     it('throws if its fourth argument exists and is not a string', () => {
       terror(
-        between(any, any, any, 0),
+        between(any(), any(), any(), 0),
         '',
         '[between]: expected fourth argument to be a string; found 0',
       )

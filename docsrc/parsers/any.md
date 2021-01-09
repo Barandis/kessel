@@ -5,14 +5,14 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `any: Parser<string>`
+> `any(m?: string): Parser`
 
 Parses any single character.
 
 #### Example
 
 ```javascript
-const parser = any
+const parser = any()
 
 const s = parse(parser, 'abc')
 console.log(status(s))  // "ok"
@@ -28,6 +28,10 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Note: failure occurred at the end of input
 ```
 
+#### Parameters
+
+* `m`: The optional expected error message that will take the place of the default error message.
+
 #### Success
 
 * Succeeds as long as there is a character to be read. That character is consumed and returned.
@@ -35,6 +39,10 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 #### Failure
 
 * Fails at the end of input.
+
+#### Throws
+
+* Throws an error if `m` exists and is not a string.
 
 #### See Also
 
