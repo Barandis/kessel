@@ -6,7 +6,7 @@
 import {
   alpha,
   any,
-  anyOf,
+  oneof,
   char,
   charI,
   digit,
@@ -14,7 +14,7 @@ import {
   hex,
   letter,
   lower,
-  noneOf,
+  noneof,
   octal,
   range,
   satisfy,
@@ -420,111 +420,175 @@ describe('Character parsers', () => {
     })
   })
 
-  describe('anyOf', () => {
+  describe('oneof', () => {
     it('throws if the argument is not a string or an array', () => {
       terror(
-        anyOf(0),
+        oneof(0),
         '',
-        '[anyOf]: expected a string or an array of characters; found 0',
+        '[oneof]: expected argument to be a string or an array of characters; '
+          + 'found 0',
+      )
+      terror(
+        oneof(0, 'test'),
+        '',
+        '[oneof]: expected first argument to be a string or an array of '
+          + 'characters; found 0',
       )
     })
     it('throws if the argument is an array of non-character strings', () => {
       terror(
-        anyOf(['te', 'st']),
+        oneof(['te', 'st']),
         '',
-        '[anyOf]: expected a string or an array of characters; '
+        '[oneof]: expected argument to be a string or an array of characters; '
           + 'found ["te","st"]',
       )
       terror(
-        anyOf(['', 'a']),
+        oneof(['', 'a']),
         '',
-        '[anyOf]: expected a string or an array of characters; found ["","a"]',
+        '[oneof]: expected argument to be a string or an array of characters; '
+          + 'found ["","a"]',
       )
     })
     it('throws if the argument is an array of non-strings', () => {
       terror(
-        anyOf([0, 1, 2]),
+        oneof([0, 1, 2]),
         '',
-        '[anyOf]: expected a string or an array of characters; found [0,1,2]',
+        '[oneof]: expected argument to be a string or an array of characters; '
+          + 'found [0,1,2]',
+      )
+    })
+    it('throws if the second argument exists and is not a string', () => {
+      terror(
+        oneof('abc', 0),
+        '',
+        '[oneof]: expected second argument to be a string; found 0',
       )
     })
     it('checks the next charater against 1-byte characters', () => {
-      const parser = anyOf('Onoma')
+      const parser = oneof('Onoma')
+      const parserm = oneof('Onoma', 'test')
+
       tpass(parser, 'Onomatopoeia', { result: 'O', index: 1 })
       tpass(parser, 'matriculate', { result: 'm', index: 1 })
-      tfail(parser, 'Matriculate', "any of 'O', 'n', 'o', 'm', or 'a'")
+      tpass(parserm, 'matriculate', { result: 'm', index: 1 })
+      tfail(parser, 'Matriculate', "one of 'O', 'n', 'o', 'm', or 'a'")
+      tfail(parserm, 'Matriculate', 'test')
     })
     it('checks the next character against 2-byte characters', () => {
-      const parser = anyOf('Звуко')
+      const parser = oneof('Звуко')
+      const parserm = oneof('Звуко', 'test')
+
       tpass(parser, 'Звукоподражание', { result: 'З', index: 2 })
       tpass(parser, 'учитель', { result: 'у', index: 2 })
-      tfail(parser, 'Учитель', "any of 'З', 'в', 'у', 'к', or 'о'")
+      tpass(parserm, 'учитель', { result: 'у', index: 2 })
+      tfail(parser, 'Учитель', "one of 'З', 'в', 'у', 'к', or 'о'")
+      tfail(parserm, 'Учитель', 'test')
     })
     it('checks the next character against 3-byte characters', () => {
-      const parser = anyOf('คำเลี')
+      const parser = oneof('คำเลี')
+      const parserm = oneof('คำเลี', 'test')
+
       tpass(parser, 'คำเลียนเสียง', { result: 'ค', index: 3 })
       tpass(parser, 'ลียน', { result: 'ล', index: 3 })
-      tfail(parser, 'ยง', "any of 'ค', 'ำ', 'เ', 'ล', or 'ี'")
+      tpass(parserm, 'ลียน', { result: 'ล', index: 3 })
+      tfail(parser, 'ยง', "one of 'ค', 'ำ', 'เ', 'ล', or 'ี'")
+      tfail(parserm, 'ยง', 'test')
     })
     it('checks the next character against 4-byte characters', () => {
-      const parser = anyOf('𝑂𝑛𝑜𝑚𝑎')
+      const parser = oneof('𝑂𝑛𝑜𝑚𝑎')
+      const parserm = oneof('𝑂𝑛𝑜𝑚𝑎', 'test')
+
       tpass(parser, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂', index: 4 })
       tpass(parser, '𝑚𝑎𝑡𝑟𝑖𝑐𝑢𝑙𝑎𝑡𝑒', { result: '𝑚', index: 4 })
-      tfail(parser, 'matriculate', "any of '𝑂', '𝑛', '𝑜', '𝑚', or '𝑎'")
+      tpass(parserm, '𝑚𝑎𝑡𝑟𝑖𝑐𝑢𝑙𝑎𝑡𝑒', { result: '𝑚', index: 4 })
+      tfail(parser, 'matriculate', "one of '𝑂', '𝑛', '𝑜', '𝑚', or '𝑎'")
+      tfail(parserm, 'matriculate', 'test')
     })
   })
 
-  describe('noneOf', () => {
+  describe('noneof', () => {
     it('throws if the argument is not a string or an array', () => {
       terror(
-        noneOf(0),
+        noneof(0),
         '',
-        '[noneOf]: expected a string or an array of characters; found 0',
+        '[noneof]: expected argument to be a string or an array of characters; '
+          + 'found 0',
+      )
+      terror(
+        noneof(0, 'test'),
+        '',
+        '[noneof]: expected first argument to be a string or an array of '
+          + 'characters; found 0',
       )
     })
     it('throws if the argument is an array of non-character strings', () => {
       terror(
-        noneOf(['te', 'st']),
+        noneof(['te', 'st']),
         '',
-        '[noneOf]: expected a string or an array of characters; '
+        '[noneof]: expected argument to be a string or an array of characters; '
           + 'found ["te","st"]',
       )
       terror(
-        noneOf(['', 'a']),
+        noneof(['', 'a']),
         '',
-        '[noneOf]: expected a string or an array of characters; found ["","a"]',
+        '[noneof]: expected argument to be a string or an array of characters; '
+          + 'found ["","a"]',
       )
     })
     it('throws if the argument is an array of non-strings', () => {
       terror(
-        noneOf([0, 1, 2]),
+        noneof([0, 1, 2]),
         '',
-        '[noneOf]: expected a string or an array of characters; found [0,1,2]',
+        '[noneof]: expected argument to be a string or an array of characters; '
+          + 'found [0,1,2]',
+      )
+    })
+    it('throws if the second argument exists and is not a string', () => {
+      terror(
+        noneof('abc', 0),
+        '',
+        '[noneof]: expected second argument to be a string; found 0',
       )
     })
     it('checks the next charater against 1-byte characters', () => {
-      const parser = noneOf('Onoma')
+      const parser = noneof('Onoma')
+      const parserm = noneof('Onoma', 'test')
+
       tfail(parser, 'Onomatopoeia', "none of 'O', 'n', 'o', 'm', or 'a'")
       tfail(parser, 'matriculate', "none of 'O', 'n', 'o', 'm', or 'a'")
+      tfail(parserm, 'matriculate', 'test')
       tpass(parser, 'Matriculate', { result: 'M', index: 1 })
+      tpass(parserm, 'Matriculate', { result: 'M', index: 1 })
     })
     it('checks the next character against 2-byte characters', () => {
-      const parser = noneOf('Звуко')
+      const parser = noneof('Звуко')
+      const parserm = noneof('Звуко', 'test')
+
       tfail(parser, 'Звукоподражание', "none of 'З', 'в', 'у', 'к', or 'о'")
       tfail(parser, 'учитель', "none of 'З', 'в', 'у', 'к', or 'о'")
+      tfail(parserm, 'учитель', 'test')
       tpass(parser, 'Учитель', { result: 'У', index: 2 })
+      tpass(parserm, 'Учитель', { result: 'У', index: 2 })
     })
     it('checks the next character against 3-byte characters', () => {
-      const parser = noneOf('คำเลี')
+      const parser = noneof('คำเลี')
+      const parserm = noneof('คำเลี', 'test')
+
       tfail(parser, 'คำเลียนเสียง', "none of 'ค', 'ำ', 'เ', 'ล', or 'ี'")
       tfail(parser, 'ลียน', "none of 'ค', 'ำ', 'เ', 'ล', or 'ี'")
+      tfail(parserm, 'ลียน', 'test')
       tpass(parser, 'ยง', { result: 'ย', index: 3 })
+      tpass(parserm, 'ยง', { result: 'ย', index: 3 })
     })
     it('checks the next character against 4-byte characters', () => {
-      const parser = noneOf('𝑂𝑛𝑜𝑚𝑎')
+      const parser = noneof('𝑂𝑛𝑜𝑚𝑎')
+      const parserm = noneof('𝑂𝑛𝑜𝑚𝑎', 'test')
+
       tfail(parser, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', "none of '𝑂', '𝑛', '𝑜', '𝑚', or '𝑎'")
       tfail(parser, '𝑚𝑎𝑡𝑟𝑖𝑐𝑢𝑙𝑎𝑡𝑒', "none of '𝑂', '𝑛', '𝑜', '𝑚', or '𝑎'")
+      tfail(parserm, '𝑚𝑎𝑡𝑟𝑖𝑐𝑢𝑙𝑎𝑡𝑒', 'test')
       tpass(parser, 'matriculate', { result: 'm', index: 1 })
+      tpass(parserm, 'matriculate', { result: 'm', index: 1 })
     })
   })
 

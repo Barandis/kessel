@@ -27,7 +27,7 @@ import {
   skip,
 } from 'kessel/combinators/sequence'
 import { Status } from 'kessel/core'
-import { any, char, digit, eof, letter, noneOf } from 'kessel/parsers/char'
+import { any, char, digit, eof, letter, noneof } from 'kessel/parsers/char'
 import { space } from 'kessel/parsers/regex'
 import { string } from 'kessel/parsers/string'
 import { terror, tfail, tpass } from 'test/helper'
@@ -1485,8 +1485,8 @@ describe('Sequence combinators', () => {
   })
 
   describe('between', () => {
-    const parser = between(char('('), char(')'), many(noneOf(')')))
-    const parserm = between(char('('), char(')'), many(noneOf(')')),
+    const parser = between(char('('), char(')'), many(noneof(')')))
+    const parserm = between(char('('), char(')'), many(noneof(')')),
       'parenthesized characters')
 
     it('throws if its first argument is not a parser', () => {

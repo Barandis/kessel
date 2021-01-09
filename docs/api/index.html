@@ -703,18 +703,6 @@
 
 
   <li class="md-nav__item">
-    <a href="../parsers/anyof/" class="md-nav__link">
-      anyOf
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
     <a href="../parsers/anystring/" class="md-nav__link">
       anyString
     </a>
@@ -1208,7 +1196,7 @@
 
   <li class="md-nav__item">
     <a href="../parsers/noneof/" class="md-nav__link">
-      noneOf
+      noneof
     </a>
   </li>
 
@@ -1245,6 +1233,18 @@
   <li class="md-nav__item">
     <a href="../parsers/octal/" class="md-nav__link">
       octal
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../parsers/oneof/" class="md-nav__link">
+      oneof
     </a>
   </li>
 
@@ -2230,7 +2230,7 @@
 <h3 id="a-note-about-types">A Note about Types</h3>
 <p>Types are given in the descriptions for each of the parsers and functions listed below. These are contained in TypeScript definition files in the project that can be used either for writing TypeScript programs that use Kessel or just in providing signature information for your IDE.</p>
 <p>It should however be noted that some of the type information is incomplete because TypeScript leaves no way to express complete information in the case where there are variable numbers of arguments that can have different generic parameter types. There are notes to that effect in <a href="../parsers/alt/"><code>alt</code></a>, <a href="../parsers/pipe/"><code>pipe</code></a>, <a href="../parsers/pipeb/"><code>pipeB</code></a>, <a href="../parsers/seq/"><code>seq</code></a>, and <a href="../parsers/seqb/"><code>seqB</code></a>.</p>
-<p>However, there are shortcomings in other parsers that are not explicity marked. For example, TypeScript has no way to say that a string should be one character long, or that an array of strings should have elements that are all one character long. This affects the parameters in <a href="../parsers/anyof/"><code>anyOf</code></a>, <a href="../parsers/char/"><code>char</code></a>, <a href="../parsers/chari/"><code>charI</code></a>, <a href="../parsers/noneof/"><code>noneOf</code></a>, and <a href="../parsers/range/"><code>range</code></a>.</p>
+<p>However, there are shortcomings in other parsers that are not explicity marked. For example, TypeScript has no way to say that a string should be one character long, or that an array of strings should have elements that are all one character long. This affects the parameters in <a href="../parsers/oneof/"><code>oneof</code></a>, <a href="../parsers/char/"><code>char</code></a>, <a href="../parsers/chari/"><code>charI</code></a>, <a href="../parsers/noneof/"><code>noneof</code></a>, and <a href="../parsers/range/"><code>range</code></a>.</p>
 <p>A best effort is given to give useful types for documentation, but there's no way to make them perfect.</p>
 <p>Assertions in the library do take care of most of the problem. If a 3-character string gets passed to <a href="../parsers/char/"><code>char</code></a>, for example, an error will be thrown whether or not the type system can express that.</p>
 <h2 id="parsers">Parsers</h2>
@@ -2266,11 +2266,11 @@
 <td>Parses any one character.</td>
 </tr>
 <tr>
-<td><a href="../parsers/anyof/"><code>anyOf</code></a></td>
+<td><a href="../parsers/oneof/"><code>oneof</code></a></td>
 <td>Parses a single character which is included in a string or an array.</td>
 </tr>
 <tr>
-<td><a href="../parsers/noneof/"><code>noneOf</code></a></td>
+<td><a href="../parsers/noneof/"><code>noneof</code></a></td>
 <td>Parses a single character which is <em>not</em> in included in a string or an array.</td>
 </tr>
 <tr>

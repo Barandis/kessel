@@ -23,7 +23,7 @@ import { value } from 'kessel/combinators/chaining'
 import { left, many1, right, seq } from 'kessel/combinators/sequence'
 import { parse, Status } from 'kessel/core'
 import { ErrorType } from 'kessel/error'
-import { any, char, digit, eof, letter, noneOf } from 'kessel/parsers/char'
+import { any, char, digit, eof, letter, noneof } from 'kessel/parsers/char'
 import { always } from 'kessel/parsers/misc'
 import { space } from 'kessel/parsers/regex'
 import { string } from 'kessel/parsers/string'
@@ -900,8 +900,8 @@ describe('Backtracking and error handling combinators', () => {
   })
 
   describe('betweenB', () => {
-    const parser = betweenB(char('('), char(')'), many1(noneOf(')')))
-    const parserm = betweenB(char('('), char(')'), many1(noneOf(')')), 'test')
+    const parser = betweenB(char('('), char(')'), many1(noneof(')')))
+    const parserm = betweenB(char('('), char(')'), many1(noneof(')')), 'test')
 
     it('throws if its first argument is not a parser', () => {
       terror(

@@ -13,7 +13,7 @@ Types are given in the descriptions for each of the parsers and functions listed
 
 It should however be noted that some of the type information is incomplete because TypeScript leaves no way to express complete information in the case where there are variable numbers of arguments that can have different generic parameter types. There are notes to that effect in [`alt`](parsers/alt.md), [`pipe`](parsers/pipe.md), [`pipeB`](parsers/pipeb.md), [`seq`](parsers/seq.md), and [`seqB`](parsers/seqb.md).
 
-However, there are shortcomings in other parsers that are not explicity marked. For example, TypeScript has no way to say that a string should be one character long, or that an array of strings should have elements that are all one character long. This affects the parameters in [`anyOf`](parsers/anyof.md), [`char`](parsers/char.md), [`charI`](parsers/chari.md), [`noneOf`](parsers/noneof.md), and [`range`](parsers/range.md).
+However, there are shortcomings in other parsers that are not explicity marked. For example, TypeScript has no way to say that a string should be one character long, or that an array of strings should have elements that are all one character long. This affects the parameters in [`oneof`](parsers/oneof.md), [`char`](parsers/char.md), [`charI`](parsers/chari.md), [`noneof`](parsers/noneof.md), and [`range`](parsers/range.md).
 
 A best effort is given to give useful types for documentation, but there's no way to make them perfect.
 
@@ -34,8 +34,8 @@ Additionally, parsers are often said to *return* a value or to have a value as a
 | [`satisfy`](parsers/satisfy.md) | Parses a single character for which a predicate returns `true`. |
 | [`range`](parsers/range.md) | Parses a single character whose code point is between two other characters. |
 | [`any`](parsers/any.md) | Parses any one character. |
-| [`anyOf`](parsers/anyof.md) | Parses a single character which is included in a string or an array. |
-| [`noneOf`](parsers/noneof.md) | Parses a single character which is *not* in included in a string or an array. |
+| [`oneof`](parsers/oneof.md) | Parses a single character which is included in a string or an array. |
+| [`noneof`](parsers/noneof.md) | Parses a single character which is *not* in included in a string or an array. |
 | [`digit`](parsers/digit) | Parses a single decimal digit (`0-9`). |
 | [`hex`](parsers/hex) | Parses a single hexadecmial digit (`0-9`, `a-f`, or `A-F`). |
 | [`octal`](parsers/octal) | Parses a single octal digit (`0-7`). |

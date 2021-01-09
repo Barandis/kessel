@@ -44,7 +44,6 @@ nav:
       - alt: parsers/alt.md
       - always: parsers/always.md
       - any: parsers/any.md
-      - anyOf: parsers/anyof.md
       - anyString: parsers/anystring.md
       - apply: parsers/apply.md
       - applyB: parsers/applyb.md
@@ -86,10 +85,11 @@ nav:
       - map: parsers/map.md
       - newline: parsers/newline.md
       - newlineU: parsers/newlineu.md
-      - noneOf: parsers/noneof.md
+      - noneof: parsers/noneof.md
       - not: parsers/not.md
       - nth: parsers/nth.md
       - octal: parsers/octal.md
+      - oneof: parsers/oneof.md
       - opt: parsers/opt.md
       - peek: parsers/peek.md
       - pipe: parsers/pipe.md

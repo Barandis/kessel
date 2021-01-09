@@ -6,6 +6,7 @@
 import {
   argCharFormatter,
   argFnFormatter,
+  argStrArrFormatter,
   argStrFormatter,
   assertChar,
   assertFunction,
@@ -169,7 +170,7 @@ export const range = (s, e, m) => parser(ctx => {
 export const any = m => parser(ctx => {
   const hasM = m != null
 
-  ASSERT && hasM && assertString('any', m, argStrFormatter(1))
+  ASSERT && hasM && assertString('any', m, argStrFormatter())
 
   const { index, view } = ctx
   if (index >= view.byteLength) {
@@ -192,7 +193,7 @@ export const any = m => parser(ctx => {
 export const eof = m => parser(ctx => {
   const hasM = m != null
 
-  ASSERT && hasM && assertString('eof', m, argStrFormatter(1))
+  ASSERT && hasM && assertString('eof', m, argStrFormatter())
 
   const { index, view } = ctx
   return index >= view.byteLength
@@ -209,11 +210,16 @@ export const eof = m => parser(ctx => {
  * @param {(string|string[])} cs The characters, either in an array or a
  *     string, in which the next input character has to be a member for
  *     the parser to succeed.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser that succeeds if the next character is one
  *     of the characters in `chars`.
  */
-export const anyOf = cs => parser(ctx => {
-  ASSERT && assertStringOrArray('anyOf', cs)
+export const oneof = (cs, m) => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && assertStringOrArray('oneof', cs, argStrArrFormatter(1, hasM))
+  ASSERT && hasM && assertString('oneof', m, argStrFormatter(2, true))
 
   const { index, view } = ctx
   const { width, next } = nextChar(index, view)
@@ -221,7 +227,7 @@ export const anyOf = cs => parser(ctx => {
 
   return arr.includes(next)
     ? okReply(ctx, next, index + width)
-    : failReply(ctx, expecteds.anyOf(arr))
+    : failReply(ctx, ferror(m, expecteds.oneof(arr)))
 })
 
 /**
@@ -233,18 +239,23 @@ export const anyOf = cs => parser(ctx => {
  * @param {(string|string[])} cs The characters, either in an array or a
  *     string, in which the next input character has to not be a member
  *     for the parser to succeed.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser that succeeds if the next character is not
  *     one of the characters in `chars`.
  */
-export const noneOf = cs => parser(ctx => {
-  ASSERT && assertStringOrArray('noneOf', cs)
+export const noneof = (cs, m) => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && assertStringOrArray('noneof', cs, argStrArrFormatter(1, hasM))
+  ASSERT && hasM && assertString('noneof', m, argStrFormatter(2, true))
 
   const { index, view } = ctx
   const { width, next } = nextChar(index, view)
   const arr = [...cs]
 
   return arr.includes(next)
-    ? failReply(ctx, expecteds.noneOf(arr))
+    ? failReply(ctx, ferror(m, expecteds.noneof(arr)))
     : okReply(ctx, next, index + width)
 })
 

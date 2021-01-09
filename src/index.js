@@ -9,7 +9,6 @@
 export {
   alpha,
   any,
-  anyOf,
   char,
   charI,
   digit,
@@ -17,8 +16,9 @@ export {
   hex,
   letter,
   lower,
-  noneOf,
+  noneof,
   octal,
+  oneof,
   range,
   satisfy,
   upper,

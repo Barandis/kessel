@@ -12,7 +12,7 @@ import {
   join,
   many,
   newline,
-  noneOf,
+  noneof,
   run,
   second,
   sep,
@@ -21,7 +21,7 @@ import {
   value,
 } from 'kessel'
 
-const quotedChar = alt(noneOf('"'), value(string('""'), '"'))
+const quotedChar = alt(noneof('"'), value(string('""'), '"'))
 
 const quotedCell = second(seqB(
   char('"'),
@@ -29,7 +29,7 @@ const quotedCell = second(seqB(
   char('"', 'quote at end of cell'),
 ))
 
-const cell = alt(quotedCell, join(many(noneOf(',\n\r'))))
+const cell = alt(quotedCell, join(many(noneof(',\n\r'))))
 const line = sep(cell, char(','))
 const csv = end(line, newline)
 
@@ -38,9 +38,9 @@ const parseCsv = input => run(csv, input)
 const parseCsv1 = input => run(end(sep(alt(
   second(seqB(
     char('"'),
-    join(many(alt(noneOf('"'), value(string('""'), '"')))),
+    join(many(alt(noneof('"'), value(string('""'), '"')))),
     char('"', 'quote at end of cell'),
-  )), join(many(noneOf(',\n\r'))),
+  )), join(many(noneof(',\n\r'))),
 ), char(',')), newline), input)
 
 describe('CSV parser', () => {
