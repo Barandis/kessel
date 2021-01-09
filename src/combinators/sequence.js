@@ -527,12 +527,12 @@ export const end = (p, s, m) => parser(ctx => {
  * @returns {Parser} A parser that results in an array of all of the
  *     content parser results, discarding the separator parser results.
  */
-export const sepEndBy1 = (p, s, m) => parser(ctx => {
+export const end1 = (p, s, m) => parser(ctx => {
   const hasM = m != null
 
-  ASSERT && assertParser('sepEndBy1', p, argParFormatter(1, true))
-  ASSERT && assertParser('sepEndBy1', s, argParFormatter(2, true))
-  ASSERT && hasM && assertString('sepEndBy1', m, argStrFormatter(3, true))
+  ASSERT && assertParser('end1', p, argParFormatter(1, true))
+  ASSERT && assertParser('end1', s, argParFormatter(2, true))
+  ASSERT && hasM && assertString('end1', m, argStrFormatter(3, true))
 
   let index = ctx.index
   const merror = expected(m)
@@ -563,7 +563,7 @@ export const sepEndBy1 = (p, s, m) => parser(ctx => {
     }
     if (pres.status === Fail) break
 
-    if (context.index === index) throw new TypeError(loopMessage('sepEndBy1'))
+    if (context.index === index) throw new TypeError(loopMessage('end1'))
     values.push(pres.value)
   }
   const [sctx, sres] = s({ ...context, index })
