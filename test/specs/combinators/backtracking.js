@@ -893,34 +893,48 @@ describe('Backtracking and error handling combinators', () => {
 
   describe('betweenB', () => {
     const parser = betweenB(char('('), char(')'), many1(noneOf(')')))
+    const parserm = betweenB(char('('), char(')'), many1(noneOf(')')), 'test')
 
     it('throws if its first argument is not a parser', () => {
       terror(
         betweenB(0, any, any),
         '',
-        '[betweenB]: expected 1st argument to be a parser; found 0',
+        '[betweenB]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
         betweenB(any, 0, any),
         '',
-        '[betweenB]: expected 2nd argument to be a parser; found 0',
+        '[betweenB]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its third argument is not a parser', () => {
       terror(
         betweenB(any, any, 0),
         '',
-        '[betweenB]: expected 3rd argument to be a parser; found 0',
+        '[betweenB]: expected third argument to be a parser; found 0',
+      )
+    })
+    it('throws if its fourth argument exists and is not a string', () => {
+      terror(
+        betweenB(any, any, any, 0),
+        '',
+        '[betweenB]: expected fourth argument to be a string; found 0',
       )
     })
     it('succeeds with the result of its content parser', () => {
       tpass(parser, '(abc)', ['a', 'b', 'c'])
+      tpass(parserm, '(abc)', ['a', 'b', 'c'])
     })
     it('fails non-fatally if no content is consumed', () => {
       tfail(parser, 'abc)', {
         expected: "'('",
+        index: 0,
+        status: Fail,
+      })
+      tfail(parserm, 'abc)', {
+        expected: 'test',
         index: 0,
         status: Fail,
       })
@@ -931,8 +945,18 @@ describe('Backtracking and error handling combinators', () => {
         index: 0,
         status: Fail,
       })
+      tfail(parserm, '()', {
+        compound: 'test',
+        index: 0,
+        status: Fail,
+      })
       tfail(parser, '(abc', {
         nested: "')'",
+        index: 0,
+        status: Fail,
+      })
+      tfail(parserm, '(abc', {
+        compound: 'test',
         index: 0,
         status: Fail,
       })
@@ -943,9 +967,21 @@ describe('Backtracking and error handling combinators', () => {
         index: 2,
         status: Fatal,
       })
+      tfail(betweenB(char('('), char(')'), seq(letter, letter), 'zzz'), '(a)', {
+        expected: 'zzz',
+        index: 2,
+        status: Fatal,
+      })
       tfail(
         betweenB(char('('), seq(char(')'), char(')')), letter), '(a)', {
           expected: "')'",
+          index: 3,
+          status: Fatal,
+        },
+      )
+      tfail(
+        betweenB(char('('), seq(char(')'), char(')')), letter, 'zzz'), '(a)', {
+          expected: 'zzz',
           index: 3,
           status: Fatal,
         },

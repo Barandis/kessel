@@ -15,10 +15,9 @@ import {
   assertParser,
   assertString,
   formatter,
-  ordParFormatter,
 } from 'kessel/assert'
 import { failReply, fatalReply, okReply, parser, Status } from 'kessel/core'
-import { compound, ErrorType, expected, merge, nested } from 'kessel/error'
+import { compound, ErrorType, expected, merge } from 'kessel/error'
 import {
   berror,
   dup,
@@ -490,41 +489,49 @@ export const pipeB = (...args) => {
  * and results in the result of its content parser.
  *
  * If any parser fails non-fatally, this parser will backtrack to where
- * `pre` was executed and fail non-fatally.
+ * `s` was executed and fail non-fatally.
  *
- * @param {Parser} pre The first parser to execute.
- * @param {Parser} post The last parser to execute.
+ * @param {Parser} s The first parser to execute.
+ * @param {Parser} e The last parser to execute.
  * @param {Parser} p The second parser to execute and whose result
  *     becomes the result of the new parser.
- * @returns {Parser} A parser which executes `pre`, `p`, and `post` in
+ * @param {string} [m] The error message to use if the parser fails.
+ * @returns {Parser} A parser which executes `s`, `p`, and `e` in
  *     order and then returns the result of `p`.
  */
-export const betweenB = (pre, post, p) => parser(ctx => {
-  ASSERT && assertParser('betweenB', pre, ordParFormatter('1st'))
-  ASSERT && assertParser('betweenB', post, ordParFormatter('2nd'))
-  ASSERT && assertParser('betweenB', p, ordParFormatter('3rd'))
+export const betweenB = (s, e, p, m) => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && assertParser('betweenB', s, argParFormatter(1, true))
+  ASSERT && assertParser('betweenB', e, argParFormatter(2, true))
+  ASSERT && assertParser('betweenB', p, argParFormatter(3, true))
+  ASSERT && hasM && assertString('betweenB', m, argStrFormatter(4, true))
 
   const index = ctx.index
 
-  const [prerep, [prectx, preres]] = dup(pre(ctx))
-  if (preres.status !== Ok) return prerep
+  const [sctx, sres] = s(ctx)
+  if (sres.status !== Ok) {
+    const fn = replyFn(sres.status === Fatal)
+    return fn(sctx, ferror(m, sres.errors))
+  }
 
-  const [pctx, pres] = p(prectx)
-  let errors = pres.errors?.length ? merge(preres.errors, pres.errors) : []
-  if (pres.status === Fatal) return fatalReply(pctx, errors)
+  const [pctx, pres] = p(sctx)
+  const errors = pres.errors?.length ? merge(sres.errors, pres.errors) : []
+  if (pres.status === Fatal) return fatalReply(pctx, ferror(m, errors))
   if (pres.status === Fail) {
-    const err = index === pctx.index ? errors : nested(pctx, errors)
-    return failReply(pctx, err, index)
+    const error = berror(pctx.index !== index, m, pctx, errors)
+    return failReply(pctx, error, index)
   }
 
-  const [postctx, postres] = post(pctx)
-  if (postres.status === Fatal) {
-    return fatalReply(postctx, merge(errors, postres.errors))
+  const [ectx, eres] = e(pctx)
+  if (eres.status === Fatal) {
+    return fatalReply(ectx, ferror(m, merge(errors, eres.errors)))
   }
-  if (postres.status === Fail) {
-    errors = merge(errors, postres.errors)
-    const err = index === postctx.index ? errors : nested(postctx, errors)
-    return failReply(postctx, err, index)
+  if (eres.status === Fail) {
+    const error = berror(
+      ectx.index !== index, m, ectx, merge(errors, eres.errors),
+    )
+    return failReply(ectx, error, index)
   }
-  return okReply(postctx, pres.value)
+  return okReply(ectx, pres.value)
 })

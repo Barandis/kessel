@@ -5,13 +5,13 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `betweenB(pre: Parser<U>, post: Parser<V>, p: Parser<T>): Parser<T>`
+> `betweenB(s: Parser, e: Parser, p: Parser, m?: string): Parser`
 
 Applies a pre-parser, a content parser, and a post-parser in order, returning the value of the content parser.
 
-All three parsers must succeed for `betweenB` to succeed. Take care to avoid parsing too far with `p`; e.g., if the example used `join(many(any))` as a content parser instead of what it does, it would also match the ending `"`. This would mean that `post` would never succeed because `p` already consumed its `"`, so `betweenB` would never succeed.
+All three parsers must succeed for `betweenB` to succeed. Take care to avoid parsing too far with `p`; e.g., if the example used `join(many(any))` as a content parser instead of what it does, it would also match the ending `"`. This would mean that `e` would never succeed because `p` already consumed its `"`, so `betweenB` would never succeed.
 
-If any of the parsers fails after some input was consumed, the state will be backtracked to where it was before `pre` was applied.
+If any of the parsers fails after some input was consumed, the state will be backtracked to where it was before `s` was applied.
 
 #### Example
 
@@ -48,9 +48,10 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 
 #### Parameters
 
-* `pre`: The parser that is applied first. Its result is discarded.
-* `post`: The parser that is applied last. Its result is discarded.
-* `p`: The parser that is applied after `pre` and before `post`. Its result is returned by `between` itself.
+* `s`: The parser that is applied first. Its result is discarded.
+* `e`: The parser that is applied last. Its result is discarded.
+* `p`: The parser that is applied after `s` and before `e`. Its result is returned by `betweenB` itself.
+* `m`: The optional expected error message that will take the place of the default error message.
 
 #### Success
 
@@ -66,7 +67,8 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 
 #### Throws
 
-* Throws an error if any of `pre`, `post`, and `p` are not parsers.
+* Throws an error if any of `s`, `e`, and `p` are not parsers.
+* Throws an error if `m` exists and is not a string.
 
 #### See Also
 
