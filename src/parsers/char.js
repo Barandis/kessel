@@ -169,7 +169,7 @@ export const range = (s, e, m) => parser(ctx => {
 export const any = m => parser(ctx => {
   const hasM = m != null
 
-  ASSERT && hasM && assertString('any', m, argStrFormatter(1, true))
+  ASSERT && hasM && assertString('any', m, argStrFormatter(1))
 
   const { index, view } = ctx
   if (index >= view.byteLength) {
@@ -185,13 +185,19 @@ export const any = m => parser(ctx => {
  * not exist (i.e., if the index is already at the end of the input).
  * Consumes nothing on either success or failure.
  *
- * @type {Parser}
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
+ * @returns {Parser} A parser that matches the end of input.
  */
-export const eof = parser(ctx => {
+export const eof = m => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && hasM && assertString('eof', m, argStrFormatter(1))
+
   const { index, view } = ctx
   return index >= view.byteLength
     ? okReply(ctx, null)
-    : failReply(ctx, expecteds.eof)
+    : failReply(ctx, ferror(m, expecteds.eof))
 })
 
 /**

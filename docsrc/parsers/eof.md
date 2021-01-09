@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `eof: Parser<null>`
+> `eof(m?: string): Parser`
 
 Attempts to parse a character and succeeds if there is no character to parse.
 
@@ -14,7 +14,7 @@ The only time that there is no character to read is at the end of input, so this
 #### Example
 
 ```javascript
-const parser = eof
+const parser = eof()
 
 const s = parse(parser, '')
 console.log(status(s))  // "ok"
@@ -29,6 +29,10 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Expected end of input
 ```
 
+#### Parameters
+
+* `m`: The optional expected error message that will take the place of the default error message.
+
 #### Success
 
 * Succeeds if the current parse location is at the end of input. Returns nothing and consumes no input.
@@ -36,6 +40,10 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 #### Failure
 
 * Fails if there is any character left to read.
+
+#### Throws
+
+* Throws an error if `m` exists and is not a string.
 
 #### See Also
 

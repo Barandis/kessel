@@ -369,6 +369,9 @@ describe('Character parsers', () => {
   })
 
   describe('any', () => {
+    it('throws if its argument exists and is not a string', () => {
+      terror(any(0), '', '[any]: expected argument to be a string; found 0')
+    })
     it('results in the next 1-byte character', () => {
       tpass(any(), 'Onomatopoeia', { result: 'O', index: 1 })
       tpass(any('test'), 'Onomatopoeia', { result: 'O', index: 1 })
@@ -392,20 +395,28 @@ describe('Character parsers', () => {
   })
 
   describe('eof', () => {
+    it('throws if its argument exists and is not a string', () => {
+      terror(eof(0), '', '[eof]: expected argument to be a string; found 0')
+    })
     it('fails if there are any remaining 1-byte characters', () => {
-      tfail(eof, 'Onomatopoeia', 'end of input')
+      tfail(eof(), 'Onomatopoeia', 'end of input')
+      tfail(eof('test'), 'Onomatopoeia', 'test')
     })
     it('fails if there are any remaining 2-byte characters', () => {
-      tfail(eof, 'Звукоподражание', 'end of input')
+      tfail(eof(), 'Звукоподражание', 'end of input')
+      tfail(eof('test'), 'Звукоподражание', 'test')
     })
     it('fails if there are any remaining 3-byte characters', () => {
-      tfail(eof, 'คำเลียนเสียง', 'end of input')
+      tfail(eof(), 'คำเลียนเสียง', 'end of input')
+      tfail(eof('test'), 'คำเลียนเสียง', 'test')
     })
     it('fails if there are any remaining 4-byte characters', () => {
-      tfail(eof, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', 'end of input')
+      tfail(eof(), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', 'end of input')
+      tfail(eof('test'), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', 'test')
     })
     it('succeeds only at EOF', () => {
-      tpass(eof, '', { result: null, index: 0 })
+      tpass(eof(), '', { result: null, index: 0 })
+      tpass(eof('test'), '', { result: null, index: 0 })
     })
   })
 

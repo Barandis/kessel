@@ -163,7 +163,7 @@ describe('Backtracking and error handling combinators', () => {
       tpass(parserm, 'abcdefghi', { result: ['abc', 'def', 'ghi'], index: 9 })
     })
     it('adds null to results', () => {
-      tpass(seqB(string('abc'), eof), 'abc', {
+      tpass(seqB(string('abc'), eof()), 'abc', {
         result: ['abc', null],
         index: 3,
       })
@@ -414,8 +414,8 @@ describe('Backtracking and error handling combinators', () => {
         expected: 'letter then digit',
         status: Fail,
       })
-      tfail(leftB(eof, char('a')), '', { expected: "'a'", status: Fail })
-      tfail(leftB(eof, char('a'), 'something impossible'), '', {
+      tfail(leftB(eof(), char('a')), '', { expected: "'a'", status: Fail })
+      tfail(leftB(eof(), char('a'), 'something impossible'), '', {
         expected: 'something impossible',
         status: Fail,
       })
@@ -497,8 +497,8 @@ describe('Backtracking and error handling combinators', () => {
         expected: 'letter then digit',
         status: Fail,
       })
-      tfail(rightB(eof, char('a')), '', { expected: "'a'", status: Fail })
-      tfail(rightB(eof, char('a'), 'something impossible'), '', {
+      tfail(rightB(eof(), char('a')), '', { expected: "'a'", status: Fail })
+      tfail(rightB(eof(), char('a'), 'something impossible'), '', {
         expected: 'something impossible',
         status: Fail,
       })
@@ -848,12 +848,12 @@ describe('Backtracking and error handling combinators', () => {
         index: 0,
         status: Fail,
       })
-      tfail(pipeB(eof, letter, (a, b) => b + a), '', {
+      tfail(pipeB(eof(), letter, (a, b) => b + a), '', {
         expected: 'a letter',
         index: 0,
         status: Fail,
       })
-      tfail(pipeB(eof, letter, (a, b) => b + a, 'something impossible'), '', {
+      tfail(pipeB(eof(), letter, (a, b) => b + a, 'something impossible'), '', {
         expected: 'something impossible',
         index: 0,
         status: Fail,

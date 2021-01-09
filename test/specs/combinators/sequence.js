@@ -77,7 +77,7 @@ describe('Sequence combinators', () => {
       tpass(parserm, 'abcdefghi', { result: ['abc', 'def', 'ghi'], index: 9 })
     })
     it('adds null to results', () => {
-      tpass(seq(string('abc'), eof), 'abc', {
+      tpass(seq(string('abc'), eof()), 'abc', {
         result: ['abc', null],
         index: 3,
       })
@@ -1304,12 +1304,12 @@ describe('Sequence combinators', () => {
         expected: 'a letter',
         status: Fail,
       })
-      tfail(left(eof, char('a')), '', { expected: "'a'", status: Fail })
+      tfail(left(eof(), char('a')), '', { expected: "'a'", status: Fail })
       tfail(left(letter, digit, 'a letter, then a digit'), '1', {
         expected: 'a letter, then a digit',
         status: Fail,
       })
-      tfail(left(eof, char('a'), 'something impossible'), '', {
+      tfail(left(eof(), char('a'), 'something impossible'), '', {
         expected: 'something impossible',
         status: Fail,
       })
@@ -1375,12 +1375,12 @@ describe('Sequence combinators', () => {
     })
     it('fails non-fatally if one parser fails and no input is consumed', () => {
       tfail(right(letter, digit), '1', { expected: 'a letter', status: Fail })
-      tfail(right(eof, char('a')), '', { expected: "'a'", status: Fail })
+      tfail(right(eof(), char('a')), '', { expected: "'a'", status: Fail })
       tfail(right(letter, digit, 'a letter, then a digit'), '1', {
         expected: 'a letter, then a digit',
         status: Fail,
       })
-      tfail(right(eof, char('a'), 'something impossible'), '', {
+      tfail(right(eof(), char('a'), 'something impossible'), '', {
         expected: 'something impossible',
         status: Fail,
       })
@@ -1445,12 +1445,12 @@ describe('Sequence combinators', () => {
         index: 0,
         status: Fail,
       })
-      tfail(pipe(eof, letter, (a, b) => b + a), '', {
+      tfail(pipe(eof(), letter, (a, b) => b + a), '', {
         expected: 'a letter',
         index: 0,
         status: Fail,
       })
-      tfail(pipe(eof, letter, (a, b) => b + a, 'something impossible'), '', {
+      tfail(pipe(eof(), letter, (a, b) => b + a, 'something impossible'), '', {
         expected: 'something impossible',
         index: 0,
         status: Fail,
