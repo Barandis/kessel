@@ -334,11 +334,20 @@ export const spaces1U = m => parser(ctx => {
  * No characters will be consumed on failure, even in the case of
  * `\r\n`.
  *
- * @type {Parser}
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
+ * @returns {Parser} A parser that succeeds if the next character is an
+ *     ASCII newline.
  */
-export const newline = parser(ctx => {
-  const [rprep, [rpctx, rpres]] = dup(regexParser(reNewline)(ctx))
-  return rpres.status === Ok ? rprep : failReply(rpctx, expecteds.newline)
+export const newline = m => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && hasM && assertString('newline', m, argStrFormatter())
+
+  const [rrep, [rctx, rres]] = dup(regexParser(reNewline)(ctx))
+  return rres.status === Ok
+    ? rrep
+    : failReply(rctx, ferror(m, expecteds.newline))
 })
 
 /**
@@ -360,9 +369,18 @@ export const newline = parser(ctx => {
  * No characters will be consumed on failure, even in the case of
  * `\r\n`.
  *
- * @type {Parser}
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
+ * @returns {Parser} A parser that succeeds if the next character is a
+ *     Unicode newline.
  */
-export const newlineU = parser(ctx => {
-  const [rprep, [rpctx, rpres]] = dup(regexParser(reUnewline)(ctx))
-  return rpres.status === Ok ? rprep : failReply(rpctx, expecteds.newlineU)
+export const newlineU = m => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && hasM && assertString('newlineU', m, argStrFormatter())
+
+  const [rrep, [rctx, rres]] = dup(regexParser(reUnewline)(ctx))
+  return rres.status === Ok
+    ? rrep
+    : failReply(rctx, ferror(m, expecteds.newlineU))
 })

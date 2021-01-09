@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `newlineU: Parser<string>`
+> `newlineU(m?: string): Parser`
 
 Parses a Unicode newline.
 
@@ -14,7 +14,7 @@ Unicode newlines include the ASCII newlines `\r`, `\n`, and `\r\n`, as well as t
 #### Example
 
 ```javascript
-const parser = newlineU
+const parser = newlineU()
 
 const s = parse(parser, '\u2028Next line')
 console.log(status(s))  // "ok"
@@ -29,6 +29,10 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Expected a Unicode newline
 ```
 
+#### Parameters
+
+* `m`: The optional expected error message that will take the place of the default error message.
+
 #### Success
 
 * Succeeds if the next character (or two characters, for `\r\n`) is a Unicode newline. This character (or these characters) are consumed and returned as a single string.
@@ -36,6 +40,10 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 #### Failure
 
 * Fails if the next character is any other character.
+
+#### Throws
+
+* Throws an error if `m` exists and is not a string.
 
 #### See Also
 

@@ -708,36 +708,46 @@ describe('Regular expression parsers', () => {
   })
 
   describe('newline', () => {
+    it('throws if it has a non-string argument', () => {
+      terror(newline(0), '', 'expected argument to be a string; found 0')
+    })
     it('succeeds on a single newline', () => {
-      tpass(newline, '\nabc', '\n')
-      tpass(newline, '\rabc', '\r')
-      tpass(newline, '\r\nabc', '\r\n')
+      tpass(newline(), '\nabc', '\n')
+      tpass(newline(), '\rabc', '\r')
+      tpass(newline(), '\r\nabc', '\r\n')
+      tpass(newline('test'), '\nabc', '\n')
     })
     it('fails on any other character combination', () => {
-      tfail(newline, '\u0085abc', 'a newline')
-      tfail(newline, '\u2028abc', 'a newline')
-      tfail(newline, '\u2029abc', 'a newline')
-      tfail(newline, 'Onoma', 'a newline')
+      tfail(newline(), '\u0085abc', 'a newline')
+      tfail(newline(), '\u2028abc', 'a newline')
+      tfail(newline(), '\u2029abc', 'a newline')
+      tfail(newline('test'), 'Onoma', 'test')
     })
     it('fails at EOF', () => {
-      tfail(newline, '', { expected: 'a newline', actual: 'EOF' })
+      tfail(newline('test'), '', 'test')
     })
   })
 
   describe('newlineU', () => {
+    it('throws if it has a non-string argument', () => {
+      terror(newlineU(0), '', 'expected argument to be a string; found 0')
+    })
     it('succeeds on a single Unicode newline', () => {
-      tpass(newlineU, '\nabc', '\n')
-      tpass(newlineU, '\rabc', '\r')
-      tpass(newlineU, '\r\nabc', '\r\n')
-      tpass(newlineU, '\u0085abc', '\u0085')
-      tpass(newlineU, '\u2028abc', '\u2028')
-      tpass(newlineU, '\u2029abc', '\u2029')
+      tpass(newlineU(), '\nabc', '\n')
+      tpass(newlineU(), '\rabc', '\r')
+      tpass(newlineU(), '\r\nabc', '\r\n')
+      tpass(newlineU(), '\u0085abc', '\u0085')
+      tpass(newlineU(), '\u2028abc', '\u2028')
+      tpass(newlineU(), '\u2029abc', '\u2029')
+      tpass(newlineU('test'), '\nabc', '\n')
     })
     it('fails on any other character combination', () => {
-      tfail(newlineU, 'Onoma', 'a Unicode newline')
+      tfail(newlineU(), 'Onoma', 'a Unicode newline')
+      tfail(newlineU('test'), 'Onoma', 'test')
     })
     it('fails at EOF', () => {
-      tfail(newlineU, '', 'a Unicode newline')
+      tfail(newlineU(), '', 'a Unicode newline')
+      tfail(newlineU('test'), '', 'test')
     })
   })
 })

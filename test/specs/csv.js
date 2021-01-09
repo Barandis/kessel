@@ -31,7 +31,7 @@ const quotedCell = second(seqB(
 
 const cell = alt(quotedCell, join(many(noneof(',\n\r'))))
 const line = sepby(cell, char(','))
-const csv = endby(line, newline)
+const csv = endby(line, newline())
 
 const parseCsv = input => run(csv, input)
 
@@ -41,7 +41,7 @@ const parseCsv1 = input => run(endby(sepby(alt(
     join(many(alt(noneof('"'), value(string('""'), '"')))),
     char('"', 'quote at end of cell'),
   )), join(many(noneof(',\n\r'))),
-), char(',')), newline), input)
+), char(',')), newline()), input)
 
 describe('CSV parser', () => {
   it('successfully parses example CSV', () => {
