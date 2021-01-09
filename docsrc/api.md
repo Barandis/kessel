@@ -32,7 +32,6 @@ Additionally, parsers are often said to *return* a value or to have a value as a
 | [`char`](parsers/char.md) | Parses a single character. |
 | [`charI`](parsers/chari.md) | Parses a single character, but without case sensitivity. |
 | [`satisfy`](parsers/satisfy.md) | Parses a single character for which a predicate returns `true`. |
-| [`satisfyM`](parsers/satisfym.md) | Parses a single character for which a predicate returns `true`. Fails with a message string if the predicate returns `false`. |
 | [`range`](parsers/range.md) | Parses a single character whose code point is between two other characters. |
 | [`any`](parsers/any.md) | Parses any one character. |
 | [`anyOf`](parsers/anyof.md) | Parses a single character which is included in a string or an array. |

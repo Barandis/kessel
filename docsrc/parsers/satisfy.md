@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `satisfy(fn: (arg: string) => boolean): Parser<string>`
+> `satisfy(fn: function, m?: string): Parser`
 
 Parses a character for which the predicate `fn` returns `true` when passed that character.
 
@@ -33,6 +33,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 #### Parameters
 
 * `fn`: The predicate function that the next character must pass in order for the parser to succeed.
+* `m`: The optional expected error message that will take the place of the default error message.
 
 #### Success
 
@@ -45,10 +46,10 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 #### Throws
 
 * Throws an error if `fn` is not a non-parser function.
+* Throws an error if `m` exists and is not a string.
 
 #### See Also
 
 * [`Parser`](../types/parser.md)
 * [`range`](range.md)
 * [`regex`](regex.md)
-* [`satisfyM`](satisfym.md)

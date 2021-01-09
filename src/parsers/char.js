@@ -5,17 +5,15 @@
 
 import {
   argCharFormatter,
+  argFnFormatter,
   argStrFormatter,
   assertChar,
   assertFunction,
   assertString,
   assertStringOrArray,
   ordCharFormatter,
-  ordFnFormatter,
-  ordStrFormatter,
 } from 'kessel/assert'
 import { failReply, okReply, parser, Status } from 'kessel/core'
-import { expected } from 'kessel/error'
 import { expecteds } from 'kessel/messages'
 import { dup, ferror, nextChar } from 'kessel/util'
 
@@ -113,34 +111,20 @@ export const charI = (c, m) => parser(ctx => {
  * @param {function(string):boolean} fn A function to which the next
  *     character is passed; if it returns `true`, the parser succeeds
  *     and if it returns `false` the parser fails.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser that reads a character and executes `fn`
  *     on it when applied to input.
  */
-export const satisfy = fn => parser(ctx => {
-  ASSERT && assertFunction('satisfy', fn)
-  return charParser(fn)(ctx)
-})
+export const satisfy = (fn, m) => parser(ctx => {
+  const hasM = m != null
 
-/**
- * A parser that reads a single character and passes it to the provided
- * function. If the function returns `true`, this parser succeeds with
- * that character as the result. If the function returns `false`, this
- * parser fails and consumes no input and signals an error with the
- * provided message.
- *
- * @param {function(string):boolean} fn A function to which the next
- *     character is passed; if it returns `true`, the parser succeeds
- *     and if it returns `false` the parser fails.
- * @param {string} message The error message to use if the parser fails.
- * @returns {Parser} A parser that reads a character and executes `fn`
- *     on it when applied to input.
- */
-export const satisfyM = (fn, message) => parser(ctx => {
-  ASSERT && assertFunction('satisfyM', fn, ordFnFormatter('1st'))
-  ASSERT && assertString('satisfyM', message, ordStrFormatter('2nd'))
+  ASSERT && assertFunction('satisfy', fn, argFnFormatter(1, hasM))
+  ASSERT && hasM && assertString('satisfy', m, argStrFormatter(2, true))
 
-  const [cprep, [cpctx, cpres]] = dup(charParser(fn)(ctx))
-  return cpres.status === Ok ? cprep : failReply(cpctx, expected(message))
+  const [crep, [cctx, cres]] = dup(charParser(fn)(ctx))
+  if (cres.status === Ok) return crep
+  return failReply(cctx, ferror(m, cres.errors))
 })
 
 /**

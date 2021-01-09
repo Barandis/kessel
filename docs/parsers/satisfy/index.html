@@ -1297,18 +1297,6 @@
 
 
   <li class="md-nav__item">
-    <a href="../satisfym/" class="md-nav__link">
-      satisfyM
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
     <a href="../second/" class="md-nav__link">
       second
     </a>
@@ -2061,7 +2049,7 @@
 -->
 
 <blockquote>
-<p><code>satisfy(fn: (arg: string) =&gt; boolean): Parser&lt;string&gt;</code></p>
+<p><code>satisfy(fn: function, m?: string): Parser</code></p>
 </blockquote>
 <p>Parses a character for which the predicate <code>fn</code> returns <code>true</code> when passed that character.</p>
 <p>Since the parser cannot reasonably figure out what conditions cause <code>fn</code> to pass, it does not generate an error message on failure by default. To provide a useful error message, supply that message as the optional second argument.</p>
@@ -2083,6 +2071,7 @@
 <h4 id="parameters">Parameters</h4>
 <ul>
 <li><code>fn</code>: The predicate function that the next character must pass in order for the parser to succeed.</li>
+<li><code>m</code>: The optional expected error message that will take the place of the default error message.</li>
 </ul>
 <h4 id="success">Success</h4>
 <ul>
@@ -2095,13 +2084,13 @@
 <h4 id="throws">Throws</h4>
 <ul>
 <li>Throws an error if <code>fn</code> is not a non-parser function.</li>
+<li>Throws an error if <code>m</code> exists and is not a string.</li>
 </ul>
 <h4 id="see-also">See Also</h4>
 <ul>
 <li><a href="../../types/parser/"><code>Parser</code></a></li>
 <li><a href="../range/"><code>range</code></a></li>
 <li><a href="../regex/"><code>regex</code></a></li>
-<li><a href="../satisfym/"><code>satisfyM</code></a></li>
 </ul>
                 
               
@@ -2136,13 +2125,13 @@
           </a>
         
         
-          <a href="../satisfym/" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../second/" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-footer-nav__title">
               <div class="md-ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                satisfyM
+                second
               </div>
             </div>
             <div class="md-footer-nav__button md-icon">

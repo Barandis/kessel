@@ -21,7 +21,6 @@ export {
   octal,
   range,
   satisfy,
-  satisfyM,
   upper,
 } from './parsers/char'
 export {

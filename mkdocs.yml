@@ -101,7 +101,6 @@ nav:
       - right: parsers/right.md
       - rightB: parsers/rightb.md
       - satisfy: parsers/satisfy.md
-      - satisfyM: parsers/satisfym.md
       - second: parsers/second.md
       - sep: parsers/sep.md
       - sep1: parsers/sep1.md

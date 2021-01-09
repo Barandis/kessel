@@ -18,7 +18,6 @@ import {
   octal,
   range,
   satisfy,
-  satisfyM,
   upper,
 } from 'kessel/parsers/char'
 import { terror, tfail, tpass } from 'test/helper'
@@ -265,77 +264,57 @@ describe('Character parsers', () => {
     const fn = char => char === char.toUpperCase()
 
     it('throws if a non-function is passed in', () => {
-      terror(satisfy(0), '', '[satisfy]: expected a function; found 0')
-      terror(satisfy({}), '', '[satisfy]: expected a function; found {}')
+      terror(
+        satisfy(0),
+        '',
+        '[satisfy]: expected argument to be a function; found 0',
+      )
+      terror(
+        satisfy({}),
+        '',
+        '[satisfy]: expected argument to be a function; found {}',
+      )
       terror(
         satisfy(Symbol.for('test')),
         '',
-        '[satisfy]: expected a function; found Symbol(test)',
+        '[satisfy]: expected argument to be a function; found Symbol(test)',
+      )
+      terror(
+        satisfy(0, 'test'),
+        '',
+        '[satisfy]: expected first argument to be a function; found 0',
+      )
+    })
+    it('throws if second argument exists and is not a string', () => {
+      terror(
+        satisfy(fn, 0),
+        '',
+        '[satisfy]: expected second argument to be a string; found 0',
       )
     })
     it('tests the next 1-byte character', () => {
       tpass(satisfy(fn), 'Onomatopoeia', { result: 'O', index: 1 })
+      tpass(satisfy(fn, 'test'), 'Onomatopoeia', { result: 'O', index: 1 })
       tfail(satisfy(fn), 'onomatopoeia', '')
+      tfail(satisfy(fn, 'test'), 'onomatopoeia', 'test')
     })
     it('tests the next 2-byte character', () => {
       tpass(satisfy(fn), 'Звукоподражание', { result: 'З', index: 2 })
+      tpass(satisfy(fn, 'test'), 'Звукоподражание', { result: 'З', index: 2 })
       tfail(satisfy(fn), 'звукоподражание', '')
+      tfail(satisfy(fn, 'test'), 'звукоподражание', 'test')
     })
     it('tests the next 3-byte character', () => {
       tpass(satisfy(fn), 'คำเลียนเสียง', { result: 'ค', index: 3 })
+      tpass(satisfy(fn, 'test'), 'คำเลียนเสียง', { result: 'ค', index: 3 })
     })
     it('tests the next 4-byte character', () => {
       tpass(satisfy(fn), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂', index: 4 })
+      tpass(satisfy(fn, 'test'), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂', index: 4 })
     })
     it('fails automatically at EOF', () => {
       tfail(satisfy(fn), '', '')
-    })
-  })
-
-  describe('satisfyM', () => {
-    const fn = char => char === char.toUpperCase()
-
-    it('throws if its first argument is not a function', () => {
-      terror(
-        satisfyM(0, 'test'),
-        '',
-        '[satisfyM]: expected 1st argument to be a function; found 0',
-      )
-      terror(
-        satisfyM({}, 'test'),
-        '',
-        '[satisfyM]: expected 1st argument to be a function; found {}',
-      )
-      terror(
-        satisfyM(Symbol.for('test'), 'test'),
-        '',
-        '[satisfyM]: expected 1st argument to be a function; '
-          + 'found Symbol(test)',
-      )
-    })
-    it('throws if its second argument is not a string', () => {
-      terror(
-        satisfyM(_ => true, 0),
-        '',
-        '[satisfyM]: expected 2nd argument to be a string; found 0',
-      )
-    })
-    it('tests the next 1-byte character', () => {
-      tpass(satisfyM(fn, 'test'), 'Onomatopoeia', { result: 'O', index: 1 })
-      tfail(satisfyM(fn, 'test'), 'onomatopoeia', 'test')
-    })
-    it('tests the next 2-byte character', () => {
-      tpass(satisfyM(fn, 'test'), 'Звукоподражание', { result: 'З', index: 2 })
-      tfail(satisfyM(fn, 'test'), 'звукоподражание', 'test')
-    })
-    it('tests the next 3-byte character', () => {
-      tpass(satisfyM(fn, 'test'), 'คำเลียนเสียง', { result: 'ค', index: 3 })
-    })
-    it('tests the next 4-byte character', () => {
-      tpass(satisfyM(fn, 'test'), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂', index: 4 })
-    })
-    it('fails automatically at EOF', () => {
-      tfail(satisfyM(fn, 'test'), '', 'test')
+      tfail(satisfy(fn, 'test'), '', 'test')
     })
   })
 
