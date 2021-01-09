@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `char(c: string): Parser<string>`
+> `char(c: string, m?: string): Parser`
 
 Parses the character `c`.
 
@@ -32,6 +32,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 #### Parameters
 
 * `c`: The character that the next input character must be in order to succeed.
+* `m`: The optional expected error message that will take the place of the default error message.
 
 #### Success 
 
@@ -44,6 +45,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 #### Throws
 
 * Throws an error if `c` is not a string or if it isn't exactly one character in length.
+* Throws an error if `m` exists and is not a string.
 
 #### See Also
 

@@ -4,6 +4,8 @@
 // https://opensource.org/licenses/MIT
 
 import {
+  argCharFormatter,
+  argStrFormatter,
   assertChar,
   assertFunction,
   assertString,
@@ -15,7 +17,7 @@ import {
 import { failReply, okReply, parser, Status } from 'kessel/core'
 import { expected } from 'kessel/error'
 import { expecteds } from 'kessel/messages'
-import { dup, nextChar } from 'kessel/util'
+import { dup, ferror, nextChar } from 'kessel/util'
 
 const { Ok } = Status
 
@@ -52,14 +54,21 @@ const charParser = fn => parser(ctx => {
  * @param {string} c The character to compare the next character in the
  *     input to. If `c` is more than one character, this parser will
  *     throw an error.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser that will succeed if `c` is the next
  *     character in the input.
  */
-export const char = c => parser(ctx => {
-  ASSERT && assertChar('char', c)
+export const char = (c, m) => parser(ctx => {
+  const hasM = m != null
 
-  const [cprep, [cpctx, cpres]] = dup(charParser(ch => c === ch)(ctx))
-  return cpres.status === Ok ? cprep : failReply(cpctx, expecteds.char(c))
+  ASSERT && assertChar('char', c, argCharFormatter(1, hasM))
+  ASSERT && hasM && assertString('char', m, argStrFormatter(2, true))
+
+  const [crep, [cctx, cres]] = dup(charParser(ch => c === ch)(ctx))
+  return cres.status === Ok
+    ? crep
+    : failReply(cctx, ferror(m, expecteds.char(c)))
 })
 
 /**
@@ -70,16 +79,23 @@ export const char = c => parser(ctx => {
  * @param {string} c The character to compare the next character in the
  *     input to. If `c` is more than one character, this parser will
  *     throw an error.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser that will succeed if `c` (or its
  *     other-cased counterpart) is the next character in the input.
  */
-export const charI = c => parser(ctx => {
-  ASSERT && assertChar('charI', c)
+export const charI = (c, m) => parser(ctx => {
+  const hasM = m != null
 
-  const [cprep, [cpctx, cpres]] = dup(charParser(
+  ASSERT && assertChar('charI', c, argCharFormatter(1, hasM))
+  ASSERT && hasM && assertString('charI', m, argStrFormatter(2, true))
+
+  const [crep, [cctx, cres]] = dup(charParser(
     ch => c.toLowerCase() === ch.toLowerCase(),
   )(ctx))
-  return cpres.status === Ok ? cprep : failReply(cpctx, expecteds.charI(c))
+  return cres.status === Ok
+    ? crep
+    : failReply(cctx, ferror(m, expecteds.charI(c)))
 })
 
 /**

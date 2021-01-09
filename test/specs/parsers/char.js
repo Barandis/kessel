@@ -26,154 +26,237 @@ import { terror, tfail, tpass } from 'test/helper'
 describe('Character parsers', () => {
   describe('char', () => {
     it('throws if something other than a single char is passed', () => {
-      terror(char(0), '', '[char]: expected a one-character string; found 0')
-      terror(char({}), '', '[char]: expected a one-character string; found {}')
       terror(
-        char('ab'), '', '[char]: expected a one-character string; found "ab"',
+        char(0),
+        '',
+        '[char]: expected argument to be a one-character string; found 0',
+      )
+      terror(
+        char({}),
+        '',
+        '[char]: expected argument to be a one-character string; found {}',
+      )
+      terror(
+        char('ab'),
+        '',
+        '[char]: expected argument to be a one-character string; found "ab"',
       )
       terror(
         char(() => {}),
         '',
-        '[char]: expected a one-character string; found function',
+        '[char]: expected argument to be a one-character string; '
+          + 'found function',
       )
       terror(
-        char(), '', '[char]: expected a one-character string; found undefined',
+        char(),
+        '',
+        '[char]: expected argument to be a one-character string; '
+          + 'found undefined',
+      )
+      terror(
+        char(0, 'test'),
+        '',
+        '[char]: expected first argument to be a one-character string; found 0',
+      )
+    })
+    it('throws if second argument exists and is not a string', () => {
+      terror(
+        char('a', 0),
+        '',
+        '[char]: expected second argument to be a string; found 0',
       )
     })
 
     context('1-byte characters', () => {
       const parser = char('O')
+      const parserm = char('O', 'test')
 
       it('succeeds if the next character matches', () => {
         tpass(parser, 'Onomatopoeia', 'O')
+        tpass(parserm, 'Onomatopoeia', 'O')
       })
       it('fails if the next character does not match', () => {
         tfail(parser, 'topoeia', "'O'")
+        tfail(parserm, 'topoeia', 'test')
       })
       it('fails if the case does not match', () => {
         tfail(parser, 'onomatopoeia', "'O'")
+        tfail(parserm, 'onomatopoeia', 'test')
       })
       it('fails at EOF', () => {
         tfail(parser, '', "'O'")
+        tfail(parserm, '', 'test')
       })
     })
 
     context('2-byte characters', () => {
       const parser = char('З')
+      const parserm = char('З', 'test')
 
       it('succeeds if the next character matches', () => {
         tpass(parser, 'Звукоподражание', 'З')
+        tpass(parserm, 'Звукоподражание', 'З')
       })
       it('fails if the next character does not match', () => {
         tfail(parser, 'подражание', "'З'")
+        tfail(parserm, 'подражание', 'test')
       })
       it('fails if the case does not match', () => {
         tfail(parser, 'звукоподражание', "'З'")
+        tfail(parserm, 'звукоподражание', 'test')
       })
       it('fails at EOF', () => {
         tfail(parser, '', "'З'")
+        tfail(parserm, '', 'test')
       })
     })
 
     context('3-byte characters', () => {
       const parser = char('ค')
+      const parserm = char('ค', 'test')
 
       it('succeeds if the next character matches', () => {
         tpass(parser, 'คำเลียนเสียง', 'ค')
+        tpass(parserm, 'คำเลียนเสียง', 'ค')
       })
       it('fails if the next character does not match', () => {
         tfail(parser, 'ยนเสียง', "'ค'")
+        tfail(parserm, 'ยนเสียง', 'test')
       })
       it('fails at EOF', () => {
         tfail(parser, '', "'ค'")
+        tfail(parserm, '', 'test')
       })
     })
 
     context('4-byte characters', () => {
       const parser = char('𝑂')
+      const parserm = char('𝑂', 'test')
 
       it('succeeds if the next character matches', () => {
         tpass(parser, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', '𝑂')
+        tpass(parserm, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', '𝑂')
       })
       it('fails if the next character does not match', () => {
         tfail(parser, '𝑡𝑜𝑝𝑜𝑒𝑖𝑎', "'𝑂'")
+        tfail(parserm, '𝑡𝑜𝑝𝑜𝑒𝑖𝑎', 'test')
       })
       it('fails at EOF', () => {
         tfail(parser, '', "'𝑂'")
+        tfail(parserm, '', 'test')
       })
     })
   })
 
   describe('charI', () => {
     it('throws if something other than a single char is passed', () => {
-      terror(charI(0), '', '[charI]: expected a one-character string; found 0')
       terror(
-        charI({}), '', '[charI]: expected a one-character string; found {}',
+        charI(0),
+        '',
+        '[charI]: expected argument to be a one-character string; found 0',
       )
       terror(
-        charI('ab'), '', '[charI]: expected a one-character string; found "ab"',
+        charI({}),
+        '',
+        '[charI]: expected argument to be a one-character string; found {}',
+      )
+      terror(
+        charI('ab'),
+        '',
+        '[charI]: expected argument to be a one-character string; found "ab"',
+      )
+      terror(
+        charI(0, 'test'),
+        '',
+        '[charI]: expected first argument to be a one-character string; '
+          + 'found 0',
+      )
+    })
+    it('throws if second argument exists and is not a string', () => {
+      terror(
+        charI('a', 0),
+        '',
+        '[charI]: expected second argument to be a string; found 0',
       )
     })
 
     context('1-byte characters', () => {
       const parser = charI('O')
+      const parserm = charI('O', 'test')
 
       it('succeeds if the next character matches', () => {
         tpass(parser, 'Onomatopoeia', 'O')
+        tpass(parserm, 'Onomatopoeia', 'O')
       })
       it('fails if the next character does not match', () => {
         tfail(parser, 'topoeia', "'O'")
+        tfail(parserm, 'topoeia', 'test')
       })
       it('succeeds if the case does not match', () => {
         tpass(parser, 'onomatopoeia', 'o')
+        tpass(parserm, 'onomatopoeia', 'o')
       })
       it('fails at EOF', () => {
         tfail(parser, '', "'O'")
+        tfail(parserm, '', 'test')
       })
     })
 
     context('2-byte characters', () => {
       const parser = charI('З')
+      const parserm = charI('З', 'test')
 
       it('succeeds if the next character matches', () => {
         tpass(parser, 'Звукоподражание', 'З')
+        tpass(parserm, 'Звукоподражание', 'З')
       })
       it('fails if the next character does not match', () => {
         tfail(parser, 'подражание', "'З'")
+        tfail(parserm, 'подражание', 'test')
       })
-      it('fails if the case does not match', () => {
+      it('succeeds if the case does not match', () => {
         tpass(parser, 'звукоподражание', 'з')
+        tpass(parserm, 'звукоподражание', 'з')
       })
       it('fails at EOF', () => {
         tfail(parser, '', "'З'")
+        tfail(parserm, '', 'test')
       })
     })
 
     context('3-byte characters', () => {
       const parser = charI('ค')
+      const parserm = charI('ค', 'test')
 
       it('succeeds if the next character matches', () => {
         tpass(parser, 'คำเลียนเสียง', 'ค')
+        tpass(parserm, 'คำเลียนเสียง', 'ค')
       })
       it('fails if the next character does not match', () => {
         tfail(parser, 'ยนเสียง', "'ค'")
+        tfail(parserm, 'ยนเสียง', 'test')
       })
       it('fails at EOF', () => {
         tfail(parser, '', "'ค'")
+        tfail(parserm, '', 'test')
       })
     })
 
     context('4-byte characters', () => {
       const parser = charI('𝑂')
+      const parserm = charI('𝑂', 'test')
 
       it('succeeds if the next character matches', () => {
         tpass(parser, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', '𝑂')
+        tpass(parserm, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', '𝑂')
       })
       it('fails if the next character does not match', () => {
         tfail(parser, '𝑡𝑜𝑝𝑜𝑒𝑖𝑎', "'𝑂'")
+        tfail(parserm, '𝑡𝑜𝑝𝑜𝑒𝑖𝑎', 'test')
       })
       it('fails at EOF', () => {
         tfail(parser, '', "'𝑂'")
+        tfail(parserm, '', 'test')
       })
     })
   })

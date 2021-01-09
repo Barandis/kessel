@@ -2061,7 +2061,7 @@
 -->
 
 <blockquote>
-<p><code>char(c: string): Parser&lt;string&gt;</code></p>
+<p><code>char(c: string, m?: string): Parser</code></p>
 </blockquote>
 <p>Parses the character <code>c</code>.</p>
 <p>There is no character type in JavaScript, as a "character" is just a string with a length of 1. However, using <code>char</code> is a bit more efficient than using <code>string</code> and should be used as long as only one character is needed.</p>
@@ -2083,6 +2083,7 @@
 <h4 id="parameters">Parameters</h4>
 <ul>
 <li><code>c</code>: The character that the next input character must be in order to succeed.</li>
+<li><code>m</code>: The optional expected error message that will take the place of the default error message.</li>
 </ul>
 <h4 id="success">Success</h4>
 <ul>
@@ -2095,6 +2096,7 @@
 <h4 id="throws">Throws</h4>
 <ul>
 <li>Throws an error if <code>c</code> is not a string or if it isn't exactly one character in length.</li>
+<li>Throws an error if <code>m</code> exists and is not a string.</li>
 </ul>
 <h4 id="see-also">See Also</h4>
 <ul>
