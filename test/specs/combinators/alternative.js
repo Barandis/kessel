@@ -41,7 +41,7 @@ describe('Alternative and conditional combinators', () => {
         '[alt]: expected second argument to be a parser; found 0',
       )
       terror(
-        alt(any(), letter, () => letter),
+        alt(any(), letter(), () => letter()),
         'abc',
         '[alt]: expected third argument to be a parser; found function',
       )
@@ -49,7 +49,7 @@ describe('Alternative and conditional combinators', () => {
     it('does not throw if the last argument only is a string', () => {
       tpass(alt(any(), 'test'), 'abc', 'a')
       terror(
-        alt(any(), 'test', letter),
+        alt(any(), 'test', letter()),
         'abc',
         '[alt]: expected second argument to be a parser; found "test"',
       )
@@ -79,7 +79,7 @@ describe('Alternative and conditional combinators', () => {
     })
     it('throws if its second argument exists and is not a string', () => {
       terror(
-        opt(letter, 0),
+        opt(letter(), 0),
         '',
         '[opt]: expected second argument to be a string; found 0',
       )
@@ -123,7 +123,7 @@ describe('Alternative and conditional combinators', () => {
     })
     it('throws if its third argument exists and is not a string', () => {
       terror(
-        def(letter, 0, 0),
+        def(letter(), 0, 0),
         '',
         '[def]: expected third argument to be a string; found 0',
       )
@@ -166,7 +166,7 @@ describe('Alternative and conditional combinators', () => {
     })
     it('throws if its second argument exists and is not a string', () => {
       terror(
-        peek(letter, 0),
+        peek(letter(), 0),
         '',
         '[peek]: expected second argument to be a string; found 0',
       )
@@ -196,44 +196,44 @@ describe('Alternative and conditional combinators', () => {
     })
     it('throws if its second argument exists and is not a string', () => {
       terror(
-        empty(many(letter), 0),
+        empty(many(letter()), 0),
         '',
         '[empty]: expected second argument to be a string; found 0',
       )
     })
     it('succeeds if its parser succeeds without consuming input', () => {
-      tpass(empty(many(letter)), '123', { result: null })
-      tpass(empty(many(letter), 'no letters'), '123', { result: null })
+      tpass(empty(many(letter())), '123', { result: null })
+      tpass(empty(many(letter()), 'no letters'), '123', { result: null })
     })
     it('fails if its parser succeeds and consumed input', () => {
-      tfail(empty(many(letter)), 'abc', {
+      tfail(empty(many(letter())), 'abc', {
         expected: '',
         index: 3,
         status: Fail,
       })
-      tfail(empty(many(letter), 'no letters'), 'abc', {
+      tfail(empty(many(letter()), 'no letters'), 'abc', {
         expected: 'no letters',
         index: 3,
         status: Fail,
       })
     })
     it('fails if its parser fails', () => {
-      tfail(empty(letter), '123', {
+      tfail(empty(letter()), '123', {
         expected: 'a letter',
         index: 0,
         status: Fail,
       })
-      tfail(empty(seq(letter, letter)), 'a1', {
+      tfail(empty(seq(letter(), letter())), 'a1', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
-      tfail(empty(letter, 'at least one letter'), '123', {
+      tfail(empty(letter(), 'at least one letter'), '123', {
         expected: 'at least one letter',
         index: 0,
         status: Fail,
       })
-      tfail(empty(seq(letter, letter), 'a1 or something'), 'a1', {
+      tfail(empty(seq(letter(), letter()), 'a1 or something'), 'a1', {
         expected: 'a1 or something',
         index: 1,
         status: Fatal,
@@ -256,26 +256,26 @@ describe('Alternative and conditional combinators', () => {
     })
     it('throws if its second argument exists and is not a string', () => {
       terror(
-        not(many(letter), 0),
+        not(many(letter()), 0),
         '',
         '[not]: expected second argument to be a string; found 0',
       )
     })
     it('fails without changing state if its parser succeeds', () => {
-      tfail(not(letter), 'abc', { index: 0, status: Fail })
-      tfail(not(letter, 'something other than a letter'), 'abc', {
+      tfail(not(letter()), 'abc', { index: 0, status: Fail })
+      tfail(not(letter(), 'something other than a letter'), 'abc', {
         expected: 'something other than a letter',
         index: 0,
         status: Fail,
       })
     })
     it('succeeds without changing state if its parser fails', () => {
-      tpass(not(letter), '123', { result: null, index: 0 })
-      tpass(not(seq(letter, digit())), 'abc', {
+      tpass(not(letter()), '123', { result: null, index: 0 })
+      tpass(not(seq(letter(), digit())), 'abc', {
         result: null, index: 0,
       })
-      tpass(not(letter, 'test'), '123', { result: null, index: 0 })
-      tpass(not(seq(letter, digit()), 'test'), 'abc', {
+      tpass(not(letter(), 'test'), '123', { result: null, index: 0 })
+      tpass(not(seq(letter(), digit()), 'test'), 'abc', {
         result: null, index: 0,
       })
     })

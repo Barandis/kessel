@@ -51,15 +51,15 @@ describe('Sequence combinators', () => {
         '[seq]: expected second argument to be a parser; found 0',
       )
       terror(
-        seq(any(), letter, digit(), {}),
+        seq(any(), letter(), digit(), {}),
         '',
         '[seq]: expected fourth argument to be a parser; found {}',
       )
     })
     it('does not throw if the last argument only is a string', () => {
-      tpass(seq(letter, letter, 'test'), 'abc', ['a', 'b'])
+      tpass(seq(letter(), letter(), 'test'), 'abc', ['a', 'b'])
       terror(
-        seq(any(), 'test', letter),
+        seq(any(), 'test', letter()),
         'abc',
         '[seq]: expected second argument to be a parser; found "test"',
       )
@@ -274,7 +274,7 @@ describe('Sequence combinators', () => {
     })
     it('adds null to the results', () => {
       tpass(
-        many(map(letter, x => x === 'a' ? null : x)),
+        many(map(letter(), x => x === 'a' ? null : x)),
         'abc',
         [null, 'b', 'c'],
       )
@@ -325,19 +325,19 @@ describe('Sequence combinators', () => {
     })
     it('adds null to the results', () => {
       tpass(
-        many1(map(letter, x => x === 'a' ? null : x)),
+        many1(map(letter(), x => x === 'a' ? null : x)),
         'abc',
         [null, 'b', 'c'],
       )
       tpass(
-        many1(map(letter, x => x === 'b' ? null : x)),
+        many1(map(letter(), x => x === 'b' ? null : x)),
         'abc',
         ['a', null, 'c'],
       )
     })
     it('succeeds with a single null result', () => {
       tpass(
-        many1(map(letter, x => x === 'a' ? null : x)), 'a', [null],
+        many1(map(letter(), x => x === 'a' ? null : x)), 'a', [null],
       )
     })
   })
@@ -360,7 +360,7 @@ describe('Sequence combinators', () => {
     })
     it('succeeds with no result if its parser succeeds', () => {
       tpass(skip(char('a')), 'abc', { result: null, index: 1 })
-      tpass(skip(many(letter)), 'abcdef123', { result: null, index: 6 })
+      tpass(skip(many(letter())), 'abcdef123', { result: null, index: 6 })
       tpass(skip(char('a'), 'test'), 'abc', { result: null, index: 1 })
     })
     it('propagates failures without modification', () => {
@@ -381,8 +381,8 @@ describe('Sequence combinators', () => {
   })
 
   describe('sep', () => {
-    const parser = sep(letter, char(','))
-    const parserm = sep(letter, char(','), 'comma separated letters')
+    const parser = sep(letter(), char(','))
+    const parserm = sep(letter(), char(','), 'comma separated letters')
 
     it('throws if its first argument is not a parser', () => {
       terror(
@@ -426,34 +426,34 @@ describe('Sequence combinators', () => {
       tpass(parserm, '1', { result: [], index: 0 })
     })
     it('fails if its content parser fails fatally', () => {
-      tfail(sep(seq(letter, letter), char(',')), 'ab,a1', {
+      tfail(sep(seq(letter(), letter()), char(',')), 'ab,a1', {
         expected: 'a letter',
         index: 4,
         status: Fatal,
       })
-      tfail(sep(seq(letter, letter), char(',')), 'a1', {
+      tfail(sep(seq(letter(), letter()), char(',')), 'a1', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
-      tfail(sep(seq(letter, letter), char(','), 'test'), 'ab,a1', {
+      tfail(sep(seq(letter(), letter()), char(','), 'test'), 'ab,a1', {
         expected: 'test',
         index: 4,
         status: Fatal,
       })
-      tfail(sep(seq(letter, letter), char(','), 'test'), 'a1', {
+      tfail(sep(seq(letter(), letter()), char(','), 'test'), 'a1', {
         expected: 'test',
         index: 1,
         status: Fatal,
       })
     })
     it('fails if its separator parser fails fatally', () => {
-      tfail(sep(letter, seq(char('-'), char('-'))), 'a--b-c', {
+      tfail(sep(letter(), seq(char('-'), char('-'))), 'a--b-c', {
         expected: "'-'",
         index: 5,
         status: Fatal,
       })
-      tfail(sep(letter, seq(char('-'), char('-')), 'test'), 'a--b-c', {
+      tfail(sep(letter(), seq(char('-'), char('-')), 'test'), 'a--b-c', {
         expected: 'test',
         index: 5,
         status: Fatal,
@@ -470,8 +470,8 @@ describe('Sequence combinators', () => {
   })
 
   describe('sep1', () => {
-    const parser = sep1(letter, char(','))
-    const parserm = sep1(letter, char(','), 'comma separated letters')
+    const parser = sep1(letter(), char(','))
+    const parserm = sep1(letter(), char(','), 'comma separated letters')
 
     it('throws if its first argument is not a parser', () => {
       terror(
@@ -523,34 +523,34 @@ describe('Sequence combinators', () => {
       })
     })
     it('fails if its content parser fails fatally', () => {
-      tfail(sep1(seq(letter, letter), char(',')), 'ab,a1', {
+      tfail(sep1(seq(letter(), letter()), char(',')), 'ab,a1', {
         expected: 'a letter',
         index: 4,
         status: Fatal,
       })
-      tfail(sep1(seq(letter, letter), char(',')), 'a1', {
+      tfail(sep1(seq(letter(), letter()), char(',')), 'a1', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
-      tfail(sep1(seq(letter, letter), char(','), 'test'), 'ab,a1', {
+      tfail(sep1(seq(letter(), letter()), char(','), 'test'), 'ab,a1', {
         expected: 'test',
         index: 4,
         status: Fatal,
       })
-      tfail(sep1(seq(letter, letter), char(','), 'test'), 'a1', {
+      tfail(sep1(seq(letter(), letter()), char(','), 'test'), 'a1', {
         expected: 'test',
         index: 1,
         status: Fatal,
       })
     })
     it('fails if its separator parser fails fatally', () => {
-      tfail(sep1(letter, seq(char('-'), char('-'))), 'a--b-c', {
+      tfail(sep1(letter(), seq(char('-'), char('-'))), 'a--b-c', {
         expected: "'-'",
         index: 5,
         status: Fatal,
       })
-      tfail(sep1(letter, seq(char('-'), char('-')), 'test'), 'a--b-c', {
+      tfail(sep1(letter(), seq(char('-'), char('-')), 'test'), 'a--b-c', {
         expected: 'test',
         index: 5,
         status: Fatal,
@@ -567,8 +567,8 @@ describe('Sequence combinators', () => {
   })
 
   describe('end', () => {
-    const parser = end(letter, char(','))
-    const parserm = end(letter, char(','), 'comma separated letters')
+    const parser = end(letter(), char(','))
+    const parserm = end(letter(), char(','), 'comma separated letters')
 
     it('throws if its first argument is not a parser', () => {
       terror(
@@ -612,34 +612,34 @@ describe('Sequence combinators', () => {
       tpass(parserm, '1', { result: [], index: 0 })
     })
     it('fails if its content parser fails fatally', () => {
-      tfail(end(seq(letter, letter), char(',')), 'ab,a1', {
+      tfail(end(seq(letter(), letter()), char(',')), 'ab,a1', {
         expected: 'a letter',
         index: 4,
         status: Fatal,
       })
-      tfail(end(seq(letter, letter), char(',')), 'a1', {
+      tfail(end(seq(letter(), letter()), char(',')), 'a1', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
-      tfail(end(seq(letter, letter), char(','), 'test'), 'ab,a1', {
+      tfail(end(seq(letter(), letter()), char(','), 'test'), 'ab,a1', {
         expected: 'test',
         index: 4,
         status: Fatal,
       })
-      tfail(end(seq(letter, letter), char(','), 'test'), 'a1', {
+      tfail(end(seq(letter(), letter()), char(','), 'test'), 'a1', {
         expected: 'test',
         index: 1,
         status: Fatal,
       })
     })
     it('fails if its separator parser fails fatally', () => {
-      tfail(end(letter, seq(char('-'), char('-'))), 'a--b-c', {
+      tfail(end(letter(), seq(char('-'), char('-'))), 'a--b-c', {
         expected: "'-'",
         index: 5,
         status: Fatal,
       })
-      tfail(end(letter, seq(char('-'), char('-')), 'test'), 'a--b-c', {
+      tfail(end(letter(), seq(char('-'), char('-')), 'test'), 'a--b-c', {
         expected: 'test',
         index: 5,
         status: Fatal,
@@ -656,8 +656,8 @@ describe('Sequence combinators', () => {
   })
 
   describe('end1', () => {
-    const parser = end1(letter, char(','))
-    const parserm = end1(letter, char(','), 'comma separated letters')
+    const parser = end1(letter(), char(','))
+    const parserm = end1(letter(), char(','), 'comma separated letters')
 
     it('throws if its first argument is not a parser', () => {
       terror(
@@ -709,34 +709,34 @@ describe('Sequence combinators', () => {
       })
     })
     it('fails if its content parser fails fatally', () => {
-      tfail(end1(seq(letter, letter), char(',')), 'ab,a1', {
+      tfail(end1(seq(letter(), letter()), char(',')), 'ab,a1', {
         expected: 'a letter',
         index: 4,
         status: Fatal,
       })
-      tfail(end1(seq(letter, letter), char(',')), 'a1', {
+      tfail(end1(seq(letter(), letter()), char(',')), 'a1', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
-      tfail(end1(seq(letter, letter), char(','), 'test'), 'ab,a1', {
+      tfail(end1(seq(letter(), letter()), char(','), 'test'), 'ab,a1', {
         expected: 'test',
         index: 4,
         status: Fatal,
       })
-      tfail(end1(seq(letter, letter), char(','), 'test'), 'a1', {
+      tfail(end1(seq(letter(), letter()), char(','), 'test'), 'a1', {
         expected: 'test',
         index: 1,
         status: Fatal,
       })
     })
     it('fails if its separator parser fails fatally', () => {
-      tfail(end1(letter, seq(char('-'), char('-'))), 'a--b-c', {
+      tfail(end1(letter(), seq(char('-'), char('-'))), 'a--b-c', {
         expected: "'-'",
         index: 5,
         status: Fatal,
       })
-      tfail(end1(letter, seq(char('-'), char('-')), 'test'), 'a--b-c', {
+      tfail(end1(letter(), seq(char('-'), char('-')), 'test'), 'a--b-c', {
         expected: 'test',
         index: 5,
         status: Fatal,
@@ -775,42 +775,42 @@ describe('Sequence combinators', () => {
       )
     })
     it('applies one parser a number of times', () => {
-      tpass(repeat(letter, 5), 'abcdef', ['a', 'b', 'c', 'd', 'e'])
-      tpass(repeat(letter, 2), 'abcdef', ['a', 'b'])
-      tpass(repeat(letter, 0), 'abcdef', [])
-      tpass(repeat(letter, 2, 'two letters'), 'abcdef', ['a', 'b'])
+      tpass(repeat(letter(), 5), 'abcdef', ['a', 'b', 'c', 'd', 'e'])
+      tpass(repeat(letter(), 2), 'abcdef', ['a', 'b'])
+      tpass(repeat(letter(), 0), 'abcdef', [])
+      tpass(repeat(letter(), 2, 'two letters'), 'abcdef', ['a', 'b'])
     })
     it('fails non-fatally if no input was consumed', () => {
-      tfail(repeat(letter, 5), '12345', {
+      tfail(repeat(letter(), 5), '12345', {
         expected: 'a letter',
         index: 0,
         status: Fail,
       })
-      tfail(repeat(letter, 5, 'five letters'), '12345', {
+      tfail(repeat(letter(), 5, 'five letters'), '12345', {
         expected: 'five letters',
         index: 0,
         status: Fail,
       })
     })
     it('fails fatally if the parser fails fatally', () => {
-      tfail(repeat(seq(letter, letter), 5), 'a1b2c3d4e5', {
+      tfail(repeat(seq(letter(), letter()), 5), 'a1b2c3d4e5', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
-      tfail(repeat(seq(letter, letter), 5, 'ten letters'), 'a1b2c3d4e5', {
+      tfail(repeat(seq(letter(), letter()), 5, 'ten letters'), 'a1b2c3d4e5', {
         expected: 'ten letters',
         index: 1,
         status: Fatal,
       })
     })
     it('fails fatally on non-fatal errors if input was consumed', () => {
-      tfail(repeat(letter, 5), 'abc123', {
+      tfail(repeat(letter(), 5), 'abc123', {
         expected: 'a letter',
         index: 3,
         status: Fatal,
       })
-      tfail(repeat(letter, 5, 'five letters'), 'abc123', {
+      tfail(repeat(letter(), 5, 'five letters'), 'abc123', {
         expected: 'five letters',
         index: 3,
         status: Fatal,
@@ -841,54 +841,54 @@ describe('Sequence combinators', () => {
       )
     })
     it('succeeds with content parser results before the end', () => {
-      tpass(until(any(), letter), '12./abc', ['1', '2', '.', '/'])
-      tpass(until(any(), letter, 'test'), '12./abc', ['1', '2', '.', '/'])
+      tpass(until(any(), letter()), '12./abc', ['1', '2', '.', '/'])
+      tpass(until(any(), letter(), 'test'), '12./abc', ['1', '2', '.', '/'])
     })
     it('can succeed with zero successes', () => {
-      tpass(until(any(), letter), 'abc', [])
-      tpass(until(any(), letter, 'test'), 'abc', [])
+      tpass(until(any(), letter()), 'abc', [])
+      tpass(until(any(), letter(), 'test'), 'abc', [])
     })
     it('fails if the content parser fails before the end', () => {
-      tfail(until(digit(), letter), '.123abc', {
+      tfail(until(digit(), letter()), '.123abc', {
         expected: 'a digit or a letter',
         index: 0,
         status: Fail,
       })
-      tfail(until(digit(), letter, 'digits, then a letter'), '.123abc', {
+      tfail(until(digit(), letter(), 'digits, then a letter'), '.123abc', {
         expected: 'digits, then a letter',
         index: 0,
         status: Fail,
       })
     })
     it('fails fatally if input is consumed before content parser fails', () => {
-      tfail(until(digit(), letter), '123.abc', {
+      tfail(until(digit(), letter()), '123.abc', {
         expected: 'a digit or a letter',
         index: 3,
         status: Fatal,
       })
-      tfail(until(digit(), letter, 'digits, then a letter'), '123.abc', {
+      tfail(until(digit(), letter(), 'digits, then a letter'), '123.abc', {
         expected: 'digits, then a letter',
         index: 3,
         status: Fatal,
       })
     })
     it('fails fatally if either of its parsers fail fatally', () => {
-      tfail(until(digit(), seq(letter, digit())), '123abc', {
+      tfail(until(digit(), seq(letter(), digit())), '123abc', {
         expected: 'a digit',
         index: 4,
         status: Fatal,
       })
-      tfail(until(seq(letter, digit()), digit()), 'a1b2cc3', {
+      tfail(until(seq(letter(), digit()), digit()), 'a1b2cc3', {
         expected: 'a digit',
         index: 5,
         status: Fatal,
       })
-      tfail(until(digit(), seq(letter, digit()), 'test'), '123abc', {
+      tfail(until(digit(), seq(letter(), digit()), 'test'), '123abc', {
         expected: 'test',
         index: 4,
         status: Fatal,
       })
-      tfail(until(seq(letter, digit()), digit(), 'test'), 'a1b2cc3', {
+      tfail(until(seq(letter(), digit()), digit(), 'test'), 'a1b2cc3', {
         expected: 'test',
         index: 5,
         status: Fatal,
@@ -896,7 +896,7 @@ describe('Sequence combinators', () => {
     })
     it('adds null to the results', () => {
       tpass(
-        until(alt(letter, skip(space)), digit()),
+        until(alt(letter(), skip(space)), digit()),
         'a b c 1',
         ['a', null, 'b', null, 'c', null],
       )
@@ -968,7 +968,7 @@ describe('Sequence combinators', () => {
         index: 4,
         status: Fatal,
       })
-      tfail(assocL(p, seq(letter, letter), 0), '23a1', {
+      tfail(assocL(p, seq(letter(), letter()), 0), '23a1', {
         expected: 'a letter',
         index: 3,
         status: Fatal,
@@ -983,7 +983,7 @@ describe('Sequence combinators', () => {
         index: 4,
         status: Fatal,
       })
-      tfail(assocL(p, seq(letter, letter), 0, 'an expression'), '23a1', {
+      tfail(assocL(p, seq(letter(), letter()), 0, 'an expression'), '23a1', {
         expected: 'an expression',
         index: 3,
         status: Fatal,
@@ -1065,7 +1065,7 @@ describe('Sequence combinators', () => {
         index: 4,
         status: Fatal,
       })
-      tfail(assoc1L(p, seq(letter, letter)), '23a1', {
+      tfail(assoc1L(p, seq(letter(), letter())), '23a1', {
         expected: 'a letter',
         index: 3,
         status: Fatal,
@@ -1080,7 +1080,7 @@ describe('Sequence combinators', () => {
         index: 4,
         status: Fatal,
       })
-      tfail(assoc1L(p, seq(letter, letter), 'an expression'), '23a1', {
+      tfail(assoc1L(p, seq(letter(), letter()), 'an expression'), '23a1', {
         expected: 'an expression',
         index: 3,
         status: Fatal,
@@ -1154,7 +1154,7 @@ describe('Sequence combinators', () => {
         index: 4,
         status: Fatal,
       })
-      tfail(assocR(p, seq(letter, letter), 0), '23a1', {
+      tfail(assocR(p, seq(letter(), letter()), 0), '23a1', {
         expected: 'a letter',
         index: 3,
         status: Fatal,
@@ -1169,7 +1169,7 @@ describe('Sequence combinators', () => {
         index: 4,
         status: Fatal,
       })
-      tfail(assocR(p, seq(letter, letter), 0, 'an expression'), '23a1', {
+      tfail(assocR(p, seq(letter(), letter()), 0, 'an expression'), '23a1', {
         expected: 'an expression',
         index: 3,
         status: Fatal,
@@ -1250,7 +1250,7 @@ describe('Sequence combinators', () => {
         index: 4,
         status: Fatal,
       })
-      tfail(assoc1R(p, seq(letter, letter)), '23a1', {
+      tfail(assoc1R(p, seq(letter(), letter())), '23a1', {
         expected: 'a letter',
         index: 3,
         status: Fatal,
@@ -1265,7 +1265,7 @@ describe('Sequence combinators', () => {
         index: 4,
         status: Fatal,
       })
-      tfail(assoc1R(p, seq(letter, letter), 'an expression'), '23a1', {
+      tfail(assoc1R(p, seq(letter(), letter()), 'an expression'), '23a1', {
         expected: 'an expression',
         index: 3,
         status: Fatal,
@@ -1296,16 +1296,16 @@ describe('Sequence combinators', () => {
       )
     })
     it('returns the result of its left parser if both pass', () => {
-      tpass(left(letter, digit()), 'a1', 'a')
-      tpass(left(letter, digit(), 'test'), 'a1', 'a')
+      tpass(left(letter(), digit()), 'a1', 'a')
+      tpass(left(letter(), digit(), 'test'), 'a1', 'a')
     })
     it('fails non-fatally if one parser fails and no input is consumed', () => {
-      tfail(left(letter, digit()), '1', {
+      tfail(left(letter(), digit()), '1', {
         expected: 'a letter',
         status: Fail,
       })
       tfail(left(eof(), char('a')), '', { expected: "'a'", status: Fail })
-      tfail(left(letter, digit(), 'a letter, then a digit'), '1', {
+      tfail(left(letter(), digit(), 'a letter, then a digit'), '1', {
         expected: 'a letter, then a digit',
         status: Fail,
       })
@@ -1315,22 +1315,24 @@ describe('Sequence combinators', () => {
       })
     })
     it('fails fatally if any input is consumed on failure', () => {
-      tfail(left(seq(letter, letter), digit()), 'a11', {
+      tfail(left(seq(letter(), letter()), digit()), 'a11', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
-      tfail(left(letter, digit()), 'ab', {
+      tfail(left(letter(), digit()), 'ab', {
         expected: 'a digit',
         index: 1,
         status: Fatal,
       })
-      tfail(left(seq(letter, letter), digit(), 'two letters, digit'), 'a11', {
+      tfail(left(
+        seq(letter(), letter()), digit(), 'two letters, digit',
+      ), 'a11', {
         expected: 'two letters, digit',
         index: 1,
         status: Fatal,
       })
-      tfail(left(letter, digit(), 'letter/digit'), 'ab', {
+      tfail(left(letter(), digit(), 'letter/digit'), 'ab', {
         expected: 'letter/digit',
         index: 1,
         status: Fatal,
@@ -1370,13 +1372,16 @@ describe('Sequence combinators', () => {
       )
     })
     it('returns the result of its right parser if both pass', () => {
-      tpass(right(letter, digit()), 'a1', '1')
-      tpass(right(letter, digit(), 'test'), 'a1', '1')
+      tpass(right(letter(), digit()), 'a1', '1')
+      tpass(right(letter(), digit(), 'test'), 'a1', '1')
     })
     it('fails non-fatally if one parser fails and no input is consumed', () => {
-      tfail(right(letter, digit()), '1', { expected: 'a letter', status: Fail })
+      tfail(right(letter(), digit()), '1', {
+        expected: 'a letter',
+        status: Fail,
+      })
       tfail(right(eof(), char('a')), '', { expected: "'a'", status: Fail })
-      tfail(right(letter, digit(), 'a letter, then a digit'), '1', {
+      tfail(right(letter(), digit(), 'a letter, then a digit'), '1', {
         expected: 'a letter, then a digit',
         status: Fail,
       })
@@ -1386,12 +1391,12 @@ describe('Sequence combinators', () => {
       })
     })
     it('fails fatally if any input is consumed on failure', () => {
-      tfail(right(seq(letter, letter), digit()), 'a11', {
+      tfail(right(seq(letter(), letter()), digit()), 'a11', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
-      tfail(right(letter, digit()), 'ab', {
+      tfail(right(letter(), digit()), 'ab', {
         expected: 'a digit',
         index: 1,
         status: Fatal,
@@ -1429,40 +1434,44 @@ describe('Sequence combinators', () => {
       )
     })
     it('passes parser results to a single function', () => {
-      tpass(pipe(letter, a => a.toUpperCase()), 'a', 'A')
-      tpass(pipe(letter, digit(), (a, b) => b + a), 'a1', '1a')
-      tpass(pipe(letter, digit(), letter, (a, b, c) => c + b + a), 'a1b', 'b1a')
-      tpass(pipe(letter, a => a.toUpperCase(), 'test'), 'a', 'A')
+      tpass(pipe(letter(), a => a.toUpperCase()), 'a', 'A')
+      tpass(pipe(letter(), digit(), (a, b) => b + a), 'a1', '1a')
+      tpass(pipe(
+        letter(), digit(), letter(), (a, b, c) => c + b + a,
+      ), 'a1b', 'b1a')
+      tpass(pipe(letter(), a => a.toUpperCase(), 'test'), 'a', 'A')
     })
     it('fails non-fatally if no input is consumed on failure', () => {
-      tfail(pipe(letter, a => a), '1', {
+      tfail(pipe(letter(), a => a), '1', {
         expected: 'a letter',
         index: 0,
         status: Fail,
       })
-      tfail(pipe(letter, a => a, 'a single letter'), '1', {
+      tfail(pipe(letter(), a => a, 'a single letter'), '1', {
         expected: 'a single letter',
         index: 0,
         status: Fail,
       })
-      tfail(pipe(eof(), letter, (a, b) => b + a), '', {
+      tfail(pipe(eof(), letter(), (a, b) => b + a), '', {
         expected: 'a letter',
         index: 0,
         status: Fail,
       })
-      tfail(pipe(eof(), letter, (a, b) => b + a, 'something impossible'), '', {
+      tfail(pipe(
+        eof(), letter(), (a, b) => b + a, 'something impossible',
+      ), '', {
         expected: 'something impossible',
         index: 0,
         status: Fail,
       })
     })
     it('fails fatally if input was consumed on failure', () => {
-      tfail(pipe(letter, digit(), (a, b) => b + a), 'aa', {
+      tfail(pipe(letter(), digit(), (a, b) => b + a), 'aa', {
         expected: 'a digit',
         index: 1,
         status: Fatal,
       })
-      tfail(pipe(letter, digit(), (a, b) => b + a, 'letter, digit'), 'aa', {
+      tfail(pipe(letter(), digit(), (a, b) => b + a, 'letter, digit'), 'aa', {
         expected: 'letter, digit',
         index: 1,
         status: Fatal,
@@ -1544,12 +1553,14 @@ describe('Sequence combinators', () => {
         index: 4,
         status: Fatal,
       })
-      tfail(between(char('('), char(')'), seq(letter, letter)), '(a)', {
+      tfail(between(char('('), char(')'), seq(letter(), letter())), '(a)', {
         expected: 'a letter',
         index: 2,
         status: Fatal,
       })
-      tfail(between(char('('), char(')'), seq(letter, letter), 'test'), '(a)', {
+      tfail(between(
+        char('('), char(')'), seq(letter(), letter()), 'test',
+      ), '(a)', {
         expected: 'test',
         index: 2,
         status: Fatal,

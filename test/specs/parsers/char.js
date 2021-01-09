@@ -649,62 +649,91 @@ describe('Character parsers', () => {
   })
 
   describe('letter', () => {
+    it('throws if its argument exists and is not a string', () => {
+      terror(letter(0), '', '[letter]: expected argument to be a string; '
+        + 'found 0')
+    })
     it('succeeds on uppercase letters', () => {
-      tpass(letter, 'A', 'A')
+      tpass(letter(), 'A', 'A')
+      tpass(letter('test'), 'A', 'A')
     })
     it('succeeds on lowercase letters', () => {
-      tpass(letter, 'a', 'a')
+      tpass(letter(), 'a', 'a')
+      tpass(letter('test'), 'a', 'a')
     })
     it('fails on digits', () => {
-      tfail(letter, '0', 'a letter')
+      tfail(letter(), '0', 'a letter')
+      tfail(letter('test'), '0', 'test')
     })
     it('fails on whitespace', () => {
-      tfail(letter, ' ', 'a letter')
+      tfail(letter(), ' ', 'a letter')
+      tfail(letter('test'), ' ', 'test')
     })
   })
 
   describe('alpha', () => {
+    it('throws if its argument exists and is not a string', () => {
+      terror(alpha(0), '', '[alpha]: expected argument to be a string; found 0')
+    })
     it('succeeds on uppercase letters', () => {
-      tpass(alpha, 'A', 'A')
+      tpass(alpha(), 'A', 'A')
+      tpass(alpha('test'), 'A', 'A')
     })
     it('succeeds on lowercase letters', () => {
-      tpass(alpha, 'a', 'a')
+      tpass(alpha(), 'a', 'a')
+      tpass(alpha('test'), 'a', 'a')
     })
     it('succeeds on digits', () => {
-      tpass(alpha, '0', '0')
+      tpass(alpha(), '0', '0')
+      tpass(alpha('test'), '0', '0')
     })
     it('fails on whitespace', () => {
-      tfail(alpha, ' ', 'an alphanumeric character')
+      tfail(alpha(), ' ', 'an alphanumeric character')
+      tfail(alpha('test'), ' ', 'test')
     })
   })
 
   describe('upper', () => {
+    it('throws if its argument exists and is not a string', () => {
+      terror(upper(0), '', '[upper]: expected argument to be a string; found 0')
+    })
     it('succeeds on uppercase letters', () => {
-      tpass(upper, 'A', 'A')
+      tpass(upper(), 'A', 'A')
+      tpass(upper('test'), 'A', 'A')
     })
     it('fails on lowercase letters', () => {
-      tfail(upper, 'a', 'an uppercase letter')
+      tfail(upper(), 'a', 'an uppercase letter')
+      tfail(upper('test'), 'a', 'test')
     })
     it('fails on digits', () => {
-      tfail(upper, '0', 'an uppercase letter')
+      tfail(upper(), '0', 'an uppercase letter')
+      tfail(upper('test'), '0', 'test')
     })
     it('fails on whitespace', () => {
-      tfail(upper, ' ', 'an uppercase letter')
+      tfail(upper(), ' ', 'an uppercase letter')
+      tfail(upper('test'), ' ', 'test')
     })
   })
 
   describe('lower', () => {
+    it('throws if its argument exists and is not a string', () => {
+      terror(lower(0), '', '[lower]: expected argument to be a string; found 0')
+    })
     it('fails on uppercase letters', () => {
-      tfail(lower, 'A', 'a lowercase letter')
+      tfail(lower(), 'A', 'a lowercase letter')
+      tfail(lower('test'), 'A', 'test')
     })
     it('succeeds on lowercase letters', () => {
-      tpass(lower, 'a', 'a')
+      tpass(lower(), 'a', 'a')
+      tpass(lower('test'), 'a', 'a')
     })
     it('fails on digits', () => {
-      tfail(lower, '0', 'a lowercase letter')
+      tfail(lower(), '0', 'a lowercase letter')
+      tfail(lower('test'), '0', 'test')
     })
     it('fails on whitespace', () => {
-      tfail(lower, ' ', 'a lowercase letter')
+      tfail(lower(), ' ', 'a lowercase letter')
+      tfail(lower('test'), ' ', 'test')
     })
   })
 })

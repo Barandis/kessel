@@ -962,6 +962,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#parameters" class="md-nav__link">
+    Parameters
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#success" class="md-nav__link">
     Success
   </a>
@@ -971,6 +978,13 @@
         <li class="md-nav__item">
   <a href="#failure" class="md-nav__link">
     Failure
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#throws" class="md-nav__link">
+    Throws
   </a>
   
 </li>
@@ -1978,6 +1992,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#parameters" class="md-nav__link">
+    Parameters
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#success" class="md-nav__link">
     Success
   </a>
@@ -1987,6 +2008,13 @@
         <li class="md-nav__item">
   <a href="#failure" class="md-nav__link">
     Failure
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#throws" class="md-nav__link">
+    Throws
   </a>
   
 </li>
@@ -2021,7 +2049,7 @@
 -->
 
 <blockquote>
-<p><code>letter: Parser&lt;string&gt;</code></p>
+<p><code>letter(m?: string): Parser</code></p>
 </blockquote>
 <p>Parses an ASCII letter (<code>a-z</code> or <code>A-Z</code>).</p>
 <p>This does not parse UTF-8 letters in general. Use <a href="../letteru/"><code>letterU</code></a> for that.</p>
@@ -2040,6 +2068,10 @@
                         <span class="c1">// ^</span>
                         <span class="c1">// Expected a letter</span>
 </code></pre></div>
+<h4 id="parameters">Parameters</h4>
+<ul>
+<li><code>m</code>: The optional expected error message that will take the place of the default error message.</li>
+</ul>
 <h4 id="success">Success</h4>
 <ul>
 <li>Succeeds if the next character is an ASCII letter (<code>a-z</code> or <code>A-Z</code>). Consumes and returns that character.</li>
@@ -2047,6 +2079,10 @@
 <h4 id="failure">Failure</h4>
 <ul>
 <li>Fails if the next character is any other character.</li>
+</ul>
+<h4 id="throws">Throws</h4>
+<ul>
+<li>Throws an error if <code>m</code> exists and is not a string.</li>
 </ul>
 <h4 id="see-also">See Also</h4>
 <ul>

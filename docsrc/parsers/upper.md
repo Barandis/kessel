@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `upper: Parser<string>`
+> `upper(m?: string): Parser`
 
 Parses an ASCII uppercase letter (`A-Z`).
 
@@ -29,6 +29,10 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Expected an uppercase letter
 ```
 
+#### Parameters
+
+* `m`: The optional expected error message that will take the place of the default error message.
+
 #### Success
 
 * Succeeds if the next character is an ASCII uppercase letter (`A-Z`). Consumes and returns that character.
@@ -36,6 +40,10 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 #### Failure
 
 * Fails if the next character is any other character.
+
+#### Throws
+
+* Throws an error if `m` exists and is not a string.
 
 #### See Also
 

@@ -322,48 +322,78 @@ export const octal = m => parser(ctx => {
  * A parser that reads a character and succeeds with that character if
  * it is an ASCII letter.
  *
- * @type {Parser}
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
+ * @returns {Parser} A parser that succeeds if the next character is a
+ *     letter.
  */
-export const letter = parser(ctx => {
+export const letter = m => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && hasM && assertString('letter', m, argStrFormatter())
+
   const fn = c => c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z'
-  const [cprep, [cpctx, cpres]] = dup(charParser(fn)(ctx))
-  return cpres.status === Ok ? cprep : failReply(cpctx, expecteds.letter)
+  const [crep, [cctx, cres]] = dup(charParser(fn)(ctx))
+  return cres.status === Ok
+    ? crep
+    : failReply(cctx, ferror(m, expecteds.letter))
 })
 
 /**
  * A parser that reads a character and succeeds with that character if
  * it is an ASCII alphanumeric character.
  *
- * @type {Parser}
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
+ * @returns {Parser} A parser that succeeds if the next character is an
+ *     alphanumeric character.
  */
-export const alpha = parser(ctx => {
+export const alpha = m => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && hasM && assertString('alpha', m, argStrFormatter())
+
   const fn = c => c >= 'a' && c <= 'z'
     || c >= 'A' && c <= 'Z'
     || c >= '0' && c <= '9'
-  const [cprep, [cpctx, cpres]] = dup(charParser(fn)(ctx))
-  return cpres.status === Ok ? cprep : failReply(cpctx, expecteds.alpha)
+  const [crep, [cctx, cres]] = dup(charParser(fn)(ctx))
+  return cres.status === Ok ? crep : failReply(cctx, ferror(m, expecteds.alpha))
 })
 
 /**
  * A parser that reads a character and succeeds with that character if
  * it is an ASCII uppercase letter.
  *
- * @type {Parser}
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
+ * @returns {Parser} A parser that succeeds if the next character is an
+ *     uppercase letter.
  */
-export const upper = parser(ctx => {
+export const upper = m => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && hasM && assertString('upper', m, argStrFormatter())
+
   const fn = c => c >= 'A' && c <= 'Z'
-  const [cprep, [cpctx, cpres]] = dup(charParser(fn)(ctx))
-  return cpres.status === Ok ? cprep : failReply(cpctx, expecteds.upper)
+  const [crep, [cctx, cres]] = dup(charParser(fn)(ctx))
+  return cres.status === Ok ? crep : failReply(cctx, ferror(m, expecteds.upper))
 })
 
 /**
  * A parser that reads a character and succeeds with that character if
  * it is an ASCII lowercase letter.
  *
- * @type {Parser}
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
+ * @returns {Parser} A parser that succeeds if the next character is a
+ *     lowercase letter.
  */
-export const lower = parser(ctx => {
+export const lower = m => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && hasM && assertString('lower', m, argStrFormatter())
+
   const fn = c => c >= 'a' && c <= 'z'
-  const [cprep, [cpctx, cpres]] = dup(charParser(fn)(ctx))
-  return cpres.status === Ok ? cprep : failReply(cpctx, expecteds.lower)
+  const [crep, [cctx, cres]] = dup(charParser(fn)(ctx))
+  return cres.status === Ok ? crep : failReply(cctx, ferror(m, expecteds.lower))
 })

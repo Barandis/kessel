@@ -121,7 +121,7 @@ describe('Backtracking and error handling combinators', () => {
         '[seqB]: expected second argument to be a parser; found 0',
       )
       terror(
-        seqB(any(), letter, digit(), {}),
+        seqB(any(), letter(), digit(), {}),
         '',
         '[seqB]: expected fourth argument to be a parser; found {}',
       )
@@ -169,7 +169,7 @@ describe('Backtracking and error handling combinators', () => {
       })
     })
     it('still fails fatally if any of its parsers does', () => {
-      const parser = seqB(seq(letter, digit()), letter, digit())
+      const parser = seqB(seq(letter(), digit()), letter(), digit())
       tfail(parser, 'aaa1', { expected: 'a digit', index: 1, status: Fatal })
     })
     it('gives opt error messages if later parsers fail', () => {
@@ -262,22 +262,24 @@ describe('Backtracking and error handling combinators', () => {
       })
     })
     it('still fails fatally if either parser fails fatally', () => {
-      tfail(chainB(seq(letter, digit()), () => letter), 'aaa', {
+      tfail(chainB(seq(letter(), digit()), () => letter()), 'aaa', {
         expected: 'a digit',
         index: 1,
         status: Fatal,
       })
-      tfail(chainB(seq(letter, digit()), () => letter, '\\w\\d\\w'), 'aaa', {
+      tfail(chainB(
+        seq(letter(), digit()), () => letter(), '\\w\\d\\w',
+      ), 'aaa', {
         expected: '\\w\\d\\w',
         index: 1,
         status: Fatal,
       })
-      tfail(chainB(letter, c => seq(char(c), char(c))), 'aab', {
+      tfail(chainB(letter(), c => seq(char(c), char(c))), 'aab', {
         expected: "'a'",
         index: 2,
         status: Fatal,
       })
-      tfail(chainB(letter, c => seq(char(c), char(c)), 'letter, cc'), 'aab', {
+      tfail(chainB(letter(), c => seq(char(c), char(c)), 'letter, cc'), 'aab', {
         expected: 'letter, cc',
         index: 2,
         status: Fatal,
@@ -345,22 +347,22 @@ describe('Backtracking and error handling combinators', () => {
       })
     })
     it('fails fatally if one of its parsers fails fatally', () => {
-      tfail(applyB(left(letter, letter), char('b')), 'a1b', {
+      tfail(applyB(left(letter(), letter()), char('b')), 'a1b', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
-      tfail(applyB(left(letter, letter), char('b'), '\\w\\wb'), 'a1b', {
+      tfail(applyB(left(letter(), letter()), char('b'), '\\w\\wb'), 'a1b', {
         expected: '\\w\\wb',
         index: 1,
         status: Fatal,
       })
-      tfail(applyB(char('a'), left(letter, letter)), 'ab1', {
+      tfail(applyB(char('a'), left(letter(), letter())), 'ab1', {
         expected: 'a letter',
         index: 2,
         status: Fatal,
       })
-      tfail(applyB(char('a'), left(letter, letter), 'a\\w\\w'), 'ab1', {
+      tfail(applyB(char('a'), left(letter(), letter()), 'a\\w\\w'), 'ab1', {
         expected: 'a\\w\\w',
         index: 2,
         status: Fatal,
@@ -405,12 +407,15 @@ describe('Backtracking and error handling combinators', () => {
       )
     })
     it('returns the result of its left parser if both pass', () => {
-      tpass(leftB(letter, digit()), 'a1', 'a')
-      tpass(leftB(letter, digit(), 'test'), 'a1', 'a')
+      tpass(leftB(letter(), digit()), 'a1', 'a')
+      tpass(leftB(letter(), digit(), 'test'), 'a1', 'a')
     })
     it('fails non-fatally if one parser fails and no input is consumed', () => {
-      tfail(leftB(letter, digit()), '1', { expected: 'a letter', status: Fail })
-      tfail(leftB(letter, digit(), 'letter then digit'), '1', {
+      tfail(leftB(letter(), digit()), '1', {
+        expected: 'a letter',
+        status: Fail,
+      })
+      tfail(leftB(letter(), digit(), 'letter then digit'), '1', {
         expected: 'letter then digit',
         status: Fail,
       })
@@ -421,13 +426,13 @@ describe('Backtracking and error handling combinators', () => {
       })
     })
     it('fails non-fatally on non-fatal errors after consumption', () => {
-      tfail(leftB(letter, digit()), 'aa', {
+      tfail(leftB(letter(), digit()), 'aa', {
         nested: 'a digit',
         index: 0,
         ctxindex: 1,
         status: Fail,
       })
-      tfail(leftB(letter, digit(), 'letter then digit'), 'aa', {
+      tfail(leftB(letter(), digit(), 'letter then digit'), 'aa', {
         compound: 'letter then digit',
         index: 0,
         ctxindex: 1,
@@ -435,22 +440,22 @@ describe('Backtracking and error handling combinators', () => {
       })
     })
     it('still fails fatally if either parser fails fatally', () => {
-      tfail(leftB(seq(letter, letter), digit()), 'a11', {
+      tfail(leftB(seq(letter(), letter()), digit()), 'a11', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
-      tfail(leftB(seq(letter, letter), digit(), '\\w\\w\\d'), 'a11', {
+      tfail(leftB(seq(letter(), letter()), digit(), '\\w\\w\\d'), 'a11', {
         expected: '\\w\\w\\d',
         index: 1,
         status: Fatal,
       })
-      tfail(leftB(letter, seq(letter, digit())), 'aab', {
+      tfail(leftB(letter(), seq(letter(), digit())), 'aab', {
         expected: 'a digit',
         index: 2,
         status: Fatal,
       })
-      tfail(leftB(letter, seq(letter, digit()), '\\w\\w\\d'), 'aab', {
+      tfail(leftB(letter(), seq(letter(), digit()), '\\w\\w\\d'), 'aab', {
         expected: '\\w\\w\\d',
         index: 2,
         status: Fatal,
@@ -488,15 +493,15 @@ describe('Backtracking and error handling combinators', () => {
       )
     })
     it('returns the result of its right parser if both pass', () => {
-      tpass(rightB(letter, digit()), 'a1', '1')
-      tpass(rightB(letter, digit(), 'test'), 'a1', '1')
+      tpass(rightB(letter(), digit()), 'a1', '1')
+      tpass(rightB(letter(), digit(), 'test'), 'a1', '1')
     })
     it('fails non-fatally if one parser fails and no input is consumed', () => {
-      tfail(rightB(letter, digit()), '1', {
+      tfail(rightB(letter(), digit()), '1', {
         expected: 'a letter',
         status: Fail,
       })
-      tfail(rightB(letter, digit(), 'letter then digit'), '1', {
+      tfail(rightB(letter(), digit(), 'letter then digit'), '1', {
         expected: 'letter then digit',
         status: Fail,
       })
@@ -507,13 +512,13 @@ describe('Backtracking and error handling combinators', () => {
       })
     })
     it('fails non-fatally on non-fatal errors after consumption', () => {
-      tfail(rightB(letter, digit()), 'aa', {
+      tfail(rightB(letter(), digit()), 'aa', {
         nested: 'a digit',
         index: 0,
         ctxindex: 1,
         status: Fail,
       })
-      tfail(rightB(letter, digit(), 'letter then digit'), 'aa', {
+      tfail(rightB(letter(), digit(), 'letter then digit'), 'aa', {
         compound: 'letter then digit',
         index: 0,
         ctxindex: 1,
@@ -521,22 +526,22 @@ describe('Backtracking and error handling combinators', () => {
       })
     })
     it('still fails fatally if either parser fails fatally', () => {
-      tfail(rightB(seq(letter, letter), digit()), 'a11', {
+      tfail(rightB(seq(letter(), letter()), digit()), 'a11', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
-      tfail(rightB(seq(letter, letter), digit(), '\\w\\w\\d'), 'a11', {
+      tfail(rightB(seq(letter(), letter()), digit(), '\\w\\w\\d'), 'a11', {
         expected: '\\w\\w\\d',
         index: 1,
         status: Fatal,
       })
-      tfail(rightB(letter, seq(letter, digit())), 'aab', {
+      tfail(rightB(letter(), seq(letter(), digit())), 'aab', {
         expected: 'a digit',
         index: 2,
         status: Fatal,
       })
-      tfail(rightB(letter, seq(letter, digit()), '\\w\\w\\d'), 'aab', {
+      tfail(rightB(letter(), seq(letter(), digit()), '\\w\\w\\d'), 'aab', {
         expected: '\\w\\w\\d',
         index: 2,
         status: Fatal,
@@ -574,43 +579,43 @@ describe('Backtracking and error handling combinators', () => {
       )
     })
     it('applies one parser a number of times', () => {
-      tpass(repeatB(letter, 5), 'abcdef', ['a', 'b', 'c', 'd', 'e'])
-      tpass(repeatB(letter, 2), 'abcdef', ['a', 'b'])
-      tpass(repeatB(letter, 0), 'abcdef', [])
-      tpass(repeatB(letter, 2, 'test'), 'abcdef', ['a', 'b'])
+      tpass(repeatB(letter(), 5), 'abcdef', ['a', 'b', 'c', 'd', 'e'])
+      tpass(repeatB(letter(), 2), 'abcdef', ['a', 'b'])
+      tpass(repeatB(letter(), 0), 'abcdef', [])
+      tpass(repeatB(letter(), 2, 'test'), 'abcdef', ['a', 'b'])
     })
     it('fails non-fatally if no input was consumed', () => {
-      tfail(repeatB(letter, 5), '12345', {
+      tfail(repeatB(letter(), 5), '12345', {
         expected: 'a letter',
         index: 0,
         status: Fail,
       })
-      tfail(repeatB(letter, 5, 'five letters'), '12345', {
+      tfail(repeatB(letter(), 5, 'five letters'), '12345', {
         expected: 'five letters',
         index: 0,
         status: Fail,
       })
     })
     it('fails fatally if the parser fails fatally', () => {
-      tfail(repeatB(seq(letter, letter), 5), 'a1b2c3d4e5', {
+      tfail(repeatB(seq(letter(), letter()), 5), 'a1b2c3d4e5', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
-      tfail(repeatB(seq(letter, letter), 5, 'ten letters'), 'a1b2c3d4e5', {
+      tfail(repeatB(seq(letter(), letter()), 5, 'ten letters'), 'a1b2c3d4e5', {
         expected: 'ten letters',
         index: 1,
         status: Fatal,
       })
     })
     it('fails non-fatally on non-fatal errors if input was consumed', () => {
-      tfail(repeatB(letter, 5), 'abc123', {
+      tfail(repeatB(letter(), 5), 'abc123', {
         nested: 'a letter',
         index: 0,
         ctxindex: 3,
         status: Fail,
       })
-      tfail(repeatB(letter, 5, 'five letters'), 'abc123', {
+      tfail(repeatB(letter(), 5, 'five letters'), 'abc123', {
         compound: 'five letters',
         index: 0,
         ctxindex: 3,
@@ -642,33 +647,33 @@ describe('Backtracking and error handling combinators', () => {
       )
     })
     it('succeeds with content parser results before the end', () => {
-      tpass(untilB(any(), letter), '12./abc', ['1', '2', '.', '/'])
-      tpass(untilB(any(), letter, 'test'), '12./abc', ['1', '2', '.', '/'])
+      tpass(untilB(any(), letter()), '12./abc', ['1', '2', '.', '/'])
+      tpass(untilB(any(), letter(), 'test'), '12./abc', ['1', '2', '.', '/'])
     })
     it('can succeed with zero successes', () => {
-      tpass(untilB(any(), letter), 'abc', [])
-      tpass(untilB(any(), letter, 'test'), 'abc', [])
+      tpass(untilB(any(), letter()), 'abc', [])
+      tpass(untilB(any(), letter(), 'test'), 'abc', [])
     })
     it('fails if the content parser fails before the end', () => {
-      tfail(untilB(digit(), letter), '.123abc', {
+      tfail(untilB(digit(), letter()), '.123abc', {
         expected: 'a digit or a letter',
         index: 0,
         status: Fail,
       })
-      tfail(untilB(digit(), letter, 'digit then letter'), '.123abc', {
+      tfail(untilB(digit(), letter(), 'digit then letter'), '.123abc', {
         expected: 'digit then letter',
         index: 0,
         status: Fail,
       })
     })
     it('backtracks if input is consumed before content parser fails', () => {
-      tfail(untilB(digit(), letter), '123.abc', {
+      tfail(untilB(digit(), letter()), '123.abc', {
         nested: 'a digit',
         index: 0,
         ctxindex: 3,
         status: Fail,
       })
-      tfail(untilB(digit(), letter, 'digit then letter'), '123.abc', {
+      tfail(untilB(digit(), letter(), 'digit then letter'), '123.abc', {
         compound: 'digit then letter',
         index: 0,
         ctxindex: 3,
@@ -676,17 +681,17 @@ describe('Backtracking and error handling combinators', () => {
       })
     })
     it('fails fatally if either of its parsers fail fatally', () => {
-      tfail(untilB(digit(), seq(letter, digit())), '123abc', {
+      tfail(untilB(digit(), seq(letter(), digit())), '123abc', {
         expected: 'a digit',
         index: 4,
         status: Fatal,
       })
-      tfail(untilB(digit(), seq(letter, digit()), '\\d\\w\\d'), '123abc', {
+      tfail(untilB(digit(), seq(letter(), digit()), '\\d\\w\\d'), '123abc', {
         expected: '\\d\\w\\d',
         index: 4,
         status: Fatal,
       })
-      tfail(untilB(seq(letter, digit()), digit(), '\\w\\d\\d'), 'a1b2cc3', {
+      tfail(untilB(seq(letter(), digit()), digit(), '\\w\\d\\d'), 'a1b2cc3', {
         expected: '\\w\\d\\d',
         index: 5,
         status: Fatal,
@@ -835,42 +840,44 @@ describe('Backtracking and error handling combinators', () => {
       )
     })
     it('passes parser results to a single function', () => {
-      tpass(pipeB(letter, a => a.toUpperCase()), 'a', 'A')
-      tpass(pipeB(letter, digit(), (a, b) => b + a), 'a1', '1a')
+      tpass(pipeB(letter(), a => a.toUpperCase()), 'a', 'A')
+      tpass(pipeB(letter(), digit(), (a, b) => b + a), 'a1', '1a')
       tpass(pipeB(
-        letter, digit(), letter, (a, b, c) => c + b + a,
+        letter(), digit(), letter(), (a, b, c) => c + b + a,
       ), 'a1b', 'b1a')
-      tpass(pipeB(letter, digit(), (a, b) => b + a, 'test'), 'a1', '1a')
+      tpass(pipeB(letter(), digit(), (a, b) => b + a, 'test'), 'a1', '1a')
     })
     it('fails non-fatally if no input is consumed on failure', () => {
-      tfail(pipeB(letter, a => a), '1', {
+      tfail(pipeB(letter(), a => a), '1', {
         expected: 'a letter',
         index: 0,
         status: Fail,
       })
-      tfail(pipeB(letter, a => a, 'some letter'), '1', {
+      tfail(pipeB(letter(), a => a, 'some letter'), '1', {
         expected: 'some letter',
         index: 0,
         status: Fail,
       })
-      tfail(pipeB(eof(), letter, (a, b) => b + a), '', {
+      tfail(pipeB(eof(), letter(), (a, b) => b + a), '', {
         expected: 'a letter',
         index: 0,
         status: Fail,
       })
-      tfail(pipeB(eof(), letter, (a, b) => b + a, 'something impossible'), '', {
+      tfail(pipeB(
+        eof(), letter(), (a, b) => b + a, 'something impossible',
+      ), '', {
         expected: 'something impossible',
         index: 0,
         status: Fail,
       })
     })
     it('fails non-fatally if input was consumed on non-fatal failure', () => {
-      tfail(pipeB(letter, digit(), (a, b) => b + a), 'aa', {
+      tfail(pipeB(letter(), digit(), (a, b) => b + a), 'aa', {
         nested: 'a digit',
         index: 0,
         status: Fail,
       })
-      tfail(pipeB(letter, digit(), (a, b) => b + a, 'letter, digit'), 'aa', {
+      tfail(pipeB(letter(), digit(), (a, b) => b + a, 'letter, digit'), 'aa', {
         compound: 'letter, digit',
         index: 0,
         status: Fail,
@@ -878,13 +885,13 @@ describe('Backtracking and error handling combinators', () => {
     })
     it('fails fatally if one of its parsers fails fatally', () => {
       tfail(
-        pipeB(letter, seq(digit(), digit()), (a, [b1, b2]) => b1 + b2 + a),
+        pipeB(letter(), seq(digit(), digit()), (a, [b1, b2]) => b1 + b2 + a),
         'a1b',
         { expected: 'a digit', index: 2, status: Fatal },
       )
       tfail(
         pipeB(
-          letter, seq(digit(), digit()), (a, [b1, b2]) => b1 + b2 + a, 'test',
+          letter(), seq(digit(), digit()), (a, [b1, b2]) => b1 + b2 + a, 'test',
         ),
         'a1b',
         { expected: 'test', index: 2, status: Fatal },
@@ -977,25 +984,29 @@ describe('Backtracking and error handling combinators', () => {
       })
     })
     it('fails fatally if one of its parsers fails fatally', () => {
-      tfail(betweenB(char('('), char(')'), seq(letter, letter)), '(a)', {
+      tfail(betweenB(char('('), char(')'), seq(letter(), letter())), '(a)', {
         expected: 'a letter',
         index: 2,
         status: Fatal,
       })
-      tfail(betweenB(char('('), char(')'), seq(letter, letter), 'zzz'), '(a)', {
+      tfail(betweenB(
+        char('('), char(')'), seq(letter(), letter()), 'zzz',
+      ), '(a)', {
         expected: 'zzz',
         index: 2,
         status: Fatal,
       })
       tfail(
-        betweenB(char('('), seq(char(')'), char(')')), letter), '(a)', {
+        betweenB(char('('), seq(char(')'), char(')')), letter()), '(a)', {
           expected: "')'",
           index: 3,
           status: Fatal,
         },
       )
       tfail(
-        betweenB(char('('), seq(char(')'), char(')')), letter, 'zzz'), '(a)', {
+        betweenB(
+          char('('), seq(char(')'), char(')')), letter(), 'zzz',
+        ), '(a)', {
           expected: 'zzz',
           index: 3,
           status: Fatal,
