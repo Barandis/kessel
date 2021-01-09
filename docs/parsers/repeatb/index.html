@@ -1247,8 +1247,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#fatal-failre" class="md-nav__link">
-    Fatal Failre
+  <a href="#fatal-failure" class="md-nav__link">
+    Fatal Failure
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#throws" class="md-nav__link">
+    Throws
   </a>
   
 </li>
@@ -2049,8 +2056,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#fatal-failre" class="md-nav__link">
-    Fatal Failre
+  <a href="#fatal-failure" class="md-nav__link">
+    Fatal Failure
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#throws" class="md-nav__link">
+    Throws
   </a>
   
 </li>
@@ -2085,7 +2099,7 @@
 -->
 
 <blockquote>
-<p><code>repeatB(p: Parser&lt;T&gt;, n: number): Parser&lt;[T]&gt;</code></p>
+<p><code>repeatB(p: Parser, n: number, m?: string): Parser</code></p>
 </blockquote>
 <p>Applies a parser a certain number of times, collecting the results into an array to return.</p>
 <p>The parser <code>p</code> must succeed the full <code>n</code> times for <code>repeatB</code> to succeed. Any fewer successes results in failure. Any input that is consumed in the process will be backtracked.</p>
@@ -2122,6 +2136,7 @@
 <ul>
 <li><code>p</code>: The parser to apply. Its results are returned in an array.</li>
 <li><code>n</code>: The number of times that <code>p</code> is applied.</li>
+<li><code>m</code>: The optional expected error message that will take the place of the default error message.</li>
 </ul>
 <h4 id="success">Success</h4>
 <ul>
@@ -2131,9 +2146,15 @@
 <ul>
 <li>Fails if <code>p</code> fails before it has succeeded <code>n</code> times. If any input was consumed, backtracking will occur and an additional error message will be provided that details the circumstances of the backtracking.</li>
 </ul>
-<h4 id="fatal-failre">Fatal Failre</h4>
+<h4 id="fatal-failure">Fatal Failure</h4>
 <ul>
 <li>Fails fatally if <code>p</code> fails fatally before it has succeeded <code>n</code> times.</li>
+</ul>
+<h4 id="throws">Throws</h4>
+<ul>
+<li>Throws an error if <code>p</code> is not a parser.</li>
+<li>Throws an error if <code>n</code> is not a number.</li>
+<li>Throws an error if <code>m</code> exists and is not a string.</li>
 </ul>
 <h4 id="see-also">See Also</h4>
 <ul>

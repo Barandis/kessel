@@ -550,24 +550,37 @@ describe('Backtracking and error handling combinators', () => {
       terror(
         repeatB(0, 5),
         '',
-        '[repeatB]: expected 1st argument to be a parser; found 0',
+        '[repeatB]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a number', () => {
       terror(
         repeatB(any, '3'),
         '',
-        '[repeatB]: expected 2nd argument to be a number; found "3"',
+        '[repeatB]: expected second argument to be a number; found "3"',
+      )
+    })
+    it('throws if its third argument exists and is not a string', () => {
+      terror(
+        repeatB(any, 3, 0),
+        '',
+        '[repeatB]: expected third argument to be a string; found 0',
       )
     })
     it('applies one parser a number of times', () => {
       tpass(repeatB(letter, 5), 'abcdef', ['a', 'b', 'c', 'd', 'e'])
       tpass(repeatB(letter, 2), 'abcdef', ['a', 'b'])
       tpass(repeatB(letter, 0), 'abcdef', [])
+      tpass(repeatB(letter, 2, 'test'), 'abcdef', ['a', 'b'])
     })
     it('fails non-fatally if no input was consumed', () => {
       tfail(repeatB(letter, 5), '12345', {
         expected: 'a letter',
+        index: 0,
+        status: Fail,
+      })
+      tfail(repeatB(letter, 5, 'five letters'), '12345', {
+        expected: 'five letters',
         index: 0,
         status: Fail,
       })
@@ -578,15 +591,25 @@ describe('Backtracking and error handling combinators', () => {
         index: 1,
         status: Fatal,
       })
+      tfail(repeatB(seq(letter, letter), 5, 'ten letters'), 'a1b2c3d4e5', {
+        expected: 'ten letters',
+        index: 1,
+        status: Fatal,
+      })
     })
     it('fails non-fatally on non-fatal errors if input was consumed', () => {
-      const [ctx, result] = parse(repeatB(letter, 5), 'abc123')
-      const err = result.errors[0]
-
-      expect(ctx.index).to.equal(0)
-      expect(result.status).to.equal(Fail)
-      expect(err.ctx.index).to.equal(3)
-      expect(err.errors[0].label).to.equal('a letter')
+      tfail(repeatB(letter, 5), 'abc123', {
+        nested: 'a letter',
+        index: 0,
+        ctxindex: 3,
+        status: Fail,
+      })
+      tfail(repeatB(letter, 5, 'five letters'), 'abc123', {
+        compound: 'five letters',
+        index: 0,
+        ctxindex: 3,
+        status: Fail,
+      })
     })
   })
 

@@ -5,6 +5,7 @@
 
 import {
   argFnFormatter,
+  argNumFormatter,
   argParFormatter,
   argStrFormatter,
   assertFunction,
@@ -15,7 +16,6 @@ import {
   assertString,
   formatter,
   ordFnFormatter,
-  ordNumFormatter,
   ordParFormatter,
 } from 'kessel/assert'
 import { failReply, fatalReply, okReply, parser, Status } from 'kessel/core'
@@ -303,26 +303,28 @@ export const rightB = (p, q, m) => parser(ctx => {
  *
  * @param {Parser} p A parser to execute multiple times.
  * @param {number} n The number of times to execute the parser.
+ * @param {string} [m] The error message to use if the parser fails.
  * @returns {Parser} A parser that executes `p` `n` times and results in
  *     an array of all of the successful results of `p`.
  */
-export const repeatB = (p, n) => parser(ctx => {
-  ASSERT && assertParser('repeatB', p, ordParFormatter('1st'))
-  ASSERT && assertNumber('repeatB', n, ordNumFormatter('2nd'))
+export const repeatB = (p, n, m) => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && assertParser('repeatB', p, argParFormatter(1, true))
+  ASSERT && assertNumber('repeatB', n, argNumFormatter(2, true))
+  ASSERT && hasM && assertString('repeatB', m, argStrFormatter(3, true))
 
   const index = ctx.index
   const values = []
   let context = ctx
 
   for (const _ of range(n)) {
-    const [prep, [pctx, pres]] = dup(p(context))
+    const [pctx, pres] = p(context)
     context = pctx
-    if (pres.status === Fatal) return prep
+    if (pres.status === Fatal) return fatalReply(pctx, ferror(m, pres.errors))
     if (pres.status === Fail) {
-      const err = index === context.index
-        ? pres.errors
-        : nested(context, pres.errors)
-      return failReply(context, err, index)
+      const error = berror(pctx.index !== index, m, pctx, pres.errors)
+      return failReply(pctx, error, index)
     }
     values.push(pres.value)
   }

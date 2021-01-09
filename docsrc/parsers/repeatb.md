@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `repeatB(p: Parser<T>, n: number): Parser<[T]>`
+> `repeatB(p: Parser, n: number, m?: string): Parser`
 
 Applies a parser a certain number of times, collecting the results into an array to return.
 
@@ -47,6 +47,7 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 
 * `p`: The parser to apply. Its results are returned in an array.
 * `n`: The number of times that `p` is applied.
+* `m`: The optional expected error message that will take the place of the default error message.
 
 #### Success
 
@@ -56,9 +57,15 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 
 * Fails if `p` fails before it has succeeded `n` times. If any input was consumed, backtracking will occur and an additional error message will be provided that details the circumstances of the backtracking.
 
-#### Fatal Failre
+#### Fatal Failure
 
 * Fails fatally if `p` fails fatally before it has succeeded `n` times.
+
+#### Throws
+
+* Throws an error if `p` is not a parser.
+* Throws an error if `n` is not a number.
+* Throws an error if `m` exists and is not a string.
 
 #### See Also
 
