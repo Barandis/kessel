@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `lowerU: Parser<string>`
+> `lowerU(m?: string): Parser`
 
 Parses a Unicode lowercase letter.
 
@@ -29,6 +29,10 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Expected a Unicode lowercase letter
 ```
 
+#### Parameters
+
+* `m`: The optional expected error message that will take the place of the default error message.
+
 #### Success
 
 * Succeeds if the next character is a Unicode lowercase letter. Consumes and returns that character.
@@ -36,6 +40,10 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 #### Failure
 
 * Fails if the next character is any other character.
+
+#### Throws
+
+* Throws an error if `m` exists and is not a string.
 
 #### See Also
 

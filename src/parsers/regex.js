@@ -122,11 +122,20 @@ export const regex = (r, m) => parser(ctx => {
  * it is a letter. A letter for this purpose is any character with the
  * Unicode `Alphabetic` property.
  *
- * @type {Parser}
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
+ * @returns {Parser} A parser that succeeds if the next character is a
+ *     letter.
  */
-export const letterU = parser(ctx => {
-  const [rprep, [rpctx, rpres]] = dup(regexParser(reLetter)(ctx))
-  return rpres.status === Ok ? rprep : failReply(rpctx, expecteds.letterU)
+export const letterU = m => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && hasM && assertString('letterU', m, argStrFormatter())
+
+  const [rrep, [rctx, rres]] = dup(regexParser(reLetter)(ctx))
+  return rres.status === Ok
+    ? rrep
+    : failReply(rctx, ferror(m, expecteds.letterU))
 })
 
 /**
@@ -134,11 +143,20 @@ export const letterU = parser(ctx => {
  * it is alphanumeric. A character is alphanumeric if it has either the
  * Unicode `Alphabetic` property or the Unicode `Number` property.
  *
- * @type {Parser}
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
+ * @returns {Parser} A parser that succeeds if the next character is an
+ *     alphanumeric character.
  */
-export const alphaU = parser(ctx => {
-  const [rprep, [rpctx, rpres]] = dup(regexParser(reAlpha)(ctx))
-  return rpres.status === Ok ? rprep : failReply(rpctx, expecteds.alphaU)
+export const alphaU = m => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && hasM && assertString('alphaU', m, argStrFormatter())
+
+  const [rrep, [rctx, rres]] = dup(regexParser(reAlpha)(ctx))
+  return rres.status === Ok
+    ? rrep
+    : failReply(rctx, ferror(m, expecteds.alphaU))
 })
 
 /**
@@ -147,11 +165,20 @@ export const alphaU = parser(ctx => {
  * uppercase if it has the Unicode `Uppercase` property and is titlecase
  * if it has the Unicode `Letter, Titlecase` property.
  *
- * @type {Parser}
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
+ * @returns {Parser} A parser that succeeds if the next character is an
+ *     uppercase letter.
  */
-export const upperU = parser(ctx => {
-  const [rprep, [rpctx, rpres]] = dup(regexParser(reUpper)(ctx))
-  return rpres.status === Ok ? rprep : failReply(rpctx, expecteds.upperU)
+export const upperU = m => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && hasM && assertString('upperU', m, argStrFormatter())
+
+  const [rrep, [rctx, rres]] = dup(regexParser(reUpper)(ctx))
+  return rres.status === Ok
+    ? rrep
+    : failReply(rctx, ferror(m, expecteds.upperU))
 })
 
 /**
@@ -159,11 +186,20 @@ export const upperU = parser(ctx => {
  * it is a lowercase letter. A character is lowercase if it has the
  * Unicode `Lowercase` property.
  *
- * @type {Parser}
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
+ * @returns {Parser} A parser that succeeds if the next character is a
+ *     lowercase letter.
  */
-export const lowerU = parser(ctx => {
-  const [rprep, [rpctx, rpres]] = dup(regexParser(reLower)(ctx))
-  return rpres.status === Ok ? rprep : failReply(rpctx, expecteds.lowerU)
+export const lowerU = m => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && hasM && assertString('lowerU', m, argStrFormatter())
+
+  const [rrep, [rctx, rres]] = dup(regexParser(reLower)(ctx))
+  return rres.status === Ok
+    ? rrep
+    : failReply(rctx, ferror(m, expecteds.lowerU))
 })
 
 /**

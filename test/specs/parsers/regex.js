@@ -4,18 +4,18 @@
 // https://opensource.org/licenses/MIT
 
 import {
+  alphaU,
+  letterU,
+  lowerU,
   newline,
+  newlineU,
   regex,
   space,
   spaces,
   spaces1,
-  alphaU,
-  letterU,
-  lowerU,
-  newlineU,
-  spaceU,
-  spacesU,
   spaces1U,
+  spacesU,
+  spaceU,
   upperU,
 } from 'kessel/parsers/regex'
 import { terror, tfail, tpass } from 'test/helper'
@@ -94,307 +94,358 @@ describe('Regular expression parsers', () => {
   })
 
   describe('letterU', () => {
+    it('throws if it has a non-string argument', () => {
+      terror(letterU(0), '', 'expected argument to be a string; found 0')
+    })
     it('succeeds on a single uppercase letter', () => {
-      tpass(letterU, 'A', 'A') // LATIN CAPITAL LETTER A
-      tpass(letterU, 'Ž', 'Ž') // LATIN CAPITAL LETTER Z WITH CARON
-      tpass(letterU, 'Γ', 'Γ') // GREEK CAPITAL LETTER GAMMA
-      tpass(letterU, 'Л', 'Л') // CYRILLIC CAPITAL LETTER EL
-      tpass(letterU, 'Յ', 'Յ') // ARMENIAN CAPITAL LETTER YI
-      tpass(letterU, 'Ⴄ', 'Ⴄ') // GEORGIAN CAPITAL LETTER EN
-      tpass(letterU, 'Ꮅ', 'Ꮅ') // CHEROKEE LETTER LI
-      tpass(letterU, 'Ⰽ', 'Ⰽ') // GLAGOLITHIC CAPTIAL LETTER KAKO
+      tpass(letterU(), 'A', 'A') // LATIN CAPITAL LETTER A
+      tpass(letterU(), 'Ž', 'Ž') // LATIN CAPITAL LETTER Z WITH CARON
+      tpass(letterU(), 'Γ', 'Γ') // GREEK CAPITAL LETTER GAMMA
+      tpass(letterU(), 'Л', 'Л') // CYRILLIC CAPITAL LETTER EL
+      tpass(letterU(), 'Յ', 'Յ') // ARMENIAN CAPITAL LETTER YI
+      tpass(letterU(), 'Ⴄ', 'Ⴄ') // GEORGIAN CAPITAL LETTER EN
+      tpass(letterU(), 'Ꮅ', 'Ꮅ') // CHEROKEE LETTER LI
+      tpass(letterU(), 'Ⰽ', 'Ⰽ') // GLAGOLITHIC CAPTIAL LETTER KAKO
+      tpass(letterU('test'), 'A', 'A')
     })
     it('succeeds on a single titlecase letter', () => {
       // LATIN CAPITAL LETTER D WITH SMALL LETTER Z WITH CARON
-      tpass(letterU, 'ǅ', 'ǅ')
+      tpass(letterU(), 'ǅ', 'ǅ')
       // LATIN CAPITAL LETTER N WITH SMALL LETTER J
-      tpass(letterU, 'ǋ', 'ǋ')
+      tpass(letterU(), 'ǋ', 'ǋ')
       // GREEK CAPITAL LETTER OMEGA WITH PROSGEGRAMMENI
-      tpass(letterU, 'ῼ', 'ῼ')
+      tpass(letterU(), 'ῼ', 'ῼ')
+      tpass(letterU('test'), 'ǅ', 'ǅ')
     })
     it('succeeds on a single lowercase letter', () => {
-      tpass(letterU, 'a', 'a') // LATIN SMALL LETTER A
-      tpass(letterU, 'ž', 'ž') // LATIN SMALL LETTER Z WITH CARON
-      tpass(letterU, 'γ', 'γ') // GREEK SMALL LETTER GAMMA
-      tpass(letterU, 'л', 'л') // CYRILLIC SMALL LETTER EL
-      tpass(letterU, 'յ', 'յ') // ARMENIAN SMALL LETTER YI
-      tpass(letterU, 'ე', 'ე') // GEORGIAN LETTER EN
-      tpass(letterU, 'ⰽ', 'ⰽ') // GLAGOLITIC SMALL LETTER KAKO
+      tpass(letterU(), 'a', 'a') // LATIN SMALL LETTER A
+      tpass(letterU(), 'ž', 'ž') // LATIN SMALL LETTER Z WITH CARON
+      tpass(letterU(), 'γ', 'γ') // GREEK SMALL LETTER GAMMA
+      tpass(letterU(), 'л', 'л') // CYRILLIC SMALL LETTER EL
+      tpass(letterU(), 'յ', 'յ') // ARMENIAN SMALL LETTER YI
+      tpass(letterU(), 'ე', 'ე') // GEORGIAN LETTER EN
+      tpass(letterU(), 'ⰽ', 'ⰽ') // GLAGOLITIC SMALL LETTER KAKO
+      tpass(letterU('test'), 'a', 'a')
     })
     it('fails on decimal digits', () => {
-      tfail(letterU, '4', 'a Unicode letter')
-      tfail(letterU, '۴', 'a Unicode letter')
-      tfail(letterU, '४', 'a Unicode letter')
-      tfail(letterU, '৪', 'a Unicode letter')
-      tfail(letterU, '๔', 'a Unicode letter')
-      tfail(letterU, '᠔', 'a Unicode letter')
-      tfail(letterU, '𝟜', 'a Unicode letter')
+      tfail(letterU(), '4', 'a Unicode letter')
+      tfail(letterU(), '۴', 'a Unicode letter')
+      tfail(letterU(), '४', 'a Unicode letter')
+      tfail(letterU(), '৪', 'a Unicode letter')
+      tfail(letterU(), '๔', 'a Unicode letter')
+      tfail(letterU(), '᠔', 'a Unicode letter')
+      tfail(letterU(), '𝟜', 'a Unicode letter')
+      tfail(letterU('test'), '4', 'test')
     })
     it('succeeds on a single uppercase letter number', () => {
-      tpass(letterU, 'Ⅳ', 'Ⅳ') // ROMAN NUMERAL FOUR
+      tpass(letterU(), 'Ⅳ', 'Ⅳ') // ROMAN NUMERAL FOUR
+      tpass(letterU('test'), 'Ⅳ', 'Ⅳ')
     })
     it('succeeds on a single lowercase letter number', () => {
-      tpass(letterU, 'ⅳ', 'ⅳ') // SMALL ROMAN NUMERAL FOUR
+      tpass(letterU(), 'ⅳ', 'ⅳ') // SMALL ROMAN NUMERAL FOUR
+      tpass(letterU('test'), 'ⅳ', 'ⅳ')
     })
     it('fails on other numbers', () => {
-      tfail(letterU, '¼', 'a Unicode letter')
-      tfail(letterU, '፬', 'a Unicode letter')
-      tfail(letterU, '⁴', 'a Unicode letter')
-      tfail(letterU, '₄', 'a Unicode letter')
-      tfail(letterU, '④', 'a Unicode letter')
-      tfail(letterU, '❹', 'a Unicode letter')
+      tfail(letterU(), '¼', 'a Unicode letter')
+      tfail(letterU(), '፬', 'a Unicode letter')
+      tfail(letterU(), '⁴', 'a Unicode letter')
+      tfail(letterU(), '₄', 'a Unicode letter')
+      tfail(letterU(), '④', 'a Unicode letter')
+      tfail(letterU(), '❹', 'a Unicode letter')
+      tfail(letterU('test'), '¼', 'test')
     })
     it('fails on whitespace', () => {
-      tfail(letterU, ' ', 'a Unicode letter')
-      tfail(letterU, '\t', 'a Unicode letter')
-      tfail(letterU, '\n', 'a Unicode letter')
-      tfail(letterU, ' ', 'a Unicode letter')
-      tfail(letterU, '\u2003', 'a Unicode letter')
-      tfail(letterU, '\u202f', 'a Unicode letter')
+      tfail(letterU(), ' ', 'a Unicode letter')
+      tfail(letterU(), '\t', 'a Unicode letter')
+      tfail(letterU(), '\n', 'a Unicode letter')
+      tfail(letterU(), ' ', 'a Unicode letter')
+      tfail(letterU(), '\u2003', 'a Unicode letter')
+      tfail(letterU(), '\u202f', 'a Unicode letter')
+      tfail(letterU('test'), ' ', 'test')
     })
     it('fails on punctuation', () => {
-      tfail(letterU, '(', 'a Unicode letter')
-      tfail(letterU, '｢', 'a Unicode letter')
-      tfail(letterU, ')', 'a Unicode letter')
-      tfail(letterU, '｣', 'a Unicode letter')
-      tfail(letterU, '!', 'a Unicode letter')
-      tfail(letterU, '፣', 'a Unicode letter')
+      tfail(letterU(), '(', 'a Unicode letter')
+      tfail(letterU(), '｢', 'a Unicode letter')
+      tfail(letterU(), ')', 'a Unicode letter')
+      tfail(letterU(), '｣', 'a Unicode letter')
+      tfail(letterU(), '!', 'a Unicode letter')
+      tfail(letterU(), '፣', 'a Unicode letter')
+      tfail(letterU('test'), '(', 'test')
     })
     it('fails on symbols', () => {
-      tfail(letterU, '$', 'a Unicode letter')
-      tfail(letterU, '₯', 'a Unicode letter')
-      tfail(letterU, '+', 'a Unicode letter')
-      tfail(letterU, '⫇', 'a Unicode letter')
-      tfail(letterU, '©', 'a Unicode letter')
-      tfail(letterU, '🀄', 'a Unicode letter')
+      tfail(letterU(), '$', 'a Unicode letter')
+      tfail(letterU(), '₯', 'a Unicode letter')
+      tfail(letterU(), '+', 'a Unicode letter')
+      tfail(letterU(), '⫇', 'a Unicode letter')
+      tfail(letterU(), '©', 'a Unicode letter')
+      tfail(letterU(), '🀄', 'a Unicode letter')
+      tfail(letterU('test'), '$', 'test')
     })
   })
 
   describe('alphaU', () => {
+    it('throws if it has a non-string argument', () => {
+      terror(alphaU(0), '', 'expected argument to be a string; found 0')
+    })
     it('succeeds on a single uppercase letter', () => {
-      tpass(alphaU, 'A', 'A') // LATIN CAPITAL LETTER A
-      tpass(alphaU, 'Ž', 'Ž') // LATIN CAPITAL LETTER Z WITH CARON
-      tpass(alphaU, 'Γ', 'Γ') // GREEK CAPITAL LETTER GAMMA
-      tpass(alphaU, 'Л', 'Л') // CYRILLIC CAPITAL LETTER EL
-      tpass(alphaU, 'Յ', 'Յ') // ARMENIAN CAPITAL LETTER YI
-      tpass(alphaU, 'Ⴄ', 'Ⴄ') // GEORGIAN CAPITAL LETTER EN
-      tpass(alphaU, 'Ꮅ', 'Ꮅ') // CHEROKEE LETTER LI
-      tpass(alphaU, 'Ⰽ', 'Ⰽ') // GLAGOLITHIC CAPTIAL LETTER KAKO
+      tpass(alphaU(), 'A', 'A') // LATIN CAPITAL LETTER A
+      tpass(alphaU(), 'Ž', 'Ž') // LATIN CAPITAL LETTER Z WITH CARON
+      tpass(alphaU(), 'Γ', 'Γ') // GREEK CAPITAL LETTER GAMMA
+      tpass(alphaU(), 'Л', 'Л') // CYRILLIC CAPITAL LETTER EL
+      tpass(alphaU(), 'Յ', 'Յ') // ARMENIAN CAPITAL LETTER YI
+      tpass(alphaU(), 'Ⴄ', 'Ⴄ') // GEORGIAN CAPITAL LETTER EN
+      tpass(alphaU(), 'Ꮅ', 'Ꮅ') // CHEROKEE LETTER LI
+      tpass(alphaU(), 'Ⰽ', 'Ⰽ') // GLAGOLITHIC CAPTIAL LETTER KAKO
+      tpass(alphaU('test'), 'A', 'A')
     })
     it('succeeds on a single titlecase letter', () => {
       // LATIN CAPITAL LETTER D WITH SMALL LETTER Z WITH CARON
-      tpass(alphaU, 'ǅ', 'ǅ')
+      tpass(alphaU(), 'ǅ', 'ǅ')
       // LATIN CAPITAL LETTER N WITH SMALL LETTER J
-      tpass(alphaU, 'ǋ', 'ǋ')
+      tpass(alphaU(), 'ǋ', 'ǋ')
       // GREEK CAPITAL LETTER OMEGA WITH PROSGEGRAMMENI
-      tpass(alphaU, 'ῼ', 'ῼ')
+      tpass(alphaU(), 'ῼ', 'ῼ')
+      tpass(alphaU('test'), 'ǅ', 'ǅ')
     })
     it('succeeds on a single lowercase letter', () => {
-      tpass(alphaU, 'a', 'a') // LATIN SMALL LETTER A
-      tpass(alphaU, 'ž', 'ž') // LATIN SMALL LETTER Z WITH CARON
-      tpass(alphaU, 'γ', 'γ') // GREEK SMALL LETTER GAMMA
-      tpass(alphaU, 'л', 'л') // CYRILLIC SMALL LETTER EL
-      tpass(alphaU, 'յ', 'յ') // ARMENIAN SMALL LETTER YI
-      tpass(alphaU, 'ე', 'ე') // GEORGIAN LETTER EN
-      tpass(alphaU, 'ⰽ', 'ⰽ') // GLAGOLITIC SMALL LETTER KAKO
+      tpass(alphaU(), 'a', 'a') // LATIN SMALL LETTER A
+      tpass(alphaU(), 'ž', 'ž') // LATIN SMALL LETTER Z WITH CARON
+      tpass(alphaU(), 'γ', 'γ') // GREEK SMALL LETTER GAMMA
+      tpass(alphaU(), 'л', 'л') // CYRILLIC SMALL LETTER EL
+      tpass(alphaU(), 'յ', 'յ') // ARMENIAN SMALL LETTER YI
+      tpass(alphaU(), 'ე', 'ე') // GEORGIAN LETTER EN
+      tpass(alphaU(), 'ⰽ', 'ⰽ') // GLAGOLITIC SMALL LETTER KAKO
+      tpass(alphaU('test'), 'a', 'a')
     })
     it('succeeds on a single decimal digit', () => {
-      tpass(alphaU, '4', '4') // DIGIT FOUR
-      tpass(alphaU, '۴', '۴') // ARABIC-INDIC DIGIT FOUR
-      tpass(alphaU, '४', '४') // DEVANAGARI DIGIT FOUR
-      tpass(alphaU, '৪', '৪') // BENGALI DIGIT FOUR
-      tpass(alphaU, '๔', '๔') // THAI DIGIT FOUR
-      tpass(alphaU, '᠔', '᠔') // MONGOLIAN DIGIT FOUR
-      tpass(alphaU, '𝟜', '𝟜') // MATHEMATICAL DOUBLE-STRUCK DIGIT FOUR
+      tpass(alphaU(), '4', '4') // DIGIT FOUR
+      tpass(alphaU(), '۴', '۴') // ARABIC-INDIC DIGIT FOUR
+      tpass(alphaU(), '४', '४') // DEVANAGARI DIGIT FOUR
+      tpass(alphaU(), '৪', '৪') // BENGALI DIGIT FOUR
+      tpass(alphaU(), '๔', '๔') // THAI DIGIT FOUR
+      tpass(alphaU(), '᠔', '᠔') // MONGOLIAN DIGIT FOUR
+      tpass(alphaU(), '𝟜', '𝟜') // MATHEMATICAL DOUBLE-STRUCK DIGIT FOUR
+      tpass(alphaU('test'), '4', '4')
     })
     it('succeeds on a single uppercase letter number', () => {
-      tpass(alphaU, 'Ⅳ', 'Ⅳ') // ROMAN NUMERAL FOUR
+      tpass(alphaU(), 'Ⅳ', 'Ⅳ') // ROMAN NUMERAL FOUR
+      tpass(alphaU('test'), 'Ⅳ', 'Ⅳ')
     })
     it('succeeds on a single lowercase letter number', () => {
-      tpass(alphaU, 'ⅳ', 'ⅳ') // SMALL ROMAN NUMERAL FOUR
+      tpass(alphaU(), 'ⅳ', 'ⅳ') // SMALL ROMAN NUMERAL FOUR
+      tpass(alphaU('test'), 'ⅳ', 'ⅳ')
     })
     it('succeeds on a single other number', () => {
-      tpass(alphaU, '¼', '¼') // VULGAR FRACTION ONE QUARTER
-      tpass(alphaU, '፬', '፬') // ETHIOPIC DIGIT FOUR
-      tpass(alphaU, '⁴', '⁴') // SUPERSCRIPT FOUR
-      tpass(alphaU, '₄', '₄') // SUBSCRIPT FOUR
-      tpass(alphaU, '④', '④') // CIRCLED DIGIT FOUR
-      tpass(alphaU, '❹', '❹') // DINGBAT NEGATIVE CIRCLED DIGIT FOUR
+      tpass(alphaU(), '¼', '¼') // VULGAR FRACTION ONE QUARTER
+      tpass(alphaU(), '፬', '፬') // ETHIOPIC DIGIT FOUR
+      tpass(alphaU(), '⁴', '⁴') // SUPERSCRIPT FOUR
+      tpass(alphaU(), '₄', '₄') // SUBSCRIPT FOUR
+      tpass(alphaU(), '④', '④') // CIRCLED DIGIT FOUR
+      tpass(alphaU(), '❹', '❹') // DINGBAT NEGATIVE CIRCLED DIGIT FOUR
+      tpass(alphaU('test'), '¼', '¼')
     })
     it('fails on whitespace', () => {
-      tfail(alphaU, ' ', 'a Unicode alphanumeric character')
-      tfail(alphaU, '\t', 'a Unicode alphanumeric character')
-      tfail(alphaU, '\n', 'a Unicode alphanumeric character')
-      tfail(alphaU, ' ', 'a Unicode alphanumeric character')
-      tfail(alphaU, '\u2003', 'a Unicode alphanumeric character')
-      tfail(alphaU, '\u202f', 'a Unicode alphanumeric character')
+      tfail(alphaU(), ' ', 'a Unicode alphanumeric character')
+      tfail(alphaU(), '\t', 'a Unicode alphanumeric character')
+      tfail(alphaU(), '\n', 'a Unicode alphanumeric character')
+      tfail(alphaU(), ' ', 'a Unicode alphanumeric character')
+      tfail(alphaU(), '\u2003', 'a Unicode alphanumeric character')
+      tfail(alphaU(), '\u202f', 'a Unicode alphanumeric character')
+      tfail(alphaU('test'), ' ', 'test')
     })
     it('fails on punctuation', () => {
-      tfail(alphaU, '(', 'a Unicode alphanumeric character')
-      tfail(alphaU, '｢', 'a Unicode alphanumeric character')
-      tfail(alphaU, ')', 'a Unicode alphanumeric character')
-      tfail(alphaU, '｣', 'a Unicode alphanumeric character')
-      tfail(alphaU, '!', 'a Unicode alphanumeric character')
-      tfail(alphaU, '፣', 'a Unicode alphanumeric character')
+      tfail(alphaU(), '(', 'a Unicode alphanumeric character')
+      tfail(alphaU(), '｢', 'a Unicode alphanumeric character')
+      tfail(alphaU(), ')', 'a Unicode alphanumeric character')
+      tfail(alphaU(), '｣', 'a Unicode alphanumeric character')
+      tfail(alphaU(), '!', 'a Unicode alphanumeric character')
+      tfail(alphaU(), '፣', 'a Unicode alphanumeric character')
+      tfail(alphaU('test'), '(', 'test')
     })
     it('fails on symbols', () => {
-      tfail(alphaU, '$', 'a Unicode alphanumeric character')
-      tfail(alphaU, '₯', 'a Unicode alphanumeric character')
-      tfail(alphaU, '+', 'a Unicode alphanumeric character')
-      tfail(alphaU, '⫇', 'a Unicode alphanumeric character')
-      tfail(alphaU, '©', 'a Unicode alphanumeric character')
-      tfail(alphaU, '🀄', 'a Unicode alphanumeric character')
+      tfail(alphaU(), '$', 'a Unicode alphanumeric character')
+      tfail(alphaU(), '₯', 'a Unicode alphanumeric character')
+      tfail(alphaU(), '+', 'a Unicode alphanumeric character')
+      tfail(alphaU(), '⫇', 'a Unicode alphanumeric character')
+      tfail(alphaU(), '©', 'a Unicode alphanumeric character')
+      tfail(alphaU(), '🀄', 'a Unicode alphanumeric character')
+      tfail(alphaU('test'), '$', 'test')
     })
   })
 
   describe('upperU', () => {
+    it('throws if it has a non-string argument', () => {
+      terror(upperU(0), '', 'expected argument to be a string; found 0')
+    })
     it('succeeds on a single uppercase letter', () => {
-      tpass(upperU, 'A', 'A') // LATIN CAPITAL LETTER A
-      tpass(upperU, 'Ž', 'Ž') // LATIN CAPITAL LETTER Z WITH CARON
-      tpass(upperU, 'Γ', 'Γ') // GREEK CAPITAL LETTER GAMMA
-      tpass(upperU, 'Л', 'Л') // CYRILLIC CAPITAL LETTER EL
-      tpass(upperU, 'Յ', 'Յ') // ARMENIAN CAPITAL LETTER YI
-      tpass(upperU, 'Ⴄ', 'Ⴄ') // GEORGIAN CAPITAL LETTER EN
-      tpass(upperU, 'Ꮅ', 'Ꮅ') // CHEROKEE LETTER LI
-      tpass(upperU, 'Ⰽ', 'Ⰽ') // GLAGOLITHIC CAPTIAL LETTER KAKO
+      tpass(upperU(), 'A', 'A') // LATIN CAPITAL LETTER A
+      tpass(upperU(), 'Ž', 'Ž') // LATIN CAPITAL LETTER Z WITH CARON
+      tpass(upperU(), 'Γ', 'Γ') // GREEK CAPITAL LETTER GAMMA
+      tpass(upperU(), 'Л', 'Л') // CYRILLIC CAPITAL LETTER EL
+      tpass(upperU(), 'Յ', 'Յ') // ARMENIAN CAPITAL LETTER YI
+      tpass(upperU(), 'Ⴄ', 'Ⴄ') // GEORGIAN CAPITAL LETTER EN
+      tpass(upperU(), 'Ꮅ', 'Ꮅ') // CHEROKEE LETTER LI
+      tpass(upperU(), 'Ⰽ', 'Ⰽ') // GLAGOLITHIC CAPTIAL LETTER KAKO
+      tpass(upperU('test'), 'A', 'A')
     })
     it('succeeds on a single titlecase letter', () => {
       // LATIN CAPITAL LETTER D WITH SMALL LETTER Z WITH CARON
-      tpass(upperU, 'ǅ', 'ǅ')
+      tpass(upperU(), 'ǅ', 'ǅ')
       // LATIN CAPITAL LETTER N WITH SMALL LETTER J
-      tpass(upperU, 'ǋ', 'ǋ')
+      tpass(upperU(), 'ǋ', 'ǋ')
       // GREEK CAPITAL LETTER OMEGA WITH PROSGEGRAMMENI
-      tpass(upperU, 'ῼ', 'ῼ')
+      tpass(upperU(), 'ῼ', 'ῼ')
+      tpass(upperU('test'), 'ǅ', 'ǅ')
     })
     it('fails on lowercase letters', () => {
-      tfail(upperU, 'a', 'a Unicode uppercase letter')
-      tfail(upperU, 'ž', 'a Unicode uppercase letter')
-      tfail(upperU, 'γ', 'a Unicode uppercase letter')
-      tfail(upperU, 'л', 'a Unicode uppercase letter')
-      tfail(upperU, 'յ', 'a Unicode uppercase letter')
-      tfail(upperU, 'ე', 'a Unicode uppercase letter')
-      tfail(upperU, 'ⰽ', 'a Unicode uppercase letter')
+      tfail(upperU(), 'a', 'a Unicode uppercase letter')
+      tfail(upperU(), 'ž', 'a Unicode uppercase letter')
+      tfail(upperU(), 'γ', 'a Unicode uppercase letter')
+      tfail(upperU(), 'л', 'a Unicode uppercase letter')
+      tfail(upperU(), 'յ', 'a Unicode uppercase letter')
+      tfail(upperU(), 'ე', 'a Unicode uppercase letter')
+      tfail(upperU(), 'ⰽ', 'a Unicode uppercase letter')
+      tfail(upperU('test'), 'a', 'test')
     })
     it('fails on decimal digits', () => {
-      tfail(upperU, '4', 'a Unicode uppercase letter')
-      tfail(upperU, '۴', 'a Unicode uppercase letter')
-      tfail(upperU, '४', 'a Unicode uppercase letter')
-      tfail(upperU, '৪', 'a Unicode uppercase letter')
-      tfail(upperU, '๔', 'a Unicode uppercase letter')
-      tfail(upperU, '᠔', 'a Unicode uppercase letter')
-      tfail(upperU, '𝟜', 'a Unicode uppercase letter')
+      tfail(upperU(), '4', 'a Unicode uppercase letter')
+      tfail(upperU(), '۴', 'a Unicode uppercase letter')
+      tfail(upperU(), '४', 'a Unicode uppercase letter')
+      tfail(upperU(), '৪', 'a Unicode uppercase letter')
+      tfail(upperU(), '๔', 'a Unicode uppercase letter')
+      tfail(upperU(), '᠔', 'a Unicode uppercase letter')
+      tfail(upperU(), '𝟜', 'a Unicode uppercase letter')
+      tfail(upperU('test'), '4', 'test')
     })
     it('succeeds on a single uppercase letter number', () => {
-      tpass(upperU, 'Ⅳ', 'Ⅳ') // ROMAN NUMERAL FOUR
+      tpass(upperU(), 'Ⅳ', 'Ⅳ') // ROMAN NUMERAL FOUR
+      tpass(upperU('test'), 'Ⅳ', 'Ⅳ')
     })
     it('fails on lowercase letter numbers', () => {
-      tfail(upperU, 'ⅳ', 'a Unicode uppercase letter')
+      tfail(upperU(), 'ⅳ', 'a Unicode uppercase letter')
+      tfail(upperU('test'), 'ⅳ', 'test')
     })
     it('fails on other numbers', () => {
-      tfail(upperU, '¼', 'a Unicode uppercase letter')
-      tfail(upperU, '፬', 'a Unicode uppercase letter')
-      tfail(upperU, '⁴', 'a Unicode uppercase letter')
-      tfail(upperU, '₄', 'a Unicode uppercase letter')
-      tfail(upperU, '④', 'a Unicode uppercase letter')
-      tfail(upperU, '❹', 'a Unicode uppercase letter')
+      tfail(upperU(), '¼', 'a Unicode uppercase letter')
+      tfail(upperU(), '፬', 'a Unicode uppercase letter')
+      tfail(upperU(), '⁴', 'a Unicode uppercase letter')
+      tfail(upperU(), '₄', 'a Unicode uppercase letter')
+      tfail(upperU(), '④', 'a Unicode uppercase letter')
+      tfail(upperU(), '❹', 'a Unicode uppercase letter')
+      tfail(upperU('test'), '¼', 'test')
     })
     it('fails on whitespace', () => {
-      tfail(upperU, ' ', 'a Unicode uppercase letter')
-      tfail(upperU, '\t', 'a Unicode uppercase letter')
-      tfail(upperU, '\n', 'a Unicode uppercase letter')
-      tfail(upperU, ' ', 'a Unicode uppercase letter')
-      tfail(upperU, '\u2003', 'a Unicode uppercase letter')
-      tfail(upperU, '\u202f', 'a Unicode uppercase letter')
+      tfail(upperU(), ' ', 'a Unicode uppercase letter')
+      tfail(upperU(), '\t', 'a Unicode uppercase letter')
+      tfail(upperU(), '\n', 'a Unicode uppercase letter')
+      tfail(upperU(), ' ', 'a Unicode uppercase letter')
+      tfail(upperU(), '\u2003', 'a Unicode uppercase letter')
+      tfail(upperU(), '\u202f', 'a Unicode uppercase letter')
     })
     it('fails on punctuation', () => {
-      tfail(upperU, '(', 'a Unicode uppercase letter')
-      tfail(upperU, '｢', 'a Unicode uppercase letter')
-      tfail(upperU, ')', 'a Unicode uppercase letter')
-      tfail(upperU, '｣', 'a Unicode uppercase letter')
-      tfail(upperU, '!', 'a Unicode uppercase letter')
-      tfail(upperU, '፣', 'a Unicode uppercase letter')
+      tfail(upperU(), '(', 'a Unicode uppercase letter')
+      tfail(upperU(), '｢', 'a Unicode uppercase letter')
+      tfail(upperU(), ')', 'a Unicode uppercase letter')
+      tfail(upperU(), '｣', 'a Unicode uppercase letter')
+      tfail(upperU(), '!', 'a Unicode uppercase letter')
+      tfail(upperU(), '፣', 'a Unicode uppercase letter')
+      tfail(upperU('test'), '(', 'test')
     })
     it('fails on symbols', () => {
-      tfail(upperU, '$', 'a Unicode uppercase letter')
-      tfail(upperU, '₯', 'a Unicode uppercase letter')
-      tfail(upperU, '+', 'a Unicode uppercase letter')
-      tfail(upperU, '⫇', 'a Unicode uppercase letter')
-      tfail(upperU, '©', 'a Unicode uppercase letter')
-      tfail(upperU, '🀄', 'a Unicode uppercase letter')
+      tfail(upperU(), '$', 'a Unicode uppercase letter')
+      tfail(upperU(), '₯', 'a Unicode uppercase letter')
+      tfail(upperU(), '+', 'a Unicode uppercase letter')
+      tfail(upperU(), '⫇', 'a Unicode uppercase letter')
+      tfail(upperU(), '©', 'a Unicode uppercase letter')
+      tfail(upperU(), '🀄', 'a Unicode uppercase letter')
+      tfail(upperU('test'), '$', 'test')
     })
   })
 
   describe('lowerU', () => {
+    it('throws if it has a non-string argument', () => {
+      terror(lowerU(0), '', 'expected argument to be a string; found 0')
+    })
     it('fails on uppercase letters', () => {
-      tfail(lowerU, 'A', 'a Unicode lowercase letter')
-      tfail(lowerU, 'Ž', 'a Unicode lowercase letter')
-      tfail(lowerU, 'Γ', 'a Unicode lowercase letter')
-      tfail(lowerU, 'Л', 'a Unicode lowercase letter')
-      tfail(lowerU, 'Յ', 'a Unicode lowercase letter')
-      tfail(lowerU, 'Ⴄ', 'a Unicode lowercase letter')
-      tfail(lowerU, 'Ꮅ', 'a Unicode lowercase letter')
-      tfail(lowerU, 'Ⰽ', 'a Unicode lowercase letter')
+      tfail(lowerU(), 'A', 'a Unicode lowercase letter')
+      tfail(lowerU(), 'Ž', 'a Unicode lowercase letter')
+      tfail(lowerU(), 'Γ', 'a Unicode lowercase letter')
+      tfail(lowerU(), 'Л', 'a Unicode lowercase letter')
+      tfail(lowerU(), 'Յ', 'a Unicode lowercase letter')
+      tfail(lowerU(), 'Ⴄ', 'a Unicode lowercase letter')
+      tfail(lowerU(), 'Ꮅ', 'a Unicode lowercase letter')
+      tfail(lowerU(), 'Ⰽ', 'a Unicode lowercase letter')
+      tfail(lowerU('test'), 'A', 'test')
     })
     it('fails on titlecase letters', () => {
-      tfail(lowerU, 'ǅ', 'a Unicode lowercase letter')
-      tfail(lowerU, 'ǋ', 'a Unicode lowercase letter')
-      tfail(lowerU, 'ῼ', 'a Unicode lowercase letter')
+      tfail(lowerU(), 'ǅ', 'a Unicode lowercase letter')
+      tfail(lowerU(), 'ǋ', 'a Unicode lowercase letter')
+      tfail(lowerU(), 'ῼ', 'a Unicode lowercase letter')
+      tfail(lowerU('test'), 'ǅ', 'test')
     })
     it('succeeds on a single lowercase letter', () => {
-      tpass(lowerU, 'a', 'a') // LATIN SMALL LETTER A
-      tpass(lowerU, 'ž', 'ž') // LATIN SMALL LETTER Z WITH CARON
-      tpass(lowerU, 'γ', 'γ') // GREEK SMALL LETTER GAMMA
-      tpass(lowerU, 'л', 'л') // CYRILLIC SMALL LETTER EL
-      tpass(lowerU, 'յ', 'յ') // ARMENIAN SMALL LETTER YI
-      tpass(lowerU, 'ე', 'ე') // GEORGIAN LETTER EN
-      tpass(lowerU, 'ⰽ', 'ⰽ') // GLAGOLITIC SMALL LETTER KAKO
+      tpass(lowerU(), 'a', 'a') // LATIN SMALL LETTER A
+      tpass(lowerU(), 'ž', 'ž') // LATIN SMALL LETTER Z WITH CARON
+      tpass(lowerU(), 'γ', 'γ') // GREEK SMALL LETTER GAMMA
+      tpass(lowerU(), 'л', 'л') // CYRILLIC SMALL LETTER EL
+      tpass(lowerU(), 'յ', 'յ') // ARMENIAN SMALL LETTER YI
+      tpass(lowerU(), 'ე', 'ე') // GEORGIAN LETTER EN
+      tpass(lowerU(), 'ⰽ', 'ⰽ') // GLAGOLITIC SMALL LETTER KAKO
+      tpass(lowerU('test'), 'a', 'a')
     })
     it('fails on decimal digits', () => {
-      tfail(lowerU, '4', 'a Unicode lowercase letter')
-      tfail(lowerU, '۴', 'a Unicode lowercase letter')
-      tfail(lowerU, '४', 'a Unicode lowercase letter')
-      tfail(lowerU, '৪', 'a Unicode lowercase letter')
-      tfail(lowerU, '๔', 'a Unicode lowercase letter')
-      tfail(lowerU, '᠔', 'a Unicode lowercase letter')
-      tfail(lowerU, '𝟜', 'a Unicode lowercase letter')
+      tfail(lowerU(), '4', 'a Unicode lowercase letter')
+      tfail(lowerU(), '۴', 'a Unicode lowercase letter')
+      tfail(lowerU(), '४', 'a Unicode lowercase letter')
+      tfail(lowerU(), '৪', 'a Unicode lowercase letter')
+      tfail(lowerU(), '๔', 'a Unicode lowercase letter')
+      tfail(lowerU(), '᠔', 'a Unicode lowercase letter')
+      tfail(lowerU(), '𝟜', 'a Unicode lowercase letter')
+      tfail(lowerU('test'), '4', 'test')
     })
     it('fails on uppercase letter numbers', () => {
-      tfail(lowerU, 'Ⅳ', 'a Unicode lowercase letter')
+      tfail(lowerU(), 'Ⅳ', 'a Unicode lowercase letter')
+      tfail(lowerU('test'), 'Ⅳ', 'test')
     })
     it('succeeds on a single lowercase letter number', () => {
-      tpass(lowerU, 'ⅳ', 'ⅳ') // SMALL ROMAN NUMERAL FOUR
+      tpass(lowerU(), 'ⅳ', 'ⅳ') // SMALL ROMAN NUMERAL FOUR
+      tpass(lowerU('test'), 'ⅳ', 'ⅳ')
     })
     it('fails on other numbers', () => {
-      tfail(lowerU, '¼', 'a Unicode lowercase letter')
-      tfail(lowerU, '፬', 'a Unicode lowercase letter')
-      tfail(lowerU, '⁴', 'a Unicode lowercase letter')
-      tfail(lowerU, '₄', 'a Unicode lowercase letter')
-      tfail(lowerU, '④', 'a Unicode lowercase letter')
-      tfail(lowerU, '❹', 'a Unicode lowercase letter')
+      tfail(lowerU(), '¼', 'a Unicode lowercase letter')
+      tfail(lowerU(), '፬', 'a Unicode lowercase letter')
+      tfail(lowerU(), '⁴', 'a Unicode lowercase letter')
+      tfail(lowerU(), '₄', 'a Unicode lowercase letter')
+      tfail(lowerU(), '④', 'a Unicode lowercase letter')
+      tfail(lowerU(), '❹', 'a Unicode lowercase letter')
+      tfail(lowerU('test'), '¼', 'test')
     })
     it('fails on whitespace', () => {
-      tfail(lowerU, ' ', 'a Unicode lowercase letter')
-      tfail(lowerU, '\t', 'a Unicode lowercase letter')
-      tfail(lowerU, '\n', 'a Unicode lowercase letter')
-      tfail(lowerU, ' ', 'a Unicode lowercase letter')
-      tfail(lowerU, '\u2003', 'a Unicode lowercase letter')
-      tfail(lowerU, '\u202f', 'a Unicode lowercase letter')
+      tfail(lowerU(), ' ', 'a Unicode lowercase letter')
+      tfail(lowerU(), '\t', 'a Unicode lowercase letter')
+      tfail(lowerU(), '\n', 'a Unicode lowercase letter')
+      tfail(lowerU(), ' ', 'a Unicode lowercase letter')
+      tfail(lowerU(), '\u2003', 'a Unicode lowercase letter')
+      tfail(lowerU(), '\u202f', 'a Unicode lowercase letter')
+      tfail(lowerU('test'), ' ', 'test')
     })
     it('fails on punctuation', () => {
-      tfail(lowerU, '(', 'a Unicode lowercase letter')
-      tfail(lowerU, '｢', 'a Unicode lowercase letter')
-      tfail(lowerU, ')', 'a Unicode lowercase letter')
-      tfail(lowerU, '｣', 'a Unicode lowercase letter')
-      tfail(lowerU, '!', 'a Unicode lowercase letter')
-      tfail(lowerU, '፣', 'a Unicode lowercase letter')
+      tfail(lowerU(), '(', 'a Unicode lowercase letter')
+      tfail(lowerU(), '｢', 'a Unicode lowercase letter')
+      tfail(lowerU(), ')', 'a Unicode lowercase letter')
+      tfail(lowerU(), '｣', 'a Unicode lowercase letter')
+      tfail(lowerU(), '!', 'a Unicode lowercase letter')
+      tfail(lowerU(), '፣', 'a Unicode lowercase letter')
+      tfail(lowerU('test'), '(', 'test')
     })
     it('fails on symbols', () => {
-      tfail(lowerU, '$', 'a Unicode lowercase letter')
-      tfail(lowerU, '₯', 'a Unicode lowercase letter')
-      tfail(lowerU, '+', 'a Unicode lowercase letter')
-      tfail(lowerU, '⫇', 'a Unicode lowercase letter')
-      tfail(lowerU, '©', 'a Unicode lowercase letter')
-      tfail(lowerU, '🀄', 'a Unicode lowercase letter')
+      tfail(lowerU(), '$', 'a Unicode lowercase letter')
+      tfail(lowerU(), '₯', 'a Unicode lowercase letter')
+      tfail(lowerU(), '+', 'a Unicode lowercase letter')
+      tfail(lowerU(), '⫇', 'a Unicode lowercase letter')
+      tfail(lowerU(), '©', 'a Unicode lowercase letter')
+      tfail(lowerU(), '🀄', 'a Unicode lowercase letter')
+      tfail(lowerU('test'), '$', 'test')
     })
   })
 
