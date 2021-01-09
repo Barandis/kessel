@@ -13,13 +13,13 @@ import { generic } from 'kessel/error'
  * A parser that fails without consuming input, setting the generic
  * error message to whatever is passed in.
  *
- * @param {string} msg The message used to create the generic error.
+ * @param {string} m The message used to create the generic error.
  * @returns {Parser} A parser that automatically fails with the supplied
  *     error message.
  */
-export const failNormally = msg => parser(ctx => {
-  ASSERT && assertString('failNormally', msg)
-  return failReply(ctx, generic(msg))
+export const fail = m => parser(ctx => {
+  ASSERT && assertString('fail', m)
+  return failReply(ctx, generic(m))
 })
 
 /**
@@ -27,13 +27,13 @@ export const failNormally = msg => parser(ctx => {
  * error message to whatever is passed in. This signifies a fatal error,
  * one that cannot be recovered from without backtracking.
  *
- * @param {string} msg The message used to create the generic error.
+ * @param {string} m The message used to create the generic error.
  * @returns {Parser} A parser that automatically fails fatally with the
  *     supplied error message.
  */
-export const failFatally = msg => parser(ctx => {
-  ASSERT && assertString('failFatally', msg)
-  return fatalReply(ctx, generic(msg))
+export const fatal = m => parser(ctx => {
+  ASSERT && assertString('fatal', m)
+  return fatalReply(ctx, generic(m))
 })
 
 /**

@@ -875,8 +875,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../failfatally/" class="md-nav__link">
-      failFatally
+    <a href="../fail/" class="md-nav__link">
+      fail
     </a>
   </li>
 
@@ -887,8 +887,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../failnormally/" class="md-nav__link">
-      failNormally
+    <a href="../fatal/" class="md-nav__link">
+      fatal
     </a>
   </li>
 
@@ -2021,7 +2021,7 @@
 -->
 
 <blockquote>
-<p><code>always&lt;T&gt;(x: T): Parser&lt;T&gt;</code></p>
+<p><code>always(x: *): Parser</code></p>
 </blockquote>
 <p>Always succeeds and returns its passed value.</p>
 <p>This is the only parser that can return a value that is not a string. (Some combinators can also do this.)</p>

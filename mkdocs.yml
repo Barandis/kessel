@@ -67,8 +67,8 @@ nav:
       - end: parsers/end.md
       - end1: parsers/end1.md
       - eof: parsers/eof.md
-      - failFatally: parsers/failfatally.md
-      - failNormally: parsers/failnormally.md
+      - fail: parsers/fail.md
+      - fatal: parsers/fatal.md
       - fifth: parsers/fifth.md
       - first: parsers/first.md
       - fourth: parsers/fourth.md

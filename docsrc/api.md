@@ -77,8 +77,8 @@ Additionally, parsers are often said to *return* a value or to have a value as a
 | Parser | Description |
 |--------|-------------|
 | [`always`](parsers/always.md) | Always succeeds and returns a value. |
-| [`failNormally`](parsers/failnormally.md) | Fails with a generic message. |
-| [`failFatally`](parsers/failfatally.md) | Fails fatally with a generic message. |
+| [`fail`](parsers/fail.md) | Fails with a generic message. |
+| [`fatal`](parsers/fatal.md) | Fails fatally with a generic message. |
 
 ### Table 5: Sequence combinators
 

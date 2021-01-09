@@ -5,14 +5,14 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `failNormally(msg: string): Parser<null>`
+> `fail(m: string): Parser`
 
 Fails automatically with a custom generic error message.
 
 #### Example
 
 ```javascript
-const parser = failNormally('a letter, please?')
+const parser = fail('a letter, please?')
 
 const f = parse(parser, '123')
 console.log(status(f))  // "fail"
@@ -25,18 +25,18 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 #### Parameters
 
-* `msg`: The generic error message to apply.
+* `m`: The generic error message to apply.
 
 #### Failure
 
-* Always fails. The failure message will be [`generic(msg)`](../tools/generic.md).
+* Always fails. The failure message will be [`generic(m)`](../tools/generic.md).
 
 #### Throws
 
-* Throws an error if `msg` is not a string.
+* Throws an error if `m` is not a string.
 
 #### See Also
 
 * [`Parser`](../types/parser.md)
-* [`failFatally`](failfatally.md)
+* [`fatal`](fatal.md)
 * [`generic`](../tools/generic.md)

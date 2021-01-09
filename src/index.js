@@ -25,8 +25,8 @@ export {
 } from './parsers/char'
 export {
   always,
-  failNormally,
-  failFatally,
+  fail,
+  fatal,
 } from './parsers/misc'
 export {
   alphaU,
