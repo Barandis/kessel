@@ -11,7 +11,6 @@ import {
   assertFunction,
   assertString,
   assertStringOrArray,
-  ordCharFormatter,
 } from 'kessel/assert'
 import { failReply, okReply, parser, Status } from 'kessel/core'
 import { expecteds } from 'kessel/messages'
@@ -140,16 +139,23 @@ export const satisfy = (fn, m) => parser(ctx => {
  *     of characters to match. It is included in that range.
  * @param {string} e The character that defines the end of the range of
  *     characters to match. It is included in that range.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser that will succeed if the next input
  *     character is between `start` and `end` (inclusive).
  */
-export const range = (s, e) => parser(ctx => {
-  ASSERT && assertChar('range', s, ordCharFormatter('1st'))
-  ASSERT && assertChar('range', e, ordCharFormatter('2nd'))
+export const range = (s, e, m) => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && assertChar('range', s, argCharFormatter(1, true))
+  ASSERT && assertChar('range', e, argCharFormatter(2, true))
+  ASSERT && hasM && assertString('range', m, argStrFormatter(3, true))
 
   const fn = c => c >= s && c <= e
-  const [cprep, [cpctx, cpres]] = dup(charParser(fn)(ctx))
-  return cpres.status === Ok ? cprep : failReply(cpctx, expecteds.range(s, e))
+  const [crep, [cctx, cres]] = dup(charParser(fn)(ctx))
+  return cres.status === Ok
+    ? crep
+    : failReply(cctx, ferror(m, expecteds.range(s, e)))
 })
 
 /**

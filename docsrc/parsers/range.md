@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `range(s: string, e: string): Parser<string>`
+> `range(s: string, e: string, m?: string): Parser`
 
 Parses a character between `s` and `e` (inclusive).
 
@@ -33,6 +33,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 * `s`: The character representing the lower bound of the range. The next character's code point must be greater than or equal to `s`'s code point for the parser to succeed.
 * `e`: The character representing the upper bound of the range. The next character's code point must be less than or equal to `e`'s code point for the parser to succeed.
+* `m`: The optional expected error message that will take the place of the default error message.
 
 #### Success
 
@@ -45,6 +46,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 #### Throws
 
 * Throws an error if either `s` or `e` are not strings or if either is not exactly one character in length.
+* Throws an error if `m` exists and is not a string.
 
 #### See Also
 

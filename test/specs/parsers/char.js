@@ -321,14 +321,25 @@ describe('Character parsers', () => {
   describe('range', () => {
     it('throws if the first argument is not a character', () => {
       terror(
-        range(0, '9'), '', '[range]: expected 1st argument to be a '
-          + 'one-character string; found 0',
+        range(0, '9'),
+        '',
+        '[range]: expected first argument to be a one-character string; '
+          + 'found 0',
       )
     })
     it('throws if the second argument is not a character', () => {
       terror(
-        range('0', 9), '', '[range]: expected 2nd argument to be a '
-          + 'one-character string; found 9',
+        range('0', 9),
+        '',
+        '[range]: expected second argument to be a one-character string; '
+          + 'found 9',
+      )
+    })
+    it('throws if the third argument exists and is not a string', () => {
+      terror(
+        range('0', '9', 0),
+        '',
+        '[range]: expected third argument to be a string; found 0',
       )
     })
     it('succeeds if the next character is between the supplied two', () => {
@@ -336,15 +347,24 @@ describe('Character parsers', () => {
       tpass(range('а', 'я'), 'цчш', 'ц')
       tpass(range('ก', 'ฮ'), 'รลว', 'ร')
       tpass(range('𝑎', '𝑧'), '𝑖𝑗𝑘', '𝑖')
+      tpass(range('a', 'z', 'test'), 'abc', 'a')
+      tpass(range('а', 'я', 'test'), 'цчш', 'ц')
+      tpass(range('ก', 'ฮ', 'test'), 'รลว', 'ร')
+      tpass(range('𝑎', '𝑧', 'test'), '𝑖𝑗𝑘', '𝑖')
     })
     it('fails if the next character is not between the supplied two', () => {
       tfail(range('a', 'z'), '123', "a character between 'a' and 'z'")
       tfail(range('а', 'я'), 'աբգ', "a character between 'а' and 'я'")
       tfail(range('ก', 'ฮ'), 'ａｂｃ', "a character between 'ก' and 'ฮ'")
       tfail(range('𝑎', '𝑧'), '𝒊𝒋𝒌', "a character between '𝑎' and '𝑧'")
+      tfail(range('a', 'z', 'a-z'), '123', 'a-z')
+      tfail(range('а', 'я', 'а-я'), 'աբգ', 'а-я')
+      tfail(range('ก', 'ฮ', 'ก-ฮ'), 'ａｂｃ', 'ก-ฮ')
+      tfail(range('𝑎', '𝑧', '𝑎-𝑧'), '𝒊𝒋𝒌', '𝑎-𝑧')
     })
     it('fails at EOF', () => {
       tfail(range('a', 'z'), '', "a character between 'a' and 'z'")
+      tfail(range('a', 'z', 'a-z'), '', 'a-z')
     })
   })
 

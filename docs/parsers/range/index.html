@@ -2049,7 +2049,7 @@
 -->
 
 <blockquote>
-<p><code>range(s: string, e: string): Parser&lt;string&gt;</code></p>
+<p><code>range(s: string, e: string, m?: string): Parser</code></p>
 </blockquote>
 <p>Parses a character between <code>s</code> and <code>e</code> (inclusive).</p>
 <p>"Between" is defined according to code points. This is fine in most cases, but it can get weird with higher code points. For example, there is no "h" in the set of mathematical lowercase italic symbols. The "h" that would be used in that set of symbols would instead be the Planck's Constant character, which is in a completely different part of the UTF-8 spectrum and therefore is not "between" mathematical lowercase italic symbols <code>a</code> and <code>z</code>. Take care with non-ASCII characters.</p>
@@ -2072,6 +2072,7 @@
 <ul>
 <li><code>s</code>: The character representing the lower bound of the range. The next character's code point must be greater than or equal to <code>s</code>'s code point for the parser to succeed.</li>
 <li><code>e</code>: The character representing the upper bound of the range. The next character's code point must be less than or equal to <code>e</code>'s code point for the parser to succeed.</li>
+<li><code>m</code>: The optional expected error message that will take the place of the default error message.</li>
 </ul>
 <h4 id="success">Success</h4>
 <ul>
@@ -2084,6 +2085,7 @@
 <h4 id="throws">Throws</h4>
 <ul>
 <li>Throws an error if either <code>s</code> or <code>e</code> are not strings or if either is not exactly one character in length.</li>
+<li>Throws an error if <code>m</code> exists and is not a string.</li>
 </ul>
 <h4 id="see-also">See Also</h4>
 <ul>
