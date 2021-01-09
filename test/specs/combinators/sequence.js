@@ -12,8 +12,8 @@ import {
   assocR,
   between,
   block,
-  end,
-  end1,
+  endby,
+  endby1,
   left,
   many,
   many1,
@@ -21,8 +21,8 @@ import {
   pipe,
   repeat,
   right,
-  sep,
-  sep1,
+  sepby,
+  sepby1,
   seq,
   skip,
 } from 'kessel/combinators/sequence'
@@ -380,29 +380,29 @@ describe('Sequence combinators', () => {
     })
   })
 
-  describe('sep', () => {
-    const parser = sep(letter(), char(','))
-    const parserm = sep(letter(), char(','), 'comma separated letters')
+  describe('sepby', () => {
+    const parser = sepby(letter(), char(','))
+    const parserm = sepby(letter(), char(','), 'comma separated letters')
 
     it('throws if its first argument is not a parser', () => {
       terror(
-        sep(0, any()),
+        sepby(0, any()),
         '',
-        '[sep]: expected first argument to be a parser; found 0',
+        '[sepby]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
-        sep(any(), 0),
+        sepby(any(), 0),
         '',
-        '[sep]: expected second argument to be a parser; found 0',
+        '[sepby]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its third argument is not a string', () => {
       terror(
-        sep(any(), any(), 0),
+        sepby(any(), any(), 0),
         '',
-        '[sep]: expected third argument to be a string; found 0',
+        '[sepby]: expected third argument to be a string; found 0',
       )
     })
     it('succeeds with multiple values with separators', () => {
@@ -426,34 +426,34 @@ describe('Sequence combinators', () => {
       tpass(parserm, '1', { result: [], index: 0 })
     })
     it('fails if its content parser fails fatally', () => {
-      tfail(sep(seq(letter(), letter()), char(',')), 'ab,a1', {
+      tfail(sepby(seq(letter(), letter()), char(',')), 'ab,a1', {
         expected: 'a letter',
         index: 4,
         status: Fatal,
       })
-      tfail(sep(seq(letter(), letter()), char(',')), 'a1', {
+      tfail(sepby(seq(letter(), letter()), char(',')), 'a1', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
-      tfail(sep(seq(letter(), letter()), char(','), 'test'), 'ab,a1', {
+      tfail(sepby(seq(letter(), letter()), char(','), 'test'), 'ab,a1', {
         expected: 'test',
         index: 4,
         status: Fatal,
       })
-      tfail(sep(seq(letter(), letter()), char(','), 'test'), 'a1', {
+      tfail(sepby(seq(letter(), letter()), char(','), 'test'), 'a1', {
         expected: 'test',
         index: 1,
         status: Fatal,
       })
     })
     it('fails if its separator parser fails fatally', () => {
-      tfail(sep(letter(), seq(char('-'), char('-'))), 'a--b-c', {
+      tfail(sepby(letter(), seq(char('-'), char('-'))), 'a--b-c', {
         expected: "'-'",
         index: 5,
         status: Fatal,
       })
-      tfail(sep(letter(), seq(char('-'), char('-')), 'test'), 'a--b-c', {
+      tfail(sepby(letter(), seq(char('-'), char('-')), 'test'), 'a--b-c', {
         expected: 'test',
         index: 5,
         status: Fatal,
@@ -461,37 +461,37 @@ describe('Sequence combinators', () => {
     })
     it('throws if an infinite loop was detected', () => {
       terror(
-        sep(string(''), string('')),
+        sepby(string(''), string('')),
         'abc',
-        '[sep]: infinite loop detected; '
+        '[sepby]: infinite loop detected; '
           + 'neither content nor separator parser consumed input',
       )
     })
   })
 
-  describe('sep1', () => {
-    const parser = sep1(letter(), char(','))
-    const parserm = sep1(letter(), char(','), 'comma separated letters')
+  describe('sepby1', () => {
+    const parser = sepby1(letter(), char(','))
+    const parserm = sepby1(letter(), char(','), 'comma separated letters')
 
     it('throws if its first argument is not a parser', () => {
       terror(
-        sep1(0, any()),
+        sepby1(0, any()),
         '',
-        '[sep1]: expected first argument to be a parser; found 0',
+        '[sepby1]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
-        sep1(any(), 0),
+        sepby1(any(), 0),
         '',
-        '[sep1]: expected second argument to be a parser; found 0',
+        '[sepby1]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its third argument is not a string', () => {
       terror(
-        sep1(any(), any(), 0),
+        sepby1(any(), any(), 0),
         '',
-        '[sep1]: expected third argument to be a string; found 0',
+        '[sepby1]: expected third argument to be a string; found 0',
       )
     })
     it('succeeds with multiple values with separators', () => {
@@ -523,34 +523,34 @@ describe('Sequence combinators', () => {
       })
     })
     it('fails if its content parser fails fatally', () => {
-      tfail(sep1(seq(letter(), letter()), char(',')), 'ab,a1', {
+      tfail(sepby1(seq(letter(), letter()), char(',')), 'ab,a1', {
         expected: 'a letter',
         index: 4,
         status: Fatal,
       })
-      tfail(sep1(seq(letter(), letter()), char(',')), 'a1', {
+      tfail(sepby1(seq(letter(), letter()), char(',')), 'a1', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
-      tfail(sep1(seq(letter(), letter()), char(','), 'test'), 'ab,a1', {
+      tfail(sepby1(seq(letter(), letter()), char(','), 'test'), 'ab,a1', {
         expected: 'test',
         index: 4,
         status: Fatal,
       })
-      tfail(sep1(seq(letter(), letter()), char(','), 'test'), 'a1', {
+      tfail(sepby1(seq(letter(), letter()), char(','), 'test'), 'a1', {
         expected: 'test',
         index: 1,
         status: Fatal,
       })
     })
     it('fails if its separator parser fails fatally', () => {
-      tfail(sep1(letter(), seq(char('-'), char('-'))), 'a--b-c', {
+      tfail(sepby1(letter(), seq(char('-'), char('-'))), 'a--b-c', {
         expected: "'-'",
         index: 5,
         status: Fatal,
       })
-      tfail(sep1(letter(), seq(char('-'), char('-')), 'test'), 'a--b-c', {
+      tfail(sepby1(letter(), seq(char('-'), char('-')), 'test'), 'a--b-c', {
         expected: 'test',
         index: 5,
         status: Fatal,
@@ -558,37 +558,37 @@ describe('Sequence combinators', () => {
     })
     it('throws if an infinite loop was detected', () => {
       terror(
-        sep1(string(''), string('')),
+        sepby1(string(''), string('')),
         'abc',
-        '[sep1]: infinite loop detected; '
+        '[sepby1]: infinite loop detected; '
           + 'neither content nor separator parser consumed input',
       )
     })
   })
 
-  describe('end', () => {
-    const parser = end(letter(), char(','))
-    const parserm = end(letter(), char(','), 'comma separated letters')
+  describe('endby', () => {
+    const parser = endby(letter(), char(','))
+    const parserm = endby(letter(), char(','), 'comma separated letters')
 
     it('throws if its first argument is not a parser', () => {
       terror(
-        end(0, any()),
+        endby(0, any()),
         '',
-        '[end]: expected first argument to be a parser; found 0',
+        '[endby]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
-        end(any(), 0),
+        endby(any(), 0),
         '',
-        '[end]: expected second argument to be a parser; found 0',
+        '[endby]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its third argument is not a parser', () => {
       terror(
-        end(any(), any(), 0),
+        endby(any(), any(), 0),
         '',
-        '[end]: expected third argument to be a string; found 0',
+        '[endby]: expected third argument to be a string; found 0',
       )
     })
     it('succeeds with multiple values with separators', () => {
@@ -612,34 +612,34 @@ describe('Sequence combinators', () => {
       tpass(parserm, '1', { result: [], index: 0 })
     })
     it('fails if its content parser fails fatally', () => {
-      tfail(end(seq(letter(), letter()), char(',')), 'ab,a1', {
+      tfail(endby(seq(letter(), letter()), char(',')), 'ab,a1', {
         expected: 'a letter',
         index: 4,
         status: Fatal,
       })
-      tfail(end(seq(letter(), letter()), char(',')), 'a1', {
+      tfail(endby(seq(letter(), letter()), char(',')), 'a1', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
-      tfail(end(seq(letter(), letter()), char(','), 'test'), 'ab,a1', {
+      tfail(endby(seq(letter(), letter()), char(','), 'test'), 'ab,a1', {
         expected: 'test',
         index: 4,
         status: Fatal,
       })
-      tfail(end(seq(letter(), letter()), char(','), 'test'), 'a1', {
+      tfail(endby(seq(letter(), letter()), char(','), 'test'), 'a1', {
         expected: 'test',
         index: 1,
         status: Fatal,
       })
     })
     it('fails if its separator parser fails fatally', () => {
-      tfail(end(letter(), seq(char('-'), char('-'))), 'a--b-c', {
+      tfail(endby(letter(), seq(char('-'), char('-'))), 'a--b-c', {
         expected: "'-'",
         index: 5,
         status: Fatal,
       })
-      tfail(end(letter(), seq(char('-'), char('-')), 'test'), 'a--b-c', {
+      tfail(endby(letter(), seq(char('-'), char('-')), 'test'), 'a--b-c', {
         expected: 'test',
         index: 5,
         status: Fatal,
@@ -647,37 +647,37 @@ describe('Sequence combinators', () => {
     })
     it('throws if an infinite loop was detected', () => {
       terror(
-        end(string(''), string('')),
+        endby(string(''), string('')),
         'abc',
-        '[end]: infinite loop detected; '
+        '[endby]: infinite loop detected; '
           + 'neither content nor separator parser consumed input',
       )
     })
   })
 
-  describe('end1', () => {
-    const parser = end1(letter(), char(','))
-    const parserm = end1(letter(), char(','), 'comma separated letters')
+  describe('endby1', () => {
+    const parser = endby1(letter(), char(','))
+    const parserm = endby1(letter(), char(','), 'comma separated letters')
 
     it('throws if its first argument is not a parser', () => {
       terror(
-        end1(0, any()),
+        endby1(0, any()),
         '',
-        '[end1]: expected first argument to be a parser; found 0',
+        '[endby1]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
-        end1(any(), 0),
+        endby1(any(), 0),
         '',
-        '[end1]: expected second argument to be a parser; found 0',
+        '[endby1]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its third argument is not a parser', () => {
       terror(
-        end1(any(), any(), 0),
+        endby1(any(), any(), 0),
         '',
-        '[end1]: expected third argument to be a string; found 0',
+        '[endby1]: expected third argument to be a string; found 0',
       )
     })
     it('succeeds with multiple values with separators', () => {
@@ -709,34 +709,34 @@ describe('Sequence combinators', () => {
       })
     })
     it('fails if its content parser fails fatally', () => {
-      tfail(end1(seq(letter(), letter()), char(',')), 'ab,a1', {
+      tfail(endby1(seq(letter(), letter()), char(',')), 'ab,a1', {
         expected: 'a letter',
         index: 4,
         status: Fatal,
       })
-      tfail(end1(seq(letter(), letter()), char(',')), 'a1', {
+      tfail(endby1(seq(letter(), letter()), char(',')), 'a1', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
-      tfail(end1(seq(letter(), letter()), char(','), 'test'), 'ab,a1', {
+      tfail(endby1(seq(letter(), letter()), char(','), 'test'), 'ab,a1', {
         expected: 'test',
         index: 4,
         status: Fatal,
       })
-      tfail(end1(seq(letter(), letter()), char(','), 'test'), 'a1', {
+      tfail(endby1(seq(letter(), letter()), char(','), 'test'), 'a1', {
         expected: 'test',
         index: 1,
         status: Fatal,
       })
     })
     it('fails if its separator parser fails fatally', () => {
-      tfail(end1(letter(), seq(char('-'), char('-'))), 'a--b-c', {
+      tfail(endby1(letter(), seq(char('-'), char('-'))), 'a--b-c', {
         expected: "'-'",
         index: 5,
         status: Fatal,
       })
-      tfail(end1(letter(), seq(char('-'), char('-')), 'test'), 'a--b-c', {
+      tfail(endby1(letter(), seq(char('-'), char('-')), 'test'), 'a--b-c', {
         expected: 'test',
         index: 5,
         status: Fatal,
@@ -744,9 +744,9 @@ describe('Sequence combinators', () => {
     })
     it('throws if an infinite loop was detected', () => {
       terror(
-        end1(string(''), string('')),
+        endby1(string(''), string('')),
         'abc',
-        '[end1]: infinite loop detected; '
+        '[endby1]: infinite loop detected; '
           + 'neither content nor separator parser consumed input',
       )
     })

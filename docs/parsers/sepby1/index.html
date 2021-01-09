@@ -18,7 +18,7 @@
     
     
       
-        <title>sep1 - Kessel</title>
+        <title>sepby1 - Kessel</title>
       
     
     
@@ -91,7 +91,7 @@
           </span>
           <span class="md-header-nav__topic md-ellipsis">
             
-              sep1
+              sepby1
             
           </span>
         </div>
@@ -784,8 +784,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../end/" class="md-nav__link">
-      end
+    <a href="../endby/" class="md-nav__link">
+      endby
     </a>
   </li>
 
@@ -796,8 +796,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../end1/" class="md-nav__link">
-      end1
+    <a href="../endby1/" class="md-nav__link">
+      endby1
     </a>
   </li>
 
@@ -1240,8 +1240,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../sep/" class="md-nav__link">
-      sep
+    <a href="../sepby/" class="md-nav__link">
+      sepby
     </a>
   </li>
 
@@ -1259,12 +1259,12 @@
     
     
       <label class="md-nav__link md-nav__link--active" for="__toc">
-        sep1
+        sepby1
         <span class="md-nav__icon md-icon"></span>
       </label>
     
     <a href="./" class="md-nav__link md-nav__link--active">
-      sep1
+      sepby1
     </a>
     
       
@@ -2053,7 +2053,7 @@
               
                 
                 
-                  <h1>sep1</h1>
+                  <h1>sepby1</h1>
                 
                 <!--
  Copyright (c) 2020 Thomas J. Otterson
@@ -2063,13 +2063,13 @@
 -->
 
 <blockquote>
-<p><code>sep1(p: Parser, s: Parser, m?: string): Parser</code></p>
+<p><code>sepby1(p: Parser, s: Parser, m?: string): Parser</code></p>
 </blockquote>
 <p>Parses one or more occurrences of a content parser, separated by a separator parser.</p>
-<p><code>sep1</code> applies the content parser <code>p</code> one or more times as long as both it and the preceding separator parser <code>s</code> match. The operation of the parser in EBNF is <code>p (s p)*</code>. Results of the separator parser are discarded, but results of the content parser are returned in an array.</p>
+<p><code>sepby1</code> applies the content parser <code>p</code> one or more times as long as both it and the preceding separator parser <code>s</code> match. The operation of the parser in EBNF is <code>p (s p)*</code>. Results of the separator parser are discarded, but results of the content parser are returned in an array.</p>
 <p>The content parser must be the last to match. If the separator parser succeeds but the content parser fails after it, then the parser state is left at the location immediately after the last success of the content parser (i.e., at the beginning of the text matched by the separator parser).</p>
 <h4 id="example">Example</h4>
-<div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">sep1</span><span class="p">(</span><span class="nx">count</span><span class="p">(</span><span class="nx">letter</span><span class="p">,</span> <span class="mf">3</span><span class="p">),</span> <span class="kr">char</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">))</span>
+<div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">sepby1</span><span class="p">(</span><span class="nx">count</span><span class="p">(</span><span class="nx">letter</span><span class="p">,</span> <span class="mf">3</span><span class="p">),</span> <span class="kr">char</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">))</span>
 
 <span class="kr">const</span> <span class="nx">s</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;aaa,bbb,ccc&#39;</span><span class="p">)</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">status</span><span class="p">(</span><span class="nx">s</span><span class="p">))</span>  <span class="c1">// &quot;ok&quot;</span>
@@ -2117,8 +2117,8 @@
 <h4 id="see-also">See Also</h4>
 <ul>
 <li><a href="../../types/parser/"><code>Parser</code></a></li>
-<li><a href="../end1/"><code>end1</code></a></li>
-<li><a href="../sep/"><code>sep</code></a></li>
+<li><a href="../endby1/"><code>endby1</code></a></li>
+<li><a href="../sepby/"><code>sepby</code></a></li>
 </ul>
                 
               
@@ -2138,7 +2138,7 @@
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
         
-          <a href="../sep/" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../sepby/" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-footer-nav__button md-icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
             </div>
@@ -2147,7 +2147,7 @@
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                sep
+                sepby
               </div>
             </div>
           </a>

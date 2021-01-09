@@ -337,12 +337,12 @@ export const skip = (p, m) => parser(ctx => {
  * @returns {Parser} A parser that results in an array of all of the
  *     content parser results, discarding the separator parser results.
  */
-export const sep = (p, s, m) => parser(ctx => {
+export const sepby = (p, s, m) => parser(ctx => {
   const hasM = m != null
 
-  ASSERT && assertParser('sep', p, argParFormatter(1, true))
-  ASSERT && assertParser('sep', s, argParFormatter(2, true))
-  ASSERT && hasM && assertString('sep', m, argStrFormatter(3, true))
+  ASSERT && assertParser('sepby', p, argParFormatter(1, true))
+  ASSERT && assertParser('sepby', s, argParFormatter(2, true))
+  ASSERT && hasM && assertString('sepby', m, argStrFormatter(3, true))
 
   let index = ctx.index
   const merror = expected(m)
@@ -373,7 +373,7 @@ export const sep = (p, s, m) => parser(ctx => {
     }
     if (pres.status === Fail) break
 
-    if (context.index === index) throw new TypeError(loopMessage('sep'))
+    if (context.index === index) throw new TypeError(loopMessage('sepby'))
     values.push(pres.value)
   }
   return okReply(context, values, index)
@@ -399,12 +399,12 @@ export const sep = (p, s, m) => parser(ctx => {
  * @returns {Parser} A parser that results in an array of all of the
  *     content parser results, discarding the separator parser results.
  */
-export const sep1 = (p, s, m) => parser(ctx => {
+export const sepby1 = (p, s, m) => parser(ctx => {
   const hasM = m != null
 
-  ASSERT && assertParser('sep1', p, argParFormatter(1, true))
-  ASSERT && assertParser('sep1', s, argParFormatter(2, true))
-  ASSERT && hasM && assertString('sep1', m, argStrFormatter(3, true))
+  ASSERT && assertParser('sepby1', p, argParFormatter(1, true))
+  ASSERT && assertParser('sepby1', s, argParFormatter(2, true))
+  ASSERT && hasM && assertString('sepby1', m, argStrFormatter(3, true))
 
   let index = ctx.index
   const merror = expected(m)
@@ -435,7 +435,7 @@ export const sep1 = (p, s, m) => parser(ctx => {
     }
     if (pres.status === Fail) break
 
-    if (context.index === index) throw new TypeError(loopMessage('sep1'))
+    if (context.index === index) throw new TypeError(loopMessage('sepby1'))
     values.push(pres.value)
   }
   return okReply(context, values, index)
@@ -461,12 +461,12 @@ export const sep1 = (p, s, m) => parser(ctx => {
  * @returns {Parser} A parser that results in an array of all of the
  *     content parser results, discarding the separator parser results.
  */
-export const end = (p, s, m) => parser(ctx => {
+export const endby = (p, s, m) => parser(ctx => {
   const hasM = m != null
 
-  ASSERT && assertParser('end', p, argParFormatter(1, true))
-  ASSERT && assertParser('end', s, argParFormatter(2, true))
-  ASSERT && hasM && assertString('end', m, argStrFormatter(3, true))
+  ASSERT && assertParser('endby', p, argParFormatter(1, true))
+  ASSERT && assertParser('endby', s, argParFormatter(2, true))
+  ASSERT && hasM && assertString('endby', m, argStrFormatter(3, true))
 
   let index = ctx.index
   const merror = expected(m)
@@ -497,7 +497,7 @@ export const end = (p, s, m) => parser(ctx => {
     }
     if (pres.status === Fail) break
 
-    if (context.index === index) throw new TypeError(loopMessage('end'))
+    if (context.index === index) throw new TypeError(loopMessage('endby'))
     values.push(pres.value)
   }
   const [sctx, sres] = s({ ...context, index })
@@ -527,12 +527,12 @@ export const end = (p, s, m) => parser(ctx => {
  * @returns {Parser} A parser that results in an array of all of the
  *     content parser results, discarding the separator parser results.
  */
-export const end1 = (p, s, m) => parser(ctx => {
+export const endby1 = (p, s, m) => parser(ctx => {
   const hasM = m != null
 
-  ASSERT && assertParser('end1', p, argParFormatter(1, true))
-  ASSERT && assertParser('end1', s, argParFormatter(2, true))
-  ASSERT && hasM && assertString('end1', m, argStrFormatter(3, true))
+  ASSERT && assertParser('endby1', p, argParFormatter(1, true))
+  ASSERT && assertParser('endby1', s, argParFormatter(2, true))
+  ASSERT && hasM && assertString('endby1', m, argStrFormatter(3, true))
 
   let index = ctx.index
   const merror = expected(m)
@@ -563,7 +563,7 @@ export const end1 = (p, s, m) => parser(ctx => {
     }
     if (pres.status === Fail) break
 
-    if (context.index === index) throw new TypeError(loopMessage('end1'))
+    if (context.index === index) throw new TypeError(loopMessage('endby1'))
     values.push(pres.value)
   }
   const [sctx, sres] = s({ ...context, index })

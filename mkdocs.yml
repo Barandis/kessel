@@ -64,8 +64,8 @@ nav:
       - def: parsers/def.md
       - digit: parsers/digit.md
       - empty: parsers/empty.md
-      - end: parsers/end.md
-      - end1: parsers/end1.md
+      - endby: parsers/endby.md
+      - endby1: parsers/endby1.md
       - eof: parsers/eof.md
       - fail: parsers/fail.md
       - fatal: parsers/fatal.md
@@ -102,8 +102,8 @@ nav:
       - rightB: parsers/rightb.md
       - satisfy: parsers/satisfy.md
       - second: parsers/second.md
-      - sep: parsers/sep.md
-      - sep1: parsers/sep1.md
+      - sepby: parsers/sepby.md
+      - sepby1: parsers/sepby1.md
       - seq: parsers/seq.md
       - seqB: parsers/seqb.md
       - skip: parsers/skip.md
