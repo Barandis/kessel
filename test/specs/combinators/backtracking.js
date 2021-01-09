@@ -689,39 +689,68 @@ describe('Backtracking and error handling combinators', () => {
   })
 
   describe('blockB', () => {
-    const parser = blockB(function *() {
+    const g = function *() {
       yield seq(char('a'), char('b'), char('c'))
       yield space
       const c = yield any
       yield space
 
       return c
-    })
+    }
+    const parser = blockB(g)
+    const parserm = blockB(g, 'abc then char')
 
-    it('throws if its argument is not a generator function', () => {
-      terror(blockB(0), '', '[blockB]: expected a generator function; found 0')
+    it('throws if its first argument is not a generator function', () => {
+      terror(
+        blockB(0),
+        '',
+        '[blockB]: expected argument to be a generator function; found 0',
+      )
       terror(
         blockB(() => {}),
         '',
-        '[blockB]: expected a generator function; found function',
+        '[blockB]: expected argument to be a generator function; '
+          + 'found function',
+      )
+      terror(
+        blockB(0, 'test'),
+        '',
+        '[blockB]: expected first argument to be a generator function; found 0',
+      )
+    })
+    it('throws if its second argument exists and is not a string', () => {
+      terror(
+        blockB(function *() { yield 1 }, 0),
+        '',
+        '[blockB]: expected second argument to be a string; found 0',
       )
     })
     it('throws if it yields something other than a parser', () => {
       terror(
         blockB(function *() { yield any; yield 0; return 0 }),
         'abc',
-        '[blockB]: expected 2nd yield to be to a parser; found 0',
+        '[blockB]: expected second yield to be to a parser; found 0',
       )
       terror(
         blockB(function *() { yield any; yield any; yield x => x; return 0 }),
         'abc',
-        '[blockB]: expected 3rd yield to be to a parser; found function',
+        '[blockB]: expected third yield to be to a parser; found function',
       )
     })
     it('fails if any of its parsers fail', () => {
       tfail(parser, 'abd', { expected: "'c'", index: 2, status: Fatal })
+      tfail(parserm, 'abd', {
+        expected: 'abc then char',
+        index: 2,
+        status: Fatal,
+      })
       tfail(parser, 'abcd', {
         nested: 'a whitespace character',
+        index: 0,
+        status: Fail,
+      })
+      tfail(parserm, 'abcd', {
+        compound: 'abc then char',
         index: 0,
         status: Fail,
       })
@@ -730,14 +759,25 @@ describe('Backtracking and error handling combinators', () => {
         index: 0,
         status: Fail,
       })
+      tfail(parserm, 'abc ', {
+        compound: 'abc then char',
+        index: 0,
+        status: Fail,
+      })
       tfail(parser, 'abc de', {
         nested: 'a whitespace character',
+        index: 0,
+        status: Fail,
+      })
+      tfail(parserm, 'abc de', {
+        compound: 'abc then char',
         index: 0,
         status: Fail,
       })
     })
     it('succeeds with its return value if all parsers succeed', () => {
       tpass(parser, 'abc d ', { result: 'd', index: 6 })
+      tpass(parserm, 'abc d ', { result: 'd', index: 6 })
     })
     it('gives opt error messages if later parsers fail', () => {
       const parser = blockB(function *() {

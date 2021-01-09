@@ -2075,7 +2075,7 @@
 -->
 
 <blockquote>
-<p><code>block(genFn: Iterator&lt;Parser&lt;any&gt;, T, any&gt;): Parser&lt;T&gt;</code></p>
+<p><code>blockB(g: GeneratorFunction, m?: string): Parser</code></p>
 </blockquote>
 <p>Executes a generator function that can yield to parsers in its body.</p>
 <p>This is a backtracking version of the <a href="block"><code>block</code></a> parser. It operates in exactly the same manner, except that if one of its parsers fail non-fatally after other of its parsers have consumed some input, it will backtrack to the position it was at the beginning of the <code>blockB</code> parser and report a non-fatal failure (<code>block</code> in this case would not backtrack and its failure would be fatal).</p>
@@ -2117,10 +2117,11 @@
                         <span class="c1">//    ^</span>
                         <span class="c1">//   Expected a digit</span>
 </code></pre></div>
-<p>See <a href="#block"><code>block</code></a> for a detailed breakdown of the example. That example works exactly the same as this one except with regard to the third case. With <code>block</code>, this case is a fatal error, but <code>blockB</code> backtracks and converts the error to a non-fatal one.</p>
+<p>See <a href="../block/"><code>block</code></a> for a detailed breakdown of the example. That example works exactly the same as this one except with regard to the third case. With <code>block</code>, this case is a fatal error, but <code>blockB</code> backtracks and converts the error to a non-fatal one.</p>
 <h4 id="parameters">Parameters</h4>
 <ul>
-<li><code>genFn</code>: A generator function that provides the body of the <code>blockB</code> parser. This generator function can <code>yield</code> parsers, which will have those parsers' results fed back into the function when it's restarted (so that they can be assigned to variables, used in calculations, etc.). The return value of this generator function becomes the result of the <code>blockB</code> parser.</li>
+<li><code>g</code>: A generator function that provides the body of the <code>blockB</code> parser. This generator function can <code>yield</code> parsers, which will have those parsers' results fed back into the function when it's restarted (so that they can be assigned to variables, used in calculations, etc.). The return value of this generator function becomes the result of the <code>blockB</code> parser.</li>
+<li><code>m</code>: The optional expected error message that will take the place of the default error message.</li>
 </ul>
 <h4 id="success">Success</h4>
 <ul>
@@ -2136,7 +2137,8 @@
 </ul>
 <h4 id="throws">Throws</h4>
 <ul>
-<li>Throws an error if <code>genFn</code> is not a generator function. </li>
+<li>Throws an error if <code>g</code> is not a generator function. </li>
+<li>Throws an error if <code>m</code> exists and is not a string.</li>
 <li>Throws an error if any <code>yield</code> statement is executed and the value that is yielded is not a parser.</li>
 </ul>
 <h4 id="see-also">See Also</h4>

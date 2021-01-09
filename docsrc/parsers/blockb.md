@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `block(genFn: Iterator<Parser<any>, T, any>): Parser<T>`
+> `blockB(g: GeneratorFunction, m?: string): Parser`
 
 Executes a generator function that can yield to parsers in its body.
 
@@ -53,11 +53,12 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
                         //   Expected a digit
 ```
 
-See [`block`](#block) for a detailed breakdown of the example. That example works exactly the same as this one except with regard to the third case. With `block`, this case is a fatal error, but `blockB` backtracks and converts the error to a non-fatal one.
+See [`block`](block.md) for a detailed breakdown of the example. That example works exactly the same as this one except with regard to the third case. With `block`, this case is a fatal error, but `blockB` backtracks and converts the error to a non-fatal one.
 
 #### Parameters
 
-* `genFn`: A generator function that provides the body of the `blockB` parser. This generator function can `yield` parsers, which will have those parsers' results fed back into the function when it's restarted (so that they can be assigned to variables, used in calculations, etc.). The return value of this generator function becomes the result of the `blockB` parser.
+* `g`: A generator function that provides the body of the `blockB` parser. This generator function can `yield` parsers, which will have those parsers' results fed back into the function when it's restarted (so that they can be assigned to variables, used in calculations, etc.). The return value of this generator function becomes the result of the `blockB` parser.
+* `m`: The optional expected error message that will take the place of the default error message.
 
 #### Success
 
@@ -73,7 +74,8 @@ See [`block`](#block) for a detailed breakdown of the example. That example work
 
 #### Throws
 
-* Throws an error if `genFn` is not a generator function. 
+* Throws an error if `g` is not a generator function. 
+* Throws an error if `m` exists and is not a string.
 * Throws an error if any `yield` statement is executed and the value that is yielded is not a parser.
 
 #### See Also

@@ -5,6 +5,7 @@
 
 import {
   argFnFormatter,
+  argGenFormatter,
   argNumFormatter,
   argParFormatter,
   argStrFormatter,
@@ -29,6 +30,7 @@ import {
   range,
   replyFn,
   stringify,
+  wordinal,
 } from 'kessel/util'
 
 const { Ok, Fail, Fatal } = Status
@@ -345,6 +347,7 @@ export const repeatB = (p, n, m) => parser(ctx => {
  *     array and become the returned parser's result.
  * @param {Parser} e The end parser. Parsing ends when this parser
  *     succeeds. Its result is discarded.
+ * @param {string} [m] The error message to use if the parser fails.
  * @returns {Parser} A parser which will execute `e` and then `p` zero
  *     or more times until `e` succeeds.
  */
@@ -389,18 +392,22 @@ export const untilB = (p, e, m) => parser(ctx => {
  * the point where the first parser was executed and will fail
  * non-fatally.
  *
- * @param {function():*} genFn A generator function that takes no
- *     arguments and returns whatever should be used as the returned
- *     parser's result. This generator function can `yield` only
- *     `Parser`s; otherwise an error is thrown.
+ * @param {function():*} g A generator function that takes no arguments
+ *     and returns whatever should be used as the returned parser's
+ *     result. This generator function can `yield` only `Parser`s;
+ *     otherwise an error is thrown.
+ * @param {string} [m] The error message to use if the parser fails.
  * @returns {Parser} A parser that executes the generator function,
  *     executes parsers as they are yielded, and results in the return
  *     value of the generator.
  */
-export const blockB = genFn => parser(ctx => {
-  ASSERT && assertGenFunction('blockB', genFn)
+export const blockB = (g, m) => parser(ctx => {
+  const hasM = m != null
 
-  const gen = genFn()
+  ASSERT && assertGenFunction('blockB', g, argGenFormatter(1, hasM))
+  ASSERT && hasM && assertString('blockB', m, argStrFormatter(2, true))
+
+  const gen = g()
   const index = ctx.index
   let errors = []
   let nextValue
@@ -412,17 +419,17 @@ export const blockB = genFn => parser(ctx => {
     if (done) return okReply(context, value)
 
     ASSERT && assertParser('blockB', value, v => `expected ${
-      ordinal(i + 1)
+      wordinal(i + 1)
     } yield to be to a parser; found ${stringify(v)}`)
 
     const [pctx, pres] = value(context)
     context = pctx
     errors = pres.errors?.length ? merge(errors, pres.errors) : []
 
-    if (pres.status === Fatal) return fatalReply(context, errors)
+    if (pres.status === Fatal) return fatalReply(pctx, ferror(m, errors))
     if (pres.status === Fail) {
-      const err = index === context.index ? errors : nested(context, errors)
-      return failReply(context, err, index)
+      const error = berror(pctx.index !== index, m, pctx, errors)
+      return failReply(pctx, error, index)
     }
     nextValue = pres.value
     i++
