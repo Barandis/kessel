@@ -72,4 +72,4 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 
 * [`Parser`](../types/parser.md)
 * [`between`](between.md)
-* [`manyTillB`](manytillb.md)
+* [`untilB`](untilb.md)

@@ -13,7 +13,7 @@ import {
   blockB,
   chainB,
   leftB,
-  manyTillB,
+  untilB,
   pipeB,
   repeatB,
   rightB,
@@ -613,52 +613,75 @@ describe('Backtracking and error handling combinators', () => {
     })
   })
 
-  describe('manyTillB', () => {
+  describe('untilB', () => {
     it('throws if its first argument is not a parser', () => {
       terror(
-        manyTillB(0, any),
+        untilB(0, any),
         '',
-        '[manyTillB]: expected 1st argument to be a parser; found 0',
+        '[untilB]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
-        manyTillB(any, 0),
+        untilB(any, 0),
         '',
-        '[manyTillB]: expected 2nd argument to be a parser; found 0',
+        '[untilB]: expected second argument to be a parser; found 0',
+      )
+    })
+    it('throws if its third argument exist and is not a parser', () => {
+      terror(
+        untilB(any, any, 0),
+        '',
+        '[untilB]: expected third argument to be a string; found 0',
       )
     })
     it('succeeds with content parser results before the end', () => {
-      tpass(manyTillB(any, letter), '12./abc', ['1', '2', '.', '/'])
+      tpass(untilB(any, letter), '12./abc', ['1', '2', '.', '/'])
+      tpass(untilB(any, letter, 'test'), '12./abc', ['1', '2', '.', '/'])
     })
     it('can succeed with zero successes', () => {
-      tpass(manyTillB(any, letter), 'abc', [])
+      tpass(untilB(any, letter), 'abc', [])
+      tpass(untilB(any, letter, 'test'), 'abc', [])
     })
     it('fails if the content parser fails before the end', () => {
-      tfail(manyTillB(digit, letter), '.123abc', {
+      tfail(untilB(digit, letter), '.123abc', {
         expected: 'a digit or a letter',
+        index: 0,
+        status: Fail,
+      })
+      tfail(untilB(digit, letter, 'digit then letter'), '.123abc', {
+        expected: 'digit then letter',
         index: 0,
         status: Fail,
       })
     })
     it('backtracks if input is consumed before content parser fails', () => {
-      const [ctx, result] = parse(manyTillB(digit, letter), '123.abc')
-      const err = result.errors[0]
-
-      expect(ctx.index).to.equal(0)
-      expect(result.status).to.equal(Fail)
-      expect(err.ctx.index).to.equal(3)
-      expect(err.errors[0].label).to.equal('a digit')
-      expect(err.errors[1].label).to.equal('a letter')
+      tfail(untilB(digit, letter), '123.abc', {
+        nested: 'a digit',
+        index: 0,
+        ctxindex: 3,
+        status: Fail,
+      })
+      tfail(untilB(digit, letter, 'digit then letter'), '123.abc', {
+        compound: 'digit then letter',
+        index: 0,
+        ctxindex: 3,
+        status: Fail,
+      })
     })
     it('fails fatally if either of its parsers fail fatally', () => {
-      tfail(manyTillB(digit, seq(letter, digit)), '123abc', {
+      tfail(untilB(digit, seq(letter, digit)), '123abc', {
         expected: 'a digit',
         index: 4,
         status: Fatal,
       })
-      tfail(manyTillB(seq(letter, digit), digit), 'a1b2cc3', {
-        expected: 'a digit',
+      tfail(untilB(digit, seq(letter, digit), '\\d\\w\\d'), '123abc', {
+        expected: '\\d\\w\\d',
+        index: 4,
+        status: Fatal,
+      })
+      tfail(untilB(seq(letter, digit), digit, '\\w\\d\\d'), 'a1b2cc3', {
+        expected: '\\w\\d\\d',
         index: 5,
         status: Fatal,
       })

@@ -83,7 +83,6 @@ nav:
       - lowerU: parsers/loweru.md
       - many: parsers/many.md
       - many1: parsers/many1.md
-      - manyTillB: parsers/manytillb.md
       - map: parsers/map.md
       - newline: parsers/newline.md
       - newlineU: parsers/newlineu.md
@@ -119,6 +118,7 @@ nav:
       - stringI: parsers/stringi.md
       - third: parsers/third.md
       - until: parsers/until.md
+      - untilB: parsers/untilb.md
       - upper: parsers/upper.md
       - upperU: parsers/upperu.md
       - value: parsers/value.md

@@ -337,39 +337,42 @@ export const repeatB = (p, n, m) => parser(ctx => {
  * the successful content parser results. The end parser is executed
  * *first*, so the results of the two parsers will not overlap.
  *
- * If `p` fails non-fatally before `end` succeeds, this parser will
+ * If `p` fails non-fatally before `e` succeeds, this parser will
  * backtrack to the point where `p` was executed the first time and will
  * fail non-fatally.
  *
  * @param {Parser} p The content parser. Its results are pushed into an
  *     array and become the returned parser's result.
- * @param {Parser} end The end parser. Parsing ends when this parser
+ * @param {Parser} e The end parser. Parsing ends when this parser
  *     succeeds. Its result is discarded.
- * @returns {Parser} A parser which will execute `end` and then `p` zero
- *     or more times until `end` succeeds.
+ * @returns {Parser} A parser which will execute `e` and then `p` zero
+ *     or more times until `e` succeeds.
  */
-export const manyTillB = (p, end) => parser(ctx => {
-  ASSERT && assertParser('manyTillB', p, ordParFormatter('1st'))
-  ASSERT && assertParser('manyTillB', end, ordParFormatter('2nd'))
+export const untilB = (p, e, m) => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && assertParser('untilB', p, argParFormatter(1, true))
+  ASSERT && assertParser('untilB', e, argParFormatter(2, true))
+  ASSERT && hasM && assertString('untilB', m, argStrFormatter(3, true))
 
   const index = ctx.index
   const values = []
   let context = ctx
 
   while (true) {
-    const [endrep, [endctx, endres]] = dup(end(context))
-    context = endctx
-    if (endres.status === Fatal) return endrep
-    if (endres.status === Ok) break
+    const [ectx, eres] = e(context)
+    context = ectx
+    if (eres.status === Fatal) return fatalReply(ectx, ferror(m, eres.errors))
+    if (eres.status === Ok) break
 
-    const [prep, [pctx, pres]] = dup(p(context))
+    const [pctx, pres] = p(context)
     context = pctx
-    if (pres.status === Fatal) return prep
+    if (pres.status === Fatal) return fatalReply(pctx, ferror(m, pres.errors))
     if (pres.status === Fail) {
-      const err = index === pctx.index
-        ? merge(pres.errors, endres.errors)
-        : nested(pctx, merge(pres.errors, endres.errors))
-      return failReply(pctx, err, index)
+      const error = berror(
+        pctx.index !== index, m, pctx, merge(pres.errors, eres.errors),
+      )
+      return failReply(pctx, error, index)
     }
     values.push(pres.value)
   }

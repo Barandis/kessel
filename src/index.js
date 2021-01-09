@@ -69,11 +69,11 @@ export {
   blockB,
   chainB,
   leftB,
-  manyTillB,
   pipeB,
   repeatB,
   rightB,
   seqB,
+  untilB,
 } from './combinators/backtracking'
 export {
   apply,

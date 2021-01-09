@@ -129,7 +129,7 @@ Additionally, parsers are often said to *return* a value or to have a value as a
 | [`rightB`](parsers/rightb.md) | Executes two parsers in order and returns the result of the second one. Backtracks to the location where the first parser was applied if the second one fails. |
 | [`pipeB`](parsers/pipeb.md) | Executes a series of parsers in order, then passes the results as arguments to a function, then returns the result of that function. Backtracks to where the first parser was applied if any other parser fails. |
 | [`repeatB`](parsers/repeatb.md) | Executes a parser a certain number of times, returning the results in an array. Backtracks to where the first parser was applied if any other parser fails. |
-| [`manyTillB`](parsers/manytillb.md) | Executes a content parser zero or more times until an end parser succeeds. Returns the content parser's results. Backtracks to where the content parser was first applied if it fails before the end parser succeeds. |
+| [`untilB`](parsers/untilb.md) | Executes a content parser zero or more times until an end parser succeeds. Returns the content parser's results. Backtracks to where the content parser was first applied if it fails before the end parser succeeds. |
 | [`betweenB`](parsers/betweenb.md) | Executes a content parser between two other parsers, returning only the content parser's result. Backtracks to where the first parser was applied if either other parser fails. |
 
 ### Table 8: Chaining combinators
