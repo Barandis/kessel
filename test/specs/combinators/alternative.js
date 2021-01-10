@@ -175,6 +175,10 @@ describe('Alternative and conditional combinators', () => {
       tpass(parser, 'abcd', { result: ['ab', 'cd'], index: 0 })
       tpass(parserm, 'abcd', { result: ['ab', 'cd'], index: 0 })
     })
+    it('fails regularly if there was no consumption', () => {
+      tfail(parser, 'bcd', { expected: "'ab'", index: 0 })
+      tfail(parserm, 'bcd', { expected: "'abcd'", index: 0 })
+    })
     it('fails with no consumption if its parser fails', () => {
       tfail(parser, 'abd', { nested: "'cd'", index: 0 })
       tfail(parserm, 'abd', { compound: "'abcd'", index: 0 })

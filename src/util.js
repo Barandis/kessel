@@ -1,4 +1,3 @@
-/* istanbul ignore file */
 // Copyright (c) 2020 Thomas J. Otterson
 //
 // This software is released under the MIT License.
@@ -60,32 +59,6 @@ export function *range(start, end, step, inclusive) {
     current = forward ? current + p : current - p
   }
   /* eslint-enable require-atomic-updates */
-}
-
-/**
- * An iterator that pairs values in an iterable with their indexes in a
- * series of two-element arrays. The first array element is the index;
- * the second is the value from the iterable.
- *
- * For arrays, this can be done with `array.entries()`, which produces
- * two-element arrays in the same format. However, this generator
- * function will work with any kind of object implementing the
- * `Iterable` interface.
- *
- * @param {Iterable} iterable An iterable object whose elements will
- *     be paired with their indexes.
- * @yields {[number, *]} The iterable's values, paired with their
- *     indexes.
- */
-export function *enumerate(iterable) {
-  const iterator = iterable[Symbol.iterator]()
-  let result = iterator.next()
-  let index = 0
-
-  while (!result.done) {
-    yield [index++, result.value]
-    result = iterator.next()
-  }
 }
 
 /**
@@ -327,19 +300,6 @@ export function track(fn, prop = 'created') {
   )
 }
 
-/**
- * Converts a number to its string ordinal form (i.e., `1` becomes
- * `'1st'`, `1729` becomes `'1729th'`, etc.)
- *
- * @param {number} n The number to convert into an ordinal.
- * @returns {string} The same number in its ordinal form.
- */
-export function ordinal(n) {
-  const suffixes = ['th', 'st', 'nd', 'rd']
-  const v = n % 100
-  return n + (suffixes[(v - 20) % 10] ?? suffixes[v] ?? suffixes[0])
-}
-
 const nums = [
   'zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight',
   'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen',
@@ -420,17 +380,6 @@ export function stringify(value) {
   }
   if (typeof value === 'symbol') return `Symbol(${value.description})`
   return JSON.stringify(value)
-}
-
-/**
- * Adds the appropriate indefinite article ('a' or 'an') to a word based
- * on its first letter.
- *
- * @param {string} str The string to prepend an article to.
- * @returns {string} The string with the prepended article.
- */
-export function articlify(str) {
-  return 'aeiouAEIOU'.includes(str[0]) ? `an ${str}` : `a ${str}`
 }
 
 // --------------------------------------------------------------------
