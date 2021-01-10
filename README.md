@@ -37,29 +37,28 @@ To illustrate, here's a short parser definition for a CSV parser. This is a full
 
 ```javascript
 import { 
-  char, choice, join, label, many, newline, noneOf, run, second, sepBy,
-  sepEndBy, sequenceB, string, value,
+  alt, bbetween, char, endby, join, many, newline, noneof, run, sepby, str, value,
 } from 'kessel'
 
-const quotedChar = choice(noneOf('"'), value(string('""'), '"'))
+const quotedChar = alt(noneof('"'), value(str('""'), '"'))
 
-const quotedCell = second(sequenceB(
+const quotedCell = bbetween(
+  char('"'),
   char('"'),
   join(many(quotedChar)),
-  label(char('"'), 'quote at end of cell'),
 ))
 
-const cell = choice(quotedCell, join(many(noneOf(',\n\r'))))
-const line = sepBy(cell, char(','))
-const csv = sepEndBy(line, newline)
+const cell = alt(quotedCell, join(many(noneof(',\n\r'))))
+const line = sepby(cell, char(','))
+const csv = endby(line, newline())
 
 const parseCsv = input => run(csv, input)
 ```
 
-To demonstrate the composability of the parsers in this library, and to show that all of the intermediate variables (`quotedChar`, `quotedCell`, `cell`, `line`, and `csv`) are in fact parsers themselves, here's the same thing as a single line (please do not actually write code in this way):
+To demonstrate the composability of the parsers in this library, and to show that all of the intermediate variables (`quotedChar`, `quotedCell`, `cell`, `line`, and `csv`) are in fact parsers themselves, here's the same thing as a single line (please do not actually write code this way):
 
 ```javascript
-const parseCsv = input => run(sepEndBy(sepBy(choice(second(sequenceB(char('"'), join(many(choice(noneOf('"'), value(string('""'), '"')))), label(char('"'), 'quote at end of cell'))), join(many(noneOf(',\n\r')))), char(',')), newline), input)
+const parseCsv = input => run(endby(sepby(alt(bbetween(char('"'),char('"'),join(many(alt(noneof('"'),value(str('""'),'"'))))),join(many(noneof(',\n\r')))),char(',')),newline()),input)
 ```
 
 Running this against CSV input will produce the following result (CSV input is from [Wikipedia's article on comma-separated values][4]):
