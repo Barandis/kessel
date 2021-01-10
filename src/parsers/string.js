@@ -91,11 +91,11 @@ export const str = (s, m) => parser(ctx => {
  * @returns {Parser} A parser that will succeed if the supplied string
  *     case-insensitively matches the next characters in the input.
  */
-export const strI = (s, m) => parser(ctx => {
+export const istr = (s, m) => parser(ctx => {
   const hasM = m != null
 
-  ASSERT && assertString('strI', s, argStrFormatter(1, hasM))
-  ASSERT && hasM && assertString('strI', m, argStrFormatter(2, true))
+  ASSERT && assertString('istr', s, argStrFormatter(1, hasM))
+  ASSERT && hasM && assertString('istr', m, argStrFormatter(2, true))
 
   const [srep, [sctx, sres]] = dup(stringParser(
     charLength(s), chars => s.toLowerCase() === chars.toLowerCase(),

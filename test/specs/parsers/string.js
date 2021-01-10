@@ -3,7 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { all, anystr, str, strI } from 'kessel/parsers/string'
+import { all, anystr, istr, str } from 'kessel/parsers/string'
 import { terror, tfail, tpass } from 'test/helper'
 
 describe('String parsers', () => {
@@ -112,30 +112,30 @@ describe('String parsers', () => {
     })
   })
 
-  describe('strI', () => {
+  describe('istr', () => {
     it('throws if its argument is not a string', () => {
-      terror(strI(0), '', '[strI]: expected argument to be a string; found 0')
+      terror(istr(0), '', '[istr]: expected argument to be a string; found 0')
       terror(
-        strI(0, 'test'),
+        istr(0, 'test'),
         '',
-        '[strI]: expected first argument to be a string; found 0',
+        '[istr]: expected first argument to be a string; found 0',
       )
     })
     it('throws if its second argument exists and is not a string', () => {
       terror(
-        strI('test', 0),
+        istr('test', 0),
         '',
-        '[strI]: expected second argument to be a string; found 0',
+        '[istr]: expected second argument to be a string; found 0',
       )
     })
     it('fails at the end of input', () => {
-      tfail(strI('abc'), '', "'abc'")
-      tfail(strI('abc', 'test'), '', 'test')
+      tfail(istr('abc'), '', "'abc'")
+      tfail(istr('abc', 'test'), '', 'test')
     })
 
     context('1-byte characters', () => {
-      const parser = strI('Onoma')
-      const parserm = strI('Onoma', 'test')
+      const parser = istr('Onoma')
+      const parserm = istr('Onoma', 'test')
 
       it('succeeds if the same number of characters is matched', () => {
         tpass(parser, 'Onomatopoeia', { result: 'Onoma', index: 5 })
@@ -156,8 +156,8 @@ describe('String parsers', () => {
     })
 
     context('2-byte characters', () => {
-      const parser = strI('Звуко')
-      const parserm = strI('Звуко', 'test')
+      const parser = istr('Звуко')
+      const parserm = istr('Звуко', 'test')
 
       it('succeeds if the same number of characters is matched', () => {
         tpass(parser, 'Звукоподражание', { result: 'Звуко', index: 10 })
@@ -178,8 +178,8 @@ describe('String parsers', () => {
     })
 
     context('3-byte characters', () => {
-      const parser = strI('คำเลี')
-      const parserm = strI('คำเลี', 'test')
+      const parser = istr('คำเลี')
+      const parserm = istr('คำเลี', 'test')
 
       it('succeeds if the same number of characters is matched', () => {
         tpass(parser, 'คำเลียนเสียง', { result: 'คำเลี', index: 15 })
@@ -196,8 +196,8 @@ describe('String parsers', () => {
     })
 
     context('4-byte characters', () => {
-      const parser = strI('𝑂𝑛𝑜𝑚𝑎')
-      const parserm = strI('𝑂𝑛𝑜𝑚𝑎', 'test')
+      const parser = istr('𝑂𝑛𝑜𝑚𝑎')
+      const parserm = istr('𝑂𝑛𝑜𝑚𝑎', 'test')
 
       it('succeeds if the same number of characters is matched', () => {
         tpass(parser, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂𝑛𝑜𝑚𝑎', index: 20 })

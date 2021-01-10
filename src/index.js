@@ -10,10 +10,10 @@ export {
   alpha,
   any,
   char,
-  charI,
   digit,
   eof,
   hex,
+  ichar,
   letter,
   lower,
   noneof,
@@ -46,8 +46,8 @@ export {
 export {
   all,
   anystr,
+  istr,
   str,
-  strI,
 } from './parsers/string'
 
 ///////////////////////////////////////////////////////////////////////

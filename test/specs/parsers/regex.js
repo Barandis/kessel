@@ -4,18 +4,18 @@
 // https://opensource.org/licenses/MIT
 
 import {
-  ualpha,
-  uletter,
-  ulower,
   newline,
-  unewline,
   regex,
   space,
   spaces,
   spaces1,
+  ualpha,
+  uletter,
+  ulower,
+  unewline,
+  uspace,
   uspaces1,
   uspaces,
-  uspace,
   uupper,
 } from 'kessel/parsers/regex'
 import { terror, tfail, tpass } from 'test/helper'

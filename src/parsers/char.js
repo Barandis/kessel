@@ -82,11 +82,11 @@ export const char = (c, m) => parser(ctx => {
  * @returns {Parser} A parser that will succeed if `c` (or its
  *     other-cased counterpart) is the next character in the input.
  */
-export const charI = (c, m) => parser(ctx => {
+export const ichar = (c, m) => parser(ctx => {
   const hasM = m != null
 
-  ASSERT && assertChar('charI', c, argCharFormatter(1, hasM))
-  ASSERT && hasM && assertString('charI', m, argStrFormatter(2, true))
+  ASSERT && assertChar('ichar', c, argCharFormatter(1, hasM))
+  ASSERT && hasM && assertString('ichar', m, argStrFormatter(2, true))
 
   const [crep, [cctx, cres]] = dup(charParser(
     ch => c.toLowerCase() === ch.toLowerCase(),

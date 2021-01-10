@@ -8,10 +8,10 @@ import {
   any,
   oneof,
   char,
-  charI,
   digit,
   eof,
   hex,
+  ichar,
   letter,
   lower,
   noneof,
@@ -147,41 +147,41 @@ describe('Character parsers', () => {
     })
   })
 
-  describe('charI', () => {
+  describe('ichar', () => {
     it('throws if something other than a single char is passed', () => {
       terror(
-        charI(0),
+        ichar(0),
         '',
-        '[charI]: expected argument to be a one-character string; found 0',
+        '[ichar]: expected argument to be a one-character string; found 0',
       )
       terror(
-        charI({}),
+        ichar({}),
         '',
-        '[charI]: expected argument to be a one-character string; found {}',
+        '[ichar]: expected argument to be a one-character string; found {}',
       )
       terror(
-        charI('ab'),
+        ichar('ab'),
         '',
-        '[charI]: expected argument to be a one-character string; found "ab"',
+        '[ichar]: expected argument to be a one-character string; found "ab"',
       )
       terror(
-        charI(0, 'test'),
+        ichar(0, 'test'),
         '',
-        '[charI]: expected first argument to be a one-character string; '
+        '[ichar]: expected first argument to be a one-character string; '
           + 'found 0',
       )
     })
     it('throws if second argument exists and is not a string', () => {
       terror(
-        charI('a', 0),
+        ichar('a', 0),
         '',
-        '[charI]: expected second argument to be a string; found 0',
+        '[ichar]: expected second argument to be a string; found 0',
       )
     })
 
     context('1-byte characters', () => {
-      const parser = charI('O')
-      const parserm = charI('O', 'test')
+      const parser = ichar('O')
+      const parserm = ichar('O', 'test')
 
       it('succeeds if the next character matches', () => {
         tpass(parser, 'Onomatopoeia', 'O')
@@ -202,8 +202,8 @@ describe('Character parsers', () => {
     })
 
     context('2-byte characters', () => {
-      const parser = charI('З')
-      const parserm = charI('З', 'test')
+      const parser = ichar('З')
+      const parserm = ichar('З', 'test')
 
       it('succeeds if the next character matches', () => {
         tpass(parser, 'Звукоподражание', 'З')
@@ -224,8 +224,8 @@ describe('Character parsers', () => {
     })
 
     context('3-byte characters', () => {
-      const parser = charI('ค')
-      const parserm = charI('ค', 'test')
+      const parser = ichar('ค')
+      const parserm = ichar('ค', 'test')
 
       it('succeeds if the next character matches', () => {
         tpass(parser, 'คำเลียนเสียง', 'ค')
@@ -242,8 +242,8 @@ describe('Character parsers', () => {
     })
 
     context('4-byte characters', () => {
-      const parser = charI('𝑂')
-      const parserm = charI('𝑂', 'test')
+      const parser = ichar('𝑂')
+      const parserm = ichar('𝑂', 'test')
 
       it('succeeds if the next character matches', () => {
         tpass(parser, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', '𝑂')
