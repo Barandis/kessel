@@ -473,9 +473,7 @@ export const endby = (p, s, m) => parser(ctx => {
     if (context.index === index) throw new TypeError(loopMessage('endby'))
     values.push(pres.value)
   }
-  const [sctx, sres] = s({ ...context, index })
-  if (sres.status === Fatal) return fatalReply(sctx, ferror(m, sres.errors))
-  return okReply(sctx, values)
+  return okReply(context, values)
 })
 
 /**
@@ -532,9 +530,7 @@ export const endby1 = (p, s, m) => parser(ctx => {
     if (context.index === index) throw new TypeError(loopMessage('endby1'))
     values.push(pres.value)
   }
-  const [sctx, sres] = s({ ...context, index })
-  if (sres.status === Fatal) return fatalReply(sctx, ferror(m, sres.errors))
-  return okReply(sctx, values)
+  return okReply(context, values)
 })
 
 /**

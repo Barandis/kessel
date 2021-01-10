@@ -645,6 +645,18 @@ describe('Sequence combinators', () => {
         status: Fatal,
       })
     })
+    it('fails if the optional final separator fails fatally', () => {
+      tfail(endby(letter(), seq(char('-'), char('-'))), 'a--b--c-', {
+        expected: "'-'",
+        index: 8,
+        status: Fatal,
+      })
+      tfail(endby(letter(), seq(char('-'), char('-')), 'test'), 'a--b--c-', {
+        expected: 'test',
+        index: 8,
+        status: Fatal,
+      })
+    })
     it('throws if an infinite loop was detected', () => {
       terror(
         endby(str(''), str('')),
