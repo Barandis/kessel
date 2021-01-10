@@ -93,7 +93,7 @@ Additionally, parsers are often said to *return* a value or to have a value as a
 | [`sepby1`](parsers/sepby1.md) | Executes a content parser one or more times with an application of a separator parser between each. Returns the content parser results. |
 | [`endby`](parsers/endby.md) | Executes a content parser zero or more times with an application of a separator parser between each and optionally at the end. Returns the content parser results. |
 | [`endby1`](parsers/endby1.md) | Executes a content parser one or more times with an application of a separator parser between each and optionally at the end. Returns the content parser results.  |
-| [`repeat`](parsers/repeat.md) | Executes a parser a certain number of times, returning the results in an array. |
+| [`count`](parsers/count.md) | Executes a parser a certain number of times, returning the results in an array. |
 | [`pipe`](parsers/pipe.md) | Executes a series of parsers in order, then passes the results as arguments to a function, then returns the result of that function. |
 | [`between`](parsers/between.md) | Executes a content parser between two other parsers, returning only the content parser's result. |
 | [`until`](parsers/until.md) | Executes a content parser zero or more times until an end parser succeeds. Returns the content parser's results. |
@@ -125,7 +125,7 @@ Additionally, parsers are often said to *return* a value or to have a value as a
 | [`bleft`](parsers/bleft.md) | Executes two parsers in order and returns the result of the first one. Backtracks to the location where the first parser was applied if the second one fails. |
 | [`bright`](parsers/bright.md) | Executes two parsers in order and returns the result of the second one. Backtracks to the location where the first parser was applied if the second one fails. |
 | [`bpipe`](parsers/bpipe.md) | Executes a series of parsers in order, then passes the results as arguments to a function, then returns the result of that function. Backtracks to where the first parser was applied if any other parser fails. |
-| [`brepeat`](parsers/brepeat.md) | Executes a parser a certain number of times, returning the results in an array. Backtracks to where the first parser was applied if any other parser fails. |
+| [`bcount`](parsers/bcount.md) | Executes a parser a certain number of times, returning the results in an array. Backtracks to where the first parser was applied if any other parser fails. |
 | [`buntil`](parsers/buntil.md) | Executes a content parser zero or more times until an end parser succeeds. Returns the content parser's results. Backtracks to where the content parser was first applied if it fails before the end parser succeeds. |
 | [`bbetween`](parsers/bbetween.md) | Executes a content parser between two other parsers, returning only the content parser's result. Backtracks to where the first parser was applied if either other parser fails. |
 

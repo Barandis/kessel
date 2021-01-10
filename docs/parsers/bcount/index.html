@@ -18,7 +18,7 @@
     
     
       
-        <title>brepeat - Kessel</title>
+        <title>bcount - Kessel</title>
       
     
     
@@ -91,7 +91,7 @@
           </span>
           <span class="md-header-nav__topic md-ellipsis">
             
-              brepeat
+              bcount
             
           </span>
         </div>
@@ -614,54 +614,6 @@
           
           
 
-
-  <li class="md-nav__item">
-    <a href="../between/" class="md-nav__link">
-      between
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../bleft/" class="md-nav__link">
-      bleft
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../block/" class="md-nav__link">
-      block
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../bpipe/" class="md-nav__link">
-      bpipe
-    </a>
-  </li>
-
-        
-          
-          
-          
-
   
 
 
@@ -671,12 +623,12 @@
     
     
       <label class="md-nav__link md-nav__link--active" for="__toc">
-        brepeat
+        bcount
         <span class="md-nav__icon md-icon"></span>
       </label>
     
     <a href="./" class="md-nav__link md-nav__link--active">
-      brepeat
+      bcount
     </a>
     
       
@@ -752,6 +704,54 @@
 
 
   <li class="md-nav__item">
+    <a href="../between/" class="md-nav__link">
+      between
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../bleft/" class="md-nav__link">
+      bleft
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../block/" class="md-nav__link">
+      block
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../bpipe/" class="md-nav__link">
+      bpipe
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
     <a href="../bright/" class="md-nav__link">
       bright
     </a>
@@ -814,6 +814,18 @@
   <li class="md-nav__item">
     <a href="../compact/" class="md-nav__link">
       compact
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../count/" class="md-nav__link">
+      count
     </a>
   </li>
 
@@ -1246,18 +1258,6 @@
   <li class="md-nav__item">
     <a href="../regex/" class="md-nav__link">
       regex
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../repeat/" class="md-nav__link">
-      repeat
     </a>
   </li>
 
@@ -2053,7 +2053,7 @@
               
                 
                 
-                  <h1>brepeat</h1>
+                  <h1>bcount</h1>
                 
                 <!--
  Copyright (c) 2020 Thomas J. Otterson
@@ -2063,12 +2063,12 @@
 -->
 
 <blockquote>
-<p><code>brepeat(p: Parser, n: number, m?: string): Parser</code></p>
+<p><code>bcount(p: Parser, n: number, m?: string): Parser</code></p>
 </blockquote>
 <p>Applies a parser a certain number of times, collecting the results into an array to return.</p>
-<p>The parser <code>p</code> must succeed the full <code>n</code> times for <code>brepeat</code> to succeed. Any fewer successes results in failure. Any input that is consumed in the process will be backtracked.</p>
+<p>The parser <code>p</code> must succeed the full <code>n</code> times for <code>bcount</code> to succeed. Any fewer successes results in failure. Any input that is consumed in the process will be backtracked.</p>
 <h4 id="example">Example</h4>
-<div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">brepeat</span><span class="p">(</span><span class="nx">letter</span><span class="p">(),</span> <span class="mf">3</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">bcount</span><span class="p">(</span><span class="nx">letter</span><span class="p">(),</span> <span class="mf">3</span><span class="p">)</span>
 
 <span class="kr">const</span> <span class="nx">s</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;abc&#39;</span><span class="p">)</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">status</span><span class="p">(</span><span class="nx">s</span><span class="p">))</span>  <span class="c1">// &quot;ok&quot;</span>
@@ -2124,7 +2124,7 @@
 <ul>
 <li><a href="../../types/parser/"><code>Parser</code></a></li>
 <li><a href="../bseq/"><code>bseq</code></a></li>
-<li><a href="../repeat/"><code>repeat</code></a></li>
+<li><a href="../count/"><code>count</code></a></li>
 </ul>
                 
               
@@ -2144,7 +2144,7 @@
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
         
-          <a href="../bpipe/" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../bchain/" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-footer-nav__button md-icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
             </div>
@@ -2153,19 +2153,19 @@
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                bpipe
+                bchain
               </div>
             </div>
           </a>
         
         
-          <a href="../bright/" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../between/" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-footer-nav__title">
               <div class="md-ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                bright
+                between
               </div>
             </div>
             <div class="md-footer-nav__button md-icon">

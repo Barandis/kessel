@@ -587,12 +587,12 @@ export const endby1 = (p, s, m) => parser(ctx => {
  * @returns {Parser} A parser that executes `p` `n` times and results in
  *     an array of all of the successful results of `p`.
  */
-export const repeat = (p, n, m) => parser(ctx => {
+export const count = (p, n, m) => parser(ctx => {
   const hasM = m != null
 
-  ASSERT && assertParser('repeat', p, argParFormatter(1, true))
-  ASSERT && assertNumber('repeat', n, argNumFormatter(2, true))
-  ASSERT && hasM && assertString('repeat', m, argStrFormatter(3, true))
+  ASSERT && assertParser('count', p, argParFormatter(1, true))
+  ASSERT && assertNumber('count', n, argNumFormatter(2, true))
+  ASSERT && hasM && assertString('count', m, argStrFormatter(3, true))
 
   const index = ctx.index
   const values = []

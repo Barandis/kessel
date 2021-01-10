@@ -12,10 +12,10 @@ import {
   bbetween,
   bblock,
   bchain,
+  bcount,
   bleft,
   buntil,
   bpipe,
-  brepeat,
   bright,
   bseq,
 } from 'kessel/combinators/backtracking'
@@ -556,66 +556,66 @@ describe('Backtracking and error handling combinators', () => {
     })
   })
 
-  describe('brepeat', () => {
+  describe('bcount', () => {
     it('throws if its first argument is not a parser', () => {
       terror(
-        brepeat(0, 5),
+        bcount(0, 5),
         '',
-        '[brepeat]: expected first argument to be a parser; found 0',
+        '[bcount]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a number', () => {
       terror(
-        brepeat(any(), '3'),
+        bcount(any(), '3'),
         '',
-        '[brepeat]: expected second argument to be a number; found "3"',
+        '[bcount]: expected second argument to be a number; found "3"',
       )
     })
     it('throws if its third argument exists and is not a string', () => {
       terror(
-        brepeat(any(), 3, 0),
+        bcount(any(), 3, 0),
         '',
-        '[brepeat]: expected third argument to be a string; found 0',
+        '[bcount]: expected third argument to be a string; found 0',
       )
     })
     it('applies one parser a number of times', () => {
-      tpass(brepeat(letter(), 5), 'abcdef', ['a', 'b', 'c', 'd', 'e'])
-      tpass(brepeat(letter(), 2), 'abcdef', ['a', 'b'])
-      tpass(brepeat(letter(), 0), 'abcdef', [])
-      tpass(brepeat(letter(), 2, 'test'), 'abcdef', ['a', 'b'])
+      tpass(bcount(letter(), 5), 'abcdef', ['a', 'b', 'c', 'd', 'e'])
+      tpass(bcount(letter(), 2), 'abcdef', ['a', 'b'])
+      tpass(bcount(letter(), 0), 'abcdef', [])
+      tpass(bcount(letter(), 2, 'test'), 'abcdef', ['a', 'b'])
     })
     it('fails non-fatally if no input was consumed', () => {
-      tfail(brepeat(letter(), 5), '12345', {
+      tfail(bcount(letter(), 5), '12345', {
         expected: 'a letter',
         index: 0,
         status: Fail,
       })
-      tfail(brepeat(letter(), 5, 'five letters'), '12345', {
+      tfail(bcount(letter(), 5, 'five letters'), '12345', {
         expected: 'five letters',
         index: 0,
         status: Fail,
       })
     })
     it('fails fatally if the parser fails fatally', () => {
-      tfail(brepeat(seq(letter(), letter()), 5), 'a1b2c3d4e5', {
+      tfail(bcount(seq(letter(), letter()), 5), 'a1b2c3d4e5', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
-      tfail(brepeat(seq(letter(), letter()), 5, 'ten letters'), 'a1b2c3d4e5', {
+      tfail(bcount(seq(letter(), letter()), 5, 'ten letters'), 'a1b2c3d4e5', {
         expected: 'ten letters',
         index: 1,
         status: Fatal,
       })
     })
     it('fails non-fatally on non-fatal errors if input was consumed', () => {
-      tfail(brepeat(letter(), 5), 'abc123', {
+      tfail(bcount(letter(), 5), 'abc123', {
         nested: 'a letter',
         index: 0,
         ctxindex: 3,
         status: Fail,
       })
-      tfail(brepeat(letter(), 5, 'five letters'), 'abc123', {
+      tfail(bcount(letter(), 5, 'five letters'), 'abc123', {
         compound: 'five letters',
         index: 0,
         ctxindex: 3,

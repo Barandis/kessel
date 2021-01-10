@@ -50,17 +50,18 @@ nav:
       - bbetween: parsers/bbetween.md
       - bblock: parsers/bblock.md
       - bchain: parsers/bchain.md
+      - bcount: parsers/bcount.md
       - between: parsers/between.md
       - bleft: parsers/bleft.md
       - block: parsers/block.md
       - bpipe: parsers/bpipe.md
-      - brepeat: parsers/brepeat.md
       - bright: parsers/bright.md
       - bseq: parsers/bseq.md
       - buntil: parsers/buntil.md
       - chain: parsers/chain.md
       - char: parsers/char.md
       - compact: parsers/compact.md
+      - count: parsers/count.md
       - def: parsers/def.md
       - digit: parsers/digit.md
       - empty: parsers/empty.md
@@ -97,7 +98,6 @@ nav:
       - rassoc: parsers/rassoc.md
       - rassoc1: parsers/rassoc1.md
       - regex: parsers/regex.md
-      - repeat: parsers/repeat.md
       - right: parsers/right.md
       - satisfy: parsers/satisfy.md
       - second: parsers/second.md

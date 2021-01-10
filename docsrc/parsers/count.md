@@ -5,16 +5,18 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `brepeat(p: Parser, n: number, m?: string): Parser`
+> `count(p: Parser, n: number, m?: string): Parser`
 
 Applies a parser a certain number of times, collecting the results into an array to return.
 
-The parser `p` must succeed the full `n` times for `brepeat` to succeed. Any fewer successes results in failure. Any input that is consumed in the process will be backtracked.
+The parser `p` must succeed the full `n` times for `count` to succeed. Any fewer successes results in failure.
+
+As with other combinators that run multiple parsers, it's possible for `count` to fail fatally even if the parser that failed did not fail fatally (because, for example, an earlier success consumed some input). There is another version of this parser, [`bcount`](bcount.md), that will backtrack and fail non-fatally when this happens.
 
 #### Example
 
 ```javascript
-const parser = brepeat(letter(), 3)
+const parser = count(letter(), 3)
 
 const s = parse(parser, 'abc')
 console.log(status(s))  // "ok"
@@ -29,18 +31,12 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Expected a letter
 
 const t = parse(parser, 'ab3')
-console.log(status(t))  // "fail"
-console.log(failure(t)) // Parse error at (line 1, column 1):
+console.log(status(t))  // "fatal"
+console.log(failure(t)) // Parse error at (line 1, column 3):
                         //
                         // ab3
-                        // ^
-                        // The parser backtracked after:
-                        //
-                        //   Parse error at (line 1, column 3):
-                        //
-                        //   ab3
-                        //     ^
-                        //   Expected a letter
+                        //   ^
+                        // Expected a letter
 ```
 
 #### Parameters
@@ -55,11 +51,13 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 
 #### Failure
 
-* Fails if `p` fails before it has succeeded `n` times. If any input was consumed, backtracking will occur and an additional error message will be provided that details the circumstances of the backtracking.
+* Fails if `p` does not succeed at least once.
+* Fails if `p` succeeds at least once but not `n` times and if the prior successes of do not consume any input.
 
 #### Fatal Failure
 
-* Fails fatally if `p` fails fatally before it has succeeded `n` times.
+* Fails fatally if `p` fails fatally.
+* Fails fatally if `p` does not succeed `n` times and if prior successes consume some input.
 
 #### Throws
 
@@ -70,5 +68,6 @@ console.log(failure(t)) // Parse error at (line 1, column 1):
 #### See Also
 
 * [`Parser`](../types/parser.md)
-* [`bseq`](bseq.md)
-* [`repeat`](repeat.md)
+* [`bcount`](bcount.md)
+* [`opt`](opt.md)
+* [`seq`](seq.md)

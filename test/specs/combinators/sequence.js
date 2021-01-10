@@ -9,6 +9,7 @@ import {
   rassoc1,
   between,
   block,
+  count,
   endby,
   endby1,
   lassoc,
@@ -19,7 +20,6 @@ import {
   until,
   pipe,
   rassoc,
-  repeat,
   right,
   sepby,
   sepby1,
@@ -752,65 +752,65 @@ describe('Sequence combinators', () => {
     })
   })
 
-  describe('repeat', () => {
+  describe('count', () => {
     it('throws if its first argument is not a parser', () => {
       terror(
-        repeat(0, 5),
+        count(0, 5),
         '',
-        '[repeat]: expected first argument to be a parser; found 0',
+        '[count]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a number', () => {
       terror(
-        repeat(any(), '3'),
+        count(any(), '3'),
         '',
-        '[repeat]: expected second argument to be a number; found "3"',
+        '[count]: expected second argument to be a number; found "3"',
       )
     })
     it('throws if its third argument exists and is not a string', () => {
       terror(
-        repeat(any(), 3, 0),
+        count(any(), 3, 0),
         '',
-        '[repeat]: expected third argument to be a string; found 0',
+        '[count]: expected third argument to be a string; found 0',
       )
     })
     it('applies one parser a number of times', () => {
-      tpass(repeat(letter(), 5), 'abcdef', ['a', 'b', 'c', 'd', 'e'])
-      tpass(repeat(letter(), 2), 'abcdef', ['a', 'b'])
-      tpass(repeat(letter(), 0), 'abcdef', [])
-      tpass(repeat(letter(), 2, 'two letters'), 'abcdef', ['a', 'b'])
+      tpass(count(letter(), 5), 'abcdef', ['a', 'b', 'c', 'd', 'e'])
+      tpass(count(letter(), 2), 'abcdef', ['a', 'b'])
+      tpass(count(letter(), 0), 'abcdef', [])
+      tpass(count(letter(), 2, 'two letters'), 'abcdef', ['a', 'b'])
     })
     it('fails non-fatally if no input was consumed', () => {
-      tfail(repeat(letter(), 5), '12345', {
+      tfail(count(letter(), 5), '12345', {
         expected: 'a letter',
         index: 0,
         status: Fail,
       })
-      tfail(repeat(letter(), 5, 'five letters'), '12345', {
+      tfail(count(letter(), 5, 'five letters'), '12345', {
         expected: 'five letters',
         index: 0,
         status: Fail,
       })
     })
     it('fails fatally if the parser fails fatally', () => {
-      tfail(repeat(seq(letter(), letter()), 5), 'a1b2c3d4e5', {
+      tfail(count(seq(letter(), letter()), 5), 'a1b2c3d4e5', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
-      tfail(repeat(seq(letter(), letter()), 5, 'ten letters'), 'a1b2c3d4e5', {
+      tfail(count(seq(letter(), letter()), 5, 'ten letters'), 'a1b2c3d4e5', {
         expected: 'ten letters',
         index: 1,
         status: Fatal,
       })
     })
     it('fails fatally on non-fatal errors if input was consumed', () => {
-      tfail(repeat(letter(), 5), 'abc123', {
+      tfail(count(letter(), 5), 'abc123', {
         expected: 'a letter',
         index: 3,
         status: Fatal,
       })
-      tfail(repeat(letter(), 5, 'five letters'), 'abc123', {
+      tfail(count(letter(), 5, 'five letters'), 'abc123', {
         expected: 'five letters',
         index: 3,
         status: Fatal,

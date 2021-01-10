@@ -305,12 +305,12 @@ export const bright = (p, q, m) => parser(ctx => {
  * @returns {Parser} A parser that executes `p` `n` times and results in
  *     an array of all of the successful results of `p`.
  */
-export const brepeat = (p, n, m) => parser(ctx => {
+export const bcount = (p, n, m) => parser(ctx => {
   const hasM = m != null
 
-  ASSERT && assertParser('brepeat', p, argParFormatter(1, true))
-  ASSERT && assertNumber('brepeat', n, argNumFormatter(2, true))
-  ASSERT && hasM && assertString('brepeat', m, argStrFormatter(3, true))
+  ASSERT && assertParser('bcount', p, argParFormatter(1, true))
+  ASSERT && assertNumber('bcount', n, argNumFormatter(2, true))
+  ASSERT && hasM && assertString('bcount', m, argStrFormatter(3, true))
 
   const index = ctx.index
   const values = []
