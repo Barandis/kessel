@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `status(reply: Reply<any>): Status`
+> `status(reply: Reply): Status`
 
 Returns the status of a parser reply.
 

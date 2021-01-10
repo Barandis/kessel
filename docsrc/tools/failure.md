@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `failure(reply: Reply<any>): string | null`
+> `failure(reply: Reply): string | null`
 
 Returns the error message from a failed parse reply.
 

@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `succeeded(reply: Reply<any>): boolean`
+> `succeeded(reply: Reply): boolean`
 
 Determines whether a parse reply indicates success.
 

@@ -2021,7 +2021,7 @@
 -->
 
 <blockquote>
-<p><code>parse(p: Parser&lt;T&gt;, input: Input): Reply&lt;T&gt;</code></p>
+<p><code>parse(p: Parser, input: Input): Reply</code></p>
 </blockquote>
 <p>Executes a parser against input text. This is the primary parser execution function in Kessel.</p>
 <p>For the purpose of supporting UTF-8, the input is stored internally as a <code>DataView</code>. <code>parse</code> knows how to transform several types into views, and <code>input</code> can be any of these.</p>

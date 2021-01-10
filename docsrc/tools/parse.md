@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `parse(p: Parser<T>, input: Input): Reply<T>`
+> `parse(p: Parser, input: Input): Reply`
 
 Executes a parser against input text. This is the primary parser execution function in Kessel.
 

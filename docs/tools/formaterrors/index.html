@@ -2007,7 +2007,7 @@
 -->
 
 <blockquote>
-<p><code>formatErrors(reply: Reply&lt;any&gt;, tabSize?: number, maxWidth?: number, formatter?: Formatter): string</code></p>
+<p><code>formatErrors(reply: Reply, tabSize?: number, maxWidth?: number, formatter?: Formatter): string</code></p>
 </blockquote>
 <p>Formats a failed reply into a string. There is a default formatter, but a custom formatter can be supplied if necessary.</p>
 <p>The default formatter calculates the line and column based on the reply, includes all or part of the parsed line where the error happened, and displays a caret that points to the location of that error. Below that, unexpected, expected, generic, compound, and nested errors are displayed, in that order.</p>

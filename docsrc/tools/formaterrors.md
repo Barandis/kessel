@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `formatErrors(reply: Reply<any>, tabSize?: number, maxWidth?: number, formatter?: Formatter): string`
+> `formatErrors(reply: Reply, tabSize?: number, maxWidth?: number, formatter?: Formatter): string`
 
 Formats a failed reply into a string. There is a default formatter, but a custom formatter can be supplied if necessary.
 

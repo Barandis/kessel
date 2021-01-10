@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `success(reply: Reply<T>): T | null`
+> `success(reply: Reply): * | null`
 
 Returns the parse result from a successful parse reply.
 

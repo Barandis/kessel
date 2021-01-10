@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `run(p: Parser<T>, input: Input): T`
+> `run(p: Parser, input: Input): *`
 
 Executes a parser against input text.
 
