@@ -55,6 +55,36 @@ export const join = (p, m) => parser(ctx => {
 })
 
 /**
+ * A parser which will execute `p` and return its result with all
+ * internal arrays flattened into a single-level array. This requires
+ * that `p` return an array; an error will be thrown if it does not.
+ *
+ * @param {Parser} p A parser that is expected to return an array.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
+ * @returns {Parser} A parser that executes `p` and returns a
+ *     single-level array made by flattening the elements of the array
+ *     returned by `p`.
+ */
+export const flat = (p, m) => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && assertParser('flat', p, argParFormatter(1, hasM))
+  ASSERT && hasM && assertString('flat', m, argStrFormatter(2, true))
+
+  const [pctx, pres] = p(ctx)
+  if (pres.status !== Ok) {
+    const fn = replyFn(pres.status === Fatal)
+    return fn(pctx, hasM ? expected(m) : pres.errors)
+  }
+
+  const v = pres.value
+  ASSERT && assertArray('flat', v, formatter('argument to return an array'))
+
+  return okReply(pctx, v.flat(Infinity))
+})
+
+/**
  * A parser which will execute `p` and return its results minus any
  * `null` or `undefined` results. This requires that `p` returns an
  * array; an error will be thrown if it does not.

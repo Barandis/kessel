@@ -10,6 +10,7 @@ import {
   compact,
   fifth,
   first,
+  flat,
   fourth,
   join,
   map,
@@ -69,6 +70,72 @@ describe('Chaining and piping combinators', () => {
         status: Fail,
       })
       tfail(join(seq(letter(), digit()), 'a letter and a digit'), 'ab', {
+        expected: 'a letter and a digit',
+        status: Fatal,
+      })
+    })
+  })
+
+  describe('flat', () => {
+    const parser = seq(
+      many(letter()),
+      many(seq(digit(), many1(letter()))),
+    )
+    const parserf = flat(parser)
+    const parserm = flat(parser, 'something weird')
+
+    it('throws if its first argument is not a parser', () => {
+      terror(flat(0), '', '[flat]: expected argument to be a parser; found 0')
+      terror(
+        flat(0, 'test'),
+        '',
+        '[flat]: expected first argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument exists and is not a string', () => {
+      terror(
+        flat(any(), 0),
+        '',
+        '[flat]: expected second argument to be a string; found 0',
+      )
+    })
+    it('throws if its argument does not return an array', () => {
+      terror(
+        flat(any()),
+        'a',
+        '[flat]: expected argument to return an array; found "a"',
+      )
+    })
+    it('flattens the results of nested array-producing parsers', () => {
+      tpass(parser, 'abc1ef2g3xyz', [
+        ['a', 'b', 'c'],
+        [['1', ['e', 'f']], ['2', ['g']], ['3', ['x', 'y', 'z']]],
+      ])
+      tpass(
+        parserf,
+        'abc1ef2g3xyz',
+        ['a', 'b', 'c', '1', 'e', 'f', '2', 'g', '3', 'x', 'y', 'z'],
+      )
+      tpass(
+        parserm,
+        'abc1ef2g3xyz',
+        ['a', 'b', 'c', '1', 'e', 'f', '2', 'g', '3', 'x', 'y', 'z'],
+      )
+    })
+    it('fails if its contained parser fails', () => {
+      tfail(flat(many1(any())), '', {
+        expected: 'any character',
+        status: Fail,
+      })
+      tfail(flat(seq(letter(), digit())), 'ab', {
+        expected: 'a digit',
+        status: Fatal,
+      })
+      tfail(flat(many1(any()), 'a character'), '', {
+        expected: 'a character',
+        status: Fail,
+      })
+      tfail(flat(seq(letter(), digit()), 'a letter and a digit'), 'ab', {
         expected: 'a letter and a digit',
         status: Fatal,
       })

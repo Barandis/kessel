@@ -72,6 +72,7 @@ nav:
       - fatal: parsers/fatal.md
       - fifth: parsers/fifth.md
       - first: parsers/first.md
+      - flat: parsers/flat.md
       - fourth: parsers/fourth.md
       - hex: parsers/hex.md
       - ichar: parsers/ichar.md

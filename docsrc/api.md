@@ -144,6 +144,7 @@ Additionally, parsers are often said to *return* a value or to have a value as a
 | [`fourth`](parsers/fourth.md) | Executes a parser and returns the fourth element of the resulting array. |
 | [`fifth`](parsers/fifth.md) | Executes a parser and returns the fifth element of the resulting array. |
 | [`join`](parsers/join.md) | Executes a parser and returns its resulting array elements joined together into a string. |
+| [`flat`](parsers/flat.md) | Executes a parser and returns its resulting array with all sub-arrays flattened into a single-level array. |
 | [`compact`](parsers/compact.md) | Executes a parser and returns its resulting array minus any `null` or `undefined` elements. |
 
 ## Tools

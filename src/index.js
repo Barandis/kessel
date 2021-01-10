@@ -80,6 +80,7 @@ export {
   compact,
   fifth,
   first,
+  flat,
   fourth,
   join,
   map,
