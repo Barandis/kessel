@@ -230,6 +230,13 @@ describe('Chaining and piping combinators', () => {
         '[nth]: expected second argument to be a number; found "1"',
       )
     })
+    it('throws if its third argument exists and is not a string', () => {
+      terror(
+        nth(many(any()), 1, 0),
+        '',
+        '[nth]: expected third argument to be a string; found 0',
+      )
+    })
     it('throws if its first argument does not return an array', () => {
       terror(
         nth(any(), 0),
