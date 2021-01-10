@@ -7,8 +7,8 @@ import { expect } from 'chai'
 
 import { opt, peek } from 'kessel/combinators/alternative'
 import {
-  bapply,
   attempt,
+  bapply,
   bbetween,
   bblock,
   bchain,

@@ -6,19 +6,19 @@
 import { alt, opt } from 'kessel/combinators/alternative'
 import { join, map, value } from 'kessel/combinators/chaining'
 import {
-  assoc1L,
-  assoc1R,
-  assocL,
-  assocR,
+  rassoc1,
   between,
   block,
   endby,
   endby1,
+  lassoc,
+  lassoc1,
   left,
   many,
   many1,
   until,
   pipe,
+  rassoc,
   repeat,
   right,
   sepby,
@@ -903,7 +903,7 @@ describe('Sequence combinators', () => {
     })
   })
 
-  describe('assocL', () => {
+  describe('lassoc', () => {
     const p = map(join(many1(digit())), x => parseInt(x))
     const op = alt(
       value(char('+'), (a, b) => a + b),
@@ -912,78 +912,78 @@ describe('Sequence combinators', () => {
 
     it('throws if its first argument is not a parser', () => {
       terror(
-        assocL(0, any()),
+        lassoc(0, any()),
         '',
-        '[assocL]: expected first argument to be a parser; found 0',
+        '[lassoc]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
-        assocL(any(), 0),
+        lassoc(any(), 0),
         '',
-        '[assocL]: expected second argument to be a parser; found 0',
+        '[lassoc]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its second argument does not return a function', () => {
       terror(
-        assocL(any(), any(), 0),
+        lassoc(any(), any(), 0),
         'abc',
-        '[assocL]: expected first op parser to return a function; found "b"',
+        '[lassoc]: expected first op parser to return a function; found "b"',
       )
     })
     it('throws if its fourth argument exists and is not a string', () => {
       terror(
-        assocL(any(), any(), 0, 0),
+        lassoc(any(), any(), 0, 0),
         '',
-        '[assocL]: expected fourth argument to be a string; found 0',
+        '[lassoc]: expected fourth argument to be a string; found 0',
       )
     })
     it('succeeds with a default value if there are no matches', () => {
-      tpass(assocL(p, op, 0), '', { result: 0, index: 0 })
-      tpass(assocL(p, op, 0, 'test'), '', { result: 0, index: 0 })
+      tpass(lassoc(p, op, 0), '', { result: 0, index: 0 })
+      tpass(lassoc(p, op, 0, 'test'), '', { result: 0, index: 0 })
     })
     it('succeeds with the first match if op never matches', () => {
-      tpass(assocL(p, op, 0), '23', { result: 23, index: 2 })
-      tpass(assocL(p, op, 0, 'test'), '23', { result: 23, index: 2 })
+      tpass(lassoc(p, op, 0), '23', { result: 23, index: 2 })
+      tpass(lassoc(p, op, 0, 'test'), '23', { result: 23, index: 2 })
     })
     it('succeeds with one match of op', () => {
-      tpass(assocL(p, op, 0), '23+17', { result: 40, index: 5 })
-      tpass(assocL(p, op, 0), '23-17', { result: 6, index: 5 })
+      tpass(lassoc(p, op, 0), '23+17', { result: 40, index: 5 })
+      tpass(lassoc(p, op, 0), '23-17', { result: 6, index: 5 })
     })
     it('succeeds left-associatively with more than one match of op', () => {
-      tpass(assocL(p, op, 0), '23+17-42', { result: -2, index: 8 })
-      tpass(assocL(p, op, 0), '23-17+42', { result: 48, index: 8 })
+      tpass(lassoc(p, op, 0), '23+17-42', { result: -2, index: 8 })
+      tpass(lassoc(p, op, 0), '23-17+42', { result: 48, index: 8 })
     })
     it('ignores the last op if there is no p match after', () => {
-      tpass(assocL(p, op, 0), '23+17-', { result: 40, index: 5 })
+      tpass(lassoc(p, op, 0), '23+17-', { result: 40, index: 5 })
     })
     it('fails fatally if either parser fails fatally', () => {
-      tfail(assocL(seq(digit(), digit()), op, 0), '1a', {
+      tfail(lassoc(seq(digit(), digit()), op, 0), '1a', {
         expected: 'a digit',
         index: 1,
         status: Fatal,
       })
-      tfail(assocL(seq(digit(), digit()), op, 0), '12+1a', {
+      tfail(lassoc(seq(digit(), digit()), op, 0), '12+1a', {
         expected: 'a digit',
         index: 4,
         status: Fatal,
       })
-      tfail(assocL(p, seq(letter(), letter()), 0), '23a1', {
+      tfail(lassoc(p, seq(letter(), letter()), 0), '23a1', {
         expected: 'a letter',
         index: 3,
         status: Fatal,
       })
-      tfail(assocL(seq(digit(), digit()), op, 0, 'an expression'), '1a', {
+      tfail(lassoc(seq(digit(), digit()), op, 0, 'an expression'), '1a', {
         expected: 'an expression',
         index: 1,
         status: Fatal,
       })
-      tfail(assocL(seq(digit(), digit()), op, 0, 'an expression'), '12+1a', {
+      tfail(lassoc(seq(digit(), digit()), op, 0, 'an expression'), '12+1a', {
         expected: 'an expression',
         index: 4,
         status: Fatal,
       })
-      tfail(assocL(p, seq(letter(), letter()), 0, 'an expression'), '23a1', {
+      tfail(lassoc(p, seq(letter(), letter()), 0, 'an expression'), '23a1', {
         expected: 'an expression',
         index: 3,
         status: Fatal,
@@ -991,7 +991,7 @@ describe('Sequence combinators', () => {
     })
   })
 
-  describe('assoc1L', () => {
+  describe('lassoc1', () => {
     const p = map(join(many1(digit())), x => parseInt(x))
     const op = alt(
       value(char('+'), (a, b) => a + b),
@@ -1000,87 +1000,87 @@ describe('Sequence combinators', () => {
 
     it('throws if its first argument is not a parser', () => {
       terror(
-        assoc1L(0, any()),
+        lassoc1(0, any()),
         '',
-        '[assoc1L]: expected first argument to be a parser; found 0',
+        '[lassoc1]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
-        assoc1L(any(), 0),
+        lassoc1(any(), 0),
         '',
-        '[assoc1L]: expected second argument to be a parser; found 0',
+        '[lassoc1]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its second argument does not return a function', () => {
       terror(
-        assoc1L(any(), any()),
+        lassoc1(any(), any()),
         'abc',
-        '[assoc1L]: expected first op parser to return a function; found "b"',
+        '[lassoc1]: expected first op parser to return a function; found "b"',
       )
     })
     it('throws if its third argument exists and is not a string', () => {
       terror(
-        assoc1L(any(), any(), 0),
+        lassoc1(any(), any(), 0),
         '',
-        '[assoc1L]: expected third argument to be a string; found 0',
+        '[lassoc1]: expected third argument to be a string; found 0',
       )
     })
     it('fails if there are no matches', () => {
-      tfail(assoc1L(p, op), '', {
+      tfail(lassoc1(p, op), '', {
         expected: 'a digit',
         index: 0,
         status: Fail,
       })
-      tfail(assoc1L(p, op, 'an expression'), '', {
+      tfail(lassoc1(p, op, 'an expression'), '', {
         expected: 'an expression',
         index: 0,
         status: Fail,
       })
     })
     it('succeeds with the first match if op never matches', () => {
-      tpass(assoc1L(p, op), '23', { result: 23, index: 2 })
-      tpass(assoc1L(p, op, 'test'), '23', { result: 23, index: 2 })
+      tpass(lassoc1(p, op), '23', { result: 23, index: 2 })
+      tpass(lassoc1(p, op, 'test'), '23', { result: 23, index: 2 })
     })
     it('succeeds with one match of op', () => {
-      tpass(assoc1L(p, op), '23+17', { result: 40, index: 5 })
-      tpass(assoc1L(p, op), '23-17', { result: 6, index: 5 })
+      tpass(lassoc1(p, op), '23+17', { result: 40, index: 5 })
+      tpass(lassoc1(p, op), '23-17', { result: 6, index: 5 })
     })
     it('succeeds left-associatively with more than one match of op', () => {
-      tpass(assoc1L(p, op), '23+17-42', { result: -2, index: 8 })
-      tpass(assoc1L(p, op), '23-17+42', { result: 48, index: 8 })
-      tpass(assoc1L(p, op, 'test'), '23+17-42', { result: -2, index: 8 })
+      tpass(lassoc1(p, op), '23+17-42', { result: -2, index: 8 })
+      tpass(lassoc1(p, op), '23-17+42', { result: 48, index: 8 })
+      tpass(lassoc1(p, op, 'test'), '23+17-42', { result: -2, index: 8 })
     })
     it('ignores the last op if there is no p match after', () => {
-      tpass(assoc1L(p, op), '23+17-', { result: 40, index: 5 })
+      tpass(lassoc1(p, op), '23+17-', { result: 40, index: 5 })
     })
     it('fails fatally if either parser fails fatally', () => {
-      tfail(assoc1L(seq(digit(), digit()), op), '1a', {
+      tfail(lassoc1(seq(digit(), digit()), op), '1a', {
         expected: 'a digit',
         index: 1,
         status: Fatal,
       })
-      tfail(assoc1L(seq(digit(), digit()), op), '12+1a', {
+      tfail(lassoc1(seq(digit(), digit()), op), '12+1a', {
         expected: 'a digit',
         index: 4,
         status: Fatal,
       })
-      tfail(assoc1L(p, seq(letter(), letter())), '23a1', {
+      tfail(lassoc1(p, seq(letter(), letter())), '23a1', {
         expected: 'a letter',
         index: 3,
         status: Fatal,
       })
-      tfail(assoc1L(seq(digit(), digit()), op, 'an expression'), '1a', {
+      tfail(lassoc1(seq(digit(), digit()), op, 'an expression'), '1a', {
         expected: 'an expression',
         index: 1,
         status: Fatal,
       })
-      tfail(assoc1L(seq(digit(), digit()), op, 'an expression'), '12+1a', {
+      tfail(lassoc1(seq(digit(), digit()), op, 'an expression'), '12+1a', {
         expected: 'an expression',
         index: 4,
         status: Fatal,
       })
-      tfail(assoc1L(p, seq(letter(), letter()), 'an expression'), '23a1', {
+      tfail(lassoc1(p, seq(letter(), letter()), 'an expression'), '23a1', {
         expected: 'an expression',
         index: 3,
         status: Fatal,
@@ -1088,7 +1088,7 @@ describe('Sequence combinators', () => {
     })
   })
 
-  describe('assocR', () => {
+  describe('rassoc', () => {
     const p = map(join(many1(digit())), x => parseInt(x))
     const op = alt(
       value(char('+'), (a, b) => a + b),
@@ -1097,79 +1097,79 @@ describe('Sequence combinators', () => {
 
     it('throws if its first argument is not a parser', () => {
       terror(
-        assocR(0, any()),
+        rassoc(0, any()),
         '',
-        '[assocR]: expected first argument to be a parser; found 0',
+        '[rassoc]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
-        assocR(any(), 0),
+        rassoc(any(), 0),
         '',
-        '[assocR]: expected second argument to be a parser; found 0',
+        '[rassoc]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its second argument does not return a function', () => {
       terror(
-        assocR(any(), any(), 0),
+        rassoc(any(), any(), 0),
         'abc',
-        '[assocR]: expected first op parser to return a function; found "b"',
+        '[rassoc]: expected first op parser to return a function; found "b"',
       )
     })
     it('throws if its fourth argument exists and is not a string', () => {
       terror(
-        assocR(any(), any(), 0, 0),
+        rassoc(any(), any(), 0, 0),
         '',
-        '[assocR]: expected fourth argument to be a string; found 0',
+        '[rassoc]: expected fourth argument to be a string; found 0',
       )
     })
     it('succeeds with a default value if there are no matches', () => {
-      tpass(assocR(p, op, 0), '', { result: 0, index: 0 })
-      tpass(assocR(p, op, 0, 'test'), '', { result: 0, index: 0 })
+      tpass(rassoc(p, op, 0), '', { result: 0, index: 0 })
+      tpass(rassoc(p, op, 0, 'test'), '', { result: 0, index: 0 })
     })
     it('succeeds with the first match if op never matches', () => {
-      tpass(assocR(p, op, 0), '23', { result: 23, index: 2 })
-      tpass(assocR(p, op, 0, 'test'), '23', { result: 23, index: 2 })
+      tpass(rassoc(p, op, 0), '23', { result: 23, index: 2 })
+      tpass(rassoc(p, op, 0, 'test'), '23', { result: 23, index: 2 })
     })
     it('succeeds with one match of op', () => {
-      tpass(assocR(p, op, 0), '23+17', { result: 40, index: 5 })
-      tpass(assocR(p, op, 0), '23-17', { result: 6, index: 5 })
+      tpass(rassoc(p, op, 0), '23+17', { result: 40, index: 5 })
+      tpass(rassoc(p, op, 0), '23-17', { result: 6, index: 5 })
     })
     it('succeeds right-associatively with more than one match of op', () => {
       // incorrect math, good testing
-      tpass(assocR(p, op, 0), '23+17-42', { result: -2, index: 8 })
-      tpass(assocR(p, op, 0), '23-17+42', { result: -36, index: 8 })
+      tpass(rassoc(p, op, 0), '23+17-42', { result: -2, index: 8 })
+      tpass(rassoc(p, op, 0), '23-17+42', { result: -36, index: 8 })
     })
     it('ignores the last op if there is no p match after', () => {
-      tpass(assocR(p, op, 0), '23+17-', { result: 40, index: 5 })
+      tpass(rassoc(p, op, 0), '23+17-', { result: 40, index: 5 })
     })
     it('fails fatally if either parser fails fatally', () => {
-      tfail(assocR(seq(digit(), digit()), op, 0), '1a', {
+      tfail(rassoc(seq(digit(), digit()), op, 0), '1a', {
         expected: 'a digit',
         index: 1,
         status: Fatal,
       })
-      tfail(assocR(seq(digit(), digit()), op, 0), '12+1a', {
+      tfail(rassoc(seq(digit(), digit()), op, 0), '12+1a', {
         expected: 'a digit',
         index: 4,
         status: Fatal,
       })
-      tfail(assocR(p, seq(letter(), letter()), 0), '23a1', {
+      tfail(rassoc(p, seq(letter(), letter()), 0), '23a1', {
         expected: 'a letter',
         index: 3,
         status: Fatal,
       })
-      tfail(assocR(seq(digit(), digit()), op, 0, 'an expression'), '1a', {
+      tfail(rassoc(seq(digit(), digit()), op, 0, 'an expression'), '1a', {
         expected: 'an expression',
         index: 1,
         status: Fatal,
       })
-      tfail(assocR(seq(digit(), digit()), op, 0, 'an expression'), '12+1a', {
+      tfail(rassoc(seq(digit(), digit()), op, 0, 'an expression'), '12+1a', {
         expected: 'an expression',
         index: 4,
         status: Fatal,
       })
-      tfail(assocR(p, seq(letter(), letter()), 0, 'an expression'), '23a1', {
+      tfail(rassoc(p, seq(letter(), letter()), 0, 'an expression'), '23a1', {
         expected: 'an expression',
         index: 3,
         status: Fatal,
@@ -1177,7 +1177,7 @@ describe('Sequence combinators', () => {
     })
   })
 
-  describe('assoc1R', () => {
+  describe('rassoc1', () => {
     const p = map(join(many1(digit())), x => parseInt(x))
     const op = alt(
       value(char('+'), (a, b) => a + b),
@@ -1186,86 +1186,86 @@ describe('Sequence combinators', () => {
 
     it('throws if its first argument is not a parser', () => {
       terror(
-        assoc1R(0, any()),
+        rassoc1(0, any()),
         '',
-        '[assoc1R]: expected first argument to be a parser; found 0',
+        '[rassoc1]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
-        assoc1R(any(), 0),
+        rassoc1(any(), 0),
         '',
-        '[assoc1R]: expected second argument to be a parser; found 0',
+        '[rassoc1]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its second argument does not return a function', () => {
       terror(
-        assoc1R(any(), any()),
+        rassoc1(any(), any()),
         'abc',
-        '[assoc1R]: expected first op parser to return a function; found "b"',
+        '[rassoc1]: expected first op parser to return a function; found "b"',
       )
     })
     it('throws if its third argument exists and is not a string', () => {
       terror(
-        assoc1R(any(), any(), 0),
+        rassoc1(any(), any(), 0),
         '',
-        '[assoc1R]: expected third argument to be a string; found 0',
+        '[rassoc1]: expected third argument to be a string; found 0',
       )
     })
     it('fails if there are no matches', () => {
-      tfail(assoc1R(p, op), '', {
+      tfail(rassoc1(p, op), '', {
         expected: 'a digit',
         index: 0,
         status: Fail,
       })
-      tfail(assoc1R(p, op, 'an expression'), '', {
+      tfail(rassoc1(p, op, 'an expression'), '', {
         expected: 'an expression',
         index: 0,
         status: Fail,
       })
     })
     it('succeeds with the first match if op never matches', () => {
-      tpass(assoc1R(p, op), '23', { result: 23, index: 2 })
-      tpass(assoc1R(p, op, 'test'), '23', { result: 23, index: 2 })
+      tpass(rassoc1(p, op), '23', { result: 23, index: 2 })
+      tpass(rassoc1(p, op, 'test'), '23', { result: 23, index: 2 })
     })
     it('succeeds with one match of op', () => {
-      tpass(assoc1R(p, op), '23+17', { result: 40, index: 5 })
-      tpass(assoc1R(p, op), '23-17', { result: 6, index: 5 })
+      tpass(rassoc1(p, op), '23+17', { result: 40, index: 5 })
+      tpass(rassoc1(p, op), '23-17', { result: 6, index: 5 })
     })
     it('succeeds left-associatively with more than one match of op', () => {
-      tpass(assoc1R(p, op), '23+17-42', { result: -2, index: 8 })
-      tpass(assoc1R(p, op), '23-17+42', { result: -36, index: 8 })
+      tpass(rassoc1(p, op), '23+17-42', { result: -2, index: 8 })
+      tpass(rassoc1(p, op), '23-17+42', { result: -36, index: 8 })
     })
     it('ignores the last op if there is no p match after', () => {
-      tpass(assoc1R(p, op), '23+17-', { result: 40, index: 5 })
+      tpass(rassoc1(p, op), '23+17-', { result: 40, index: 5 })
     })
     it('fails fatally if either parser fails fatally', () => {
-      tfail(assoc1R(seq(digit(), digit()), op), '1a', {
+      tfail(rassoc1(seq(digit(), digit()), op), '1a', {
         expected: 'a digit',
         index: 1,
         status: Fatal,
       })
-      tfail(assoc1R(seq(digit(), digit()), op), '12+1a', {
+      tfail(rassoc1(seq(digit(), digit()), op), '12+1a', {
         expected: 'a digit',
         index: 4,
         status: Fatal,
       })
-      tfail(assoc1R(p, seq(letter(), letter())), '23a1', {
+      tfail(rassoc1(p, seq(letter(), letter())), '23a1', {
         expected: 'a letter',
         index: 3,
         status: Fatal,
       })
-      tfail(assoc1R(seq(digit(), digit()), op, 'an expression'), '1a', {
+      tfail(rassoc1(seq(digit(), digit()), op, 'an expression'), '1a', {
         expected: 'an expression',
         index: 1,
         status: Fatal,
       })
-      tfail(assoc1R(seq(digit(), digit()), op, 'an expression'), '12+1a', {
+      tfail(rassoc1(seq(digit(), digit()), op, 'an expression'), '12+1a', {
         expected: 'an expression',
         index: 4,
         status: Fatal,
       })
-      tfail(assoc1R(p, seq(letter(), letter()), 'an expression'), '23a1', {
+      tfail(rassoc1(p, seq(letter(), letter()), 'an expression'), '23a1', {
         expected: 'an expression',
         index: 3,
         status: Fatal,

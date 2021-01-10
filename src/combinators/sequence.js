@@ -812,12 +812,12 @@ function opFormatter(ord) {
  *     applying the functions from `o` left associtively to the values
  *     that result from `p`.
  */
-export const assocL = (p, o, x, m) => parser(ctx => {
+export const lassoc = (p, o, x, m) => parser(ctx => {
   const hasM = m != null
 
-  ASSERT && assertParser('assocL', p, argParFormatter(1, true))
-  ASSERT && assertParser('assocL', o, argParFormatter(2, true))
-  ASSERT && hasM && assertString('assocL', m, argStrFormatter(4, true))
+  ASSERT && assertParser('lassoc', p, argParFormatter(1, true))
+  ASSERT && assertParser('lassoc', o, argParFormatter(2, true))
+  ASSERT && hasM && assertString('lassoc', m, argStrFormatter(4, true))
 
   const merror = expected(m)
 
@@ -849,7 +849,7 @@ export const assocL = (p, o, x, m) => parser(ctx => {
     if (pres.status === Fail) break
 
     ASSERT && assertFunction(
-      'assocL', ores.value, opFormatter(wordinal(i + 1)),
+      'lassoc', ores.value, opFormatter(wordinal(i + 1)),
     )
 
     ops.push(ores.value)
@@ -886,12 +886,12 @@ export const assocL = (p, o, x, m) => parser(ctx => {
  *     applying the functions from `o` left associtively to the values
  *     that result from `p`.
  */
-export const assoc1L = (p, o, m) => parser(ctx => {
+export const lassoc1 = (p, o, m) => parser(ctx => {
   const hasM = m != null
 
-  ASSERT && assertParser('assoc1L', p, argParFormatter(1, true))
-  ASSERT && assertParser('assoc1L', o, argParFormatter(2, true))
-  ASSERT && hasM && assertString('assoc1L', m, argStrFormatter(3, true))
+  ASSERT && assertParser('lassoc1', p, argParFormatter(1, true))
+  ASSERT && assertParser('lassoc1', o, argParFormatter(2, true))
+  ASSERT && hasM && assertString('lassoc1', m, argStrFormatter(3, true))
 
   const merror = expected(m)
 
@@ -923,7 +923,7 @@ export const assoc1L = (p, o, m) => parser(ctx => {
     if (pres.status === Fail) break
 
     ASSERT && assertFunction(
-      'assoc1L', ores.value, opFormatter(wordinal(i + 1)),
+      'lassoc1', ores.value, opFormatter(wordinal(i + 1)),
     )
 
     ops.push(ores.value)
@@ -963,12 +963,12 @@ export const assoc1L = (p, o, m) => parser(ctx => {
  *     applying the functions from `o` right associtively to the values
  *     that result from `p`.
  */
-export const assocR = (p, o, x, m) => parser(ctx => {
+export const rassoc = (p, o, x, m) => parser(ctx => {
   const hasM = m != null
 
-  ASSERT && assertParser('assocR', p, argParFormatter(1, true))
-  ASSERT && assertParser('assocR', o, argParFormatter(2, true))
-  ASSERT && hasM && assertString('assocR', m, argStrFormatter(4, true))
+  ASSERT && assertParser('rassoc', p, argParFormatter(1, true))
+  ASSERT && assertParser('rassoc', o, argParFormatter(2, true))
+  ASSERT && hasM && assertString('rassoc', m, argStrFormatter(4, true))
 
   const merror = expected(m)
 
@@ -1000,7 +1000,7 @@ export const assocR = (p, o, x, m) => parser(ctx => {
     if (pres.status === Fail) break
 
     ASSERT && assertFunction(
-      'assocR', ores.value, opFormatter(wordinal(i + 1)),
+      'rassoc', ores.value, opFormatter(wordinal(i + 1)),
     )
 
     ops.push(ores.value)
@@ -1037,12 +1037,12 @@ export const assocR = (p, o, x, m) => parser(ctx => {
  *     applying the functions from `o` right associtively to the values
  *     that result from `p`.
  */
-export const assoc1R = (p, o, m) => parser(ctx => {
+export const rassoc1 = (p, o, m) => parser(ctx => {
   const hasM = m != null
 
-  ASSERT && assertParser('assoc1R', p, argParFormatter(1, true))
-  ASSERT && assertParser('assoc1R', o, argParFormatter(2, true))
-  ASSERT && hasM && assertString('assoc1R', m, argStrFormatter(3, true))
+  ASSERT && assertParser('rassoc1', p, argParFormatter(1, true))
+  ASSERT && assertParser('rassoc1', o, argParFormatter(2, true))
+  ASSERT && hasM && assertString('rassoc1', m, argStrFormatter(3, true))
 
   const merror = expected(m)
 
@@ -1074,7 +1074,7 @@ export const assoc1R = (p, o, m) => parser(ctx => {
     if (pres.status === Fail) break
 
     ASSERT && assertFunction(
-      'assoc1R', ores.value, opFormatter(wordinal(i + 1)),
+      'rassoc1', ores.value, opFormatter(wordinal(i + 1)),
     )
 
     ops.push(ores.value)
