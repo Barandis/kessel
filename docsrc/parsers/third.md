@@ -16,7 +16,7 @@ This parser works only if `p` returns an array, and it returns the third element
 #### Example
 
 ```javascript
-const parser = third(many1(any))
+const parser = third(many1(any()))
 
 const s = parse(parser, '12345')
 console.log(status(s))  // "ok"

@@ -16,7 +16,7 @@ This combinator solves the problem in JavaScript that there is no separate chara
 #### Example
 
 ```javascript
-const parser = join(many1(any))
+const parser = join(many1(any()))
 
 const s = parse(parser, 'abcde')
 console.log(status(s))  // "ok"

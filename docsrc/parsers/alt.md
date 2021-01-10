@@ -15,10 +15,6 @@ If a parser in `ps` fails fatally, no further parsers will be applied and `alt` 
 
 If all parsers in `ps` fail, then `alt` fails as well.
 
-`alt(p, q)` is the same as `orElse(p, q)`, while `alt(p, q, r)` is the same as `orElse(orElse(p, q), r)`, etc. Because of JavaScript's lack of custom operators, `alt` becomes much more commonly used. In languages with custom operators, that `orElse(orElse(p, q), r)` would become a much more manageable `p <|> q <|> r` (if `orElse` was implemented as `<|>`, as it is in Parsec and FParsec), and `alt` itself would be less necessary.
-
-`orElse(p, q)` is more efficient than `alt(p, q)`, though once a third parser is added `alt` becomes more efficient. The differences should not be enough to be of concern.
-
 #### Example
 
 ```javascript

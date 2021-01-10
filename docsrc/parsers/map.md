@@ -16,7 +16,7 @@ Applies a parser and returns the value that a function returns when passed the p
 #### Example
 
 ```javascript
-const parser = map(lower, c => c.toUpperCase())
+const parser = map(lower(), c => c.toUpperCase())
 
 const s = parse(parser, 'abc')
 console.log(status(s))  // "ok"

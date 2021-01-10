@@ -14,7 +14,7 @@ This parser cannot produce a useful error message automatically. To provide a cu
 #### Example
 
 ```javascript
-const parser = empty(optional(char('+')))
+const parser = empty(opt(char('+')))
 
 const s = parse(parser, '123')
 console.log(status(s))  // "ok"

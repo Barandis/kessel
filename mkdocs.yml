@@ -40,26 +40,26 @@ nav:
     - Parsers:
       - all: parsers/all.md
       - alpha: parsers/alpha.md
-      - alphaU: parsers/alphau.md
       - alt: parsers/alt.md
       - always: parsers/always.md
       - any: parsers/any.md
       - anystr: parsers/anystr.md
       - apply: parsers/apply.md
-      - applyB: parsers/applyb.md
-      - assoc1L: parsers/assoc1l.md
-      - assoc1R: parsers/assoc1r.md
-      - assocL: parsers/assocl.md
-      - assocR: parsers/assocr.md
       - attempt: parsers/attempt.md
+      - bapply: parsers/bapply.md
+      - bbetween: parsers/bbetween.md
+      - bblock: parsers/bblock.md
+      - bchain: parsers/bchain.md
       - between: parsers/between.md
-      - betweenB: parsers/betweenb.md
+      - bleft: parsers/bleft.md
       - block: parsers/block.md
-      - blockB: parsers/blockb.md
+      - bpipe: parsers/bpipe.md
+      - brepeat: parsers/brepeat.md
+      - bright: parsers/bright.md
+      - bseq: parsers/bseq.md
+      - buntil: parsers/buntil.md
       - chain: parsers/chain.md
-      - chainB: parsers/chainb.md
       - char: parsers/char.md
-      - charI: parsers/chari.md
       - compact: parsers/compact.md
       - def: parsers/def.md
       - digit: parsers/digit.md
@@ -73,18 +73,18 @@ nav:
       - first: parsers/first.md
       - fourth: parsers/fourth.md
       - hex: parsers/hex.md
+      - ichar: parsers/ichar.md
+      - istr: parsers/istr.md
       - join: parsers/join.md
+      - lassoc: parsers/lassoc.md
+      - lassoc1: parsers/lassoc1.md
       - left: parsers/left.md
-      - leftB: parsers/leftb.md
       - letter: parsers/letter.md
-      - letterU: parsers/letteru.md
       - lower: parsers/lower.md
-      - lowerU: parsers/loweru.md
       - many: parsers/many.md
       - many1: parsers/many1.md
       - map: parsers/map.md
       - newline: parsers/newline.md
-      - newlineU: parsers/newlineu.md
       - noneof: parsers/noneof.md
       - not: parsers/not.md
       - nth: parsers/nth.md
@@ -93,33 +93,33 @@ nav:
       - opt: parsers/opt.md
       - peek: parsers/peek.md
       - pipe: parsers/pipe.md
-      - pipeB: parsers/pipeb.md
       - range: parsers/range.md
+      - rassoc: parsers/rassoc.md
+      - rassoc1: parsers/rassoc1.md
       - regex: parsers/regex.md
       - repeat: parsers/repeat.md
-      - repeatB: parsers/repeatb.md
       - right: parsers/right.md
-      - rightB: parsers/rightb.md
       - satisfy: parsers/satisfy.md
       - second: parsers/second.md
       - sepby: parsers/sepby.md
       - sepby1: parsers/sepby1.md
       - seq: parsers/seq.md
-      - seqB: parsers/seqb.md
       - skip: parsers/skip.md
       - space: parsers/space.md
       - spaces: parsers/spaces.md
       - spaces1: parsers/spaces1.md
-      - spaces1U: parsers/spaces1u.md
-      - spacesU: parsers/spacesu.md
-      - spaceU: parsers/spaceu.md
       - str: parsers/str.md
-      - strI: parsers/stri.md
       - third: parsers/third.md
+      - ualpha: parsers/ualpha.md
+      - uletter: parsers/uletter.md
+      - ulower: parsers/ulower.md
+      - unewline: parsers/unewline.md
       - until: parsers/until.md
-      - untilB: parsers/untilb.md
       - upper: parsers/upper.md
-      - upperU: parsers/upperu.md
+      - uspace: parsers/uspace.md
+      - uspaces: parsers/uspaces.md
+      - uspaces1: parsers/uspaces1.md
+      - uupper: parsers/uupper.md
       - value: parsers/value.md
     - Tools:
       - compound: tools/compound.md

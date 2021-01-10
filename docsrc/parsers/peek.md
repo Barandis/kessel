@@ -16,7 +16,7 @@ Since `peek` does not consume input no matter what it encounters, it cannot fail
 #### Example
 
 ```javascript
-const parser = peek(sequence(letter, letter))
+const parser = peek(seq(letter(), letter()))
 
 const s = parse(parser, 'abc')
 console.log(status(s))  // "ok"

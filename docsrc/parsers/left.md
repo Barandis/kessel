@@ -11,7 +11,7 @@ Applies two parsers in order, returning the result of the first one.
 
 The result of the second parser is discarded. If either parser fails, then the entire `left` parser also fails. If input was consumed by either parser and one of them fails, then the failure is fatal (whether or not `p` or `q` failed fatally).
 
-There is another version of this parser ([`leftB`](leftb.md)) that will backtrack and fail non-fatally if `p1` succeeds and `p2` fails non-fatally.
+There is another version of this parser ([`bleft`](bleft.md)) that will backtrack and fail non-fatally if `p1` succeeds and `p2` fails non-fatally.
 
 `left(p, q)` is the equivalent of `p <* q` in the Haskell `Applicative` class and is written `.>>` in FParsec. It can be regarded as an optimized implementation of either of the following.
 
@@ -23,7 +23,7 @@ apply(p, value(q, x => x)) // applicative style
 #### Example
 
 ```javascript
-const parser = left(letter, digit)
+const parser = left(letter(), digit())
 
 const s = parse(parser, 'a1')
 console.log(status(s))  // "ok"
@@ -76,6 +76,6 @@ In this example, `f` represents a non-fatal failure because the first parser (`l
 #### See Also
 
 * [`Parser`](../types/parser.md)
-* [`leftB`](leftb.md)
+* [`bleft`](bleft.md)
 * [`right`](right.md)
 * [`seq`](seq.md)

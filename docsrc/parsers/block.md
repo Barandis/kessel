@@ -11,7 +11,7 @@ Executes a generator function that can yield to parsers in its body.
 
 `block` is the most versatile parser in the entire library and provides a way to parse pretty much anything without having to write a custom parser. It corresponds to using do-notation blocks in Haskell (hence the name `block`).
 
-The generator function can do anything that any function could do. In addition, it can have `yield` expressions that yield any parser. That parser will be applied at that point, and if it's successful, its result will be fed back into the generator function, able to be used as needed (for example, in `const number = yield join(many1(digit))` in the example, the result of the `join` parser is assigned to the variable `number`). When the generator function returns, its return value becomes the value returned by the `block` parser.
+The generator function can do anything that any function could do. In addition, it can have `yield` expressions that yield any parser. That parser will be applied at that point, and if it's successful, its result will be fed back into the generator function, able to be used as needed (for example, in `const number = yield join(many1(digit()))` in the example, the result of the `join` parser is assigned to the variable `number`). When the generator function returns, its return value becomes the value returned by the `block` parser.
 
 If any of the parsers fail when yielded, then `block` will fail. If any input was consumed before the failure, that failure will be fatal.
 
@@ -23,10 +23,10 @@ This is most notable with sequences. A `block` parser that discards a number of 
 
 ```javascript
 const parser = block(function *() {
-  yield spaces
-  const sign = yield optional(orElse(char('+'), char('-')))
-  const number = yield join(many1(digit))
-  yield spaces
+  yield spaces()
+  const sign = yield opt(alt(char('+'), char('-')))
+  const number = yield join(many1(digit()))
+  yield spaces()
 
   const result = parseInt(number) * (sign === '-' ? -1 : 1)
   return result
@@ -55,9 +55,9 @@ console.log(failure(t)) // Parse error at (line 1, column 2):
 
 The first yielded parser here is `spaces`. This skips zero or more whitespace characters. Its result is discarded as it is not assigned to anything (besides, `spaces` only returns `null` so its result isn't useful).
 
-The second yielded parser is `opt(orElse(char('+'), char('-')))`. This will match either a `'+'` or `'-'` if it's there, or return `null` if the next character is neither of those (without `opt` it would fail, and we don't want that because it's okay for a number to have no sign). This value (either `'+'`, `'-'`, or `null`) is assigned to the variable `sign`.
+The second yielded parser is `opt(alt(char('+'), char('-')))`. This will match either a `'+'` or `'-'` if it's there, or return `null` if the next character is neither of those (without `opt` it would fail, and we don't want that because it's okay for a number to have no sign). This value (either `'+'`, `'-'`, or `null`) is assigned to the variable `sign`.
 
-The third yielded parser is `join(many1(digit))`. This simply matches a series of one or more digit characters (`0-9`), returning them as a single string instead of an array of characters (because of `join`). This parses a natural number, assigning the result to `number`. (When combined with `sign`, this could be a negative number as well, so the two together parse an integer.)
+The third yielded parser is `join(many1(digit()))`. This simply matches a series of one or more digit characters (`0-9`), returning them as a single string instead of an array of characters (because of `join`). This parses a natural number, assigning the result to `number`. (When combined with `sign`, this could be a negative number as well, so the two together parse an integer.)
 
 The fourth yielded parser skips whitespace at the end, similar to the first parser.
 
@@ -96,5 +96,5 @@ The third case (`t`) fails because, while the whitespace was ignored and the opt
 #### See Also
 
 * [`Parser`](../types/parser.md)
-* [`blockB`](blockb.md)
+* [`bblock`](bblock.md)
 * [`seq`](seq.md)

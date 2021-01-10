@@ -14,7 +14,7 @@ Applies a parser as many times as possible until it fails, collecting the result
 #### Example
 
 ```javascript
-const parser = many(right(digit, letter))
+const parser = many(right(digit(), letter()))
 
 const s = parse(parser, '1a2b')
 console.log(status(s))  // "ok"

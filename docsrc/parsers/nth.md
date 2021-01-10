@@ -9,14 +9,14 @@
 
 Applies a parser and returns a given element of the resulting array.
 
-This parser works only if `p` returns an array, and it returns the `n`th (parsers/0-based) element of that array. It's most useful with parsers like [`seq`](seq.md) and [`many`](many.md) that always return arrays, though it will work with parsers like [`map`](map.md) and [`always`](always.md) if they are programmed to return arrays.
+This parser works only if `p` returns an array, and it returns the `n`th (0-based) element of that array. It's most useful with parsers like [`seq`](seq.md) and [`many`](many.md) that always return arrays, though it will work with parsers like [`map`](map.md) and [`always`](always.md) if they are programmed to return arrays.
 
 `nth(p, n)` is an optimized implementation of `chain(p, x => always(x[n]))`.
 
 #### Example
 
 ```javascript
-const parser = nth(many1(any), 3)
+const parser = nth(many1(any()), 3)
 
 const s = parse(parser, '12345')
 console.log(status(s))  // "ok"

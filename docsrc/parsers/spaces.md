@@ -31,4 +31,4 @@ console.log(success(s)) // null
 * [`newline`](newline.md)
 * [`space`](space.md)
 * [`spaces1`](spaces1.md)
-* [`spacesU`](spacesu.md)
+* [`uspaces`](uspaces.md)

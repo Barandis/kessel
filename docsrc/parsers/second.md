@@ -16,7 +16,7 @@ This parser works only if `p` returns an array, and it returns the second elemen
 #### Example
 
 ```javascript
-const parser = second(many1(any))
+const parser = second(many1(any()))
 
 const s = parse(parser, '12345')
 console.log(status(s))  // "ok"

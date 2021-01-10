@@ -9,7 +9,7 @@
 
 Applies a parser and, if it fails after consuming input, backtracks to the original location and fails non-fatally.
 
-`attempt` implements general backtracking. It is different from the backtracking `B` parsers ([`seqB`](seqb.md), [`leftB`](leftb.md), etc.) in that it is meant to deal with all fatal failures (the `B` parsers only deal with fatal failures that result from non-fatal failures that come after successes). It's common to use this parser in conjunction with [`alt`](alt.md), [`opt`](opt.md), and other parsers which only fail if their parsers fail fatally.
+`attempt` implements general backtracking. It is different from the backtracking `B` parsers ([`bseq`](bseq.md), [`bleft`](bleft.md), etc.) in that it is meant to deal with all fatal failures (the `B` parsers only deal with fatal failures that result from non-fatal failures that come after successes). It's common to use this parser in conjunction with [`alt`](alt.md), [`opt`](opt.md), and other parsers which only fail if their parsers fail fatally.
 
 If an optional error message string is provided (as the second argument), then that message will become the new text of an error message for a regular failure, or it will become the text of a compound error message if the parser had to backtrack.
 

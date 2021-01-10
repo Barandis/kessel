@@ -9,7 +9,7 @@
 
 Parses an ASCII alphanumeric character (`0-9`, `a-z`, or `A-Z`).
 
-This does not parse UTF-8 alphanumeric characters in general. Use [`alphaU`](alphau.md) for that.
+This does not parse UTF-8 alphanumeric characters in general. Use [`ualpha`](ualpha.md) for that.
 
 #### Example
 
@@ -48,7 +48,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 #### See Also
 
 * [`Parser`](../types/parser.md)
-* [`alphaU`](alphau.md)
 * [`letter`](letter.md)
 * [`lower`](lower.md)
+* [`ualpha`](ualpha.md)
 * [`upper`](upper.md)

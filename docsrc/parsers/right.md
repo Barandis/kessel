@@ -11,7 +11,7 @@ Applies two parsers in order, returning the result of the second one.
 
 The result of the first parser is discarded. If either parser fails, then the entire `right` parser also fails. If input was consumed by either parser and one of them fails, then the failure is fatal (whether or not `p` or `q` failed fatally).
 
-There is another version of this parser ([`rightB`](rightb.md)) that will backtrack and fail non-fatally if `p` succeeds and `q` fails non-fatally.
+There is another version of this parser ([`bright`](bright.md)) that will backtrack and fail non-fatally if `p` succeeds and `q` fails non-fatally.
 
 `right(p, q)` is the equivalent of `p *> q` in the Haskell `Applicative` class and is written `>>.` in FParsec. It can be regarded as an optimized implementation of either of the following.
 
@@ -23,7 +23,7 @@ apply(p, apply(q, x => () => x)) // applicative style
 #### Example
 
 ```javascript
-const parser = right(letter, digit)
+const parser = right(letter(), digit())
 
 const s = parse(parser, 'a1')
 console.log(status(s))  // "ok"
@@ -76,6 +76,6 @@ In this example, `f` represents a non-fatal failure because the first parser (`l
 #### See Also
 
 * [`Parser`](../types/parser.md)
+* [`bright`](bright.md)
 * [`left`](left.md)
-* [`rightB`](rightb.md)
 * [`seq`](seq.md)

@@ -16,7 +16,7 @@ A common use case is to skip some optional input; in this case, `opt` can be wra
 #### Example
 
 ```javascript
-const parser = opt(sequence(letter, digit))
+const parser = opt(seq(letter(), digit()))
 
 const s = parse(parser, 'a1')
 console.log(status(s))  // "ok"

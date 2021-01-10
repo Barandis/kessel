@@ -16,7 +16,7 @@ The operation of this parser in EBNF is `(!e p)* e`.
 #### Example
 
 ```javascript
-const parser = until(letter, char('>'))
+const parser = until(letter(), char('>'))
 
 const s = parse(parser, 'abcd>')
 console.log(status(s))  // "ok"
@@ -68,5 +68,5 @@ console.log(failure(t)) // Parse error at (line 1, column 3):
 
 * [`Parser`](../types/parser.md)
 * [`between`](between.md)
+* [`buntil`](buntil.md)
 * [`seq`](seq.md)
-* [`untilB`](untilb.md)

@@ -11,12 +11,12 @@ Applies a parser a certain number of times, collecting the results into an array
 
 The parser `p` must succeed the full `n` times for `repeat` to succeed. Any fewer successes results in failure.
 
-As with other combinators that run multiple parsers, it's possible for `repeat` to fail fatally even if the parser that failed did not fail fatally (because, for example, an earlier success consumed some input). There is another version of this parser, [`repeatB`](repeatb.md), that will backtrack and fail non-fatally when this happens.
+As with other combinators that run multiple parsers, it's possible for `repeat` to fail fatally even if the parser that failed did not fail fatally (because, for example, an earlier success consumed some input). There is another version of this parser, [`brepeat`](brepeat.md), that will backtrack and fail non-fatally when this happens.
 
 #### Example
 
 ```javascript
-const parser = repeat(letter, 3)
+const parser = repeat(letter(), 3)
 
 const s = parse(parser, 'abc')
 console.log(status(s))  // "ok"
@@ -68,6 +68,6 @@ console.log(failure(t)) // Parse error at (line 1, column 3):
 #### See Also
 
 * [`Parser`](../types/parser.md)
+* [`brepeat`](brepeat.md)
 * [`opt`](opt.md)
-* [`repeatB`](repeatb.md)
 * [`seq`](seq.md)

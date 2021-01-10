@@ -14,7 +14,7 @@ Applies a parser and discards its result on success.
 #### Example
 
 ```javascript
-const parser = skip(letter)
+const parser = skip(letter())
 
 const s = parse(parser, 'abc')
 console.log(status(s))  // "ok"

@@ -13,7 +13,7 @@ This parser is the applicative-style counterpart of the monadic-style [`chain`](
 
 As this parser requires that one of its parser return a function, [`always`](always.md) is often used to provide that parser.
 
-There is another version of this parser ([`applyB`](applyb.md)) that will backtrack and fail non-fatally if `q` fails non-fatally.
+There is another version of this parser ([`bapply`](bapply.md)) that will backtrack and fail non-fatally if `q` fails non-fatally.
 
 #### Example
 
@@ -71,5 +71,5 @@ console.log(failure(t)) // Parse error at (line 1, column 2):
 
 * [`Parser`](../types/parser.md)
 * [`always`](always.md)
-* [`applyB`](applyb.md)
+* [`bapply`](bapply.md)
 * [`chain`](chain.md)

@@ -9,12 +9,12 @@
 
 Parses an ASCII uppercase letter (`A-Z`).
 
-This does not parse UTF-8 uppercase letters in general. Use [`upperU`](upperu.md) for that.
+This does not parse UTF-8 uppercase letters in general. Use [`uupper`](uupper.md) for that.
 
 #### Example
 
 ```javascript
-const parser = upper
+const parser = upper()
 
 const s = parse(parser, 'ABC')
 console.log(status(s))  // "ok"
@@ -51,4 +51,4 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 * [`alpha`](alpha.md)
 * [`letter`](letter.md)
 * [`lower`](lower.md)
-* [`upperU`](upperu.md)
+* [`uupper`](uupper.md)

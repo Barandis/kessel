@@ -54,5 +54,5 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 * [`Parser`](../types/parser.md)
 * [`char`](char.md)
+* [`istr`](istr.md)
 * [`regex`](regex.md)
-* [`strI`](stri.md)

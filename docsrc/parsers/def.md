@@ -16,7 +16,7 @@ The only way `def` can fail is if its parser fails fatally. For this reason, a c
 #### Example
 
 ```javascript
-const parser = def(join(sequence(letter, digit)), 'Z0')
+const parser = def(join(seq(letter(), digit())), 'Z0')
 
 const s = parse(parser, 'a1')
 console.log(status(s))  // "ok"

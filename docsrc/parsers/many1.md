@@ -16,7 +16,7 @@ As long as `p` succeeds at least once, the only way `many1` can fail is if `p` f
 #### Example
 
 ```javascript
-const parser = many1(right(digit, letter))
+const parser = many1(right(digit(), letter()))
 
 const s = parse(parser, '1a2b')
 console.log(status(s))  // "ok"

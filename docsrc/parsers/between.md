@@ -9,9 +9,9 @@
 
 Applies a pre-parser, a content parser, and a post-parser in order, returning the value of the content parser.
 
-All three parsers must succeed for `between` to succeed. Take care to avoid parsing too far with `p`; e.g., if the example used `join(many(any))` as a content parser instead of what it does, it would also match the ending `"`. This would mean that `e` would never succeed because `p` already consumed its `"`, so `between` would never succeed.
+All three parsers must succeed for `between` to succeed. Take care to avoid parsing too far with `p`; e.g., if the example used `join(many(any()))` as a content parser instead of what it does, it would also match the ending `"`. This would mean that `e` would never succeed because `p` already consumed its `"`, so `between` would never succeed.
 
-There is another version of this parser, [`betweenB`](betweenb.md), which backtracks and fails non-fatally if a non-fatal failure happens after input is consumed.
+There is another version of this parser, [`bbetween`](bbetween.md), which backtracks and fails non-fatally if a non-fatal failure happens after input is consumed.
 
 `between(s, e, p)` is an optimized implementation of `chain(chain(s, () => p), x => value(e, x))`. (Using higher-level parsers, this can also be written `left(right(s, p), e)`.)
 
@@ -72,5 +72,5 @@ The first failure case in the example (`f`) is non-fatal failure, because no cha
 #### See Also
 
 * [`Parser`](../types/parser.md)
-* [`betweenB`](betweenb.md)
+* [`bbetween`](bbetween.md)
 * [`until`](until.md)

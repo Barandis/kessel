@@ -9,12 +9,12 @@
 
 Parses an ASCII letter (`a-z` or `A-Z`).
 
-This does not parse UTF-8 letters in general. Use [`letterU`](letteru.md) for that.
+This does not parse UTF-8 letters in general. Use [`uletter`](uletter.md) for that.
 
 #### Example
 
 ```javascript
-const parser = letter
+const parser = letter()
 
 const s = parse(parser, 'abc')
 console.log(status(s))  // "ok"
@@ -49,6 +49,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 * [`Parser`](../types/parser.md)
 * [`alpha`](alpha.md)
-* [`letterU`](letteru.md)
 * [`lower`](lower.md)
+* [`uletter`](uletter.md)
 * [`upper`](upper.md)

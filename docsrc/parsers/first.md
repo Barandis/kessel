@@ -16,7 +16,7 @@ This parser works only if `p` returns an array, and it returns the first element
 #### Example
 
 ```javascript
-const parser = first(many1(any))
+const parser = first(many1(any()))
 
 const s = parse(parser, '12345')
 console.log(status(s))  // "ok"

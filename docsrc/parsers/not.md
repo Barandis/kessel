@@ -14,7 +14,7 @@ Applies a parser and succeeds without consuming input if that parser fails.
 #### Example
 
 ```javascript
-const parser = not(digit)
+const parser = not(digit())
 
 const s = parse(parser, 'a')
 console.log(status(s))  // "ok"

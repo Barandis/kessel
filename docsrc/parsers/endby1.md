@@ -16,7 +16,7 @@ The content parser need not be the last to match. If the separator parser succee
 #### Example
 
 ```javascript
-const parser = endby1(count(letter, 3), char(','))
+const parser = endby1(count(letter(), 3), char(','))
 
 const s = parse(parser, 'aaa,bbb,ccc,')
 console.log(status(s))  // "ok"

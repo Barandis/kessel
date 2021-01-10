@@ -51,4 +51,4 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 * [`newline`](newline.md)
 * [`spaces`](spaces.md)
 * [`spaces1`](spaces1.md)
-* [`spaceU`](spaceu.md)
+* [`uspace`](uspace.md)

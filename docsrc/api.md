@@ -9,11 +9,9 @@
 
 ### A Note about Types
 
-Types are given in the descriptions for each of the parsers and functions listed below. These are contained in TypeScript definition files in the project that can be used either for writing TypeScript programs that use Kessel or just in providing signature information for your IDE.
+Types are given in the descriptions for each of the parsers and functions listed below. The format here is just something that makes reasonable sense. These are not TypeScript types or anything that's actually useful in code. The types are just to make it easy to talk about their interface.
 
-It should however be noted that some of the type information is incomplete because TypeScript leaves no way to express complete information in the case where there are variable numbers of arguments that can have different generic parameter types. There are notes to that effect in [`alt`](parsers/alt.md), [`pipe`](parsers/pipe.md), [`pipeB`](parsers/pipeb.md), [`seq`](parsers/seq.md), and [`seqB`](parsers/seqb.md).
-
-However, there are shortcomings in other parsers that are not explicity marked. For example, TypeScript has no way to say that a string should be one character long, or that an array of strings should have elements that are all one character long. This affects the parameters in [`oneof`](parsers/oneof.md), [`char`](parsers/char.md), [`charI`](parsers/chari.md), [`noneof`](parsers/noneof.md), and [`range`](parsers/range.md).
+Some of the definitions don't, in fact, represent anything that's actually legal. [`alt`](parsers/alt.md), for example, is given this type information: `alt(...ps: Parser[], m?: string)`. In JavaScript, you can't declare a function parameter after you declare a rest parameter (the one with the `...` in front of it). In fact, in code, this function's signature is just `alt(...args)`. But the code looks for an optional string at the end, so the type that we provide here is useful for discussing how `alt` works.
 
 A best effort is given to give useful types for documentation, but there's no way to make them perfect.
 
@@ -30,7 +28,7 @@ Additionally, parsers are often said to *return* a value or to have a value as a
 | Parser | Description |
 |--------|-------------|
 | [`char`](parsers/char.md) | Parses a single character. |
-| [`charI`](parsers/chari.md) | Parses a single character, but without case sensitivity. |
+| [`ichar`](parsers/ichar.md) | Parses a single character, but without case sensitivity. |
 | [`satisfy`](parsers/satisfy.md) | Parses a single character for which a predicate returns `true`. |
 | [`range`](parsers/range.md) | Parses a single character whose code point is between two other characters. |
 | [`any`](parsers/any.md) | Parses any one character. |
@@ -43,17 +41,17 @@ Additionally, parsers are often said to *return* a value or to have a value as a
 | [`alpha`](parsers/alpha) | Parses a single ASCII alphanumeric character (`0-9`, `a-z`, or `A-Z`). |
 | [`lower`](parsers/lower) | Parses a single ASCII lowercase letter (`a-z`). |
 | [`upper`](parsers/upper) | Parses a single ASCII uppercase letter (`A-Z`). |
-| [`letterU`](parsers/letteru.md) | Parses a single UTF-8 letter. |
-| [`alphaU`](parsers/alphau.md) | Parses a single UTF-8 alphanumeric character. |
-| [`lowerU`](parsers/loweru.md) | Parses a single UTF-8 lowercase letter. |
-| [`upperU`](parsers/upperu.md) | Parses a single UTF-8 uppercase letter. |
+| [`uletter`](parsers/uletter.md) | Parses a single UTF-8 letter. |
+| [`ualpha`](parsers/ualpha.md) | Parses a single UTF-8 alphanumeric character. |
+| [`ulower`](parsers/ulower.md) | Parses a single UTF-8 lowercase letter. |
+| [`uupper`](parsers/uupper.md) | Parses a single UTF-8 uppercase letter. |
 
 ### Table 2: String (multiple-character) parsers
 
 | Parser | Description |
 |--------|-------------|
 | [`str`](parsers/str.md) | Parses a string. |
-| [`strI`](parsers/stri.md) | Parses a string, but without case sensitivity. |
+| [`istr`](parsers/istr.md) | Parses a string, but without case sensitivity. |
 | [`regex`](parsers/regex.md) | Parses a string matching a regular expression pattern. |
 | [`all`](parsers/all.md) | Parses the remainder of the input as a string. |
 | [`anystr`](parsers/anystr.md) | Parses a string of a certain number of characters. |
@@ -66,10 +64,10 @@ Additionally, parsers are often said to *return* a value or to have a value as a
 | [`space`](parsers/space) | Parses a single ASCII whitespace character (` `, `\t`, or a newline). |
 | [`spaces`](parsers/spaces.md) | Skips zero or more ASCII whitespace characters. |
 | [`spaces1`](parsers/spaces1.md) | Skips one or more ASCII whitespace characters. |
-| [`newlineU`](parsers/newlineu.md) | Parses a single UTF-8 newline character. |
-| [`spaceU`](parsers/spaceu) | Parses a single UTF-8 whitespace character (including newlines.md). |
-| [`spacesU`](parsers/spacesu.md) | Skips zero or more UTF-8 whitespace characters. |
-| [`spaces1U`](parsers/spaces1u.md) | Skips one or more UTF-8 whitespace characters. |
+| [`unewline`](parsers/unewline.md) | Parses a single UTF-8 newline character. |
+| [`uspace`](parsers/uspace.md) | Parses a single UTF-8 whitespace character (including newlines.md). |
+| [`uspaces`](parsers/uspaces.md) | Skips zero or more UTF-8 whitespace characters. |
+| [`uspaces1`](parsers/uspaces1.md) | Skips one or more UTF-8 whitespace characters. |
 | [`eof`](parsers/eof.md) | Succeeds only at the end of the input. |
 
 ### Table 4: Miscellaneous parsers
@@ -99,10 +97,10 @@ Additionally, parsers are often said to *return* a value or to have a value as a
 | [`pipe`](parsers/pipe.md) | Executes a series of parsers in order, then passes the results as arguments to a function, then returns the result of that function. |
 | [`between`](parsers/between.md) | Executes a content parser between two other parsers, returning only the content parser's result. |
 | [`until`](parsers/until.md) | Executes a content parser zero or more times until an end parser succeeds. Returns the content parser's results. |
-| [`assocL`](parsers/assocl.md) | Executes a content parser zero or more times with an application of an operator parser between each. Returns the value obtained by left associative application of all functions returned by the operator parser to the results returned by the content parser. |
-| [`assoc1L`](parsers/assoc1l.md) | Executes a content parser one or more times with an application of an operator parser between each. Returns the value obtained by left associative application of all functions returned by the operator parser to the results returned by the content parser.|
-| [`assocR`](parsers/assocr.md) | Executes a content parser zero or more times with an application of an operator parser between each. Returns the value obtained by right associative application of all functions returned by the operator parser to the results returned by the content parser.|
-| [`assoc1R`](parsers/assoc1r.md) | Executes a content parser one or more times with an application of an operator parser between each. Returns the value obtained by right associative application of all functions returned by the operator parser to the results returned by the content parser. |
+| [`lassoc`](parsers/lassoc.md) | Executes a content parser zero or more times with an application of an operator parser between each. Returns the value obtained by left associative application of all functions returned by the operator parser to the results returned by the content parser. |
+| [`lassoc1`](parsers/lassoc1.md) | Executes a content parser one or more times with an application of an operator parser between each. Returns the value obtained by left associative application of all functions returned by the operator parser to the results returned by the content parser.|
+| [`rassoc`](parsers/rassoc.md) | Executes a content parser zero or more times with an application of an operator parser between each. Returns the value obtained by right associative application of all functions returned by the operator parser to the results returned by the content parser.|
+| [`rassoc1`](parsers/rassoc1.md) | Executes a content parser one or more times with an application of an operator parser between each. Returns the value obtained by right associative application of all functions returned by the operator parser to the results returned by the content parser. |
 
 ### Table 6: Alternative and conditional combinators
 
@@ -120,16 +118,16 @@ Additionally, parsers are often said to *return* a value or to have a value as a
 | Parser | Description |
 |--------|-------------|
 | [`attempt`](parsers/attempt.md) | Executes a parser, backtracking to its original position if the parser fails and consumes input. |
-| [`seqB`](parsers/seqb.md) | Executes a series of parsers in order, returning their results in an array. Backtracks to where the first parser was applied if any other of its parsers fails. |
-| [`blockB`](parsers/blockb.md) | Runs a generator function. The generator can `yield` parsers, whose results will be returned as the result of the `yield` expressions. Returns the result of the generator. Backtracks to where the first yielded parser was applied if any later parser fails. |
-| [`chainB`](parsers/chainb.md) | Executes a parser, then applies a function to the result, then applies the parser returned by the function. Backtracks to where the first parser was applied if the parser returned by the function fails. |
-| [`applyB`](parsers/applyb.md) | Parses content and a function, returning the result of the function when passed the content. Backtracks to where the first parser was applied if the second parser fails. |
-| [`leftB`](parsers/leftb.md) | Executes two parsers in order and returns the result of the first one. Backtracks to the location where the first parser was applied if the second one fails. |
-| [`rightB`](parsers/rightb.md) | Executes two parsers in order and returns the result of the second one. Backtracks to the location where the first parser was applied if the second one fails. |
-| [`pipeB`](parsers/pipeb.md) | Executes a series of parsers in order, then passes the results as arguments to a function, then returns the result of that function. Backtracks to where the first parser was applied if any other parser fails. |
-| [`repeatB`](parsers/repeatb.md) | Executes a parser a certain number of times, returning the results in an array. Backtracks to where the first parser was applied if any other parser fails. |
-| [`untilB`](parsers/untilb.md) | Executes a content parser zero or more times until an end parser succeeds. Returns the content parser's results. Backtracks to where the content parser was first applied if it fails before the end parser succeeds. |
-| [`betweenB`](parsers/betweenb.md) | Executes a content parser between two other parsers, returning only the content parser's result. Backtracks to where the first parser was applied if either other parser fails. |
+| [`bseq`](parsers/bseq.md) | Executes a series of parsers in order, returning their results in an array. Backtracks to where the first parser was applied if any other of its parsers fails. |
+| [`bblock`](parsers/bblock.md) | Runs a generator function. The generator can `yield` parsers, whose results will be returned as the result of the `yield` expressions. Returns the result of the generator. Backtracks to where the first yielded parser was applied if any later parser fails. |
+| [`bchain`](parsers/bchain.md) | Executes a parser, then applies a function to the result, then applies the parser returned by the function. Backtracks to where the first parser was applied if the parser returned by the function fails. |
+| [`bapply`](parsers/bapply.md) | Parses content and a function, returning the result of the function when passed the content. Backtracks to where the first parser was applied if the second parser fails. |
+| [`bleft`](parsers/bleft.md) | Executes two parsers in order and returns the result of the first one. Backtracks to the location where the first parser was applied if the second one fails. |
+| [`bright`](parsers/bright.md) | Executes two parsers in order and returns the result of the second one. Backtracks to the location where the first parser was applied if the second one fails. |
+| [`bpipe`](parsers/bpipe.md) | Executes a series of parsers in order, then passes the results as arguments to a function, then returns the result of that function. Backtracks to where the first parser was applied if any other parser fails. |
+| [`brepeat`](parsers/brepeat.md) | Executes a parser a certain number of times, returning the results in an array. Backtracks to where the first parser was applied if any other parser fails. |
+| [`buntil`](parsers/buntil.md) | Executes a content parser zero or more times until an end parser succeeds. Returns the content parser's results. Backtracks to where the content parser was first applied if it fails before the end parser succeeds. |
+| [`bbetween`](parsers/bbetween.md) | Executes a content parser between two other parsers, returning only the content parser's result. Backtracks to where the first parser was applied if either other parser fails. |
 
 ### Table 8: Chaining combinators
 

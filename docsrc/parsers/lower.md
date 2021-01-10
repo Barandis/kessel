@@ -9,12 +9,12 @@
 
 Parses an ASCII lowercase letter (`a-z`).
 
-This does not parse UTF-8 lowercase letters in general. Use [`lowerU`](loweru.md) for that.
+This does not parse UTF-8 lowercase letters in general. Use [`ulower`](ulower.md) for that.
 
 #### Example
 
 ```javascript
-const parser = lower
+const parser = lower()
 
 const s = parse(parser, 'abc')
 console.log(status(s))  // "ok"
@@ -50,5 +50,5 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 * [`Parser`](../types/parser.md)
 * [`alpha`](alpha.md)
 * [`letter`](letter.md)
-* [`lowerU`](loweru.md)
+* [`ulower`](ulower.md)
 * [`upper`](upper.md)

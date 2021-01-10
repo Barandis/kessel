@@ -14,7 +14,7 @@ This combinator is useful in conjunction with parsers like [`seq`](seq.md) and [
 #### Example
 
 ```javascript
-const parser = compact(seq(opt(char('-')), digit, digit))
+const parser = compact(seq(opt(char('-')), digit(), digit()))
 
 const s = parse(parser, '-12')
 console.log(status(s))  // "ok"

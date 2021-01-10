@@ -13,12 +13,12 @@ Applies a parser to the input, passes its result to a function, and then applies
 
 This parser is not expected to see a lot of use since none of the Kessels parsers are implemented in terms of it, but it is available in case someone wants to parse monadically without using `block`.
 
-There is another version of this parser ([`chainB`](chainb.md)) that will backtrack and fail non-fatally if the parser returned by `fn` fails non-fatally.
+There is another version of this parser ([`bchain`](bchain.md)) that will backtrack and fail non-fatally if the parser returned by `fn` fails non-fatally.
 
 #### Example
 
 ```javascript
-const parser = chain(any, c => char(c))
+const parser = chain(any(), c => char(c))
 
 const s = parse(parser, 'aabbcc')
 console.log(status(s))  // "ok"
@@ -77,5 +77,5 @@ In the case of `f`, `chain` fails fatally. This is because a character was consu
 
 * [`Parser`](../types/parser.md)
 * [`apply`](apply.md)
-* [`chainB`](chainb.md)
+* [`bchain`](bchain.md)
 * [`map`](map.md)

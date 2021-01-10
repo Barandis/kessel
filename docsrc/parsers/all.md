@@ -5,14 +5,14 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `all: Parser<string>`
+> `all(): Parser`
 
 Parses the entire remaining input.
 
 #### Example
 
 ```javascript
-const parser = all
+const parser = all()
 
 const s = parse(parser, 'content')
 console.log(status(s))  // "ok"
