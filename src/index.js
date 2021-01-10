@@ -62,17 +62,17 @@ export {
   peek,
 } from './combinators/alternative'
 export {
-  applyB,
   attempt,
-  betweenB,
-  blockB,
-  chainB,
-  leftB,
-  pipeB,
-  repeatB,
-  rightB,
-  seqB,
-  untilB,
+  bapply,
+  bbetween,
+  bblock,
+  bchain,
+  bleft,
+  bpipe,
+  brepeat,
+  bright,
+  bseq,
+  buntil,
 } from './combinators/backtracking'
 export {
   apply,

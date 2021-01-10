@@ -5,7 +5,7 @@
   "main": "lib/kessel.js",
   "types": "types/index.d.ts",
   "scripts": {
-    "add": "npm run build && npm run docs && git add -A",
+    "add": "npm run build && npm run docs && git add -A && git status",
     "clean": "rimraf dist",
     "build": "npm run clean && npm run bundle",
     "bundle:dev": "cross-env NODE_ENV=development webpack --progress --colors --config webpack.dev.js",

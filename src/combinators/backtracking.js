@@ -91,13 +91,13 @@ export const attempt = (p, m) => parser(ctx => {
  * @returns {Parser} A parser that executes the supplied parsers one at
  *     a time, in order, and fails if any of those parsers fail.
  */
-export const seqB = (...args) => {
+export const bseq = (...args) => {
   const ps = args.slice()
   const m = typeof ps[ps.length - 1] === 'string' ? ps.pop() : null
 
   return parser(ctx => {
     ASSERT && ps.forEach((p, i) =>
-      assertParser('seqB', p, argParFormatter(i + 1, args.length > 1)))
+      assertParser('bseq', p, argParFormatter(i + 1, args.length > 1)))
 
     const values = []
     const index = ctx.index
@@ -141,12 +141,12 @@ export const seqB = (...args) => {
  *     the supplied function, and use that function's return value as a
  *     second parser to execute.
  */
-export const chainB = (p, fn, m) => parser(ctx => {
+export const bchain = (p, fn, m) => parser(ctx => {
   const hasM = m != null
 
-  ASSERT && assertParser('chainB', p, argParFormatter(1, true))
-  ASSERT && assertFunction('chainB', fn, argFnFormatter(2, true))
-  ASSERT && hasM && assertString('chainB', m, argStrFormatter(3, true))
+  ASSERT && assertParser('bchain', p, argParFormatter(1, true))
+  ASSERT && assertFunction('bchain', fn, argFnFormatter(2, true))
+  ASSERT && hasM && assertString('bchain', m, argStrFormatter(3, true))
 
   const index = ctx.index
 
@@ -158,7 +158,7 @@ export const chainB = (p, fn, m) => parser(ctx => {
 
   const q = fn(pres.value)
   ASSERT && assertParser(
-    'chainB', q, formatter('second argument to return a parser'),
+    'bchain', q, formatter('second argument to return a parser'),
   )
 
   const [qrep, [qctx, qres]] = dup(q(pctx))
@@ -185,12 +185,12 @@ export const chainB = (p, fn, m) => parser(ctx => {
  *     the return value of the function returned by `q` when the value
  *     returned by `p` is passed into it.
  */
-export const applyB = (p, q, m) => parser(ctx => {
+export const bapply = (p, q, m) => parser(ctx => {
   const hasM = m != null
 
-  ASSERT && assertParser('applyB', p, argParFormatter(1, true))
-  ASSERT && assertParser('applyB', q, argParFormatter(2, true))
-  ASSERT && hasM && assertString('applyB', m, argStrFormatter(3, true))
+  ASSERT && assertParser('bapply', p, argParFormatter(1, true))
+  ASSERT && assertParser('bapply', q, argParFormatter(2, true))
+  ASSERT && hasM && assertString('bapply', m, argStrFormatter(3, true))
 
   const index = ctx.index
 
@@ -210,7 +210,7 @@ export const applyB = (p, q, m) => parser(ctx => {
 
   const fn = qres.value
   ASSERT && assertFunction(
-    'applyB', fn, formatter('second argument to return a function'),
+    'bapply', fn, formatter('second argument to return a function'),
   )
   return okReply(qctx, fn(pres.value))
 })
@@ -228,12 +228,12 @@ export const applyB = (p, q, m) => parser(ctx => {
  * @returns {Parser} A parser that executes `p` and `q` and returns the
  *     result of the first.
  */
-export const leftB = (p, q, m) => parser(ctx => {
+export const bleft = (p, q, m) => parser(ctx => {
   const hasM = m != null
 
-  ASSERT && assertParser('leftB', p, argParFormatter(1, true))
-  ASSERT && assertParser('leftB', q, argParFormatter(2, true))
-  ASSERT && hasM && assertString('leftB', m, argStrFormatter(3, true))
+  ASSERT && assertParser('bleft', p, argParFormatter(1, true))
+  ASSERT && assertParser('bleft', q, argParFormatter(2, true))
+  ASSERT && hasM && assertString('bleft', m, argStrFormatter(3, true))
 
   const index = ctx.index
 
@@ -266,12 +266,12 @@ export const leftB = (p, q, m) => parser(ctx => {
  * @returns {Parser} A parser that executes `p` and `q` and returns the
  *     result of the second.
  */
-export const rightB = (p, q, m) => parser(ctx => {
+export const bright = (p, q, m) => parser(ctx => {
   const hasM = m != null
 
-  ASSERT && assertParser('rightB', p, argParFormatter(1, true))
-  ASSERT && assertParser('rightB', q, argParFormatter(2, true))
-  ASSERT && hasM && assertString('rightB', m, argStrFormatter(3, true))
+  ASSERT && assertParser('bright', p, argParFormatter(1, true))
+  ASSERT && assertParser('bright', q, argParFormatter(2, true))
+  ASSERT && hasM && assertString('bright', m, argStrFormatter(3, true))
 
   const index = ctx.index
 
@@ -305,12 +305,12 @@ export const rightB = (p, q, m) => parser(ctx => {
  * @returns {Parser} A parser that executes `p` `n` times and results in
  *     an array of all of the successful results of `p`.
  */
-export const repeatB = (p, n, m) => parser(ctx => {
+export const brepeat = (p, n, m) => parser(ctx => {
   const hasM = m != null
 
-  ASSERT && assertParser('repeatB', p, argParFormatter(1, true))
-  ASSERT && assertNumber('repeatB', n, argNumFormatter(2, true))
-  ASSERT && hasM && assertString('repeatB', m, argStrFormatter(3, true))
+  ASSERT && assertParser('brepeat', p, argParFormatter(1, true))
+  ASSERT && assertNumber('brepeat', n, argNumFormatter(2, true))
+  ASSERT && hasM && assertString('brepeat', m, argStrFormatter(3, true))
 
   const index = ctx.index
   const values = []
@@ -347,12 +347,12 @@ export const repeatB = (p, n, m) => parser(ctx => {
  * @returns {Parser} A parser which will execute `e` and then `p` zero
  *     or more times until `e` succeeds.
  */
-export const untilB = (p, e, m) => parser(ctx => {
+export const buntil = (p, e, m) => parser(ctx => {
   const hasM = m != null
 
-  ASSERT && assertParser('untilB', p, argParFormatter(1, true))
-  ASSERT && assertParser('untilB', e, argParFormatter(2, true))
-  ASSERT && hasM && assertString('untilB', m, argStrFormatter(3, true))
+  ASSERT && assertParser('buntil', p, argParFormatter(1, true))
+  ASSERT && assertParser('buntil', e, argParFormatter(2, true))
+  ASSERT && hasM && assertString('buntil', m, argStrFormatter(3, true))
 
   const index = ctx.index
   const values = []
@@ -397,11 +397,11 @@ export const untilB = (p, e, m) => parser(ctx => {
  *     executes parsers as they are yielded, and results in the return
  *     value of the generator.
  */
-export const blockB = (g, m) => parser(ctx => {
+export const bblock = (g, m) => parser(ctx => {
   const hasM = m != null
 
-  ASSERT && assertGenFunction('blockB', g, argGenFormatter(1, hasM))
-  ASSERT && hasM && assertString('blockB', m, argStrFormatter(2, true))
+  ASSERT && assertGenFunction('bblock', g, argGenFormatter(1, hasM))
+  ASSERT && hasM && assertString('bblock', m, argStrFormatter(2, true))
 
   const gen = g()
   const index = ctx.index
@@ -414,7 +414,7 @@ export const blockB = (g, m) => parser(ctx => {
     const { value, done } = gen.next(nextValue)
     if (done) return okReply(context, value)
 
-    ASSERT && assertParser('blockB', value, v => `expected ${
+    ASSERT && assertParser('bblock', value, v => `expected ${
       wordinal(i + 1)
     } yield to be to a parser; found ${stringify(v)}`)
 
@@ -452,16 +452,16 @@ export const blockB = (g, m) => parser(ctx => {
  *     feed the results to its function, and result in the function's
  *     return value.
  */
-export const pipeB = (...args) => {
+export const bpipe = (...args) => {
   const ps = args.slice()
   const m = typeof ps[ps.length - 1] === 'string' ? ps.pop() : null
   const fn = ps.pop()
 
   return parser(ctx => {
     ASSERT && ps.forEach((p, i) => assertParser(
-      'pipeB', p, argParFormatter(i + 1, true),
+      'bpipe', p, argParFormatter(i + 1, true),
     ))
-    ASSERT && assertFunction('pipeB', fn, argFnFormatter(ps.length + 1, true))
+    ASSERT && assertFunction('bpipe', fn, argFnFormatter(ps.length + 1, true))
 
     const index = ctx.index
     const values = []
@@ -499,13 +499,13 @@ export const pipeB = (...args) => {
  * @returns {Parser} A parser which executes `s`, `p`, and `e` in
  *     order and then returns the result of `p`.
  */
-export const betweenB = (s, e, p, m) => parser(ctx => {
+export const bbetween = (s, e, p, m) => parser(ctx => {
   const hasM = m != null
 
-  ASSERT && assertParser('betweenB', s, argParFormatter(1, true))
-  ASSERT && assertParser('betweenB', e, argParFormatter(2, true))
-  ASSERT && assertParser('betweenB', p, argParFormatter(3, true))
-  ASSERT && hasM && assertString('betweenB', m, argStrFormatter(4, true))
+  ASSERT && assertParser('bbetween', s, argParFormatter(1, true))
+  ASSERT && assertParser('bbetween', e, argParFormatter(2, true))
+  ASSERT && assertParser('bbetween', p, argParFormatter(3, true))
+  ASSERT && hasM && assertString('bbetween', m, argStrFormatter(4, true))
 
   const index = ctx.index
 

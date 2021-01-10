@@ -7,17 +7,17 @@ import { expect } from 'chai'
 
 import { opt, peek } from 'kessel/combinators/alternative'
 import {
-  applyB,
+  bapply,
   attempt,
-  betweenB,
-  blockB,
-  chainB,
-  leftB,
-  untilB,
-  pipeB,
-  repeatB,
-  rightB,
-  seqB,
+  bbetween,
+  bblock,
+  bchain,
+  bleft,
+  buntil,
+  bpipe,
+  brepeat,
+  bright,
+  bseq,
 } from 'kessel/combinators/backtracking'
 import { value } from 'kessel/combinators/chaining'
 import { left, many1, right, seq } from 'kessel/combinators/sequence'
@@ -108,22 +108,22 @@ describe('Backtracking and error handling combinators', () => {
     })
   })
 
-  describe('seqB', () => {
-    const parser = seqB(str('abc'), str('def'), str('ghi'))
-    const parserm = seqB(
+  describe('bseq', () => {
+    const parser = bseq(str('abc'), str('def'), str('ghi'))
+    const parserm = bseq(
       str('abc'), str('def'), str('ghi'), 'abc,def,ghi',
     )
 
     it('throws if any of its arguments is not a parser', () => {
       terror(
-        seqB(any(), 0),
+        bseq(any(), 0),
         '',
-        '[seqB]: expected second argument to be a parser; found 0',
+        '[bseq]: expected second argument to be a parser; found 0',
       )
       terror(
-        seqB(any(), letter(), digit(), {}),
+        bseq(any(), letter(), digit(), {}),
         '',
-        '[seqB]: expected fourth argument to be a parser; found {}',
+        '[bseq]: expected fourth argument to be a parser; found {}',
       )
     })
     it('fails if any of its parsers fail', () => {
@@ -163,23 +163,23 @@ describe('Backtracking and error handling combinators', () => {
       tpass(parserm, 'abcdefghi', { result: ['abc', 'def', 'ghi'], index: 9 })
     })
     it('adds null to results', () => {
-      tpass(seqB(str('abc'), eof()), 'abc', {
+      tpass(bseq(str('abc'), eof()), 'abc', {
         result: ['abc', null],
         index: 3,
       })
     })
     it('still fails fatally if any of its parsers does', () => {
-      const parser = seqB(seq(letter(), digit()), letter(), digit())
+      const parser = bseq(seq(letter(), digit()), letter(), digit())
       tfail(parser, 'aaa1', { expected: 'a digit', index: 1, status: Fatal })
     })
     it('gives opt error messages if later parsers fail', () => {
-      const parser = seqB(opt(char('+')), opt(char('-')), digit())
+      const parser = bseq(opt(char('+')), opt(char('-')), digit())
       tpass(parser, '+-1', ['+', '-', '1'])
       tpass(parser, '1', [null, null, '1'])
       tfail(parser, 'a', "'+', '-', or a digit")
     })
     it('ignores opt error messages if a later parser succeeds', () => {
-      const parser = seqB(opt(char('-')), digit(), digit())
+      const parser = bseq(opt(char('-')), digit(), digit())
       tpass(parser, '-12', ['-', '1', '2'])
       tpass(parser, '12', [null, '1', '2'])
       tfail(parser, 'ab', "'-' or a digit")
@@ -187,74 +187,74 @@ describe('Backtracking and error handling combinators', () => {
     })
   })
 
-  describe('chainB', () => {
+  describe('bchain', () => {
     it('throws if its first argument is not a parser', () => {
       terror(
-        chainB(0, x => x),
+        bchain(0, x => x),
         '',
-        '[chainB]: expected first argument to be a parser; found 0',
+        '[bchain]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a function', () => {
       terror(
-        chainB(any(), 0),
+        bchain(any(), 0),
         '',
-        '[chainB]: expected second argument to be a function; found 0',
+        '[bchain]: expected second argument to be a function; found 0',
       )
     })
     it('throws if its third argument exists and is not a string', () => {
       terror(
-        chainB(any(), x => x, 0),
+        bchain(any(), x => x, 0),
         '',
-        '[chainB]: expected third argument to be a string; found 0',
+        '[bchain]: expected third argument to be a string; found 0',
       )
     })
     it('throws if the function does not return a parser', () => {
       terror(
-        chainB(any(), x => x),
+        bchain(any(), x => x),
         'abc',
-        '[chainB]: expected second argument to return a parser; found "a"',
+        '[bchain]: expected second argument to return a parser; found "a"',
       )
     })
     it('passes successful result to function to get the next parser', () => {
-      tpass(chainB(any(), c => char(c)), 'aa', { result: 'a', index: 2 })
-      tpass(chainB(any(), c => char(c), 'test'), 'aa', {
+      tpass(bchain(any(), c => char(c)), 'aa', { result: 'a', index: 2 })
+      tpass(bchain(any(), c => char(c), 'test'), 'aa', {
         result: 'a',
         index: 2,
       })
     })
     it('fails if its parser fails without calling the second parser', () => {
-      tfail(chainB(char('a'), () => char('b')), 'bb', {
+      tfail(bchain(char('a'), () => char('b')), 'bb', {
         expected: "'a'",
         index: 0,
         status: Fail,
       })
-      tfail(chainB(char('a'), () => char('b'), 'a then b'), 'bb', {
+      tfail(bchain(char('a'), () => char('b'), 'a then b'), 'bb', {
         expected: 'a then b',
         index: 0,
         status: Fail,
       })
     })
     it('fails when the second fails without the first consuming', () => {
-      tfail(chainB(peek(char('a')), () => char('b')), 'a', {
+      tfail(bchain(peek(char('a')), () => char('b')), 'a', {
         expected: "'b'",
         index: 0,
         status: Fail,
       })
-      tfail(chainB(peek(char('a')), () => char('b'), 'a then b'), 'a', {
+      tfail(bchain(peek(char('a')), () => char('b'), 'a then b'), 'a', {
         expected: 'a then b',
         index: 0,
         status: Fail,
       })
     })
     it('fails non-fatally if the second fails after the first consumes', () => {
-      tfail(chainB(char('a'), () => char('b')), 'ac', {
+      tfail(bchain(char('a'), () => char('b')), 'ac', {
         nested: "'b'",
         index: 0,
         ctxindex: 1,
         status: Fail,
       })
-      tfail(chainB(char('a'), () => char('b'), 'a then b'), 'ac', {
+      tfail(bchain(char('a'), () => char('b'), 'a then b'), 'ac', {
         compound: 'a then b',
         index: 0,
         ctxindex: 1,
@@ -262,31 +262,31 @@ describe('Backtracking and error handling combinators', () => {
       })
     })
     it('still fails fatally if either parser fails fatally', () => {
-      tfail(chainB(seq(letter(), digit()), () => letter()), 'aaa', {
+      tfail(bchain(seq(letter(), digit()), () => letter()), 'aaa', {
         expected: 'a digit',
         index: 1,
         status: Fatal,
       })
-      tfail(chainB(
+      tfail(bchain(
         seq(letter(), digit()), () => letter(), '\\w\\d\\w',
       ), 'aaa', {
         expected: '\\w\\d\\w',
         index: 1,
         status: Fatal,
       })
-      tfail(chainB(letter(), c => seq(char(c), char(c))), 'aab', {
+      tfail(bchain(letter(), c => seq(char(c), char(c))), 'aab', {
         expected: "'a'",
         index: 2,
         status: Fatal,
       })
-      tfail(chainB(letter(), c => seq(char(c), char(c)), 'letter, cc'), 'aab', {
+      tfail(bchain(letter(), c => seq(char(c), char(c)), 'letter, cc'), 'aab', {
         expected: 'letter, cc',
         index: 2,
         status: Fatal,
       })
     })
     it('adds opt error message if next parser fails', () => {
-      const parser = chainB(opt(char('-')), () => digit())
+      const parser = bchain(opt(char('-')), () => digit())
       tpass(parser, '-1', '1')
       tpass(parser, '1', '1')
       tfail(parser, 'a', "'-' or a digit")
@@ -294,75 +294,75 @@ describe('Backtracking and error handling combinators', () => {
     })
   })
 
-  describe('applyB', () => {
+  describe('bapply', () => {
     it('throws if its first argument is not a parser', () => {
       terror(
-        applyB(0, any()),
+        bapply(0, any()),
         '',
-        '[applyB]: expected first argument to be a parser; found 0',
+        '[bapply]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
-        applyB(any(), 0),
+        bapply(any(), 0),
         '',
-        '[applyB]: expected second argument to be a parser; found 0',
+        '[bapply]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its third argument exists and is not a string', () => {
       terror(
-        applyB(any(), any(), 0),
+        bapply(any(), any(), 0),
         '',
-        '[applyB]: expected third argument to be a string; found 0',
+        '[bapply]: expected third argument to be a string; found 0',
       )
     })
     it('throws if its second argument fails to return a function', () => {
       terror(
-        applyB(any(), any()),
+        bapply(any(), any()),
         'ab',
-        '[applyB]: expected second argument to return a function; found "b"',
+        '[bapply]: expected second argument to return a function; found "b"',
       )
     })
     it('returns the result of the function when passed the other value', () => {
-      tpass(applyB(any(), always(x => x.toUpperCase())), 'a', 'A')
-      tpass(applyB(any(), always(x => x.toUpperCase()), 'test'), 'a', 'A')
+      tpass(bapply(any(), always(x => x.toUpperCase())), 'a', 'A')
+      tpass(bapply(any(), always(x => x.toUpperCase()), 'test'), 'a', 'A')
     })
     it('fails without calling parser 2 if parser 1 fails', () => {
-      tfail(applyB(char('a'), any()), 'b', { expected: "'a'", status: Fail })
-      tfail(applyB(char('a'), any(), "'a' and a character"), 'b', {
+      tfail(bapply(char('a'), any()), 'b', { expected: "'a'", status: Fail })
+      tfail(bapply(char('a'), any(), "'a' and a character"), 'b', {
         expected: "'a' and a character",
         status: Fail,
       })
     })
     it('backtracks if input is consumed before failure', () => {
-      tfail(applyB(char('a'), char('b')), 'ac', {
+      tfail(bapply(char('a'), char('b')), 'ac', {
         nested: "'b'",
         index: 0,
         status: Fail,
       })
-      tfail(applyB(char('a'), char('b'), 'a then b'), 'ac', {
+      tfail(bapply(char('a'), char('b'), 'a then b'), 'ac', {
         compound: 'a then b',
         index: 0,
         status: Fail,
       })
     })
     it('fails fatally if one of its parsers fails fatally', () => {
-      tfail(applyB(left(letter(), letter()), char('b')), 'a1b', {
+      tfail(bapply(left(letter(), letter()), char('b')), 'a1b', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
-      tfail(applyB(left(letter(), letter()), char('b'), '\\w\\wb'), 'a1b', {
+      tfail(bapply(left(letter(), letter()), char('b'), '\\w\\wb'), 'a1b', {
         expected: '\\w\\wb',
         index: 1,
         status: Fatal,
       })
-      tfail(applyB(char('a'), left(letter(), letter())), 'ab1', {
+      tfail(bapply(char('a'), left(letter(), letter())), 'ab1', {
         expected: 'a letter',
         index: 2,
         status: Fatal,
       })
-      tfail(applyB(char('a'), left(letter(), letter()), 'a\\w\\w'), 'ab1', {
+      tfail(bapply(char('a'), left(letter(), letter()), 'a\\w\\w'), 'ab1', {
         expected: 'a\\w\\w',
         index: 2,
         status: Fatal,
@@ -370,13 +370,13 @@ describe('Backtracking and error handling combinators', () => {
     })
     it('can be used to implement sequencing', () => {
       // Applicative style for `andThenB(char('a'), char('b'))`
-      const p = applyB(char('a'), applyB(char('b'), always(b => a => [a, b])))
+      const p = bapply(char('a'), bapply(char('b'), always(b => a => [a, b])))
       tpass(p, 'ab', ['a', 'b'])
       tfail(p, 'cd', { expected: "'a'", status: Fail })
       tfail(p, 'ac', { nested: "'b'", status: Fail })
     })
     it('adds opt error message if next parser fails', () => {
-      const parser = applyB(opt(char('-')), value(digit(), x => x))
+      const parser = bapply(opt(char('-')), value(digit(), x => x))
       tpass(parser, '-1', '-')
       tpass(parser, '1', { value: null })
       tfail(parser, 'a', "'-' or a digit")
@@ -384,55 +384,55 @@ describe('Backtracking and error handling combinators', () => {
     })
   })
 
-  describe('leftB', () => {
+  describe('bleft', () => {
     it('throws if its first argument is not a parser', () => {
       terror(
-        leftB(0, any()),
+        bleft(0, any()),
         '',
-        '[leftB]: expected first argument to be a parser; found 0',
+        '[bleft]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
-        leftB(any(), 0),
+        bleft(any(), 0),
         '',
-        '[leftB]: expected second argument to be a parser; found 0',
+        '[bleft]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its third argument exists and is not a string', () => {
       terror(
-        leftB(any(), any(), 0),
+        bleft(any(), any(), 0),
         '',
-        '[leftB]: expected third argument to be a string; found 0',
+        '[bleft]: expected third argument to be a string; found 0',
       )
     })
     it('returns the result of its left parser if both pass', () => {
-      tpass(leftB(letter(), digit()), 'a1', 'a')
-      tpass(leftB(letter(), digit(), 'test'), 'a1', 'a')
+      tpass(bleft(letter(), digit()), 'a1', 'a')
+      tpass(bleft(letter(), digit(), 'test'), 'a1', 'a')
     })
     it('fails non-fatally if one parser fails and no input is consumed', () => {
-      tfail(leftB(letter(), digit()), '1', {
+      tfail(bleft(letter(), digit()), '1', {
         expected: 'a letter',
         status: Fail,
       })
-      tfail(leftB(letter(), digit(), 'letter then digit'), '1', {
+      tfail(bleft(letter(), digit(), 'letter then digit'), '1', {
         expected: 'letter then digit',
         status: Fail,
       })
-      tfail(leftB(eof(), char('a')), '', { expected: "'a'", status: Fail })
-      tfail(leftB(eof(), char('a'), 'something impossible'), '', {
+      tfail(bleft(eof(), char('a')), '', { expected: "'a'", status: Fail })
+      tfail(bleft(eof(), char('a'), 'something impossible'), '', {
         expected: 'something impossible',
         status: Fail,
       })
     })
     it('fails non-fatally on non-fatal errors after consumption', () => {
-      tfail(leftB(letter(), digit()), 'aa', {
+      tfail(bleft(letter(), digit()), 'aa', {
         nested: 'a digit',
         index: 0,
         ctxindex: 1,
         status: Fail,
       })
-      tfail(leftB(letter(), digit(), 'letter then digit'), 'aa', {
+      tfail(bleft(letter(), digit(), 'letter then digit'), 'aa', {
         compound: 'letter then digit',
         index: 0,
         ctxindex: 1,
@@ -440,29 +440,29 @@ describe('Backtracking and error handling combinators', () => {
       })
     })
     it('still fails fatally if either parser fails fatally', () => {
-      tfail(leftB(seq(letter(), letter()), digit()), 'a11', {
+      tfail(bleft(seq(letter(), letter()), digit()), 'a11', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
-      tfail(leftB(seq(letter(), letter()), digit(), '\\w\\w\\d'), 'a11', {
+      tfail(bleft(seq(letter(), letter()), digit(), '\\w\\w\\d'), 'a11', {
         expected: '\\w\\w\\d',
         index: 1,
         status: Fatal,
       })
-      tfail(leftB(letter(), seq(letter(), digit())), 'aab', {
+      tfail(bleft(letter(), seq(letter(), digit())), 'aab', {
         expected: 'a digit',
         index: 2,
         status: Fatal,
       })
-      tfail(leftB(letter(), seq(letter(), digit()), '\\w\\w\\d'), 'aab', {
+      tfail(bleft(letter(), seq(letter(), digit()), '\\w\\w\\d'), 'aab', {
         expected: '\\w\\w\\d',
         index: 2,
         status: Fatal,
       })
     })
     it('adds opt message if next parser fails', () => {
-      const parser = leftB(opt(char('-')), digit())
+      const parser = bleft(opt(char('-')), digit())
       tpass(parser, '-1', '-')
       tpass(parser, '1', { result: null })
       tfail(parser, 'a', "'-' or a digit")
@@ -470,55 +470,55 @@ describe('Backtracking and error handling combinators', () => {
     })
   })
 
-  describe('rightB', () => {
+  describe('bright', () => {
     it('throws if its first argument is not a parser', () => {
       terror(
-        rightB(0, any()),
+        bright(0, any()),
         '',
-        '[rightB]: expected first argument to be a parser; found 0',
+        '[bright]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
-        rightB(any(), 0),
+        bright(any(), 0),
         '',
-        '[rightB]: expected second argument to be a parser; found 0',
+        '[bright]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its third argument exists and is not a string', () => {
       terror(
-        rightB(any(), any(), 0),
+        bright(any(), any(), 0),
         '',
-        '[rightB]: expected third argument to be a string; found 0',
+        '[bright]: expected third argument to be a string; found 0',
       )
     })
     it('returns the result of its right parser if both pass', () => {
-      tpass(rightB(letter(), digit()), 'a1', '1')
-      tpass(rightB(letter(), digit(), 'test'), 'a1', '1')
+      tpass(bright(letter(), digit()), 'a1', '1')
+      tpass(bright(letter(), digit(), 'test'), 'a1', '1')
     })
     it('fails non-fatally if one parser fails and no input is consumed', () => {
-      tfail(rightB(letter(), digit()), '1', {
+      tfail(bright(letter(), digit()), '1', {
         expected: 'a letter',
         status: Fail,
       })
-      tfail(rightB(letter(), digit(), 'letter then digit'), '1', {
+      tfail(bright(letter(), digit(), 'letter then digit'), '1', {
         expected: 'letter then digit',
         status: Fail,
       })
-      tfail(rightB(eof(), char('a')), '', { expected: "'a'", status: Fail })
-      tfail(rightB(eof(), char('a'), 'something impossible'), '', {
+      tfail(bright(eof(), char('a')), '', { expected: "'a'", status: Fail })
+      tfail(bright(eof(), char('a'), 'something impossible'), '', {
         expected: 'something impossible',
         status: Fail,
       })
     })
     it('fails non-fatally on non-fatal errors after consumption', () => {
-      tfail(rightB(letter(), digit()), 'aa', {
+      tfail(bright(letter(), digit()), 'aa', {
         nested: 'a digit',
         index: 0,
         ctxindex: 1,
         status: Fail,
       })
-      tfail(rightB(letter(), digit(), 'letter then digit'), 'aa', {
+      tfail(bright(letter(), digit(), 'letter then digit'), 'aa', {
         compound: 'letter then digit',
         index: 0,
         ctxindex: 1,
@@ -526,29 +526,29 @@ describe('Backtracking and error handling combinators', () => {
       })
     })
     it('still fails fatally if either parser fails fatally', () => {
-      tfail(rightB(seq(letter(), letter()), digit()), 'a11', {
+      tfail(bright(seq(letter(), letter()), digit()), 'a11', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
-      tfail(rightB(seq(letter(), letter()), digit(), '\\w\\w\\d'), 'a11', {
+      tfail(bright(seq(letter(), letter()), digit(), '\\w\\w\\d'), 'a11', {
         expected: '\\w\\w\\d',
         index: 1,
         status: Fatal,
       })
-      tfail(rightB(letter(), seq(letter(), digit())), 'aab', {
+      tfail(bright(letter(), seq(letter(), digit())), 'aab', {
         expected: 'a digit',
         index: 2,
         status: Fatal,
       })
-      tfail(rightB(letter(), seq(letter(), digit()), '\\w\\w\\d'), 'aab', {
+      tfail(bright(letter(), seq(letter(), digit()), '\\w\\w\\d'), 'aab', {
         expected: '\\w\\w\\d',
         index: 2,
         status: Fatal,
       })
     })
     it('adds opt message if next parser fails', () => {
-      const parser = rightB(opt(char('-')), digit())
+      const parser = bright(opt(char('-')), digit())
       tpass(parser, '-1', '1')
       tpass(parser, '1', '1')
       tfail(parser, 'a', "'-' or a digit")
@@ -556,66 +556,66 @@ describe('Backtracking and error handling combinators', () => {
     })
   })
 
-  describe('repeatB', () => {
+  describe('brepeat', () => {
     it('throws if its first argument is not a parser', () => {
       terror(
-        repeatB(0, 5),
+        brepeat(0, 5),
         '',
-        '[repeatB]: expected first argument to be a parser; found 0',
+        '[brepeat]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a number', () => {
       terror(
-        repeatB(any(), '3'),
+        brepeat(any(), '3'),
         '',
-        '[repeatB]: expected second argument to be a number; found "3"',
+        '[brepeat]: expected second argument to be a number; found "3"',
       )
     })
     it('throws if its third argument exists and is not a string', () => {
       terror(
-        repeatB(any(), 3, 0),
+        brepeat(any(), 3, 0),
         '',
-        '[repeatB]: expected third argument to be a string; found 0',
+        '[brepeat]: expected third argument to be a string; found 0',
       )
     })
     it('applies one parser a number of times', () => {
-      tpass(repeatB(letter(), 5), 'abcdef', ['a', 'b', 'c', 'd', 'e'])
-      tpass(repeatB(letter(), 2), 'abcdef', ['a', 'b'])
-      tpass(repeatB(letter(), 0), 'abcdef', [])
-      tpass(repeatB(letter(), 2, 'test'), 'abcdef', ['a', 'b'])
+      tpass(brepeat(letter(), 5), 'abcdef', ['a', 'b', 'c', 'd', 'e'])
+      tpass(brepeat(letter(), 2), 'abcdef', ['a', 'b'])
+      tpass(brepeat(letter(), 0), 'abcdef', [])
+      tpass(brepeat(letter(), 2, 'test'), 'abcdef', ['a', 'b'])
     })
     it('fails non-fatally if no input was consumed', () => {
-      tfail(repeatB(letter(), 5), '12345', {
+      tfail(brepeat(letter(), 5), '12345', {
         expected: 'a letter',
         index: 0,
         status: Fail,
       })
-      tfail(repeatB(letter(), 5, 'five letters'), '12345', {
+      tfail(brepeat(letter(), 5, 'five letters'), '12345', {
         expected: 'five letters',
         index: 0,
         status: Fail,
       })
     })
     it('fails fatally if the parser fails fatally', () => {
-      tfail(repeatB(seq(letter(), letter()), 5), 'a1b2c3d4e5', {
+      tfail(brepeat(seq(letter(), letter()), 5), 'a1b2c3d4e5', {
         expected: 'a letter',
         index: 1,
         status: Fatal,
       })
-      tfail(repeatB(seq(letter(), letter()), 5, 'ten letters'), 'a1b2c3d4e5', {
+      tfail(brepeat(seq(letter(), letter()), 5, 'ten letters'), 'a1b2c3d4e5', {
         expected: 'ten letters',
         index: 1,
         status: Fatal,
       })
     })
     it('fails non-fatally on non-fatal errors if input was consumed', () => {
-      tfail(repeatB(letter(), 5), 'abc123', {
+      tfail(brepeat(letter(), 5), 'abc123', {
         nested: 'a letter',
         index: 0,
         ctxindex: 3,
         status: Fail,
       })
-      tfail(repeatB(letter(), 5, 'five letters'), 'abc123', {
+      tfail(brepeat(letter(), 5, 'five letters'), 'abc123', {
         compound: 'five letters',
         index: 0,
         ctxindex: 3,
@@ -624,56 +624,56 @@ describe('Backtracking and error handling combinators', () => {
     })
   })
 
-  describe('untilB', () => {
+  describe('buntil', () => {
     it('throws if its first argument is not a parser', () => {
       terror(
-        untilB(0, any()),
+        buntil(0, any()),
         '',
-        '[untilB]: expected first argument to be a parser; found 0',
+        '[buntil]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
-        untilB(any(), 0),
+        buntil(any(), 0),
         '',
-        '[untilB]: expected second argument to be a parser; found 0',
+        '[buntil]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its third argument exist and is not a parser', () => {
       terror(
-        untilB(any(), any(), 0),
+        buntil(any(), any(), 0),
         '',
-        '[untilB]: expected third argument to be a string; found 0',
+        '[buntil]: expected third argument to be a string; found 0',
       )
     })
     it('succeeds with content parser results before the end', () => {
-      tpass(untilB(any(), letter()), '12./abc', ['1', '2', '.', '/'])
-      tpass(untilB(any(), letter(), 'test'), '12./abc', ['1', '2', '.', '/'])
+      tpass(buntil(any(), letter()), '12./abc', ['1', '2', '.', '/'])
+      tpass(buntil(any(), letter(), 'test'), '12./abc', ['1', '2', '.', '/'])
     })
     it('can succeed with zero successes', () => {
-      tpass(untilB(any(), letter()), 'abc', [])
-      tpass(untilB(any(), letter(), 'test'), 'abc', [])
+      tpass(buntil(any(), letter()), 'abc', [])
+      tpass(buntil(any(), letter(), 'test'), 'abc', [])
     })
     it('fails if the content parser fails before the end', () => {
-      tfail(untilB(digit(), letter()), '.123abc', {
+      tfail(buntil(digit(), letter()), '.123abc', {
         expected: 'a digit or a letter',
         index: 0,
         status: Fail,
       })
-      tfail(untilB(digit(), letter(), 'digit then letter'), '.123abc', {
+      tfail(buntil(digit(), letter(), 'digit then letter'), '.123abc', {
         expected: 'digit then letter',
         index: 0,
         status: Fail,
       })
     })
     it('backtracks if input is consumed before content parser fails', () => {
-      tfail(untilB(digit(), letter()), '123.abc', {
+      tfail(buntil(digit(), letter()), '123.abc', {
         nested: 'a digit',
         index: 0,
         ctxindex: 3,
         status: Fail,
       })
-      tfail(untilB(digit(), letter(), 'digit then letter'), '123.abc', {
+      tfail(buntil(digit(), letter(), 'digit then letter'), '123.abc', {
         compound: 'digit then letter',
         index: 0,
         ctxindex: 3,
@@ -681,17 +681,17 @@ describe('Backtracking and error handling combinators', () => {
       })
     })
     it('fails fatally if either of its parsers fail fatally', () => {
-      tfail(untilB(digit(), seq(letter(), digit())), '123abc', {
+      tfail(buntil(digit(), seq(letter(), digit())), '123abc', {
         expected: 'a digit',
         index: 4,
         status: Fatal,
       })
-      tfail(untilB(digit(), seq(letter(), digit()), '\\d\\w\\d'), '123abc', {
+      tfail(buntil(digit(), seq(letter(), digit()), '\\d\\w\\d'), '123abc', {
         expected: '\\d\\w\\d',
         index: 4,
         status: Fatal,
       })
-      tfail(untilB(seq(letter(), digit()), digit(), '\\w\\d\\d'), 'a1b2cc3', {
+      tfail(buntil(seq(letter(), digit()), digit(), '\\w\\d\\d'), 'a1b2cc3', {
         expected: '\\w\\d\\d',
         index: 5,
         status: Fatal,
@@ -699,7 +699,7 @@ describe('Backtracking and error handling combinators', () => {
     })
   })
 
-  describe('blockB', () => {
+  describe('bblock', () => {
     const g = function *() {
       yield seq(char('a'), char('b'), char('c'))
       yield space()
@@ -708,49 +708,49 @@ describe('Backtracking and error handling combinators', () => {
 
       return c
     }
-    const parser = blockB(g)
-    const parserm = blockB(g, 'abc then char')
+    const parser = bblock(g)
+    const parserm = bblock(g, 'abc then char')
 
     it('throws if its first argument is not a generator function', () => {
       terror(
-        blockB(0),
+        bblock(0),
         '',
-        '[blockB]: expected argument to be a generator function; found 0',
+        '[bblock]: expected argument to be a generator function; found 0',
       )
       terror(
-        blockB(() => {}),
+        bblock(() => {}),
         '',
-        '[blockB]: expected argument to be a generator function; '
+        '[bblock]: expected argument to be a generator function; '
           + 'found function',
       )
       terror(
-        blockB(0, 'test'),
+        bblock(0, 'test'),
         '',
-        '[blockB]: expected first argument to be a generator function; found 0',
+        '[bblock]: expected first argument to be a generator function; found 0',
       )
     })
     it('throws if its second argument exists and is not a string', () => {
       terror(
-        blockB(function *() { yield 1 }, 0),
+        bblock(function *() { yield 1 }, 0),
         '',
-        '[blockB]: expected second argument to be a string; found 0',
+        '[bblock]: expected second argument to be a string; found 0',
       )
     })
     it('throws if it yields something other than a parser', () => {
       terror(
-        blockB(function *() { yield any(); yield 0; return 0 }),
+        bblock(function *() { yield any(); yield 0; return 0 }),
         'abc',
-        '[blockB]: expected second yield to be to a parser; found 0',
+        '[bblock]: expected second yield to be to a parser; found 0',
       )
       terror(
-        blockB(function *() {
+        bblock(function *() {
           yield any()
           yield any()
           yield x => x
           return 0
         }),
         'abc',
-        '[blockB]: expected third yield to be to a parser; found function',
+        '[bblock]: expected third yield to be to a parser; found function',
       )
     })
     it('fails if any of its parsers fail', () => {
@@ -796,7 +796,7 @@ describe('Backtracking and error handling combinators', () => {
       tpass(parserm, 'abc d ', { result: 'd', index: 6 })
     })
     it('gives opt error messages if later parsers fail', () => {
-      const parser = blockB(function *() {
+      const parser = bblock(function *() {
         yield opt(char('+'))
         yield opt(char('-'))
         return yield digit()
@@ -806,7 +806,7 @@ describe('Backtracking and error handling combinators', () => {
       tfail(parser, 'a', "'+', '-', or a digit")
     })
     it('ignores opt error messages if a later parser succeeds', () => {
-      const parser = blockB(function *() {
+      const parser = bblock(function *() {
         yield opt(char('-'))
         const a = yield digit()
         const b = yield digit()
@@ -819,51 +819,51 @@ describe('Backtracking and error handling combinators', () => {
     })
   })
 
-  describe('pipeB', () => {
+  describe('bpipe', () => {
     it('throws if its last argument is not a function', () => {
       terror(
-        pipeB(any(), any(), 0),
+        bpipe(any(), any(), 0),
         '',
-        '[pipeB]: expected third argument to be a function; found 0',
+        '[bpipe]: expected third argument to be a function; found 0',
       )
       terror(
-        pipeB(any(), any(), any(), any()),
+        bpipe(any(), any(), any(), any()),
         '',
-        '[pipeB]: expected fourth argument to be a function; found parser',
+        '[bpipe]: expected fourth argument to be a function; found parser',
       )
     })
     it('throws if string last arg is not preceded by a function', () => {
       terror(
-        pipeB(any(), any(), any(), 'test'),
+        bpipe(any(), any(), any(), 'test'),
         '',
-        '[pipeB]: expected third argument to be a function; found parser',
+        '[bpipe]: expected third argument to be a function; found parser',
       )
     })
     it('passes parser results to a single function', () => {
-      tpass(pipeB(letter(), a => a.toUpperCase()), 'a', 'A')
-      tpass(pipeB(letter(), digit(), (a, b) => b + a), 'a1', '1a')
-      tpass(pipeB(
+      tpass(bpipe(letter(), a => a.toUpperCase()), 'a', 'A')
+      tpass(bpipe(letter(), digit(), (a, b) => b + a), 'a1', '1a')
+      tpass(bpipe(
         letter(), digit(), letter(), (a, b, c) => c + b + a,
       ), 'a1b', 'b1a')
-      tpass(pipeB(letter(), digit(), (a, b) => b + a, 'test'), 'a1', '1a')
+      tpass(bpipe(letter(), digit(), (a, b) => b + a, 'test'), 'a1', '1a')
     })
     it('fails non-fatally if no input is consumed on failure', () => {
-      tfail(pipeB(letter(), a => a), '1', {
+      tfail(bpipe(letter(), a => a), '1', {
         expected: 'a letter',
         index: 0,
         status: Fail,
       })
-      tfail(pipeB(letter(), a => a, 'some letter'), '1', {
+      tfail(bpipe(letter(), a => a, 'some letter'), '1', {
         expected: 'some letter',
         index: 0,
         status: Fail,
       })
-      tfail(pipeB(eof(), letter(), (a, b) => b + a), '', {
+      tfail(bpipe(eof(), letter(), (a, b) => b + a), '', {
         expected: 'a letter',
         index: 0,
         status: Fail,
       })
-      tfail(pipeB(
+      tfail(bpipe(
         eof(), letter(), (a, b) => b + a, 'something impossible',
       ), '', {
         expected: 'something impossible',
@@ -872,12 +872,12 @@ describe('Backtracking and error handling combinators', () => {
       })
     })
     it('fails non-fatally if input was consumed on non-fatal failure', () => {
-      tfail(pipeB(letter(), digit(), (a, b) => b + a), 'aa', {
+      tfail(bpipe(letter(), digit(), (a, b) => b + a), 'aa', {
         nested: 'a digit',
         index: 0,
         status: Fail,
       })
-      tfail(pipeB(letter(), digit(), (a, b) => b + a, 'letter, digit'), 'aa', {
+      tfail(bpipe(letter(), digit(), (a, b) => b + a, 'letter, digit'), 'aa', {
         compound: 'letter, digit',
         index: 0,
         status: Fail,
@@ -885,12 +885,12 @@ describe('Backtracking and error handling combinators', () => {
     })
     it('fails fatally if one of its parsers fails fatally', () => {
       tfail(
-        pipeB(letter(), seq(digit(), digit()), (a, [b1, b2]) => b1 + b2 + a),
+        bpipe(letter(), seq(digit(), digit()), (a, [b1, b2]) => b1 + b2 + a),
         'a1b',
         { expected: 'a digit', index: 2, status: Fatal },
       )
       tfail(
-        pipeB(
+        bpipe(
           letter(), seq(digit(), digit()), (a, [b1, b2]) => b1 + b2 + a, 'test',
         ),
         'a1b',
@@ -898,14 +898,14 @@ describe('Backtracking and error handling combinators', () => {
       )
     })
     it('includes opt message if next parser fails', () => {
-      const parser = pipeB(opt(char('-')), digit(), digit(), (s, a, b) =>
+      const parser = bpipe(opt(char('-')), digit(), digit(), (s, a, b) =>
         parseInt(a + b) * (s ? -1 : 1))
       tpass(parser, '-12', { result: -12 })
       tpass(parser, '12', { result: 12 })
       tfail(parser, 'a1', "'-' or a digit")
     })
     it('does not include opt message if next parser succeeds', () => {
-      const parser = pipeB(opt(char('-')), digit(), digit(), (s, a, b) =>
+      const parser = bpipe(opt(char('-')), digit(), digit(), (s, a, b) =>
         parseInt(a + b) * (s ? -1 : 1))
       tpass(parser, '-12', { result: -12 })
       tpass(parser, '12', { result: 12 })
@@ -913,36 +913,36 @@ describe('Backtracking and error handling combinators', () => {
     })
   })
 
-  describe('betweenB', () => {
-    const parser = betweenB(char('('), char(')'), many1(noneof(')')))
-    const parserm = betweenB(char('('), char(')'), many1(noneof(')')), 'test')
+  describe('bbetween', () => {
+    const parser = bbetween(char('('), char(')'), many1(noneof(')')))
+    const parserm = bbetween(char('('), char(')'), many1(noneof(')')), 'test')
 
     it('throws if its first argument is not a parser', () => {
       terror(
-        betweenB(0, any(), any()),
+        bbetween(0, any(), any()),
         '',
-        '[betweenB]: expected first argument to be a parser; found 0',
+        '[bbetween]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
-        betweenB(any(), 0, any()),
+        bbetween(any(), 0, any()),
         '',
-        '[betweenB]: expected second argument to be a parser; found 0',
+        '[bbetween]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its third argument is not a parser', () => {
       terror(
-        betweenB(any(), any(), 0),
+        bbetween(any(), any(), 0),
         '',
-        '[betweenB]: expected third argument to be a parser; found 0',
+        '[bbetween]: expected third argument to be a parser; found 0',
       )
     })
     it('throws if its fourth argument exists and is not a string', () => {
       terror(
-        betweenB(any(), any(), any(), 0),
+        bbetween(any(), any(), any(), 0),
         '',
-        '[betweenB]: expected fourth argument to be a string; found 0',
+        '[bbetween]: expected fourth argument to be a string; found 0',
       )
     })
     it('succeeds with the result of its content parser', () => {
@@ -984,12 +984,12 @@ describe('Backtracking and error handling combinators', () => {
       })
     })
     it('fails fatally if one of its parsers fails fatally', () => {
-      tfail(betweenB(char('('), char(')'), seq(letter(), letter())), '(a)', {
+      tfail(bbetween(char('('), char(')'), seq(letter(), letter())), '(a)', {
         expected: 'a letter',
         index: 2,
         status: Fatal,
       })
-      tfail(betweenB(
+      tfail(bbetween(
         char('('), char(')'), seq(letter(), letter()), 'zzz',
       ), '(a)', {
         expected: 'zzz',
@@ -997,14 +997,14 @@ describe('Backtracking and error handling combinators', () => {
         status: Fatal,
       })
       tfail(
-        betweenB(char('('), seq(char(')'), char(')')), letter()), '(a)', {
+        bbetween(char('('), seq(char(')'), char(')')), letter()), '(a)', {
           expected: "')'",
           index: 3,
           status: Fatal,
         },
       )
       tfail(
-        betweenB(
+        bbetween(
           char('('), seq(char(')'), char(')')), letter(), 'zzz',
         ), '(a)', {
           expected: 'zzz',
@@ -1014,17 +1014,17 @@ describe('Backtracking and error handling combinators', () => {
       )
     })
     it('gives opt error message if next parser fails', () => {
-      const parser = betweenB(opt(char('-')), char('-'), digit())
+      const parser = bbetween(opt(char('-')), char('-'), digit())
       tpass(parser, '-1-', '1')
       tpass(parser, '1-', '1')
       tfail(parser, 'a', "'-' or a digit")
     })
     it('gives two opt error messages if post parser fails', () => {
-      const parser = betweenB(opt(char('-')), char('&'), opt(digit()))
+      const parser = bbetween(opt(char('-')), char('&'), opt(digit()))
       tfail(parser, '+', "'-', a digit, or '&'")
     })
     it('gives no opt message if next parser succeeds', () => {
-      const parser = betweenB(opt(char('-')), char('-'), digit())
+      const parser = bbetween(opt(char('-')), char('-'), digit())
       tpass(parser, '-1-', '1')
       tfail(parser, 'a', "'-' or a digit")
       tfail(parser, '1+', { nested: "'-'" })

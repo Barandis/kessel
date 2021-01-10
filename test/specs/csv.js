@@ -7,6 +7,7 @@ import { expect } from 'chai'
 
 import {
   alt,
+  bseq,
   char,
   endby,
   join,
@@ -16,14 +17,13 @@ import {
   run,
   second,
   sepby,
-  seqB,
   str,
   value,
 } from 'kessel'
 
 const quotedChar = alt(noneof('"'), value(str('""'), '"'))
 
-const quotedCell = second(seqB(
+const quotedCell = second(bseq(
   char('"'),
   join(many(quotedChar)),
   char('"', 'quote at end of cell'),
@@ -36,7 +36,7 @@ const csv = endby(line, newline())
 const parseCsv = input => run(csv, input)
 
 const parseCsv1 = input => run(endby(sepby(alt(
-  second(seqB(
+  second(bseq(
     char('"'),
     join(many(alt(noneof('"'), value(str('""'), '"')))),
     char('"', 'quote at end of cell'),
