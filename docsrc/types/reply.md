@@ -5,7 +5,7 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `type Reply<T> = [Context, Result<T>]`
+> `type Reply = [Context, Result]`
 
 The type representing a reply from a parser. Each parser returns a value of this type, and [`parse`](../tools/parse.md) does as well.
 

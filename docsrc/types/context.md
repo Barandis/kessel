@@ -25,6 +25,6 @@ Contexts should be created using the functions [`okReply`](../tools/okreply.md),
 * [`Reply`](reply.md)
 * [`failReply`](../tools/failreply.md)
 * [`fatalReply`](../tools/fatalreply.md)
-* [`Reply`](../tools/okreply.md)
+* [`okReply`](../tools/okreply.md)
 * [`parse`](../tools/parse.md)
 * [`run`](../tools/run.md)

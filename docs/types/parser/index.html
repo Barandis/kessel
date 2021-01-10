@@ -2007,10 +2007,9 @@
 -->
 
 <blockquote>
-<p><code>type Parser&lt;T&gt; = (ctx: Context) =&gt; Reply&lt;T&gt;</code></p>
+<p><code>type Parser = (ctx: Context) =&gt; Reply</code></p>
 </blockquote>
 <p>The type for a parsing function. This is, unsurprisingly, the most important type in Kessel.</p>
-<p>The parameter <code>T</code> refers to the type of the parser's result. <a href="../../parsers/any/"><code>any</code></a> is of type <code>Parser&lt;string&gt;</code>, for example, because that parser produces a single character (which is, of course, a string).</p>
 <p>Since <a href="../reply/"><code>Reply</code></a> is a tuple of a <a href="../context/"><code>Context</code></a> and a <a href="../result/"><code>Result</code></a>, a <code>Parser</code> is just a function that accepts a context and returns an updated context and a result.</p>
 <h4 id="parameters">Parameters</h4>
 <ul>

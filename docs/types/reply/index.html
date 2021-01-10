@@ -1979,7 +1979,7 @@
 -->
 
 <blockquote>
-<p><code>type Reply&lt;T&gt; = [Context, Result&lt;T&gt;]</code></p>
+<p><code>type Reply = [Context, Result]</code></p>
 </blockquote>
 <p>The type representing a reply from a parser. Each parser returns a value of this type, and <a href="../../tools/parse/"><code>parse</code></a> does as well.</p>
 <p><code>Reply</code> objects should be produced by <a href="../../tools/okreply/"><code>okReply</code></a>, <a href="../../tools/failreply/"><code>failReply</code></a>, and <a href="../../tools/fatalreply/"><code>fatalReply</code></a> rather than being produced by hand. This ensures that the context is copied so that there aren't accidental overwrites of the indexes of older contexts.</p>

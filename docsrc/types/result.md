@@ -5,7 +5,8 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `type Result<T> = { status: 'ok'; value: T; errors?: ErrorList } | { status: 'fail' | 'fatal'; value?: T; errors: ErrorList; }`
+> `type Result = { status: 'ok'; value: *; errors?: ErrorList }`
+> `            | { status: 'fail' | 'fatal'; value?: *; errors: ErrorList; }`
 
 The result produced by a parser. This can either be a success or a failure, depending on the values of the properties.
 
