@@ -102,7 +102,7 @@ export const strI = (s, m) => parser(ctx => {
   )(ctx))
   return sres.status === Ok
     ? srep
-    : failReply(sctx, ferror(m, expecteds.strI(s)))
+    : failReply(sctx, ferror(m, expecteds.istr(s)))
 })
 
 /**

@@ -29,19 +29,19 @@ export {
   fatal,
 } from './parsers/misc'
 export {
-  alphaU,
-  letterU,
-  lowerU,
   newline,
-  newlineU,
   regex,
   space,
-  spaceU,
   spaces,
   spaces1,
-  spaces1U,
-  spacesU,
-  upperU,
+  ualpha,
+  uletter,
+  ulower,
+  unewline,
+  uspace,
+  uspaces,
+  uspaces1,
+  uupper,
 } from './parsers/regex'
 export {
   all,

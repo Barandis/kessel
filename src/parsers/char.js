@@ -93,7 +93,7 @@ export const charI = (c, m) => parser(ctx => {
   )(ctx))
   return cres.status === Ok
     ? crep
-    : failReply(cctx, ferror(m, expecteds.charI(c)))
+    : failReply(cctx, ferror(m, expecteds.ichar(c)))
 })
 
 /**

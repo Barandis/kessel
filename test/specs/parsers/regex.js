@@ -4,19 +4,19 @@
 // https://opensource.org/licenses/MIT
 
 import {
-  alphaU,
-  letterU,
-  lowerU,
+  ualpha,
+  uletter,
+  ulower,
   newline,
-  newlineU,
+  unewline,
   regex,
   space,
   spaces,
   spaces1,
-  spaces1U,
-  spacesU,
-  spaceU,
-  upperU,
+  uspaces1,
+  uspaces,
+  uspace,
+  uupper,
 } from 'kessel/parsers/regex'
 import { terror, tfail, tpass } from 'test/helper'
 
@@ -93,359 +93,375 @@ describe('Regular expression parsers', () => {
     })
   })
 
-  describe('letterU', () => {
+  describe('uletter', () => {
     it('throws if it has a non-string argument', () => {
-      terror(letterU(0), '', 'expected argument to be a string; found 0')
+      terror(
+        uletter(0),
+        '',
+        '[uletter]: expected argument to be a string; found 0',
+      )
     })
     it('succeeds on a single uppercase letter', () => {
-      tpass(letterU(), 'A', 'A') // LATIN CAPITAL LETTER A
-      tpass(letterU(), 'Ž', 'Ž') // LATIN CAPITAL LETTER Z WITH CARON
-      tpass(letterU(), 'Γ', 'Γ') // GREEK CAPITAL LETTER GAMMA
-      tpass(letterU(), 'Л', 'Л') // CYRILLIC CAPITAL LETTER EL
-      tpass(letterU(), 'Յ', 'Յ') // ARMENIAN CAPITAL LETTER YI
-      tpass(letterU(), 'Ⴄ', 'Ⴄ') // GEORGIAN CAPITAL LETTER EN
-      tpass(letterU(), 'Ꮅ', 'Ꮅ') // CHEROKEE LETTER LI
-      tpass(letterU(), 'Ⰽ', 'Ⰽ') // GLAGOLITHIC CAPTIAL LETTER KAKO
-      tpass(letterU('test'), 'A', 'A')
+      tpass(uletter(), 'A', 'A') // LATIN CAPITAL LETTER A
+      tpass(uletter(), 'Ž', 'Ž') // LATIN CAPITAL LETTER Z WITH CARON
+      tpass(uletter(), 'Γ', 'Γ') // GREEK CAPITAL LETTER GAMMA
+      tpass(uletter(), 'Л', 'Л') // CYRILLIC CAPITAL LETTER EL
+      tpass(uletter(), 'Յ', 'Յ') // ARMENIAN CAPITAL LETTER YI
+      tpass(uletter(), 'Ⴄ', 'Ⴄ') // GEORGIAN CAPITAL LETTER EN
+      tpass(uletter(), 'Ꮅ', 'Ꮅ') // CHEROKEE LETTER LI
+      tpass(uletter(), 'Ⰽ', 'Ⰽ') // GLAGOLITHIC CAPTIAL LETTER KAKO
+      tpass(uletter('test'), 'A', 'A')
     })
     it('succeeds on a single titlecase letter', () => {
       // LATIN CAPITAL LETTER D WITH SMALL LETTER Z WITH CARON
-      tpass(letterU(), 'ǅ', 'ǅ')
+      tpass(uletter(), 'ǅ', 'ǅ')
       // LATIN CAPITAL LETTER N WITH SMALL LETTER J
-      tpass(letterU(), 'ǋ', 'ǋ')
+      tpass(uletter(), 'ǋ', 'ǋ')
       // GREEK CAPITAL LETTER OMEGA WITH PROSGEGRAMMENI
-      tpass(letterU(), 'ῼ', 'ῼ')
-      tpass(letterU('test'), 'ǅ', 'ǅ')
+      tpass(uletter(), 'ῼ', 'ῼ')
+      tpass(uletter('test'), 'ǅ', 'ǅ')
     })
     it('succeeds on a single lowercase letter', () => {
-      tpass(letterU(), 'a', 'a') // LATIN SMALL LETTER A
-      tpass(letterU(), 'ž', 'ž') // LATIN SMALL LETTER Z WITH CARON
-      tpass(letterU(), 'γ', 'γ') // GREEK SMALL LETTER GAMMA
-      tpass(letterU(), 'л', 'л') // CYRILLIC SMALL LETTER EL
-      tpass(letterU(), 'յ', 'յ') // ARMENIAN SMALL LETTER YI
-      tpass(letterU(), 'ე', 'ე') // GEORGIAN LETTER EN
-      tpass(letterU(), 'ⰽ', 'ⰽ') // GLAGOLITIC SMALL LETTER KAKO
-      tpass(letterU('test'), 'a', 'a')
+      tpass(uletter(), 'a', 'a') // LATIN SMALL LETTER A
+      tpass(uletter(), 'ž', 'ž') // LATIN SMALL LETTER Z WITH CARON
+      tpass(uletter(), 'γ', 'γ') // GREEK SMALL LETTER GAMMA
+      tpass(uletter(), 'л', 'л') // CYRILLIC SMALL LETTER EL
+      tpass(uletter(), 'յ', 'յ') // ARMENIAN SMALL LETTER YI
+      tpass(uletter(), 'ე', 'ე') // GEORGIAN LETTER EN
+      tpass(uletter(), 'ⰽ', 'ⰽ') // GLAGOLITIC SMALL LETTER KAKO
+      tpass(uletter('test'), 'a', 'a')
     })
     it('fails on decimal digits', () => {
-      tfail(letterU(), '4', 'a Unicode letter')
-      tfail(letterU(), '۴', 'a Unicode letter')
-      tfail(letterU(), '४', 'a Unicode letter')
-      tfail(letterU(), '৪', 'a Unicode letter')
-      tfail(letterU(), '๔', 'a Unicode letter')
-      tfail(letterU(), '᠔', 'a Unicode letter')
-      tfail(letterU(), '𝟜', 'a Unicode letter')
-      tfail(letterU('test'), '4', 'test')
+      tfail(uletter(), '4', 'a Unicode letter')
+      tfail(uletter(), '۴', 'a Unicode letter')
+      tfail(uletter(), '४', 'a Unicode letter')
+      tfail(uletter(), '৪', 'a Unicode letter')
+      tfail(uletter(), '๔', 'a Unicode letter')
+      tfail(uletter(), '᠔', 'a Unicode letter')
+      tfail(uletter(), '𝟜', 'a Unicode letter')
+      tfail(uletter('test'), '4', 'test')
     })
     it('succeeds on a single uppercase letter number', () => {
-      tpass(letterU(), 'Ⅳ', 'Ⅳ') // ROMAN NUMERAL FOUR
-      tpass(letterU('test'), 'Ⅳ', 'Ⅳ')
+      tpass(uletter(), 'Ⅳ', 'Ⅳ') // ROMAN NUMERAL FOUR
+      tpass(uletter('test'), 'Ⅳ', 'Ⅳ')
     })
     it('succeeds on a single lowercase letter number', () => {
-      tpass(letterU(), 'ⅳ', 'ⅳ') // SMALL ROMAN NUMERAL FOUR
-      tpass(letterU('test'), 'ⅳ', 'ⅳ')
+      tpass(uletter(), 'ⅳ', 'ⅳ') // SMALL ROMAN NUMERAL FOUR
+      tpass(uletter('test'), 'ⅳ', 'ⅳ')
     })
     it('fails on other numbers', () => {
-      tfail(letterU(), '¼', 'a Unicode letter')
-      tfail(letterU(), '፬', 'a Unicode letter')
-      tfail(letterU(), '⁴', 'a Unicode letter')
-      tfail(letterU(), '₄', 'a Unicode letter')
-      tfail(letterU(), '④', 'a Unicode letter')
-      tfail(letterU(), '❹', 'a Unicode letter')
-      tfail(letterU('test'), '¼', 'test')
+      tfail(uletter(), '¼', 'a Unicode letter')
+      tfail(uletter(), '፬', 'a Unicode letter')
+      tfail(uletter(), '⁴', 'a Unicode letter')
+      tfail(uletter(), '₄', 'a Unicode letter')
+      tfail(uletter(), '④', 'a Unicode letter')
+      tfail(uletter(), '❹', 'a Unicode letter')
+      tfail(uletter('test'), '¼', 'test')
     })
     it('fails on whitespace', () => {
-      tfail(letterU(), ' ', 'a Unicode letter')
-      tfail(letterU(), '\t', 'a Unicode letter')
-      tfail(letterU(), '\n', 'a Unicode letter')
-      tfail(letterU(), ' ', 'a Unicode letter')
-      tfail(letterU(), '\u2003', 'a Unicode letter')
-      tfail(letterU(), '\u202f', 'a Unicode letter')
-      tfail(letterU('test'), ' ', 'test')
+      tfail(uletter(), ' ', 'a Unicode letter')
+      tfail(uletter(), '\t', 'a Unicode letter')
+      tfail(uletter(), '\n', 'a Unicode letter')
+      tfail(uletter(), ' ', 'a Unicode letter')
+      tfail(uletter(), '\u2003', 'a Unicode letter')
+      tfail(uletter(), '\u202f', 'a Unicode letter')
+      tfail(uletter('test'), ' ', 'test')
     })
     it('fails on punctuation', () => {
-      tfail(letterU(), '(', 'a Unicode letter')
-      tfail(letterU(), '｢', 'a Unicode letter')
-      tfail(letterU(), ')', 'a Unicode letter')
-      tfail(letterU(), '｣', 'a Unicode letter')
-      tfail(letterU(), '!', 'a Unicode letter')
-      tfail(letterU(), '፣', 'a Unicode letter')
-      tfail(letterU('test'), '(', 'test')
+      tfail(uletter(), '(', 'a Unicode letter')
+      tfail(uletter(), '｢', 'a Unicode letter')
+      tfail(uletter(), ')', 'a Unicode letter')
+      tfail(uletter(), '｣', 'a Unicode letter')
+      tfail(uletter(), '!', 'a Unicode letter')
+      tfail(uletter(), '፣', 'a Unicode letter')
+      tfail(uletter('test'), '(', 'test')
     })
     it('fails on symbols', () => {
-      tfail(letterU(), '$', 'a Unicode letter')
-      tfail(letterU(), '₯', 'a Unicode letter')
-      tfail(letterU(), '+', 'a Unicode letter')
-      tfail(letterU(), '⫇', 'a Unicode letter')
-      tfail(letterU(), '©', 'a Unicode letter')
-      tfail(letterU(), '🀄', 'a Unicode letter')
-      tfail(letterU('test'), '$', 'test')
+      tfail(uletter(), '$', 'a Unicode letter')
+      tfail(uletter(), '₯', 'a Unicode letter')
+      tfail(uletter(), '+', 'a Unicode letter')
+      tfail(uletter(), '⫇', 'a Unicode letter')
+      tfail(uletter(), '©', 'a Unicode letter')
+      tfail(uletter(), '🀄', 'a Unicode letter')
+      tfail(uletter('test'), '$', 'test')
     })
   })
 
-  describe('alphaU', () => {
+  describe('ualpha', () => {
     it('throws if it has a non-string argument', () => {
-      terror(alphaU(0), '', 'expected argument to be a string; found 0')
+      terror(
+        ualpha(0),
+        '',
+        '[ualpha]: expected argument to be a string; found 0',
+      )
     })
     it('succeeds on a single uppercase letter', () => {
-      tpass(alphaU(), 'A', 'A') // LATIN CAPITAL LETTER A
-      tpass(alphaU(), 'Ž', 'Ž') // LATIN CAPITAL LETTER Z WITH CARON
-      tpass(alphaU(), 'Γ', 'Γ') // GREEK CAPITAL LETTER GAMMA
-      tpass(alphaU(), 'Л', 'Л') // CYRILLIC CAPITAL LETTER EL
-      tpass(alphaU(), 'Յ', 'Յ') // ARMENIAN CAPITAL LETTER YI
-      tpass(alphaU(), 'Ⴄ', 'Ⴄ') // GEORGIAN CAPITAL LETTER EN
-      tpass(alphaU(), 'Ꮅ', 'Ꮅ') // CHEROKEE LETTER LI
-      tpass(alphaU(), 'Ⰽ', 'Ⰽ') // GLAGOLITHIC CAPTIAL LETTER KAKO
-      tpass(alphaU('test'), 'A', 'A')
+      tpass(ualpha(), 'A', 'A') // LATIN CAPITAL LETTER A
+      tpass(ualpha(), 'Ž', 'Ž') // LATIN CAPITAL LETTER Z WITH CARON
+      tpass(ualpha(), 'Γ', 'Γ') // GREEK CAPITAL LETTER GAMMA
+      tpass(ualpha(), 'Л', 'Л') // CYRILLIC CAPITAL LETTER EL
+      tpass(ualpha(), 'Յ', 'Յ') // ARMENIAN CAPITAL LETTER YI
+      tpass(ualpha(), 'Ⴄ', 'Ⴄ') // GEORGIAN CAPITAL LETTER EN
+      tpass(ualpha(), 'Ꮅ', 'Ꮅ') // CHEROKEE LETTER LI
+      tpass(ualpha(), 'Ⰽ', 'Ⰽ') // GLAGOLITHIC CAPTIAL LETTER KAKO
+      tpass(ualpha('test'), 'A', 'A')
     })
     it('succeeds on a single titlecase letter', () => {
       // LATIN CAPITAL LETTER D WITH SMALL LETTER Z WITH CARON
-      tpass(alphaU(), 'ǅ', 'ǅ')
+      tpass(ualpha(), 'ǅ', 'ǅ')
       // LATIN CAPITAL LETTER N WITH SMALL LETTER J
-      tpass(alphaU(), 'ǋ', 'ǋ')
+      tpass(ualpha(), 'ǋ', 'ǋ')
       // GREEK CAPITAL LETTER OMEGA WITH PROSGEGRAMMENI
-      tpass(alphaU(), 'ῼ', 'ῼ')
-      tpass(alphaU('test'), 'ǅ', 'ǅ')
+      tpass(ualpha(), 'ῼ', 'ῼ')
+      tpass(ualpha('test'), 'ǅ', 'ǅ')
     })
     it('succeeds on a single lowercase letter', () => {
-      tpass(alphaU(), 'a', 'a') // LATIN SMALL LETTER A
-      tpass(alphaU(), 'ž', 'ž') // LATIN SMALL LETTER Z WITH CARON
-      tpass(alphaU(), 'γ', 'γ') // GREEK SMALL LETTER GAMMA
-      tpass(alphaU(), 'л', 'л') // CYRILLIC SMALL LETTER EL
-      tpass(alphaU(), 'յ', 'յ') // ARMENIAN SMALL LETTER YI
-      tpass(alphaU(), 'ე', 'ე') // GEORGIAN LETTER EN
-      tpass(alphaU(), 'ⰽ', 'ⰽ') // GLAGOLITIC SMALL LETTER KAKO
-      tpass(alphaU('test'), 'a', 'a')
+      tpass(ualpha(), 'a', 'a') // LATIN SMALL LETTER A
+      tpass(ualpha(), 'ž', 'ž') // LATIN SMALL LETTER Z WITH CARON
+      tpass(ualpha(), 'γ', 'γ') // GREEK SMALL LETTER GAMMA
+      tpass(ualpha(), 'л', 'л') // CYRILLIC SMALL LETTER EL
+      tpass(ualpha(), 'յ', 'յ') // ARMENIAN SMALL LETTER YI
+      tpass(ualpha(), 'ე', 'ე') // GEORGIAN LETTER EN
+      tpass(ualpha(), 'ⰽ', 'ⰽ') // GLAGOLITIC SMALL LETTER KAKO
+      tpass(ualpha('test'), 'a', 'a')
     })
     it('succeeds on a single decimal digit', () => {
-      tpass(alphaU(), '4', '4') // DIGIT FOUR
-      tpass(alphaU(), '۴', '۴') // ARABIC-INDIC DIGIT FOUR
-      tpass(alphaU(), '४', '४') // DEVANAGARI DIGIT FOUR
-      tpass(alphaU(), '৪', '৪') // BENGALI DIGIT FOUR
-      tpass(alphaU(), '๔', '๔') // THAI DIGIT FOUR
-      tpass(alphaU(), '᠔', '᠔') // MONGOLIAN DIGIT FOUR
-      tpass(alphaU(), '𝟜', '𝟜') // MATHEMATICAL DOUBLE-STRUCK DIGIT FOUR
-      tpass(alphaU('test'), '4', '4')
+      tpass(ualpha(), '4', '4') // DIGIT FOUR
+      tpass(ualpha(), '۴', '۴') // ARABIC-INDIC DIGIT FOUR
+      tpass(ualpha(), '४', '४') // DEVANAGARI DIGIT FOUR
+      tpass(ualpha(), '৪', '৪') // BENGALI DIGIT FOUR
+      tpass(ualpha(), '๔', '๔') // THAI DIGIT FOUR
+      tpass(ualpha(), '᠔', '᠔') // MONGOLIAN DIGIT FOUR
+      tpass(ualpha(), '𝟜', '𝟜') // MATHEMATICAL DOUBLE-STRUCK DIGIT FOUR
+      tpass(ualpha('test'), '4', '4')
     })
     it('succeeds on a single uppercase letter number', () => {
-      tpass(alphaU(), 'Ⅳ', 'Ⅳ') // ROMAN NUMERAL FOUR
-      tpass(alphaU('test'), 'Ⅳ', 'Ⅳ')
+      tpass(ualpha(), 'Ⅳ', 'Ⅳ') // ROMAN NUMERAL FOUR
+      tpass(ualpha('test'), 'Ⅳ', 'Ⅳ')
     })
     it('succeeds on a single lowercase letter number', () => {
-      tpass(alphaU(), 'ⅳ', 'ⅳ') // SMALL ROMAN NUMERAL FOUR
-      tpass(alphaU('test'), 'ⅳ', 'ⅳ')
+      tpass(ualpha(), 'ⅳ', 'ⅳ') // SMALL ROMAN NUMERAL FOUR
+      tpass(ualpha('test'), 'ⅳ', 'ⅳ')
     })
     it('succeeds on a single other number', () => {
-      tpass(alphaU(), '¼', '¼') // VULGAR FRACTION ONE QUARTER
-      tpass(alphaU(), '፬', '፬') // ETHIOPIC DIGIT FOUR
-      tpass(alphaU(), '⁴', '⁴') // SUPERSCRIPT FOUR
-      tpass(alphaU(), '₄', '₄') // SUBSCRIPT FOUR
-      tpass(alphaU(), '④', '④') // CIRCLED DIGIT FOUR
-      tpass(alphaU(), '❹', '❹') // DINGBAT NEGATIVE CIRCLED DIGIT FOUR
-      tpass(alphaU('test'), '¼', '¼')
+      tpass(ualpha(), '¼', '¼') // VULGAR FRACTION ONE QUARTER
+      tpass(ualpha(), '፬', '፬') // ETHIOPIC DIGIT FOUR
+      tpass(ualpha(), '⁴', '⁴') // SUPERSCRIPT FOUR
+      tpass(ualpha(), '₄', '₄') // SUBSCRIPT FOUR
+      tpass(ualpha(), '④', '④') // CIRCLED DIGIT FOUR
+      tpass(ualpha(), '❹', '❹') // DINGBAT NEGATIVE CIRCLED DIGIT FOUR
+      tpass(ualpha('test'), '¼', '¼')
     })
     it('fails on whitespace', () => {
-      tfail(alphaU(), ' ', 'a Unicode alphanumeric character')
-      tfail(alphaU(), '\t', 'a Unicode alphanumeric character')
-      tfail(alphaU(), '\n', 'a Unicode alphanumeric character')
-      tfail(alphaU(), ' ', 'a Unicode alphanumeric character')
-      tfail(alphaU(), '\u2003', 'a Unicode alphanumeric character')
-      tfail(alphaU(), '\u202f', 'a Unicode alphanumeric character')
-      tfail(alphaU('test'), ' ', 'test')
+      tfail(ualpha(), ' ', 'a Unicode alphanumeric character')
+      tfail(ualpha(), '\t', 'a Unicode alphanumeric character')
+      tfail(ualpha(), '\n', 'a Unicode alphanumeric character')
+      tfail(ualpha(), ' ', 'a Unicode alphanumeric character')
+      tfail(ualpha(), '\u2003', 'a Unicode alphanumeric character')
+      tfail(ualpha(), '\u202f', 'a Unicode alphanumeric character')
+      tfail(ualpha('test'), ' ', 'test')
     })
     it('fails on punctuation', () => {
-      tfail(alphaU(), '(', 'a Unicode alphanumeric character')
-      tfail(alphaU(), '｢', 'a Unicode alphanumeric character')
-      tfail(alphaU(), ')', 'a Unicode alphanumeric character')
-      tfail(alphaU(), '｣', 'a Unicode alphanumeric character')
-      tfail(alphaU(), '!', 'a Unicode alphanumeric character')
-      tfail(alphaU(), '፣', 'a Unicode alphanumeric character')
-      tfail(alphaU('test'), '(', 'test')
+      tfail(ualpha(), '(', 'a Unicode alphanumeric character')
+      tfail(ualpha(), '｢', 'a Unicode alphanumeric character')
+      tfail(ualpha(), ')', 'a Unicode alphanumeric character')
+      tfail(ualpha(), '｣', 'a Unicode alphanumeric character')
+      tfail(ualpha(), '!', 'a Unicode alphanumeric character')
+      tfail(ualpha(), '፣', 'a Unicode alphanumeric character')
+      tfail(ualpha('test'), '(', 'test')
     })
     it('fails on symbols', () => {
-      tfail(alphaU(), '$', 'a Unicode alphanumeric character')
-      tfail(alphaU(), '₯', 'a Unicode alphanumeric character')
-      tfail(alphaU(), '+', 'a Unicode alphanumeric character')
-      tfail(alphaU(), '⫇', 'a Unicode alphanumeric character')
-      tfail(alphaU(), '©', 'a Unicode alphanumeric character')
-      tfail(alphaU(), '🀄', 'a Unicode alphanumeric character')
-      tfail(alphaU('test'), '$', 'test')
+      tfail(ualpha(), '$', 'a Unicode alphanumeric character')
+      tfail(ualpha(), '₯', 'a Unicode alphanumeric character')
+      tfail(ualpha(), '+', 'a Unicode alphanumeric character')
+      tfail(ualpha(), '⫇', 'a Unicode alphanumeric character')
+      tfail(ualpha(), '©', 'a Unicode alphanumeric character')
+      tfail(ualpha(), '🀄', 'a Unicode alphanumeric character')
+      tfail(ualpha('test'), '$', 'test')
     })
   })
 
-  describe('upperU', () => {
+  describe('uupper', () => {
     it('throws if it has a non-string argument', () => {
-      terror(upperU(0), '', 'expected argument to be a string; found 0')
+      terror(
+        uupper(0),
+        '',
+        '[uupper]: expected argument to be a string; found 0',
+      )
     })
     it('succeeds on a single uppercase letter', () => {
-      tpass(upperU(), 'A', 'A') // LATIN CAPITAL LETTER A
-      tpass(upperU(), 'Ž', 'Ž') // LATIN CAPITAL LETTER Z WITH CARON
-      tpass(upperU(), 'Γ', 'Γ') // GREEK CAPITAL LETTER GAMMA
-      tpass(upperU(), 'Л', 'Л') // CYRILLIC CAPITAL LETTER EL
-      tpass(upperU(), 'Յ', 'Յ') // ARMENIAN CAPITAL LETTER YI
-      tpass(upperU(), 'Ⴄ', 'Ⴄ') // GEORGIAN CAPITAL LETTER EN
-      tpass(upperU(), 'Ꮅ', 'Ꮅ') // CHEROKEE LETTER LI
-      tpass(upperU(), 'Ⰽ', 'Ⰽ') // GLAGOLITHIC CAPTIAL LETTER KAKO
-      tpass(upperU('test'), 'A', 'A')
+      tpass(uupper(), 'A', 'A') // LATIN CAPITAL LETTER A
+      tpass(uupper(), 'Ž', 'Ž') // LATIN CAPITAL LETTER Z WITH CARON
+      tpass(uupper(), 'Γ', 'Γ') // GREEK CAPITAL LETTER GAMMA
+      tpass(uupper(), 'Л', 'Л') // CYRILLIC CAPITAL LETTER EL
+      tpass(uupper(), 'Յ', 'Յ') // ARMENIAN CAPITAL LETTER YI
+      tpass(uupper(), 'Ⴄ', 'Ⴄ') // GEORGIAN CAPITAL LETTER EN
+      tpass(uupper(), 'Ꮅ', 'Ꮅ') // CHEROKEE LETTER LI
+      tpass(uupper(), 'Ⰽ', 'Ⰽ') // GLAGOLITHIC CAPTIAL LETTER KAKO
+      tpass(uupper('test'), 'A', 'A')
     })
     it('succeeds on a single titlecase letter', () => {
       // LATIN CAPITAL LETTER D WITH SMALL LETTER Z WITH CARON
-      tpass(upperU(), 'ǅ', 'ǅ')
+      tpass(uupper(), 'ǅ', 'ǅ')
       // LATIN CAPITAL LETTER N WITH SMALL LETTER J
-      tpass(upperU(), 'ǋ', 'ǋ')
+      tpass(uupper(), 'ǋ', 'ǋ')
       // GREEK CAPITAL LETTER OMEGA WITH PROSGEGRAMMENI
-      tpass(upperU(), 'ῼ', 'ῼ')
-      tpass(upperU('test'), 'ǅ', 'ǅ')
+      tpass(uupper(), 'ῼ', 'ῼ')
+      tpass(uupper('test'), 'ǅ', 'ǅ')
     })
     it('fails on lowercase letters', () => {
-      tfail(upperU(), 'a', 'a Unicode uppercase letter')
-      tfail(upperU(), 'ž', 'a Unicode uppercase letter')
-      tfail(upperU(), 'γ', 'a Unicode uppercase letter')
-      tfail(upperU(), 'л', 'a Unicode uppercase letter')
-      tfail(upperU(), 'յ', 'a Unicode uppercase letter')
-      tfail(upperU(), 'ე', 'a Unicode uppercase letter')
-      tfail(upperU(), 'ⰽ', 'a Unicode uppercase letter')
-      tfail(upperU('test'), 'a', 'test')
+      tfail(uupper(), 'a', 'a Unicode uppercase letter')
+      tfail(uupper(), 'ž', 'a Unicode uppercase letter')
+      tfail(uupper(), 'γ', 'a Unicode uppercase letter')
+      tfail(uupper(), 'л', 'a Unicode uppercase letter')
+      tfail(uupper(), 'յ', 'a Unicode uppercase letter')
+      tfail(uupper(), 'ე', 'a Unicode uppercase letter')
+      tfail(uupper(), 'ⰽ', 'a Unicode uppercase letter')
+      tfail(uupper('test'), 'a', 'test')
     })
     it('fails on decimal digits', () => {
-      tfail(upperU(), '4', 'a Unicode uppercase letter')
-      tfail(upperU(), '۴', 'a Unicode uppercase letter')
-      tfail(upperU(), '४', 'a Unicode uppercase letter')
-      tfail(upperU(), '৪', 'a Unicode uppercase letter')
-      tfail(upperU(), '๔', 'a Unicode uppercase letter')
-      tfail(upperU(), '᠔', 'a Unicode uppercase letter')
-      tfail(upperU(), '𝟜', 'a Unicode uppercase letter')
-      tfail(upperU('test'), '4', 'test')
+      tfail(uupper(), '4', 'a Unicode uppercase letter')
+      tfail(uupper(), '۴', 'a Unicode uppercase letter')
+      tfail(uupper(), '४', 'a Unicode uppercase letter')
+      tfail(uupper(), '৪', 'a Unicode uppercase letter')
+      tfail(uupper(), '๔', 'a Unicode uppercase letter')
+      tfail(uupper(), '᠔', 'a Unicode uppercase letter')
+      tfail(uupper(), '𝟜', 'a Unicode uppercase letter')
+      tfail(uupper('test'), '4', 'test')
     })
     it('succeeds on a single uppercase letter number', () => {
-      tpass(upperU(), 'Ⅳ', 'Ⅳ') // ROMAN NUMERAL FOUR
-      tpass(upperU('test'), 'Ⅳ', 'Ⅳ')
+      tpass(uupper(), 'Ⅳ', 'Ⅳ') // ROMAN NUMERAL FOUR
+      tpass(uupper('test'), 'Ⅳ', 'Ⅳ')
     })
     it('fails on lowercase letter numbers', () => {
-      tfail(upperU(), 'ⅳ', 'a Unicode uppercase letter')
-      tfail(upperU('test'), 'ⅳ', 'test')
+      tfail(uupper(), 'ⅳ', 'a Unicode uppercase letter')
+      tfail(uupper('test'), 'ⅳ', 'test')
     })
     it('fails on other numbers', () => {
-      tfail(upperU(), '¼', 'a Unicode uppercase letter')
-      tfail(upperU(), '፬', 'a Unicode uppercase letter')
-      tfail(upperU(), '⁴', 'a Unicode uppercase letter')
-      tfail(upperU(), '₄', 'a Unicode uppercase letter')
-      tfail(upperU(), '④', 'a Unicode uppercase letter')
-      tfail(upperU(), '❹', 'a Unicode uppercase letter')
-      tfail(upperU('test'), '¼', 'test')
+      tfail(uupper(), '¼', 'a Unicode uppercase letter')
+      tfail(uupper(), '፬', 'a Unicode uppercase letter')
+      tfail(uupper(), '⁴', 'a Unicode uppercase letter')
+      tfail(uupper(), '₄', 'a Unicode uppercase letter')
+      tfail(uupper(), '④', 'a Unicode uppercase letter')
+      tfail(uupper(), '❹', 'a Unicode uppercase letter')
+      tfail(uupper('test'), '¼', 'test')
     })
     it('fails on whitespace', () => {
-      tfail(upperU(), ' ', 'a Unicode uppercase letter')
-      tfail(upperU(), '\t', 'a Unicode uppercase letter')
-      tfail(upperU(), '\n', 'a Unicode uppercase letter')
-      tfail(upperU(), ' ', 'a Unicode uppercase letter')
-      tfail(upperU(), '\u2003', 'a Unicode uppercase letter')
-      tfail(upperU(), '\u202f', 'a Unicode uppercase letter')
+      tfail(uupper(), ' ', 'a Unicode uppercase letter')
+      tfail(uupper(), '\t', 'a Unicode uppercase letter')
+      tfail(uupper(), '\n', 'a Unicode uppercase letter')
+      tfail(uupper(), ' ', 'a Unicode uppercase letter')
+      tfail(uupper(), '\u2003', 'a Unicode uppercase letter')
+      tfail(uupper(), '\u202f', 'a Unicode uppercase letter')
     })
     it('fails on punctuation', () => {
-      tfail(upperU(), '(', 'a Unicode uppercase letter')
-      tfail(upperU(), '｢', 'a Unicode uppercase letter')
-      tfail(upperU(), ')', 'a Unicode uppercase letter')
-      tfail(upperU(), '｣', 'a Unicode uppercase letter')
-      tfail(upperU(), '!', 'a Unicode uppercase letter')
-      tfail(upperU(), '፣', 'a Unicode uppercase letter')
-      tfail(upperU('test'), '(', 'test')
+      tfail(uupper(), '(', 'a Unicode uppercase letter')
+      tfail(uupper(), '｢', 'a Unicode uppercase letter')
+      tfail(uupper(), ')', 'a Unicode uppercase letter')
+      tfail(uupper(), '｣', 'a Unicode uppercase letter')
+      tfail(uupper(), '!', 'a Unicode uppercase letter')
+      tfail(uupper(), '፣', 'a Unicode uppercase letter')
+      tfail(uupper('test'), '(', 'test')
     })
     it('fails on symbols', () => {
-      tfail(upperU(), '$', 'a Unicode uppercase letter')
-      tfail(upperU(), '₯', 'a Unicode uppercase letter')
-      tfail(upperU(), '+', 'a Unicode uppercase letter')
-      tfail(upperU(), '⫇', 'a Unicode uppercase letter')
-      tfail(upperU(), '©', 'a Unicode uppercase letter')
-      tfail(upperU(), '🀄', 'a Unicode uppercase letter')
-      tfail(upperU('test'), '$', 'test')
+      tfail(uupper(), '$', 'a Unicode uppercase letter')
+      tfail(uupper(), '₯', 'a Unicode uppercase letter')
+      tfail(uupper(), '+', 'a Unicode uppercase letter')
+      tfail(uupper(), '⫇', 'a Unicode uppercase letter')
+      tfail(uupper(), '©', 'a Unicode uppercase letter')
+      tfail(uupper(), '🀄', 'a Unicode uppercase letter')
+      tfail(uupper('test'), '$', 'test')
     })
   })
 
-  describe('lowerU', () => {
+  describe('ulower', () => {
     it('throws if it has a non-string argument', () => {
-      terror(lowerU(0), '', 'expected argument to be a string; found 0')
+      terror(
+        ulower(0),
+        '',
+        '[ulower]: expected argument to be a string; found 0',
+      )
     })
     it('fails on uppercase letters', () => {
-      tfail(lowerU(), 'A', 'a Unicode lowercase letter')
-      tfail(lowerU(), 'Ž', 'a Unicode lowercase letter')
-      tfail(lowerU(), 'Γ', 'a Unicode lowercase letter')
-      tfail(lowerU(), 'Л', 'a Unicode lowercase letter')
-      tfail(lowerU(), 'Յ', 'a Unicode lowercase letter')
-      tfail(lowerU(), 'Ⴄ', 'a Unicode lowercase letter')
-      tfail(lowerU(), 'Ꮅ', 'a Unicode lowercase letter')
-      tfail(lowerU(), 'Ⰽ', 'a Unicode lowercase letter')
-      tfail(lowerU('test'), 'A', 'test')
+      tfail(ulower(), 'A', 'a Unicode lowercase letter')
+      tfail(ulower(), 'Ž', 'a Unicode lowercase letter')
+      tfail(ulower(), 'Γ', 'a Unicode lowercase letter')
+      tfail(ulower(), 'Л', 'a Unicode lowercase letter')
+      tfail(ulower(), 'Յ', 'a Unicode lowercase letter')
+      tfail(ulower(), 'Ⴄ', 'a Unicode lowercase letter')
+      tfail(ulower(), 'Ꮅ', 'a Unicode lowercase letter')
+      tfail(ulower(), 'Ⰽ', 'a Unicode lowercase letter')
+      tfail(ulower('test'), 'A', 'test')
     })
     it('fails on titlecase letters', () => {
-      tfail(lowerU(), 'ǅ', 'a Unicode lowercase letter')
-      tfail(lowerU(), 'ǋ', 'a Unicode lowercase letter')
-      tfail(lowerU(), 'ῼ', 'a Unicode lowercase letter')
-      tfail(lowerU('test'), 'ǅ', 'test')
+      tfail(ulower(), 'ǅ', 'a Unicode lowercase letter')
+      tfail(ulower(), 'ǋ', 'a Unicode lowercase letter')
+      tfail(ulower(), 'ῼ', 'a Unicode lowercase letter')
+      tfail(ulower('test'), 'ǅ', 'test')
     })
     it('succeeds on a single lowercase letter', () => {
-      tpass(lowerU(), 'a', 'a') // LATIN SMALL LETTER A
-      tpass(lowerU(), 'ž', 'ž') // LATIN SMALL LETTER Z WITH CARON
-      tpass(lowerU(), 'γ', 'γ') // GREEK SMALL LETTER GAMMA
-      tpass(lowerU(), 'л', 'л') // CYRILLIC SMALL LETTER EL
-      tpass(lowerU(), 'յ', 'յ') // ARMENIAN SMALL LETTER YI
-      tpass(lowerU(), 'ე', 'ე') // GEORGIAN LETTER EN
-      tpass(lowerU(), 'ⰽ', 'ⰽ') // GLAGOLITIC SMALL LETTER KAKO
-      tpass(lowerU('test'), 'a', 'a')
+      tpass(ulower(), 'a', 'a') // LATIN SMALL LETTER A
+      tpass(ulower(), 'ž', 'ž') // LATIN SMALL LETTER Z WITH CARON
+      tpass(ulower(), 'γ', 'γ') // GREEK SMALL LETTER GAMMA
+      tpass(ulower(), 'л', 'л') // CYRILLIC SMALL LETTER EL
+      tpass(ulower(), 'յ', 'յ') // ARMENIAN SMALL LETTER YI
+      tpass(ulower(), 'ე', 'ე') // GEORGIAN LETTER EN
+      tpass(ulower(), 'ⰽ', 'ⰽ') // GLAGOLITIC SMALL LETTER KAKO
+      tpass(ulower('test'), 'a', 'a')
     })
     it('fails on decimal digits', () => {
-      tfail(lowerU(), '4', 'a Unicode lowercase letter')
-      tfail(lowerU(), '۴', 'a Unicode lowercase letter')
-      tfail(lowerU(), '४', 'a Unicode lowercase letter')
-      tfail(lowerU(), '৪', 'a Unicode lowercase letter')
-      tfail(lowerU(), '๔', 'a Unicode lowercase letter')
-      tfail(lowerU(), '᠔', 'a Unicode lowercase letter')
-      tfail(lowerU(), '𝟜', 'a Unicode lowercase letter')
-      tfail(lowerU('test'), '4', 'test')
+      tfail(ulower(), '4', 'a Unicode lowercase letter')
+      tfail(ulower(), '۴', 'a Unicode lowercase letter')
+      tfail(ulower(), '४', 'a Unicode lowercase letter')
+      tfail(ulower(), '৪', 'a Unicode lowercase letter')
+      tfail(ulower(), '๔', 'a Unicode lowercase letter')
+      tfail(ulower(), '᠔', 'a Unicode lowercase letter')
+      tfail(ulower(), '𝟜', 'a Unicode lowercase letter')
+      tfail(ulower('test'), '4', 'test')
     })
     it('fails on uppercase letter numbers', () => {
-      tfail(lowerU(), 'Ⅳ', 'a Unicode lowercase letter')
-      tfail(lowerU('test'), 'Ⅳ', 'test')
+      tfail(ulower(), 'Ⅳ', 'a Unicode lowercase letter')
+      tfail(ulower('test'), 'Ⅳ', 'test')
     })
     it('succeeds on a single lowercase letter number', () => {
-      tpass(lowerU(), 'ⅳ', 'ⅳ') // SMALL ROMAN NUMERAL FOUR
-      tpass(lowerU('test'), 'ⅳ', 'ⅳ')
+      tpass(ulower(), 'ⅳ', 'ⅳ') // SMALL ROMAN NUMERAL FOUR
+      tpass(ulower('test'), 'ⅳ', 'ⅳ')
     })
     it('fails on other numbers', () => {
-      tfail(lowerU(), '¼', 'a Unicode lowercase letter')
-      tfail(lowerU(), '፬', 'a Unicode lowercase letter')
-      tfail(lowerU(), '⁴', 'a Unicode lowercase letter')
-      tfail(lowerU(), '₄', 'a Unicode lowercase letter')
-      tfail(lowerU(), '④', 'a Unicode lowercase letter')
-      tfail(lowerU(), '❹', 'a Unicode lowercase letter')
-      tfail(lowerU('test'), '¼', 'test')
+      tfail(ulower(), '¼', 'a Unicode lowercase letter')
+      tfail(ulower(), '፬', 'a Unicode lowercase letter')
+      tfail(ulower(), '⁴', 'a Unicode lowercase letter')
+      tfail(ulower(), '₄', 'a Unicode lowercase letter')
+      tfail(ulower(), '④', 'a Unicode lowercase letter')
+      tfail(ulower(), '❹', 'a Unicode lowercase letter')
+      tfail(ulower('test'), '¼', 'test')
     })
     it('fails on whitespace', () => {
-      tfail(lowerU(), ' ', 'a Unicode lowercase letter')
-      tfail(lowerU(), '\t', 'a Unicode lowercase letter')
-      tfail(lowerU(), '\n', 'a Unicode lowercase letter')
-      tfail(lowerU(), ' ', 'a Unicode lowercase letter')
-      tfail(lowerU(), '\u2003', 'a Unicode lowercase letter')
-      tfail(lowerU(), '\u202f', 'a Unicode lowercase letter')
-      tfail(lowerU('test'), ' ', 'test')
+      tfail(ulower(), ' ', 'a Unicode lowercase letter')
+      tfail(ulower(), '\t', 'a Unicode lowercase letter')
+      tfail(ulower(), '\n', 'a Unicode lowercase letter')
+      tfail(ulower(), ' ', 'a Unicode lowercase letter')
+      tfail(ulower(), '\u2003', 'a Unicode lowercase letter')
+      tfail(ulower(), '\u202f', 'a Unicode lowercase letter')
+      tfail(ulower('test'), ' ', 'test')
     })
     it('fails on punctuation', () => {
-      tfail(lowerU(), '(', 'a Unicode lowercase letter')
-      tfail(lowerU(), '｢', 'a Unicode lowercase letter')
-      tfail(lowerU(), ')', 'a Unicode lowercase letter')
-      tfail(lowerU(), '｣', 'a Unicode lowercase letter')
-      tfail(lowerU(), '!', 'a Unicode lowercase letter')
-      tfail(lowerU(), '፣', 'a Unicode lowercase letter')
-      tfail(lowerU('test'), '(', 'test')
+      tfail(ulower(), '(', 'a Unicode lowercase letter')
+      tfail(ulower(), '｢', 'a Unicode lowercase letter')
+      tfail(ulower(), ')', 'a Unicode lowercase letter')
+      tfail(ulower(), '｣', 'a Unicode lowercase letter')
+      tfail(ulower(), '!', 'a Unicode lowercase letter')
+      tfail(ulower(), '፣', 'a Unicode lowercase letter')
+      tfail(ulower('test'), '(', 'test')
     })
     it('fails on symbols', () => {
-      tfail(lowerU(), '$', 'a Unicode lowercase letter')
-      tfail(lowerU(), '₯', 'a Unicode lowercase letter')
-      tfail(lowerU(), '+', 'a Unicode lowercase letter')
-      tfail(lowerU(), '⫇', 'a Unicode lowercase letter')
-      tfail(lowerU(), '©', 'a Unicode lowercase letter')
-      tfail(lowerU(), '🀄', 'a Unicode lowercase letter')
-      tfail(lowerU('test'), '$', 'test')
+      tfail(ulower(), '$', 'a Unicode lowercase letter')
+      tfail(ulower(), '₯', 'a Unicode lowercase letter')
+      tfail(ulower(), '+', 'a Unicode lowercase letter')
+      tfail(ulower(), '⫇', 'a Unicode lowercase letter')
+      tfail(ulower(), '©', 'a Unicode lowercase letter')
+      tfail(ulower(), '🀄', 'a Unicode lowercase letter')
+      tfail(ulower('test'), '$', 'test')
     })
   })
 
@@ -503,54 +519,58 @@ describe('Regular expression parsers', () => {
     })
   })
 
-  describe('spaceU', () => {
+  describe('uspace', () => {
     it('throws if it has a non-string argument', () => {
-      terror(spaceU(0), '', 'expected argument to be a string; found 0')
+      terror(
+        uspace(0),
+        '',
+        '[uspace]: expected argument to be a string; found 0',
+      )
     })
     it('succeeds on a single instance of Unicode whitespace', () => {
-      tpass(spaceU(), '\t', '\t')
-      tpass(spaceU(), '\n', '\n')
-      tpass(spaceU(), '\v', '\v')
-      tpass(spaceU(), '\f', '\f')
-      tpass(spaceU(), '\r', '\r')
-      tpass(spaceU(), '\r\n', '\r\n')
-      tpass(spaceU(), ' ', ' ')
-      tpass(spaceU(), '\u0085', '\u0085')
-      tpass(spaceU(), '\u00a0', '\u00a0')
-      tpass(spaceU(), '\u1680', '\u1680')
-      tpass(spaceU(), '\u2000', '\u2000')
-      tpass(spaceU(), '\u2001', '\u2001')
-      tpass(spaceU(), '\u2002', '\u2002')
-      tpass(spaceU(), '\u2003', '\u2003')
-      tpass(spaceU(), '\u2004', '\u2004')
-      tpass(spaceU(), '\u2005', '\u2005')
-      tpass(spaceU(), '\u2006', '\u2006')
-      tpass(spaceU(), '\u2007', '\u2007')
-      tpass(spaceU(), '\u2008', '\u2008')
-      tpass(spaceU(), '\u2009', '\u2009')
-      tpass(spaceU(), '\u200a', '\u200a')
-      tpass(spaceU(), '\u2028', '\u2028')
-      tpass(spaceU(), '\u2029', '\u2029')
-      tpass(spaceU(), '\u202f', '\u202f')
-      tpass(spaceU(), '\u205f', '\u205f')
-      tpass(spaceU(), '\u3000', '\u3000')
-      tpass(spaceU('test'), '\t', '\t')
+      tpass(uspace(), '\t', '\t')
+      tpass(uspace(), '\n', '\n')
+      tpass(uspace(), '\v', '\v')
+      tpass(uspace(), '\f', '\f')
+      tpass(uspace(), '\r', '\r')
+      tpass(uspace(), '\r\n', '\r\n')
+      tpass(uspace(), ' ', ' ')
+      tpass(uspace(), '\u0085', '\u0085')
+      tpass(uspace(), '\u00a0', '\u00a0')
+      tpass(uspace(), '\u1680', '\u1680')
+      tpass(uspace(), '\u2000', '\u2000')
+      tpass(uspace(), '\u2001', '\u2001')
+      tpass(uspace(), '\u2002', '\u2002')
+      tpass(uspace(), '\u2003', '\u2003')
+      tpass(uspace(), '\u2004', '\u2004')
+      tpass(uspace(), '\u2005', '\u2005')
+      tpass(uspace(), '\u2006', '\u2006')
+      tpass(uspace(), '\u2007', '\u2007')
+      tpass(uspace(), '\u2008', '\u2008')
+      tpass(uspace(), '\u2009', '\u2009')
+      tpass(uspace(), '\u200a', '\u200a')
+      tpass(uspace(), '\u2028', '\u2028')
+      tpass(uspace(), '\u2029', '\u2029')
+      tpass(uspace(), '\u202f', '\u202f')
+      tpass(uspace(), '\u205f', '\u205f')
+      tpass(uspace(), '\u3000', '\u3000')
+      tpass(uspace('test'), '\t', '\t')
     })
     it('succeeds only once', () => {
-      tpass(spaceU(), '     123', ' ')
-      tpass(spaceU(), '\u3000\u1680\u202f', '\u3000')
+      tpass(uspace(), '     123', ' ')
+      tpass(uspace(), '\u3000\u1680\u202f', '\u3000')
     })
     it('fails on non-whitespace characters', () => {
-      tfail(spaceU(), 'O', 'a Unicode whitespace character')
-      tfail(spaceU(), 'З', 'a Unicode whitespace character')
-      tfail(spaceU(), 'ค', 'a Unicode whitespace character')
-      tfail(spaceU(), '𝑂', 'a Unicode whitespace character')
-      tfail(spaceU(), '\u180e', 'a Unicode whitespace character')
-      tfail(spaceU(), '\u200b', 'a Unicode whitespace character')
-      tfail(spaceU(), '\u200c', 'a Unicode whitespace character')
-      tfail(spaceU(), '\u200d', 'a Unicode whitespace character')
-      tfail(spaceU(), '\u2060', 'a Unicode whitespace character')
-      tfail(spaceU('test'), 'O', 'test')
+      tfail(uspace(), 'O', 'a Unicode whitespace character')
+      tfail(uspace(), 'З', 'a Unicode whitespace character')
+      tfail(uspace(), 'ค', 'a Unicode whitespace character')
+      tfail(uspace(), '𝑂', 'a Unicode whitespace character')
+      tfail(uspace(), '\u180e', 'a Unicode whitespace character')
+      tfail(uspace(), '\u200b', 'a Unicode whitespace character')
+      tfail(uspace(), '\u200c', 'a Unicode whitespace character')
+      tfail(uspace(), '\u200d', 'a Unicode whitespace character')
+      tfail(uspace(), '\u2060', 'a Unicode whitespace character')
+      tfail(uspace('test'), 'O', 'test')
     })
   })
 
@@ -590,37 +610,37 @@ describe('Regular expression parsers', () => {
     })
   })
 
-  describe('spacesU', () => {
+  describe('uspaces', () => {
     it('succeeds even if no whitespace is found', () => {
-      tpass(spacesU(), '', { result: null, index: 0 })
-      tpass(spacesU(), 'abc', { result: null, index: 0 })
+      tpass(uspaces(), '', { result: null, index: 0 })
+      tpass(uspaces(), 'abc', { result: null, index: 0 })
     })
     it('skips all whitespace until the first non-whitespace', () => {
-      tpass(spacesU(), '\t\t\tabc', { result: null, index: 3 })
-      tpass(spacesU(), '\n\nabc', { result: null, index: 2 })
-      tpass(spacesU(), '\vabc', { result: null, index: 1 })
-      tpass(spacesU(), '\f\f\f\fabc', { result: null, index: 4 })
-      tpass(spacesU(), '\r\rabc', { result: null, index: 2 })
-      tpass(spacesU(), ' abc', { result: null, index: 1 })
-      tpass(spacesU(), '\u0085abc', { result: null, index: 2 })
-      tpass(spacesU(), '\u00a0abc', { result: null, index: 2 })
-      tpass(spacesU(), '\u1680abc', { result: null, index: 3 })
-      tpass(spacesU(), '\u2000abc', { result: null, index: 3 })
-      tpass(spacesU(), '\u2001abc', { result: null, index: 3 })
-      tpass(spacesU(), '\u2002abc', { result: null, index: 3 })
-      tpass(spacesU(), '\u2003abc', { result: null, index: 3 })
-      tpass(spacesU(), '\u2004abc', { result: null, index: 3 })
-      tpass(spacesU(), '\u2005abc', { result: null, index: 3 })
-      tpass(spacesU(), '\u2006abc', { result: null, index: 3 })
-      tpass(spacesU(), '\u2007abc', { result: null, index: 3 })
-      tpass(spacesU(), '\u2008abc', { result: null, index: 3 })
-      tpass(spacesU(), '\u2009abc', { result: null, index: 3 })
-      tpass(spacesU(), '\u200aabc', { result: null, index: 3 })
-      tpass(spacesU(), '\u2028abc', { result: null, index: 3 })
-      tpass(spacesU(), '\u2029abc', { result: null, index: 3 })
-      tpass(spacesU(), '\u202fabc', { result: null, index: 3 })
-      tpass(spacesU(), '\u205fabc', { result: null, index: 3 })
-      tpass(spacesU(), '\u3000abc', { result: null, index: 3 })
+      tpass(uspaces(), '\t\t\tabc', { result: null, index: 3 })
+      tpass(uspaces(), '\n\nabc', { result: null, index: 2 })
+      tpass(uspaces(), '\vabc', { result: null, index: 1 })
+      tpass(uspaces(), '\f\f\f\fabc', { result: null, index: 4 })
+      tpass(uspaces(), '\r\rabc', { result: null, index: 2 })
+      tpass(uspaces(), ' abc', { result: null, index: 1 })
+      tpass(uspaces(), '\u0085abc', { result: null, index: 2 })
+      tpass(uspaces(), '\u00a0abc', { result: null, index: 2 })
+      tpass(uspaces(), '\u1680abc', { result: null, index: 3 })
+      tpass(uspaces(), '\u2000abc', { result: null, index: 3 })
+      tpass(uspaces(), '\u2001abc', { result: null, index: 3 })
+      tpass(uspaces(), '\u2002abc', { result: null, index: 3 })
+      tpass(uspaces(), '\u2003abc', { result: null, index: 3 })
+      tpass(uspaces(), '\u2004abc', { result: null, index: 3 })
+      tpass(uspaces(), '\u2005abc', { result: null, index: 3 })
+      tpass(uspaces(), '\u2006abc', { result: null, index: 3 })
+      tpass(uspaces(), '\u2007abc', { result: null, index: 3 })
+      tpass(uspaces(), '\u2008abc', { result: null, index: 3 })
+      tpass(uspaces(), '\u2009abc', { result: null, index: 3 })
+      tpass(uspaces(), '\u200aabc', { result: null, index: 3 })
+      tpass(uspaces(), '\u2028abc', { result: null, index: 3 })
+      tpass(uspaces(), '\u2029abc', { result: null, index: 3 })
+      tpass(uspaces(), '\u202fabc', { result: null, index: 3 })
+      tpass(uspaces(), '\u205fabc', { result: null, index: 3 })
+      tpass(uspaces(), '\u3000abc', { result: null, index: 3 })
     })
   })
 
@@ -667,49 +687,57 @@ describe('Regular expression parsers', () => {
     })
   })
 
-  describe('spaces1U', () => {
+  describe('uspaces1', () => {
     it('throws if it has a non-string argument', () => {
-      terror(spaces1U(0), '', 'expected argument to be a string; found 0')
+      terror(
+        uspaces1(0),
+        '',
+        '[uspaces1]: expected argument to be a string; found 0',
+      )
     })
     it('fails if no whitespace is found', () => {
-      tfail(spaces1U(), '', 'one or more Unicode whitespace characters')
-      tfail(spaces1U(), 'abc', 'one or more Unicode whitespace characters')
-      tfail(spaces1U('test'), '', 'test')
-      tfail(spaces1U('test'), 'abc', 'test')
+      tfail(uspaces1(), '', 'one or more Unicode whitespace characters')
+      tfail(uspaces1(), 'abc', 'one or more Unicode whitespace characters')
+      tfail(uspaces1('test'), '', 'test')
+      tfail(uspaces1('test'), 'abc', 'test')
     })
     it('skips all whitespace until the first non-whitespace', () => {
-      tpass(spaces1U(), '\t\t\tabc', { result: null, index: 3 })
-      tpass(spaces1U(), '\n\nabc', { result: null, index: 2 })
-      tpass(spaces1U(), '\vabc', { result: null, index: 1 })
-      tpass(spaces1U(), '\f\f\f\fabc', { result: null, index: 4 })
-      tpass(spaces1U(), '\r\rabc', { result: null, index: 2 })
-      tpass(spaces1U(), ' abc', { result: null, index: 1 })
-      tpass(spaces1U(), '\u0085abc', { result: null, index: 2 })
-      tpass(spaces1U(), '\u00a0abc', { result: null, index: 2 })
-      tpass(spaces1U(), '\u1680abc', { result: null, index: 3 })
-      tpass(spaces1U(), '\u2000abc', { result: null, index: 3 })
-      tpass(spaces1U(), '\u2001abc', { result: null, index: 3 })
-      tpass(spaces1U(), '\u2002abc', { result: null, index: 3 })
-      tpass(spaces1U(), '\u2003abc', { result: null, index: 3 })
-      tpass(spaces1U(), '\u2004abc', { result: null, index: 3 })
-      tpass(spaces1U(), '\u2005abc', { result: null, index: 3 })
-      tpass(spaces1U(), '\u2006abc', { result: null, index: 3 })
-      tpass(spaces1U(), '\u2007abc', { result: null, index: 3 })
-      tpass(spaces1U(), '\u2008abc', { result: null, index: 3 })
-      tpass(spaces1U(), '\u2009abc', { result: null, index: 3 })
-      tpass(spaces1U(), '\u200aabc', { result: null, index: 3 })
-      tpass(spaces1U(), '\u2028abc', { result: null, index: 3 })
-      tpass(spaces1U(), '\u2029abc', { result: null, index: 3 })
-      tpass(spaces1U(), '\u202fabc', { result: null, index: 3 })
-      tpass(spaces1U(), '\u205fabc', { result: null, index: 3 })
-      tpass(spaces1U(), '\u3000abc', { result: null, index: 3 })
-      tpass(spaces1U('test'), '\t\t\tabc', { result: null, index: 3 })
+      tpass(uspaces1(), '\t\t\tabc', { result: null, index: 3 })
+      tpass(uspaces1(), '\n\nabc', { result: null, index: 2 })
+      tpass(uspaces1(), '\vabc', { result: null, index: 1 })
+      tpass(uspaces1(), '\f\f\f\fabc', { result: null, index: 4 })
+      tpass(uspaces1(), '\r\rabc', { result: null, index: 2 })
+      tpass(uspaces1(), ' abc', { result: null, index: 1 })
+      tpass(uspaces1(), '\u0085abc', { result: null, index: 2 })
+      tpass(uspaces1(), '\u00a0abc', { result: null, index: 2 })
+      tpass(uspaces1(), '\u1680abc', { result: null, index: 3 })
+      tpass(uspaces1(), '\u2000abc', { result: null, index: 3 })
+      tpass(uspaces1(), '\u2001abc', { result: null, index: 3 })
+      tpass(uspaces1(), '\u2002abc', { result: null, index: 3 })
+      tpass(uspaces1(), '\u2003abc', { result: null, index: 3 })
+      tpass(uspaces1(), '\u2004abc', { result: null, index: 3 })
+      tpass(uspaces1(), '\u2005abc', { result: null, index: 3 })
+      tpass(uspaces1(), '\u2006abc', { result: null, index: 3 })
+      tpass(uspaces1(), '\u2007abc', { result: null, index: 3 })
+      tpass(uspaces1(), '\u2008abc', { result: null, index: 3 })
+      tpass(uspaces1(), '\u2009abc', { result: null, index: 3 })
+      tpass(uspaces1(), '\u200aabc', { result: null, index: 3 })
+      tpass(uspaces1(), '\u2028abc', { result: null, index: 3 })
+      tpass(uspaces1(), '\u2029abc', { result: null, index: 3 })
+      tpass(uspaces1(), '\u202fabc', { result: null, index: 3 })
+      tpass(uspaces1(), '\u205fabc', { result: null, index: 3 })
+      tpass(uspaces1(), '\u3000abc', { result: null, index: 3 })
+      tpass(uspaces1('test'), '\t\t\tabc', { result: null, index: 3 })
     })
   })
 
   describe('newline', () => {
     it('throws if it has a non-string argument', () => {
-      terror(newline(0), '', 'expected argument to be a string; found 0')
+      terror(
+        newline(0),
+        '',
+        '[newline]: expected argument to be a string; found 0',
+      )
     })
     it('succeeds on a single newline', () => {
       tpass(newline(), '\nabc', '\n')
@@ -728,26 +756,30 @@ describe('Regular expression parsers', () => {
     })
   })
 
-  describe('newlineU', () => {
+  describe('unewline', () => {
     it('throws if it has a non-string argument', () => {
-      terror(newlineU(0), '', 'expected argument to be a string; found 0')
+      terror(
+        unewline(0),
+        '',
+        '[unewline]: expected argument to be a string; found 0',
+      )
     })
     it('succeeds on a single Unicode newline', () => {
-      tpass(newlineU(), '\nabc', '\n')
-      tpass(newlineU(), '\rabc', '\r')
-      tpass(newlineU(), '\r\nabc', '\r\n')
-      tpass(newlineU(), '\u0085abc', '\u0085')
-      tpass(newlineU(), '\u2028abc', '\u2028')
-      tpass(newlineU(), '\u2029abc', '\u2029')
-      tpass(newlineU('test'), '\nabc', '\n')
+      tpass(unewline(), '\nabc', '\n')
+      tpass(unewline(), '\rabc', '\r')
+      tpass(unewline(), '\r\nabc', '\r\n')
+      tpass(unewline(), '\u0085abc', '\u0085')
+      tpass(unewline(), '\u2028abc', '\u2028')
+      tpass(unewline(), '\u2029abc', '\u2029')
+      tpass(unewline('test'), '\nabc', '\n')
     })
     it('fails on any other character combination', () => {
-      tfail(newlineU(), 'Onoma', 'a Unicode newline')
-      tfail(newlineU('test'), 'Onoma', 'test')
+      tfail(unewline(), 'Onoma', 'a Unicode newline')
+      tfail(unewline('test'), 'Onoma', 'test')
     })
     it('fails at EOF', () => {
-      tfail(newlineU(), '', 'a Unicode newline')
-      tfail(newlineU('test'), '', 'test')
+      tfail(unewline(), '', 'a Unicode newline')
+      tfail(unewline('test'), '', 'test')
     })
   })
 })
