@@ -4,7 +4,7 @@
 // https://opensource.org/licenses/MIT
 
 import { parser } from './core'
-import { charLength, enumerate, ordinal, stringify, wordinal } from './util'
+import { charLength, stringify, wordinal } from './util'
 
 /**
  * Generates a formatter function out of a type.
@@ -59,25 +59,6 @@ export const argStrArrFormatter = (order = 1, multiple = false) =>
   argFormatter('a string or an array of characters', order, multiple)
 export const argStrRegFormatter = (order = 1, multiple = false) =>
   argFormatter('a string or a regular expression', order, multiple)
-
-/**
- * Generates a formatter function out of a type and a position.
- *
- * @param {string} type The type that the value should be.
- * @param {string} ord The position of the value within aan argument
- *     list, a block of code, etc.
- * @returns {function(*):string} A function that accepts a value of any
- *     type and returns a string incorporating that value.
- */
-export const ordFormatter = (type, ord) => value =>
-  `expected ${ord} argument to be ${type}; found ${stringify(value)}`
-
-export const ordCharFormatter = ord =>
-  ordFormatter('a one-character string', ord)
-export const ordFnFormatter = ord => ordFormatter('a function', ord)
-export const ordNumFormatter = ord => ordFormatter('a number', ord)
-export const ordParFormatter = ord => ordFormatter('a parser', ord)
-export const ordStrFormatter = ord => ordFormatter('a string', ord)
 
 /**
  * @param {string} name
@@ -211,17 +192,5 @@ export function assertNumber(name, value, formatter = numFormatter) {
 export function assertParser(name, value, formatter = parFormatter) {
   if (typeof value !== 'function' || !parser.created(value)) {
     failAssert(name, value, formatter)
-  }
-}
-
-/**
- * Asserts that an array contains only parsers.
- *
- * @param {string} name The name of the function making the assertion.
- * @param {*[]} values The array of values being checked.
- */
-export function assertParsers(name, values) {
-  for (const [i, value] of enumerate(values)) {
-    assertParser(name, value, ordParFormatter(ordinal(i + 1)))
   }
 }
