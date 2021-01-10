@@ -74,7 +74,7 @@ export const opt = (p, m) => parser(ctx => {
 
   const [prep, [pctx, pres]] = dup(p(ctx))
   if (pres.status === Ok) return prep
-  const errors = hasM ? expected(m) : pres.errors
+  const errors = ferror(m, pres.errors)
   if (pres.status === Fatal) return fatalReply(pctx, errors)
 
   // If the optional parser fails, we add the error message even though

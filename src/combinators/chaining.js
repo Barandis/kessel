@@ -16,8 +16,8 @@ import {
   formatter,
 } from 'kessel/assert'
 import { okReply, parser, Status } from 'kessel/core'
-import { expected, merge } from 'kessel/error'
-import { dup, replyFn } from 'kessel/util'
+import { merge } from 'kessel/error'
+import { dup, ferror, replyFn } from 'kessel/util'
 
 const { Ok, Fatal } = Status
 
@@ -45,7 +45,7 @@ export const join = (p, m) => parser(ctx => {
   const [pctx, pres] = p(ctx)
   if (pres.status !== Ok) {
     const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, hasM ? expected(m) : pres.errors)
+    return fn(pctx, ferror(m, pres.errors))
   }
 
   const v = pres.value
@@ -75,7 +75,7 @@ export const flat = (p, m) => parser(ctx => {
   const [pctx, pres] = p(ctx)
   if (pres.status !== Ok) {
     const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, hasM ? expected(m) : pres.errors)
+    return fn(pctx, ferror(m, pres.errors))
   }
 
   const v = pres.value
@@ -104,7 +104,7 @@ export const compact = (p, m) => parser(ctx => {
   const [pctx, pres] = p(ctx)
   if (pres.status !== Ok) {
     const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, hasM ? expected(m) : pres.errors)
+    return fn(pctx, ferror(m, pres.errors))
   }
 
   const v = pres.value
@@ -133,7 +133,7 @@ export const value = (p, x, m) => parser(ctx => {
   const [pctx, pres] = p(ctx)
   if (pres.status !== Ok) {
     const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, hasM ? expected(m) : pres.errors)
+    return fn(pctx, ferror(m, pres.errors))
   }
   return okReply(pctx, x)
 })
@@ -159,7 +159,7 @@ export const nth = (p, n, m) => parser(ctx => {
   const [pctx, pres] = p(ctx)
   if (pres.status !== Ok) {
     const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, hasM ? expected(m) : pres.errors)
+    return fn(pctx, ferror(m, pres.errors))
   }
 
   const v = pres.value
@@ -189,7 +189,7 @@ export const first = (p, m) => parser(ctx => {
   const [pctx, pres] = p(ctx)
   if (pres.status !== Ok) {
     const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, hasM ? expected(m) : pres.errors)
+    return fn(pctx, ferror(m, pres.errors))
   }
 
   const v = pres.value
@@ -217,7 +217,7 @@ export const second = (p, m) => parser(ctx => {
   const [pctx, pres] = p(ctx)
   if (pres.status !== Ok) {
     const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, hasM ? expected(m) : pres.errors)
+    return fn(pctx, ferror(m, pres.errors))
   }
 
   const v = pres.value
@@ -245,7 +245,7 @@ export const third = (p, m) => parser(ctx => {
   const [pctx, pres] = p(ctx)
   if (pres.status !== Ok) {
     const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, hasM ? expected(m) : pres.errors)
+    return fn(pctx, ferror(m, pres.errors))
   }
 
   const v = pres.value
@@ -273,7 +273,7 @@ export const fourth = (p, m) => parser(ctx => {
   const [pctx, pres] = p(ctx)
   if (pres.status !== Ok) {
     const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, hasM ? expected(m) : pres.errors)
+    return fn(pctx, ferror(m, pres.errors))
   }
 
   const v = pres.value
@@ -301,7 +301,7 @@ export const fifth = (p, m) => parser(ctx => {
   const [pctx, pres] = p(ctx)
   if (pres.status !== Ok) {
     const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, hasM ? expected(m) : pres.errors)
+    return fn(pctx, ferror(m, pres.errors))
   }
 
   const v = pres.value
@@ -338,7 +338,7 @@ export const map = (p, fn, m) => parser(ctx => {
   const [pctx, pres] = p(ctx)
   if (pres.status !== Ok) {
     const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, hasM ? expected(m) : pres.errors)
+    return fn(pctx, ferror(m, pres.errors))
   }
   return okReply(pctx, fn(pres.value))
 })
@@ -370,18 +370,17 @@ export const apply = (p, q, m) => parser(ctx => {
   ASSERT && hasM && assertString('apply', m, argStrFormatter(3, true))
 
   const index = ctx.index
-  const merror = expected(m)
 
   const [pctx, pres] = p(ctx)
   if (pres.status !== Ok) {
     const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, hasM ? merror : pres.errors)
+    return fn(pctx, ferror(m, pres.errors))
   }
 
   const [qctx, qres] = q(pctx)
   if (qres.status !== Ok) {
     const fn = replyFn(qres.status === Fatal || qctx.index !== index)
-    return fn(qctx, hasM ? merror : merge(pres.errors, qres.errors))
+    return fn(qctx, ferror(m, merge(pres.errors, qres.errors)))
   }
 
   const fn = qres.value
@@ -422,12 +421,11 @@ export const chain = (p, fn, m) => parser(ctx => {
   ASSERT && hasM && assertString('chain', m, argStrFormatter(3, true))
 
   const index = ctx.index
-  const merror = expected(m)
 
   const [pctx, pres] = p(ctx)
   if (pres.status !== Ok) {
     const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, hasM ? merror : pres.errors)
+    return fn(pctx, ferror(m, pres.errors))
   }
 
   const q = fn(pres.value)
@@ -438,7 +436,7 @@ export const chain = (p, fn, m) => parser(ctx => {
   const [qrep, [qctx, qres]] = dup(q(pctx))
   if (qres.status !== Ok) {
     const fn = replyFn(qres.status === Fatal || qctx.index !== index)
-    return fn(qctx, hasM ? merror : merge(pres.errors, qres.errors))
+    return fn(qctx, ferror(m, merge(pres.errors, qres.errors)))
   }
   return qrep
 })
