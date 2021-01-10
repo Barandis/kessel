@@ -45,7 +45,7 @@ export {
 } from './parsers/regex'
 export {
   all,
-  anyString,
+  anystr,
   str,
   strI,
 } from './parsers/string'

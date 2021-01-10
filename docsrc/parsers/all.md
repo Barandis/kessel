@@ -26,5 +26,5 @@ console.log(success(s)) // "content"
 #### See Also
 
 * [`Parser`](../types/parser.md)
-* [`anyString`](anystring.md)
+* [`anystr`](anystr.md)
 * [`eof`](eof.md)

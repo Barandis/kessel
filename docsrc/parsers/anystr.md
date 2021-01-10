@@ -5,14 +5,14 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `anyString(n: number): Parser<string>`
+> `anystr(n: number, m?: string): Parser`
 
 Parses a string that is `n` characters long.
 
 #### Example
 
 ```javascript
-const parser = anyString(3)
+const parser = anystr(3)
 
 const s = parse(parser, 'abcdef')
 console.log(status(s))  // "ok"
@@ -30,6 +30,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 #### Parameters
 
 * `n`: The number of characters to read.
+* `m`: The optional expected error message that will take the place of the default error message.
 
 #### Success
 
@@ -42,6 +43,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 #### Throws
 
 * Throws an error if `n` is not a number.
+* Throws an error if `m` exists and is not a string.
 
 #### See Also
 

@@ -44,7 +44,7 @@ nav:
       - alt: parsers/alt.md
       - always: parsers/always.md
       - any: parsers/any.md
-      - anyString: parsers/anystring.md
+      - anystr: parsers/anystr.md
       - apply: parsers/apply.md
       - applyB: parsers/applyb.md
       - assoc1L: parsers/assoc1l.md

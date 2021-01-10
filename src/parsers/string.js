@@ -3,7 +3,12 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { argStrFormatter, assertNumber, assertString } from 'kessel/assert'
+import {
+  argNumFormatter,
+  argStrFormatter,
+  assertNumber,
+  assertString,
+} from 'kessel/assert'
 import { failReply, okReply, parser, Status } from 'kessel/core'
 import { expecteds } from 'kessel/messages'
 import { charLength, dup, ferror, nextChars, viewToString } from 'kessel/util'
@@ -104,9 +109,10 @@ export const strI = (s, m) => parser(ctx => {
  * A parser that reads the remainder of the input text and results in
  * that text. Succeeds if already at EOF, resulting in an empty string.
  *
- * @type {Parser}
+ * @returns {Parser} A parser that will always succeed and returns the
+ *     remainder of the input.
  */
-export const all = parser(ctx => {
+export const all = () => parser(ctx => {
   const { index, view } = ctx
   const width = view.byteLength - index
   return okReply(ctx, viewToString(index, width, view), index + width)
@@ -118,12 +124,19 @@ export const all = parser(ctx => {
  * many characters left to read.
  *
  * @param {number} n The number of characters to read.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser that reads that many characters and joins
  *     them into a string for its result.
  */
-export const anyString = n => parser(ctx => {
-  ASSERT && assertNumber('anyString', n)
+export const anystr = (n, m) => parser(ctx => {
+  const hasM = m != null
 
-  const [sprep, [spctx, spres]] = dup(stringParser(n, () => true)(ctx))
-  return spres.status === Ok ? sprep : failReply(spctx, expecteds.anyString(n))
+  ASSERT && assertNumber('anystr', n, argNumFormatter(1, hasM))
+  ASSERT && hasM && assertString('anystr', m, argStrFormatter(2, true))
+
+  const [srep, [sctx, sres]] = dup(stringParser(n, () => true)(ctx))
+  return sres.status === Ok
+    ? srep
+    : failReply(sctx, ferror(m, expecteds.anystr(n)))
 })

@@ -3,7 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { all, anyString, str, strI } from 'kessel/parsers/string'
+import { all, anystr, str, strI } from 'kessel/parsers/string'
 import { terror, tfail, tpass } from 'test/helper'
 
 describe('String parsers', () => {
@@ -216,43 +216,70 @@ describe('String parsers', () => {
 
   describe('all', () => {
     it('results in all remaining 1-byte characters', () => {
-      tpass(all, 'Onomatopoeia', { result: 'Onomatopoeia', index: 12 })
+      tpass(all(), 'Onomatopoeia', { result: 'Onomatopoeia', index: 12 })
     })
     it('results in all remaining 2-byte characters', () => {
-      tpass(all, 'Звукоподражание', { result: 'Звукоподражание', index: 30 })
+      tpass(all(), 'Звукоподражание', { result: 'Звукоподражание', index: 30 })
     })
     it('results in all remaining 3-byte characters', () => {
-      tpass(all, 'คำเลียนเสียง', { result: 'คำเลียนเสียง', index: 36 })
+      tpass(all(), 'คำเลียนเสียง', { result: 'คำเลียนเสียง', index: 36 })
     })
     it('results in all remaining 4-byte characters', () => {
-      tpass(all, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', index: 48 })
+      tpass(all(), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', index: 48 })
     })
     it('succeeds at EOF', () => {
-      tpass(all, '', { result: '', index: 0 })
+      tpass(all(), '', { result: '', index: 0 })
     })
   })
 
-  describe('anyString', () => {
-    it('throws if its argument is not a number', () => {
-      terror(anyString('0'), '', '[anyString]: expected a number; found "0"')
+  describe('anystr', () => {
+    it('throws if its first argument is not a number', () => {
+      terror(
+        anystr('0'),
+        '',
+        '[anystr]: expected argument to be a number; found "0"',
+      )
+      terror(
+        anystr('0', 'test'),
+        '',
+        '[anystr]: expected first argument to be a number; found "0"',
+      )
+    })
+    it('throws if its second argument exists and is not a string', () => {
+      terror(
+        anystr(0, 0),
+        '',
+        '[anystr]: expected second argument to be a string; found 0',
+      )
     })
     it('succeeds if there are more 1-byte characters than it reads', () => {
-      tpass(anyString(5), 'Onomatopoeia', { result: 'Onoma', index: 5 })
+      tpass(anystr(5), 'Onomatopoeia', { result: 'Onoma', index: 5 })
+      tpass(anystr(5, 'test'), 'Onomatopoeia', { result: 'Onoma', index: 5 })
     })
     it('succeeds if there are more 2-byte characters than it reads', () => {
-      tpass(anyString(5), 'Звукоподражание', { result: 'Звуко', index: 10 })
+      tpass(anystr(5), 'Звукоподражание', { result: 'Звуко', index: 10 })
+      tpass(anystr(5, 'test'), 'Звукоподражание', {
+        result: 'Звуко',
+        index: 10,
+      })
     })
     it('succeeds if there are more 3-byte characters than it reads', () => {
-      tpass(anyString(5), 'คำเลียนเสียง', { result: 'คำเลี', index: 15 })
+      tpass(anystr(5), 'คำเลียนเสียง', { result: 'คำเลี', index: 15 })
+      tpass(anystr(5, 'test'), 'คำเลียนเสียง', { result: 'คำเลี', index: 15 })
     })
     it('succeeds if there are more 4-byte characters than it reads', () => {
-      tpass(anyString(5), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂𝑛𝑜𝑚𝑎', index: 20 })
+      tpass(anystr(5), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂𝑛𝑜𝑚𝑎', index: 20 })
+      tpass(anystr(5, 'test'), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', {
+        result: '𝑂𝑛𝑜𝑚𝑎',
+        index: 20,
+      })
     })
     it('fails if there aren\'t enough characters remaining', () => {
-      tfail(anyString(5), 'Ono', {
+      tfail(anystr(5), 'Ono', {
         expected: 'a string of 5 characters',
         index: 0,
       })
+      tfail(anystr(5, 'test'), 'Ono', { expected: 'test', index: 0 })
     })
   })
 })
