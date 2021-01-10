@@ -2005,7 +2005,7 @@
 -->
 
 <p>For convenience, let's reprint the successful <a href="../../tools/parse/"><code>parse</code></a> example from the last page.</p>
-<div class="highlight"><pre><span></span><code>&gt; K.parse(K.letter, &#39;abcdef&#39;)
+<div class="highlight"><pre><span></span><code>&gt; K.parse(K.letter(), &#39;abcdef&#39;)
 [
   {
     view: DataView { byteLength: 6, byteOffset: 0, buffer: [ArrayBuffer] },
@@ -2033,7 +2033,7 @@
 }
 </code></pre></div>
 There it is, it's the <code>buffer</code> property <code>view</code> property in the context. An <code>ArrayBuffer</code> object is a byte array, and this one happens to hold UTF-8 encoded bytes. Let's look a little closer, since this view doesn't show us much about it.</p>
-<div class="highlight"><pre><span></span><code>&gt; const [ctx1, res1] = K.parse(K.letter, &#39;abcdef&#39;)
+<div class="highlight"><pre><span></span><code>&gt; const [ctx1, res1] = K.parse(K.letter(), &#39;abcdef&#39;)
 undefined
 &gt; ctx1.view.buffer
 ArrayBuffer { [Uint8Contents]: &lt;61 62 63 64 65 66&gt;, byteLength: 6 }
@@ -2041,7 +2041,7 @@ ArrayBuffer { [Uint8Contents]: &lt;61 62 63 64 65 66&gt;, byteLength: 6 }
 <p><em>There's</em> the text! The contents of the array buffer are six numbers, which just happen to be (in hexadecimal) the UTF-8 code points for the letters <code>'abcdef'</code>. Mystery solved.<sup id="fnref:jsabcdef"><a class="footnote-ref" href="#fn:jsabcdef">2</a></sup> <sup id="fnref:russian"><a class="footnote-ref" href="#fn:russian">3</a></sup></p>
 <p>As for the rest of the context &mdash; well, there's just the <code>index</code>. It just points at the byte that is the next to be read when the next parser is applied. The byte array itself doesn't change once the context is created, so rather than stripping bytes off the front (as in the simple example at the start of <a href="../ch-01/">Chapter 1</a>), this <code>index</code> is simply updated.</p>
 <p>As a final note about context, let's see what happens to <code>index</code> in a parse failure.</p>
-<div class="highlight"><pre><span></span><code>&gt; K.parse(K.letter, &#39;123456&#39;)
+<div class="highlight"><pre><span></span><code>&gt; K.parse(K.letter(), &#39;123456&#39;)
 [
   {
     view: DataView { byteLength: 6, byteOffset: 0, buffer: [ArrayBuffer] },
@@ -2060,7 +2060,7 @@ ArrayBuffer { [Uint8Contents]: &lt;61 62 63 64 65 66&gt;, byteLength: 6 }
 <div class="highlight"><pre><span></span><code>{ status: &#39;fail&#39;, errors: [ [Object] ] }
 </code></pre></div>
 <p>This time, the <code>status</code> again tells us how it all worked out, in this case that the parse failed. With failure, there is no <code>value</code> property; in its place is <code>errors</code>, which is an array of objects describing errors that happened in the parse (there can be more than one, but there was not in this case.) Here's a closer look at the object in that <code>errors</code> property.</p>
-<div class="highlight"><pre><span></span><code>&gt; const [ctx2, res2] = K.parse(K.letter, &#39;123456&#39;)
+<div class="highlight"><pre><span></span><code>&gt; const [ctx2, res2] = K.parse(K.letter(), &#39;123456&#39;)
 undefined
 &gt; res2.errors[0]
 { type: &#39;expected&#39;, label: &#39;a letter&#39; }
@@ -2094,8 +2094,8 @@ undefined
 <p>JavaScript would encode this same string as <code>&lt;61 00 62 00 63 00 64 00 65 00 66 00&gt;</code>.&#160;<a class="footnote-backref" href="#fnref:jsabcdef" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
 <li id="fn:russian">
-<p>To show how UTF-8 works, here's the same sort of thing, except using the first six letters of the <em>Russian</em> (Cyrillic) alphabet:</p>
-<div class="highlight"><pre><span></span><code>&gt; const [ctxr, resr] = K.parse(K.letter, &#39;абвгде&#39;)
+<p>To show how UTF-8 works, here's the same sort of thing, except using the first six letters of the <em>Russian</em> (Cyrillic) alphabet (this uses <a href="../../parsers/uletter/"><code>uletter</code></a> because <code>letter</code> only succeeds with ASCII letters):</p>
+<div class="highlight"><pre><span></span><code>&gt; const [ctxr, resr] = K.parse(K.uletter(), &#39;абвгде&#39;)
 undefined
 &gt; ctxr.view.buffer
 ArrayBuffer {
@@ -2107,8 +2107,8 @@ ArrayBuffer {
 <p>A JavaScript string with the same content would be encoded <code>&lt;30 04 31 04 32 04 33 04 34 04 35 04&gt;</code>. Even though these particular characters are the same length in both encodings, the encoding values are entirely different.&#160;<a class="footnote-backref" href="#fnref:russian" title="Jump back to footnote 3 in the text">&#8617;</a></p>
 </li>
 <li id="fn:byteindex">
-<p>Alright, <em>one</em> more thing about <code>index</code>: it is a <em>byte</em> index, not a <em>character</em> index. Let's see how it works in that Russian text again (this uses <a href="../../parsers/uletter/"><code>uletter</code></a> because <code>letter</code> only succeeds with ASCII letters).</p>
-<div class="highlight"><pre><span></span><code>&gt; K.parse(K.uletter, &#39;абвгде&#39;)
+<p>Alright, <em>one</em> more thing about <code>index</code>: it is a <em>byte</em> index, not a <em>character</em> index. Let's see how it works in that Russian text again.</p>
+<div class="highlight"><pre><span></span><code>&gt; K.parse(K.uletter(), &#39;абвгде&#39;)
 [
   {
     view: DataView { byteLength: 12, byteOffset: 0, buffer: [ArrayBuffer] },

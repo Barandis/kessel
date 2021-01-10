@@ -2004,7 +2004,7 @@ undefined
 <p>And we're ready to go. This is the way I'm running every example in this user's guide and in the tutorial. There are lots of different ways to run JavScripot code and you can run it any way you want...load it into a browser via a local webpage, write and execute scripts, however you like.</p>
 <h2 id="running-a-parser">Running a parser</h2>
 <p>Let's run a simple parser.</p>
-<div class="highlight"><pre><span></span><code>&gt; K.run(K.letter, &#39;abcdef&#39;)
+<div class="highlight"><pre><span></span><code>&gt; K.run(K.letter(), &#39;abcdef&#39;)
 &#39;a&#39;
 </code></pre></div>
 <p><code>run</code> executes the <code>letter</code> parser against the input, and <code>letter</code> matches the first character, which <code>run</code> returns.</p>
@@ -2013,13 +2013,13 @@ undefined
 <div class="highlight"><pre><span></span><code>const { run, letter } = require(&#39;./lib/kessel&#39;)
 </code></pre></div>
 <p>Then you could call the parsers and functions without the <code>K</code> prefix.</p>
-<div class="highlight"><pre><span></span><code>&gt; run(letter, &#39;abcdef&#39;)
+<div class="highlight"><pre><span></span><code>&gt; run(letter(), &#39;abcdef&#39;)
 &#39;a&#39;
 </code></pre></div>
 <p>This is the way I normally write JavaScript code. However, when working in a REPL as we are here, it's not very convenient to have to know exactly which library functions you're going to use at the very beginning, so we import them all into <code>K</code> and use them from there.</p>
 </details>
 <p>What if the parser fails?</p>
-<div class="highlight"><pre><span></span><code>&gt; K.run(K.letter, &#39;123456&#39;)
+<div class="highlight"><pre><span></span><code>&gt; K.run(K.letter(), &#39;123456&#39;)
 Uncaught Error: Parse error at (line 1, column 1):
 
 123456
@@ -2031,7 +2031,7 @@ Expected a letter
 <p>So after all of the talk in <a href="../ch-01/">Chapter 1</a> about <em>contexts</em>, we come over here and see no hint of a context at all when we're running our first parser. Well, that is the way of things. Contexts are handled transparently. <code>run</code> creates the context out of the input text you give to it, and even when we get to composite parsers, we'll see that the context gets passed from parser to parser without us ever even having to see it. You can write an extraordinarily complex parser with Kessel and never even have to know that contexts exist.</p>
 <p>But <code>run</code> isn't the only game in town. In fact, <code>run</code> is pretty quick and dirty, either returning a successful result or just bailing with an exception. Oftentimes we would like more control than that. That's where <a href="../../tools/parse/"><code>parse</code></a> comes in.</p>
 <p><code>parse</code> does everything <em>almost</em> the same as <code>run</code>. It accepts the same arguments (a parser and some input text), it creates the context in the background, it executes the parser against that context. The difference is in what it returns.</p>
-<div class="highlight"><pre><span></span><code>&gt; K.parse(K.letter, &#39;abcdef&#39;)
+<div class="highlight"><pre><span></span><code>&gt; K.parse(K.letter(), &#39;abcdef&#39;)
 [
   {
     view: DataView { byteLength: 6, byteOffset: 0, buffer: [ArrayBuffer] },
@@ -2040,9 +2040,9 @@ Expected a letter
   { status: &#39;ok&#39;, value: &#39;a&#39; }
 ]
 </code></pre></div>
-<p>Alright, so that's a little more involved than the <code>'a'</code> that <code>run</code> returned. Given a little thought, you might guess that what we have here is the infamous <code>[Context, Result&lt;T&gt;]</code> tuple that we talked about in <a href="../ch-01/">Chapter 1</a>, and you would be right. <code>parse</code> basically takes the output tuple that its parser returns and passes it right along to us.</p>
+<p>Alright, so that's a little more involved than the <code>'a'</code> that <code>run</code> returned. Given a little thought, you might guess that what we have here is the infamous <code>[Context, Result]</code> tuple that we talked about in <a href="../ch-01/">Chapter 1</a>, and you would be right. <code>parse</code> basically takes the output tuple that its parser returns and passes it right along to us.</p>
 <p>This is <em>really</em> notable when we run a parser that fails. <code>run</code> throws an exception, but <code>parse</code> is a different story.</p>
-<div class="highlight"><pre><span></span><code>&gt; K.parse(K.letter, &#39;123456&#39;)
+<div class="highlight"><pre><span></span><code>&gt; K.parse(K.letter(), &#39;123456&#39;)
 [
   {
     view: DataView { byteLength: 6, byteOffset: 0, buffer: [ArrayBuffer] },
