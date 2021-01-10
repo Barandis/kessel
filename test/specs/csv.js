@@ -17,11 +17,11 @@ import {
   second,
   sepby,
   seqB,
-  string,
+  str,
   value,
 } from 'kessel'
 
-const quotedChar = alt(noneof('"'), value(string('""'), '"'))
+const quotedChar = alt(noneof('"'), value(str('""'), '"'))
 
 const quotedCell = second(seqB(
   char('"'),
@@ -38,7 +38,7 @@ const parseCsv = input => run(csv, input)
 const parseCsv1 = input => run(endby(sepby(alt(
   second(seqB(
     char('"'),
-    join(many(alt(noneof('"'), value(string('""'), '"')))),
+    join(many(alt(noneof('"'), value(str('""'), '"')))),
     char('"', 'quote at end of cell'),
   )), join(many(noneof(',\n\r'))),
 ), char(',')), newline()), input)

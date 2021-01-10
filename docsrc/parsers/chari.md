@@ -50,4 +50,4 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 * [`Parser`](../types/parser.md)
 * [`any`](any.md)
 * [`char`](char.md)
-* [`stringI`](stringi.md)
+* [`strI`](stri.md)

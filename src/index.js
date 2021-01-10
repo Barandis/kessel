@@ -46,8 +46,8 @@ export {
 export {
   all,
   anyString,
-  string,
-  stringI,
+  str,
+  strI,
 } from './parsers/string'
 
 ///////////////////////////////////////////////////////////////////////

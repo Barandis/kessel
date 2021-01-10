@@ -52,8 +52,8 @@ Additionally, parsers are often said to *return* a value or to have a value as a
 
 | Parser | Description |
 |--------|-------------|
-| [`string`](parsers/string.md) | Parses a string. |
-| [`stringI`](parsers/stringi.md) | Parses a string, but without case sensitivity. |
+| [`str`](parsers/str.md) | Parses a string. |
+| [`strI`](parsers/stri.md) | Parses a string, but without case sensitivity. |
 | [`regex`](parsers/regex.md) | Parses a string matching a regular expression pattern. |
 | [`all`](parsers/all.md) | Parses the remainder of the input as a string. |
 | [`anyString`](parsers/anystring.md) | Parses a string of a certain number of characters. |

@@ -26,7 +26,7 @@ import { ErrorType } from 'kessel/error'
 import { any, char, digit, eof, letter, noneof } from 'kessel/parsers/char'
 import { always } from 'kessel/parsers/misc'
 import { space } from 'kessel/parsers/regex'
-import { string } from 'kessel/parsers/string'
+import { str } from 'kessel/parsers/string'
 import { terror, tfail, tpass } from 'test/helper'
 
 const { Fail, Fatal } = Status
@@ -67,12 +67,12 @@ describe('Backtracking and error handling combinators', () => {
       tfail(attempt(char('a'), 'letter a'), 'bcd', 'letter a')
     })
     it('resets the index if its parser fails with consuming input', () => {
-      const parser = seq(string('te'), string('st'))
+      const parser = seq(str('te'), str('st'))
       tfail(parser, 'tesl', { index: 2, status: Fatal })
       tfail(attempt(parser), 'tesl', { index: 0, status: Fail })
     })
     it('creates a nested error if it fails while consuming input', () => {
-      const parser = seq(string('te'), string('st'))
+      const parser = seq(str('te'), str('st'))
       const [ctx, result] = parse(attempt(parser), 'tesl')
       const error = result.errors[0]
 
@@ -109,9 +109,9 @@ describe('Backtracking and error handling combinators', () => {
   })
 
   describe('seqB', () => {
-    const parser = seqB(string('abc'), string('def'), string('ghi'))
+    const parser = seqB(str('abc'), str('def'), str('ghi'))
     const parserm = seqB(
-      string('abc'), string('def'), string('ghi'), 'abc,def,ghi',
+      str('abc'), str('def'), str('ghi'), 'abc,def,ghi',
     )
 
     it('throws if any of its arguments is not a parser', () => {
@@ -163,7 +163,7 @@ describe('Backtracking and error handling combinators', () => {
       tpass(parserm, 'abcdefghi', { result: ['abc', 'def', 'ghi'], index: 9 })
     })
     it('adds null to results', () => {
-      tpass(seqB(string('abc'), eof()), 'abc', {
+      tpass(seqB(str('abc'), eof()), 'abc', {
         result: ['abc', null],
         index: 3,
       })

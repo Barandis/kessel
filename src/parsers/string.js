@@ -3,10 +3,10 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { assertNumber, assertString } from 'kessel/assert'
+import { argStrFormatter, assertNumber, assertString } from 'kessel/assert'
 import { failReply, okReply, parser, Status } from 'kessel/core'
 import { expecteds } from 'kessel/messages'
-import { charLength, dup, nextChars, viewToString } from 'kessel/util'
+import { charLength, dup, ferror, nextChars, viewToString } from 'kessel/util'
 
 const { Ok } = Status
 
@@ -47,21 +47,28 @@ const stringParser = (length, fn) => parser(ctx => {
  * exact (it is case-sensitive), and all UTF-8 characters are recognized
  * properly.
  *
- * If `str` is empty, the parser will automatically succeed. If it is
+ * If `s` is empty, the parser will automatically succeed. If it is
  * longer than the remaining input, the parser will automatically fail.
  *
- * @param {string} str The string to compare against the next characters
+ * @param {string} s The string to compare against the next characters
  *     of the input.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser that will succeed if the supplied string
  *     matches the next characters in the input.
  */
-export const string = str => parser(ctx => {
-  ASSERT && assertString('string', str)
+export const str = (s, m) => parser(ctx => {
+  const hasM = m != null
 
-  const [sprep, [spctx, spres]] = dup(stringParser(
-    charLength(str), chars => str === chars,
+  ASSERT && assertString('str', s, argStrFormatter(1, hasM))
+  ASSERT && hasM && assertString('str', m, argStrFormatter(2, true))
+
+  const [srep, [sctx, sres]] = dup(stringParser(
+    charLength(s), chars => s === chars,
   )(ctx))
-  return spres.status === Ok ? sprep : failReply(spctx, expecteds.string(str))
+  return sres.status === Ok
+    ? srep
+    : failReply(sctx, ferror(m, expecteds.str(s)))
 })
 
 /**
@@ -72,18 +79,25 @@ export const string = str => parser(ctx => {
  * If `str` is empty, the parser will automatically succeed. If it is
  * longer than the remaining input, the parser will automatically fail.
  *
- * @param {string} str The string to compare against the next characters
+ * @param {string} s The string to compare against the next characters
  *     of the input.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
  * @returns {Parser} A parser that will succeed if the supplied string
  *     case-insensitively matches the next characters in the input.
  */
-export const stringI = str => parser(ctx => {
-  ASSERT && assertString('stringI', str)
+export const strI = (s, m) => parser(ctx => {
+  const hasM = m != null
 
-  const [sprep, [spctx, spres]] = dup(stringParser(
-    charLength(str), chars => str.toLowerCase() === chars.toLowerCase(),
+  ASSERT && assertString('strI', s, argStrFormatter(1, hasM))
+  ASSERT && hasM && assertString('strI', m, argStrFormatter(2, true))
+
+  const [srep, [sctx, sres]] = dup(stringParser(
+    charLength(s), chars => s.toLowerCase() === chars.toLowerCase(),
   )(ctx))
-  return spres.status === Ok ? sprep : failReply(spctx, expecteds.stringI(str))
+  return sres.status === Ok
+    ? srep
+    : failReply(sctx, ferror(m, expecteds.strI(s)))
 })
 
 /**

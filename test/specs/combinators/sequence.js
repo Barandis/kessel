@@ -29,18 +29,18 @@ import {
 import { Status } from 'kessel/core'
 import { any, char, digit, eof, letter, noneof } from 'kessel/parsers/char'
 import { space } from 'kessel/parsers/regex'
-import { string } from 'kessel/parsers/string'
+import { str } from 'kessel/parsers/string'
 import { terror, tfail, tpass } from 'test/helper'
 
 const { Fail, Fatal } = Status
 
 describe('Sequence combinators', () => {
   describe('seq', () => {
-    const parser = seq(string('abc'), string('def'), string('ghi'))
+    const parser = seq(str('abc'), str('def'), str('ghi'))
     const parserm = seq(
-      string('abc'),
-      string('def'),
-      string('ghi'),
+      str('abc'),
+      str('def'),
+      str('ghi'),
       "'abcdefghi'",
     )
 
@@ -77,7 +77,7 @@ describe('Sequence combinators', () => {
       tpass(parserm, 'abcdefghi', { result: ['abc', 'def', 'ghi'], index: 9 })
     })
     it('adds null to results', () => {
-      tpass(seq(string('abc'), eof()), 'abc', {
+      tpass(seq(str('abc'), eof()), 'abc', {
         result: ['abc', null],
         index: 3,
       })
@@ -106,7 +106,7 @@ describe('Sequence combinators', () => {
 
   describe('block', () => {
     const parser = block(function *() {
-      yield string('abc')
+      yield str('abc')
       yield space()
       const c = yield any()
       yield space()
@@ -114,7 +114,7 @@ describe('Sequence combinators', () => {
       return c
     })
     const parserm = block(function *() {
-      yield string('abc')
+      yield str('abc')
       yield space()
       const c = yield any()
       yield space()
@@ -365,7 +365,7 @@ describe('Sequence combinators', () => {
     })
     it('propagates failures without modification', () => {
       tfail(skip(char('a')), '123', { expected: "'a'", status: Fail })
-      tfail(skip(seq(string('ab'), string('cd'))), 'abce', {
+      tfail(skip(seq(str('ab'), str('cd'))), 'abce', {
         expected: "'cd'",
         status: Fatal,
       })
@@ -373,7 +373,7 @@ describe('Sequence combinators', () => {
         expected: "an 'a'",
         status: Fail,
       })
-      tfail(skip(seq(string('ab'), string('cd')), "'abcd'"), 'abce', {
+      tfail(skip(seq(str('ab'), str('cd')), "'abcd'"), 'abce', {
         expected: "'abcd'",
         status: Fatal,
       })
@@ -461,7 +461,7 @@ describe('Sequence combinators', () => {
     })
     it('throws if an infinite loop was detected', () => {
       terror(
-        sepby(string(''), string('')),
+        sepby(str(''), str('')),
         'abc',
         '[sepby]: infinite loop detected; '
           + 'neither content nor separator parser consumed input',
@@ -558,7 +558,7 @@ describe('Sequence combinators', () => {
     })
     it('throws if an infinite loop was detected', () => {
       terror(
-        sepby1(string(''), string('')),
+        sepby1(str(''), str('')),
         'abc',
         '[sepby1]: infinite loop detected; '
           + 'neither content nor separator parser consumed input',
@@ -647,7 +647,7 @@ describe('Sequence combinators', () => {
     })
     it('throws if an infinite loop was detected', () => {
       terror(
-        endby(string(''), string('')),
+        endby(str(''), str('')),
         'abc',
         '[endby]: infinite loop detected; '
           + 'neither content nor separator parser consumed input',
@@ -744,7 +744,7 @@ describe('Sequence combinators', () => {
     })
     it('throws if an infinite loop was detected', () => {
       terror(
-        endby1(string(''), string('')),
+        endby1(str(''), str('')),
         'abc',
         '[endby1]: infinite loop detected; '
           + 'neither content nor separator parser consumed input',

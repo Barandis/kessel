@@ -113,8 +113,8 @@ nav:
       - spaces1U: parsers/spaces1u.md
       - spacesU: parsers/spacesu.md
       - spaceU: parsers/spaceu.md
-      - string: parsers/string.md
-      - stringI: parsers/stringi.md
+      - str: parsers/str.md
+      - strI: parsers/stri.md
       - third: parsers/third.md
       - until: parsers/until.md
       - untilB: parsers/untilb.md

@@ -53,4 +53,4 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 * [`any`](any.md)
 * [`charI`](chari.md)
 * [`range`](range.md)
-* [`string`](string.md)
+* [`str`](str.md)

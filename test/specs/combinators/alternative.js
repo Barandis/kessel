@@ -15,7 +15,7 @@ import { many, seq } from 'kessel/combinators/sequence'
 import { Status } from 'kessel/core'
 import { attempt } from 'kessel/index'
 import { any, char, digit, letter } from 'kessel/parsers/char'
-import { string } from 'kessel/parsers/string'
+import { str } from 'kessel/parsers/string'
 import { terror, tfail, tpass } from 'test/helper'
 
 const { Fail, Fatal } = Status
@@ -137,11 +137,11 @@ describe('Alternative and conditional combinators', () => {
       tpass(def(char('b'), 'z', 'test'), 'abc', 'z')
     })
     it('fails fatally if its parser does', () => {
-      tfail(def(seq(string('ab'), string('cd')), 'z'), 'abce', {
+      tfail(def(seq(str('ab'), str('cd')), 'z'), 'abce', {
         expected: "'cd'",
         status: Fatal,
       })
-      tfail(def(seq(string('ab'), string('cd')), 'z', 'test'), 'abce', {
+      tfail(def(seq(str('ab'), str('cd')), 'z', 'test'), 'abce', {
         expected: 'test',
         status: Fatal,
       })
@@ -149,8 +149,8 @@ describe('Alternative and conditional combinators', () => {
   })
 
   describe('peek', () => {
-    const parser = peek(seq(string('ab'), string('cd')))
-    const parserm = peek(seq(string('ab'), string('cd')), "'abcd'")
+    const parser = peek(seq(str('ab'), str('cd')))
+    const parserm = peek(seq(str('ab'), str('cd')), "'abcd'")
 
     it('throws if its first argument is not a parser', () => {
       terror(

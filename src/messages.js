@@ -33,8 +33,8 @@ export const strings = {
   spacesU: 'zero or more Unicode whitespace characters',
   spaces1U: 'one or more Unicode whitespace characters',
   spaceU: 'a Unicode whitespace character',
-  string: str => quote(str),
-  stringI: str => quote(str),
+  str: s => quote(s),
+  strI: s => quote(s),
   upper: 'an uppercase letter',
   upperU: 'a Unicode uppercase letter',
 }
@@ -66,8 +66,8 @@ export const expecteds = {
   spacesU: expected(strings.spacesU),
   spaces1U: expected(strings.spaces1U),
   spaceU: expected(strings.spaceU),
-  string: str => expected(strings.string(str)),
-  stringI: str => expected(strings.stringI(str)),
+  str: s => expected(strings.str(s)),
+  strI: s => expected(strings.strI(s)),
   upper: expected(strings.upper),
   upperU: expected(strings.upperU),
 }

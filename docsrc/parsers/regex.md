@@ -50,4 +50,4 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 
 * [`Parser`](../types/parser.md)
 * [`satisfy`](satisfy.md)
-* [`string`](string.md)
+* [`str`](str.md)

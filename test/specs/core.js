@@ -20,7 +20,7 @@ import {
 } from 'kessel/core'
 import { ErrorType, merge, unexpected } from 'kessel/error'
 import { char } from 'kessel/parsers/char'
-import { string } from 'kessel/parsers/string'
+import { str } from 'kessel/parsers/string'
 import { stringToView } from 'kessel/util'
 import { terror, tpass } from 'test/helper'
 
@@ -30,20 +30,20 @@ describe('Core functionality', () => {
   describe('parser state', () => {
     context('input type', () => {
       it('parses strings', () => {
-        tpass(string('abc'), 'abc', 'abc')
+        tpass(str('abc'), 'abc', 'abc')
       })
       it('parses array buffers', () => {
-        tpass(string('abc'), encoder.encode('abc').buffer, 'abc')
+        tpass(str('abc'), encoder.encode('abc').buffer, 'abc')
       })
       it('parses typed arrays', () => {
-        tpass(string('abc'), encoder.encode('abc'), 'abc')
+        tpass(str('abc'), encoder.encode('abc'), 'abc')
       })
       it('parses data views', () => {
-        tpass(string('abc'), new DataView(encoder.encode('abc').buffer), 'abc')
+        tpass(str('abc'), new DataView(encoder.encode('abc').buffer), 'abc')
       })
       it('throws an error if anything else is passed', () => {
         terror(
-          string('123'),
+          str('123'),
           123,
           'Parser input must be a string, a typed array, an array buffer, or '
             + 'a data view; parser input was number',
@@ -53,13 +53,13 @@ describe('Core functionality', () => {
 
     describe('updating successful parser state', () => {
       it('creates new objects', () => {
-        const [state, result] = parse(string('123'), '123')
+        const [state, result] = parse(str('123'), '123')
         const [ustate, uresult] = okReply(state, result.value)
         expect(state).to.not.equal(ustate)
         expect(result).to.deep.equal(uresult)
       })
       it('can update result and/or index properties', () => {
-        const [state, result] = parse(string('123'), '123')
+        const [state, result] = parse(str('123'), '123')
         const [ustate, uresult] = okReply(state, '456', 0)
         expect(result.value).to.equal('123')
         expect(uresult.value).to.equal('456')
@@ -70,13 +70,13 @@ describe('Core functionality', () => {
 
     describe('updated failure parser state', () => {
       it('creates a new object', () => {
-        const [state, result] = parse(string('123'), 'abc')
+        const [state, result] = parse(str('123'), 'abc')
         const [ustate, uresult] = failReply(state, result.errors)
         expect(state).to.not.equal(ustate)
         expect(result).to.deep.equal(uresult)
       })
       it('can update errors and/or index properties', () => {
-        const [state, result] = parse(string('123'), 'abc')
+        const [state, result] = parse(str('123'), 'abc')
         const [ustate1, uresult1] = failReply(state, merge(
           result.errors, unexpected("'z'"),
         ))

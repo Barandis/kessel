@@ -3,151 +3,213 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { all, anyString, string, stringI } from 'kessel/parsers/string'
+import { all, anyString, str, strI } from 'kessel/parsers/string'
 import { terror, tfail, tpass } from 'test/helper'
 
 describe('String parsers', () => {
-  describe('string', () => {
-    it('throws if its argument is not a string', () => {
-      terror(string(0), '', '[string]: expected a string; found 0')
+  describe('str', () => {
+    it('throws if its first argument is not a string', () => {
+      terror(str(0), '', '[str]: expected argument to be a string; found 0')
+      terror(
+        str(0, 'test'),
+        '',
+        '[str]: expected first argument to be a string; found 0',
+      )
+    })
+    it('throws if its second argument exists and is not a string', () => {
+      terror(
+        str('test', 0),
+        '',
+        '[str]: expected second argument to be a string; found 0',
+      )
     })
     it('fails at the end of input', () => {
-      tfail(string('abc'), '', "'abc'")
+      tfail(str('abc'), '', "'abc'")
+      tfail(str('abc', 'test'), '', 'test')
     })
 
     context('1-byte characters', () => {
-      const parser = string('Onoma')
+      const parser = str('Onoma')
+      const parserm = str('Onoma', 'test')
 
       it('succeeds if the same number of characters is matched', () => {
         tpass(parser, 'Onomatopoeia', { result: 'Onoma', index: 5 })
+        tpass(parserm, 'Onomatopoeia', { result: 'Onoma', index: 5 })
       })
       it('fails if case does not match', () => {
         tfail(parser, 'onomatopoeia', { expected: "'Onoma'", index: 0 })
+        tfail(parserm, 'onomatopoeia', { expected: 'test', index: 0 })
       })
       it('does not consume input on failure', () => {
         tfail(parser, 'Onosho', { expected: "'Onoma'", index: 0 })
+        tfail(parserm, 'Onosho', { expected: 'test', index: 0 })
       })
       it('fails if the string is longer than the remaining text', () => {
         tfail(parser, 'Ono', { expected: "'Onoma'", index: 0 })
+        tfail(parserm, 'Ono', { expected: 'test', index: 0 })
       })
       it('succeeds with an empty string', () => {
-        tpass(string(''), 'Onomatopoeia', { result: '', index: 0 })
+        tpass(str(''), 'Onomatopoeia', { result: '', index: 0 })
+        tpass(str('', 'test'), 'Onomatopoeia', { result: '', index: 0 })
       })
     })
 
     context('2-byte characters', () => {
-      const parser = string('Звуко')
+      const parser = str('Звуко')
+      const parserm = str('Звуко', 'test')
 
       it('succeeds if the same number of characters is matched', () => {
         tpass(parser, 'Звукоподражание', { result: 'Звуко', index: 10 })
+        tpass(parserm, 'Звукоподражание', { result: 'Звуко', index: 10 })
       })
       it('fails if case does not match', () => {
         tfail(parser, 'звукоподражание', { expected: "'Звуко'", index: 0 })
+        tfail(parserm, 'звукоподражание', { expected: 'test', index: 0 })
       })
       it('fails if the string is longer than the remaining text', () => {
         tfail(parser, 'Зву', { expected: "'Звуко'", index: 0 })
+        tfail(parserm, 'Зву', { expected: 'test', index: 0 })
       })
       it('succeeds with an empty string', () => {
-        tpass(string(''), 'Звукоподражание', { result: '', index: 0 })
+        tpass(str('', 'test'), 'Звукоподражание', { result: '', index: 0 })
       })
     })
 
     context('3-byte characters', () => {
-      const parser = string('คำเลี')
+      const parser = str('คำเลี')
+      const parserm = str('คำเลี', 'test')
 
       it('succeeds if the same number of characters is matched', () => {
         tpass(parser, 'คำเลียนเสียง', { result: 'คำเลี', index: 15 })
+        tpass(parserm, 'คำเลียนเสียง', { result: 'คำเลี', index: 15 })
       })
       it('fails if the string is longer than the remaining text', () => {
         tfail(parser, 'คำเ', { expected: "'คำเลี'", index: 0 })
+        tfail(parserm, 'คำเ', { expected: 'test', index: 0 })
       })
       it('succeeds with an empty string', () => {
-        tpass(string(''), 'คำเลียนเสียง', { result: '', index: 0 })
+        tpass(str(''), 'คำเลียนเสียง', { result: '', index: 0 })
+        tpass(str('', 'test'), 'คำเลียนเสียง', { result: '', index: 0 })
       })
     })
 
     context('4-byte characters', () => {
-      const parser = string('𝑂𝑛𝑜𝑚𝑎')
+      const parser = str('𝑂𝑛𝑜𝑚𝑎')
+      const parserm = str('𝑂𝑛𝑜𝑚𝑎', 'test')
 
       it('succeeds if the same number of characters is matched', () => {
         tpass(parser, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂𝑛𝑜𝑚𝑎', index: 20 })
+        tpass(parserm, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂𝑛𝑜𝑚𝑎', index: 20 })
       })
       it('fails if the string is longer than the remaining text', () => {
         tfail(parser, '𝑂𝑛𝑜', { expect: "'𝑂𝑛𝑜𝑚𝑎'", index: 0 })
+        tfail(parser, '𝑂𝑛𝑜', { expect: 'test', index: 0 })
       })
       it('succeeds with an empty string', () => {
-        tpass(string(''), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '', index: 0 })
+        tpass(str(''), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '', index: 0 })
+        tpass(str('', 'test'), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '', index: 0 })
       })
     })
   })
 
-  describe('stringI', () => {
+  describe('strI', () => {
     it('throws if its argument is not a string', () => {
-      terror(stringI(0), '', '[stringI]: expected a string; found 0')
+      terror(strI(0), '', '[strI]: expected argument to be a string; found 0')
+      terror(
+        strI(0, 'test'),
+        '',
+        '[strI]: expected first argument to be a string; found 0',
+      )
+    })
+    it('throws if its second argument exists and is not a string', () => {
+      terror(
+        strI('test', 0),
+        '',
+        '[strI]: expected second argument to be a string; found 0',
+      )
     })
     it('fails at the end of input', () => {
-      tfail(stringI('abc'), '', { expected: "'abc'", actual: 'EOF' })
+      tfail(strI('abc'), '', "'abc'")
+      tfail(strI('abc', 'test'), '', 'test')
     })
 
     context('1-byte characters', () => {
-      const parser = stringI('Onoma')
+      const parser = strI('Onoma')
+      const parserm = strI('Onoma', 'test')
 
       it('succeeds if the same number of characters is matched', () => {
         tpass(parser, 'Onomatopoeia', { result: 'Onoma', index: 5 })
+        tpass(parserm, 'Onomatopoeia', { result: 'Onoma', index: 5 })
       })
       it('succeeds if case does not match', () => {
         tpass(parser, 'onomatopoeia', { result: 'onoma', index: 5 })
+        tpass(parserm, 'onomatopoeia', { result: 'onoma', index: 5 })
       })
       it('fails if the string is longer than the remaining text', () => {
         tfail(parser, 'Ono', { expected: "'Onoma'", index: 0 })
+        tfail(parserm, 'Ono', { expected: 'test', index: 0 })
       })
       it('succeeds with an empty string', () => {
-        tpass(string(''), 'Onomatopoeia', { result: '', index: 0 })
+        tpass(str(''), 'Onomatopoeia', { result: '', index: 0 })
+        tpass(str('', 'test'), 'Onomatopoeia', { result: '', index: 0 })
       })
     })
 
     context('2-byte characters', () => {
-      const parser = stringI('Звуко')
+      const parser = strI('Звуко')
+      const parserm = strI('Звуко', 'test')
 
       it('succeeds if the same number of characters is matched', () => {
         tpass(parser, 'Звукоподражание', { result: 'Звуко', index: 10 })
+        tpass(parserm, 'Звукоподражание', { result: 'Звуко', index: 10 })
       })
       it('succeeds if case does not match', () => {
         tpass(parser, 'звукоподражание', { result: 'звуко', index: 10 })
+        tpass(parserm, 'звукоподражание', { result: 'звуко', index: 10 })
       })
       it('fails if the string is longer than the remaining text', () => {
         tfail(parser, 'Зву', { expected: "'Звуко'", index: 0 })
+        tfail(parserm, 'Зву', { expected: 'test', index: 0 })
       })
       it('succeeds with an empty string', () => {
-        tpass(string(''), 'Звукоподражание', { result: '', index: 0 })
+        tpass(str(''), 'Звукоподражание', { result: '', index: 0 })
+        tpass(str('', 'test'), 'Звукоподражание', { result: '', index: 0 })
       })
     })
 
     context('3-byte characters', () => {
-      const parser = stringI('คำเลี')
+      const parser = strI('คำเลี')
+      const parserm = strI('คำเลี', 'test')
 
       it('succeeds if the same number of characters is matched', () => {
         tpass(parser, 'คำเลียนเสียง', { result: 'คำเลี', index: 15 })
+        tpass(parserm, 'คำเลียนเสียง', { result: 'คำเลี', index: 15 })
       })
       it('fails if the string is longer than the remaining text', () => {
         tfail(parser, 'คำเ', { expected: "'คำเลี'", index: 0 })
+        tfail(parserm, 'คำเ', { expected: 'test', index: 0 })
       })
       it('succeeds with an empty string', () => {
-        tpass(string(''), 'คำเลียนเสียง', { result: '', index: 0 })
+        tpass(str(''), 'คำเลียนเสียง', { result: '', index: 0 })
+        tpass(str('', 'test'), 'คำเลียนเสียง', { result: '', index: 0 })
       })
     })
 
     context('4-byte characters', () => {
-      const parser = stringI('𝑂𝑛𝑜𝑚𝑎')
+      const parser = strI('𝑂𝑛𝑜𝑚𝑎')
+      const parserm = strI('𝑂𝑛𝑜𝑚𝑎', 'test')
 
       it('succeeds if the same number of characters is matched', () => {
         tpass(parser, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂𝑛𝑜𝑚𝑎', index: 20 })
+        tpass(parserm, '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '𝑂𝑛𝑜𝑚𝑎', index: 20 })
       })
       it('fails if the string is longer than the remaining text', () => {
         tfail(parser, '𝑂𝑛𝑜', { expected: "'𝑂𝑛𝑜𝑚𝑎'", index: 0 })
+        tfail(parserm, '𝑂𝑛𝑜', { expected: 'test', index: 0 })
       })
       it('succeeds with an empty string', () => {
-        tpass(string(''), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '', index: 0 })
+        tpass(str(''), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '', index: 0 })
+        tpass(str('', 'test'), '𝑂𝑛𝑜𝑚𝑎𝑡𝑜𝑝𝑜𝑒𝑖𝑎', { result: '', index: 0 })
       })
     })
   })
