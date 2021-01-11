@@ -60,7 +60,6 @@ nav:
       - buntil: parsers/buntil.md
       - chain: parsers/chain.md
       - char: parsers/char.md
-      - compact: parsers/compact.md
       - count: parsers/count.md
       - def: parsers/def.md
       - digit: parsers/digit.md

@@ -11,6 +11,8 @@ Applies a parser and returns the elements of the resulting array joined into a s
 
 This combinator solves the problem in JavaScript that there is no separate character type, and therefore a string is not just a list/array of characters. (Parsec parsers, for example, can return arrays of characters which Haskell regards also as strings in their own right.) Parsers like [`seq`](seq.md) and [`many`](many.md) return arrays, and often they are arrays of single-character strings. `join` will turn these results into simple strings.
 
+`join` ignores `null` and `undefined` values and adds nothing to the output string for them (it does not add the string `'null'` or any such thing).
+
 `join(p)` is an optimized implementation of `map(p, x => x.join(''))`.
 
 #### Example

@@ -77,7 +77,6 @@ export {
 export {
   apply,
   chain,
-  compact,
   fifth,
   first,
   flat,
