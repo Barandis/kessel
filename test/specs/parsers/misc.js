@@ -5,15 +5,12 @@
 
 import { Status } from 'kessel/core'
 import { always, fail, fatal } from 'kessel/parsers/misc'
-import { terror, tfail, tpass } from 'test/helper'
+import { tfail, tpass } from 'test/helper'
 
 const { Fail, Fatal } = Status
 
 describe('Miscellaneous parsers', () => {
   describe('fail', () => {
-    it('throws if its argument is not a string', () => {
-      terror(fail(0), '', '[fail]: expected a string; found 0')
-    })
     it('fails with the supplied generic message', () => {
       tfail(fail('test message'), '', {
         generic: 'test message',
@@ -21,18 +18,21 @@ describe('Miscellaneous parsers', () => {
         status: Fail,
       })
     })
+    it('works fine with no message', () => {
+      tfail(fail(), '', { generic: undefined, index: 0, status: Fail })
+    })
   })
 
   describe('fatal', () => {
-    it('throws if its argument is not a string', () => {
-      terror(fatal(0), '', '[fatal]: expected a string; found 0')
-    })
     it('fails with the supplied generic message', () => {
       tfail(fatal('test message'), '', {
         generic: 'test message',
         index: 0,
         status: Fatal,
       })
+    })
+    it('works fine with no message', () => {
+      tfail(fatal(), '', { generic: undefined, index: 0, status: Fatal })
     })
   })
 

@@ -3,7 +3,6 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import { assertString } from 'kessel/assert'
 import { failReply, fatalReply, okReply, parser } from 'kessel/core'
 import { generic } from 'kessel/error'
 
@@ -17,10 +16,7 @@ import { generic } from 'kessel/error'
  * @returns {Parser} A parser that automatically fails with the supplied
  *     error message.
  */
-export const fail = m => parser(ctx => {
-  ASSERT && assertString('fail', m)
-  return failReply(ctx, generic(m))
-})
+export const fail = m => parser(ctx => failReply(ctx, generic(m)))
 
 /**
  * A parser that fails without consuming input, setting the generic
@@ -31,10 +27,7 @@ export const fail = m => parser(ctx => {
  * @returns {Parser} A parser that automatically fails fatally with the
  *     supplied error message.
  */
-export const fatal = m => parser(ctx => {
-  ASSERT && assertString('fatal', m)
-  return fatalReply(ctx, generic(m))
-})
+export const fatal = m => parser(ctx => fatalReply(ctx, generic(m)))
 
 /**
  * A parser which always succeeds with the supplied value.

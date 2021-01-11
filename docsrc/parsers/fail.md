@@ -5,9 +5,11 @@
  https://opensource.org/licenses/MIT
 -->
 
-> `fail(m: string): Parser`
+> `fail(m?: string): Parser`
 
 Fails automatically with a custom generic error message.
+
+The message is not required. Supplying no message will produce an error with no message, but `fail` is often used in situations where other nearby parsers will be supplying the error message.
 
 #### Example
 
@@ -30,10 +32,6 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
 #### Failure
 
 * Always fails. The failure message will be [`generic(m)`](../tools/generic.md).
-
-#### Throws
-
-* Throws an error if `m` is not a string.
 
 #### See Also
 
