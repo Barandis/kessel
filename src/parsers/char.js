@@ -221,9 +221,12 @@ export const oneof = (cs, m) => parser(ctx => {
   ASSERT && assertStringOrArray('oneof', cs, argStrArrFormatter(1, hasM))
   ASSERT && hasM && assertString('oneof', m, argStrFormatter(2, true))
 
-  const { index, view } = ctx
-  const { width, next } = nextChar(index, view)
   const arr = [...cs]
+  const { index, view } = ctx
+  if (index >= view.byteLength) {
+    return failReply(ctx, ferror(m, expecteds.oneof(arr)))
+  }
+  const { width, next } = nextChar(index, view)
 
   return arr.includes(next)
     ? okReply(ctx, next, index + width)
@@ -250,9 +253,12 @@ export const noneof = (cs, m) => parser(ctx => {
   ASSERT && assertStringOrArray('noneof', cs, argStrArrFormatter(1, hasM))
   ASSERT && hasM && assertString('noneof', m, argStrFormatter(2, true))
 
-  const { index, view } = ctx
-  const { width, next } = nextChar(index, view)
   const arr = [...cs]
+  const { index, view } = ctx
+  if (index >= view.byteLength) {
+    return failReply(ctx, ferror(m, expecteds.noneof(arr)))
+  }
+  const { width, next } = nextChar(index, view)
 
   return arr.includes(next)
     ? failReply(ctx, ferror(m, expecteds.noneof(arr)))
