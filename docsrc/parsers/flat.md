@@ -36,6 +36,32 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Expected a letter or a digit
 ```
 
+Here's an additional example to demonstrate the motivation behind making this parser in the first place. While writing a TOML parser, this parser ended up being written (unknown variables here &mdash; including `newline`, as TOML has its own idea of what a newline is &mdash; are just parsers defined in other parts of the code and aren't important here):
+
+```javascript
+const mlBasicBody = join(compact(seq(
+  value(opt(newline), ''),
+  join(many(mlbContent)),
+  join(many(join(bseq(mlbQuotes, join(many1(mlbContent)))))),
+  opt(mlbQuotes),
+)))
+```
+
+This not-otherwise-complex parser includes five `join` parsers. This is necessary because one of the side effects of `join` is that it eliminates an array by turning it into a string. Without `join`, this parser would produce a three-level nested array, which is hard to pick string parts out of.
+
+At least until `flat` made it easy. It will turn that three-level nested array into a single-level array, which eliminates the need for *all* of the internal `join`s. That same parser currently looks like this.
+
+```javascript
+const mlBasicBody = join(compact(flat(seq(
+  value(opt(newline), ''),
+  many(mlbContent),
+  many(bseq(mlbQuotes, many1(mlbContent))),
+  opt(mlbQuotes),
+))))
+```
+
+Now there is a single `join` at the very top, and with the internal `join`s gone, the intent of the code is much clearer.
+
 #### Parameters
 
 * `p`: The parser that is applied, which must return an array.
