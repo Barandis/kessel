@@ -2099,7 +2099,7 @@
                         <span class="c1">// ^</span>
                         <span class="c1">// Expected a letter or a digit</span>
 </code></pre></div>
-<p>Here's an additional example to demonstrate the motivation behind making this parser in the first place. While writing a TOML parser, this parser ended up being written (unknown variables here &mdash; including <code>newline</code>, as TOML has its own idea of what a newline is &mdash; are just parsers defined in other parts of the code and aren't important here):</p>
+<p>Here's an additional example to demonstrate the motivation behind making this parser in the first place. While writing a TOML parser, this parser ended up being written (non-functions here &mdash; including <code>newline</code>, as TOML has its own idea of what a newline is &mdash; are just parsers defined in other parts of the code and aren't important for understanding the point):</p>
 <div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">mlBasicBody</span> <span class="o">=</span> <span class="nx">join</span><span class="p">(</span><span class="nx">compact</span><span class="p">(</span><span class="nx">seq</span><span class="p">(</span>
   <span class="nx">value</span><span class="p">(</span><span class="nx">opt</span><span class="p">(</span><span class="nx">newline</span><span class="p">),</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
   <span class="nx">join</span><span class="p">(</span><span class="nx">many</span><span class="p">(</span><span class="nx">mlbContent</span><span class="p">)),</span>

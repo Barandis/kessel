@@ -36,7 +36,7 @@ console.log(failure(f)) // Parse error at (line 1, column 1):
                         // Expected a letter or a digit
 ```
 
-Here's an additional example to demonstrate the motivation behind making this parser in the first place. While writing a TOML parser, this parser ended up being written (unknown variables here &mdash; including `newline`, as TOML has its own idea of what a newline is &mdash; are just parsers defined in other parts of the code and aren't important here):
+Here's an additional example to demonstrate the motivation behind making this parser in the first place. While writing a TOML parser, this parser ended up being written (non-functions here &mdash; including `newline`, as TOML has its own idea of what a newline is &mdash; are just parsers defined in other parts of the code and aren't important for understanding the point):
 
 ```javascript
 const mlBasicBody = join(compact(seq(
