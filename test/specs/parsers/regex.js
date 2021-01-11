@@ -55,7 +55,7 @@ describe('Regular expression parsers', () => {
       tfail(regex(/poe/), 'Onomatopoeia', 'a string matching /^poe/')
       tfail(regex(/poe/, 'test'), 'Onomatopoeia', 'test')
     })
-    it('fails if the input is at its end', () => {
+    it('fails at EOF', () => {
       tfail(regex(/^./), '', 'a string matching /^./')
       tfail(regex(/^./, 'test'), '', 'test')
     })
@@ -185,6 +185,10 @@ describe('Regular expression parsers', () => {
       tfail(uletter(), '🀄', 'a Unicode letter')
       tfail(uletter('test'), '$', 'test')
     })
+    it('fails at EOF', () => {
+      tfail(uletter(), '', 'a Unicode letter')
+      tfail(uletter('test'), '', 'test')
+    })
   })
 
   describe('ualpha', () => {
@@ -279,6 +283,10 @@ describe('Regular expression parsers', () => {
       tfail(ualpha(), '🀄', 'a Unicode alphanumeric character')
       tfail(ualpha('test'), '$', 'test')
     })
+    it('fails at EOF', () => {
+      tfail(ualpha(), '', 'a Unicode alphanumeric character')
+      tfail(ualpha('test'), '', 'test')
+    })
   })
 
   describe('uupper', () => {
@@ -372,6 +380,10 @@ describe('Regular expression parsers', () => {
       tfail(uupper(), '🀄', 'a Unicode uppercase letter')
       tfail(uupper('test'), '$', 'test')
     })
+    it('fails at EOF', () => {
+      tfail(uupper(), '', 'a Unicode uppercase letter')
+      tfail(uupper('test'), '', 'test')
+    })
   })
 
   describe('ulower', () => {
@@ -463,6 +475,10 @@ describe('Regular expression parsers', () => {
       tfail(ulower(), '🀄', 'a Unicode lowercase letter')
       tfail(ulower('test'), '$', 'test')
     })
+    it('fails at EOF', () => {
+      tfail(ulower(), '', 'a Unicode lowercase letter')
+      tfail(ulower('test'), '', 'test')
+    })
   })
 
   describe('space', () => {
@@ -516,6 +532,10 @@ describe('Regular expression parsers', () => {
       tfail(space(), '\u200d', 'a whitespace character')
       tfail(space(), '\u2060', 'a whitespace character')
       tfail(space('test'), 'O', 'test')
+    })
+    it('fails at EOF', () => {
+      tfail(space(), '', 'a whitespace character')
+      tfail(space('test'), '', 'test')
     })
   })
 
@@ -571,6 +591,10 @@ describe('Regular expression parsers', () => {
       tfail(uspace(), '\u200d', 'a Unicode whitespace character')
       tfail(uspace(), '\u2060', 'a Unicode whitespace character')
       tfail(uspace('test'), 'O', 'test')
+    })
+    it('fails at EOF', () => {
+      tfail(uspace(), '', 'a Unicode whitespace character')
+      tfail(uspace('test'), '', 'test')
     })
   })
 
@@ -685,6 +709,10 @@ describe('Regular expression parsers', () => {
       tfail(spaces1(), '\u3000abc', 'one or more whitespace characters')
       tfail(spaces1('test'), '\vabc', 'test')
     })
+    it('fails at EOF', () => {
+      tfail(spaces1(), '', 'one or more whitespace characters')
+      tfail(spaces1('test'), '', 'test')
+    })
   })
 
   describe('uspaces1', () => {
@@ -729,6 +757,10 @@ describe('Regular expression parsers', () => {
       tpass(uspaces1(), '\u3000abc', { result: null, index: 3 })
       tpass(uspaces1('test'), '\t\t\tabc', { result: null, index: 3 })
     })
+    it('fails at EOF', () => {
+      tfail(uspaces1(), '', 'one or more Unicode whitespace characters')
+      tfail(uspaces1('test'), '', 'test')
+    })
   })
 
   describe('newline', () => {
@@ -752,6 +784,7 @@ describe('Regular expression parsers', () => {
       tfail(newline('test'), 'Onoma', 'test')
     })
     it('fails at EOF', () => {
+      tfail(newline(), '', 'a newline')
       tfail(newline('test'), '', 'test')
     })
   })

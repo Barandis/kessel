@@ -23,9 +23,13 @@ describe('String parsers', () => {
         '[str]: expected second argument to be a string; found 0',
       )
     })
-    it('fails at the end of input', () => {
+    it('fails at EOF', () => {
       tfail(str('abc'), '', "'abc'")
       tfail(str('abc', 'test'), '', 'test')
+    })
+    it('succeeds at EOF for an empty string', () => {
+      tpass(str(''), '', '')
+      tpass(str('', 'test'), '', '')
     })
 
     context('1-byte characters', () => {
@@ -128,9 +132,13 @@ describe('String parsers', () => {
         '[istr]: expected second argument to be a string; found 0',
       )
     })
-    it('fails at the end of input', () => {
+    it('fails at EOF', () => {
       tfail(istr('abc'), '', "'abc'")
       tfail(istr('abc', 'test'), '', 'test')
+    })
+    it('passes at EOF for an empty string', () => {
+      tpass(istr(''), '', '')
+      tpass(istr('', 'test'), '', '')
     })
 
     context('1-byte characters', () => {
@@ -280,6 +288,14 @@ describe('String parsers', () => {
         index: 0,
       })
       tfail(anystr(5, 'test'), 'Ono', { expected: 'test', index: 0 })
+    })
+    it('fails at EOF', () => {
+      tfail(anystr(2), '', 'a string of 2 characters')
+      tfail(anystr(2, 'test'), '', 'test')
+    })
+    it('succeeds at EOF for a 0-character string', () => {
+      tpass(anystr(0), '', '')
+      tpass(anystr(0, 'test'), '', '')
     })
   })
 })

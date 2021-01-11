@@ -504,6 +504,10 @@ describe('Character parsers', () => {
       tfail(parser, 'matriculate', "one of '𝑂', '𝑛', '𝑜', '𝑚', or '𝑎'")
       tfail(parserm, 'matriculate', 'test')
     })
+    it('fails at EOF', () => {
+      tfail(oneof('abc'), '', "one of 'a', 'b', or 'c'")
+      tfail(oneof('abc', 'abc'), '', 'abc')
+    })
   })
 
   describe('noneof', () => {
@@ -590,6 +594,10 @@ describe('Character parsers', () => {
       tpass(parser, 'matriculate', { result: 'm', index: 1 })
       tpass(parserm, 'matriculate', { result: 'm', index: 1 })
     })
+    it('fails at EOF', () => {
+      tfail(noneof('abc'), '', "none of 'a', 'b', or 'c'")
+      tfail(noneof('abc', 'not abc'), '', 'not abc')
+    })
   })
 
   describe('digit', () => {
@@ -669,6 +677,10 @@ describe('Character parsers', () => {
       tfail(letter(), ' ', 'a letter')
       tfail(letter('test'), ' ', 'test')
     })
+    it('fails at EOF', () => {
+      tfail(letter(), '', 'a letter')
+      tfail(letter('test'), '', 'test')
+    })
   })
 
   describe('alpha', () => {
@@ -690,6 +702,10 @@ describe('Character parsers', () => {
     it('fails on whitespace', () => {
       tfail(alpha(), ' ', 'an alphanumeric character')
       tfail(alpha('test'), ' ', 'test')
+    })
+    it('fails at EOF', () => {
+      tfail(alpha(), '', 'an alphanumeric character')
+      tfail(alpha('test'), '', 'test')
     })
   })
 
@@ -713,6 +729,10 @@ describe('Character parsers', () => {
       tfail(upper(), ' ', 'an uppercase letter')
       tfail(upper('test'), ' ', 'test')
     })
+    it('fails at EOF', () => {
+      tfail(upper(), '', 'an uppercase letter')
+      tfail(upper('test'), '', 'test')
+    })
   })
 
   describe('lower', () => {
@@ -734,6 +754,10 @@ describe('Character parsers', () => {
     it('fails on whitespace', () => {
       tfail(lower(), ' ', 'a lowercase letter')
       tfail(lower('test'), ' ', 'test')
+    })
+    it('fails at EOF', () => {
+      tfail(lower(), '', 'a lowercase letter')
+      tfail(lower('test'), '', 'test')
     })
   })
 })
