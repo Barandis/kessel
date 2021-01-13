@@ -57,6 +57,7 @@ export {
   alt,
   def,
   empty,
+  label,
   not,
   opt,
   peek,

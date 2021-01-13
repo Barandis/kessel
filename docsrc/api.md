@@ -112,6 +112,7 @@ Additionally, parsers are often said to *return* a value or to have a value as a
 | [`peek`](parsers/peek.md) | Executes a parser and returns its result without consuming input. |
 | [`empty`](parsers/empty.md) | Executes a parser and fails if the parser succeeds but consumes input. |
 | [`not`](parsers/not.md) | Executes a parser and succeeds without consuming input if that parser fails. |
+| [`label`](parsers/label.md) | Provides an alternative error message if its contained parser fails. |
 
 ### Table 7: Backtracking combinators
 

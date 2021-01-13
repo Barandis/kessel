@@ -7,13 +7,14 @@ import {
   alt,
   def,
   empty,
+  label,
   not,
   opt,
   peek,
 } from 'kessel/combinators/alternative'
 import { many, seq } from 'kessel/combinators/sequence'
 import { Status } from 'kessel/core'
-import { attempt } from 'kessel/index'
+import { attempt, bseq } from 'kessel/index'
 import { any, char, digit, letter } from 'kessel/parsers/char'
 import { str } from 'kessel/parsers/string'
 import { terror, tfail, tpass } from 'test/helper'
@@ -246,7 +247,7 @@ describe('Alternative and conditional combinators', () => {
   })
 
   describe('not', () => {
-    it('throws if its argument is not a parser', () => {
+    it('throws if its first argument is not a parser', () => {
       terror(
         not(0),
         '',
@@ -282,6 +283,34 @@ describe('Alternative and conditional combinators', () => {
       tpass(not(seq(letter(), digit()), 'test'), 'abc', {
         result: null, index: 0,
       })
+    })
+  })
+
+  describe('label', () => {
+    it('throws if its first argument is not a parser', () => {
+      terror(
+        label(0, 'test'),
+        '',
+        '[label]: expected first argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument is not a string', () => {
+      terror(
+        label(letter()),
+        '',
+        '[label]: expected second argument to be a string; found undefined',
+      )
+    })
+    it('changes the error message of the parser it wraps', () => {
+      tfail(label(letter(), 'not a digit!'), '1', 'not a digit!')
+      tfail(label(bseq(letter(), letter()), 'two letters'), 'a1', 'two letters')
+    })
+    it('retains the result if the parser succeeds', () => {
+      tpass(label(letter(), 'not a digit!'), 'a', 'a')
+      tpass(label(bseq(letter(), letter()), 'two letters'), 'ab', ['a', 'b'])
+    })
+    it('retains the old error message if the parser fails fatally', () => {
+      tfail(label(seq(letter(), letter()), 'two letters'), 'a1', 'a letter')
     })
   })
 })

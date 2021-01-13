@@ -79,6 +79,7 @@ nav:
       - join: parsers/join.md
       - lassoc: parsers/lassoc.md
       - lassoc1: parsers/lassoc1.md
+      - label: parsers/label.md
       - left: parsers/left.md
       - letter: parsers/letter.md
       - lower: parsers/lower.md

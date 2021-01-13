@@ -18,7 +18,7 @@
     
     
       
-        <title>flat - Kessel</title>
+        <title>label - Kessel</title>
       
     
     
@@ -91,7 +91,7 @@
           </span>
           <span class="md-header-nav__topic md-ellipsis">
             
-              flat
+              label
             
           </span>
         </div>
@@ -866,87 +866,11 @@
           
           
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-    
-    
-      <label class="md-nav__link md-nav__link--active" for="__toc">
-        flat
-        <span class="md-nav__icon md-icon"></span>
-      </label>
-    
-    <a href="./" class="md-nav__link md-nav__link--active">
+  <li class="md-nav__item">
+    <a href="../flat/" class="md-nav__link">
       flat
     </a>
-    
-      
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#example" class="md-nav__link">
-    Example
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
-    Parameters
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#success" class="md-nav__link">
-    Success
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#failure" class="md-nav__link">
-    Failure
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#fatal-failure" class="md-nav__link">
-    Fatal Failure
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#throws" class="md-nav__link">
-    Throws
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    See Also
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-    
   </li>
 
         
@@ -1038,11 +962,87 @@
           
           
 
+  
 
-  <li class="md-nav__item">
-    <a href="../label/" class="md-nav__link">
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        label
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+    
+    <a href="./" class="md-nav__link md-nav__link--active">
       label
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    Example
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parameters" class="md-nav__link">
+    Parameters
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#success" class="md-nav__link">
+    Success
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#failure" class="md-nav__link">
+    Failure
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fatal-failure" class="md-nav__link">
+    Fatal Failure
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#throws" class="md-nav__link">
+    Throws
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    See Also
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+    
   </li>
 
         
@@ -2065,7 +2065,7 @@
               
                 
                 
-                  <h1>flat</h1>
+                  <h1>label</h1>
                 
                 <!--
  Copyright (c) 2020 Thomas J. Otterson
@@ -2075,60 +2075,56 @@
 -->
 
 <blockquote>
-<p><code>flat(p: Parser, m?: string): Parser</code></p>
+<p><code>label(p: Parser, m: string): Parser</code></p>
 </blockquote>
-<p>Applies a parser and returns the elements of the resulting array flattened into a single-level array.</p>
-<p>This is a combinator that's useful because of the nature of strings in JavaScript, and specifically that they are not the same as a list of characters as they are in some other languages. When a parser made from nested array-producing parsers is executed, it can often return a result that is an array with some elements that are also arrays, when what's actually desired is a simple single-level array that can be easily <a href="../join/"><code>join</code></a>ed into a string.</p>
-<p>This combinator does exactly that, flattening an arbitrarily nested array of arrays into a single, flat array.</p>
-<p><code>flat(p)</code> is an optimized implementation of <code>map(p, x =&gt; x.flat(Infinity))</code>.</p>
+<p>Changes the error message of a parser if it fails normally when executed. If the parser succeeds or fails fatally, <code>label</code> has no effect.</p>
+<p>Every parser that can fail already accepts an alternative error message as an optional parameter. The purpose of <code>label</code> is to provide a way to change the error message <em>after</em> the parser has already been created.</p>
+<p>For instance, one might create a parser like this:</p>
+<div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">quoted</span> <span class="o">=</span> <span class="nx">between</span><span class="p">(</span><span class="kr">char</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">),</span> <span class="kr">char</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">),</span> <span class="nx">many</span><span class="p">(</span><span class="nx">noneof</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)))</span>
+</code></pre></div>
+<p>If this parser is applied to an input that does <em>not</em> begin with a quotation mark, it will fail with a message that includes <code>Expected '"'</code>. This might be a good error message for a certain context, but this quoted parser could be re-used several times in several different contexts, some of which might want to have a different error message. Rather than creating a new version of the <code>quoted</code> parser that changes nothing but the message, one could use <code>label</code> instead:</p>
+<div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">newQuoted</span> <span class="o">=</span> <span class="nx">label</span><span class="p">(</span><span class="nx">quoted</span><span class="p">,</span> <span class="s1">&#39;a quoted string&#39;</span><span class="p">)</span>
+</code></pre></div>
+<p>This new parser does exactly the same thing as <code>quoted</code>, but if it meets an input that does not begin with a quotation mark, it will instead produce a message that includes <code>Expected a quoted string</code>.</p>
+<p>There is nothing preventing you from using <code>label</code> with a parser during creation time, something like <code>label(letter(), 'some letter')</code> instead of <code>letter('some letter')</code>. This is <em>not</em> recommended however. If the desired error message is known at creation time, pass it directly to the parser instead of using <code>label</code>. In many cases it won't matter, but backtracking parser in particular will work much better without <code>label</code>.</p>
+<p>Speaking of that, <strong>take care when using <code>label</code> with backtracking parsers</strong>. Not only does <code>label</code> not produce a nested error message when backtracking happens, it will also eliminate all backtracking information from the error message altogether. Unless the <code>label</code> message takes this into account, it can be a source of great confusion.</p>
+<p>Note that the message parameter <code>m</code> is required. This is not typical of other parsers in the library.</p>
 <h4 id="example">Example</h4>
-<div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">flat</span><span class="p">(</span><span class="nx">seq</span><span class="p">(</span>
-  <span class="nx">many</span><span class="p">(</span><span class="nx">letter</span><span class="p">()),</span>
-  <span class="nx">many1</span><span class="p">(</span><span class="nx">seq</span><span class="p">(</span><span class="nx">digit</span><span class="p">(),</span> <span class="nx">many1</span><span class="p">(</span><span class="nx">letter</span><span class="p">()))),</span>
-<span class="p">))</span>
+<div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">twoLetters</span> <span class="o">=</span> <span class="nx">seq</span><span class="p">(</span><span class="nx">letter</span><span class="p">(),</span> <span class="nx">letter</span><span class="p">())</span>
+<span class="kr">const</span> <span class="nx">parser</span> <span class="o">=</span> <span class="nx">label</span><span class="p">(</span><span class="nx">twoLetters</span><span class="p">,</span> <span class="s1">&#39;two letters&#39;</span><span class="p">)</span>
 
-<span class="kr">const</span> <span class="nx">s</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;abc1ef2g3xyz&#39;</span><span class="p">)</span>
+<span class="kr">const</span> <span class="nx">s</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;ab&#39;</span><span class="p">)</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">status</span><span class="p">(</span><span class="nx">s</span><span class="p">))</span>  <span class="c1">// &quot;ok&quot;</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">success</span><span class="p">(</span><span class="nx">s</span><span class="p">))</span> <span class="c1">// [&quot;a&quot;,&quot;b&quot;,&quot;c&quot;,&quot;1&quot;,&quot;e&quot;,&quot;f&quot;,&quot;2&quot;,&quot;g&quot;,&quot;3&quot;,&quot;x&quot;,&quot;y&quot;,&quot;z&quot;]</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">success</span><span class="p">(</span><span class="nx">s</span><span class="p">))</span> <span class="c1">// [&quot;a&quot;,&quot;b&quot;]</span>
 
-<span class="kr">const</span> <span class="nx">f</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="kr">const</span> <span class="nx">f</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;12&#39;</span><span class="p">)</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">status</span><span class="p">(</span><span class="nx">f</span><span class="p">))</span>  <span class="c1">// &quot;fail&quot;</span>
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">failure</span><span class="p">(</span><span class="nx">f</span><span class="p">))</span> <span class="c1">// Parse error at (line 1, column 1):</span>
                         <span class="c1">//</span>
-                        <span class="c1">// </span>
+                        <span class="c1">// 12</span>
                         <span class="c1">// ^</span>
-                        <span class="c1">// Expected a letter or a digit</span>
+                        <span class="c1">// Expected two letters</span>
+
+<span class="kr">const</span> <span class="nx">t</span> <span class="o">=</span> <span class="nx">parse</span><span class="p">(</span><span class="nx">parser</span><span class="p">,</span> <span class="s1">&#39;a1&#39;</span><span class="p">)</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">status</span><span class="p">(</span><span class="nx">t</span><span class="p">))</span>  <span class="c1">// &quot;fatal&quot;</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">failure</span><span class="p">(</span><span class="nx">f</span><span class="p">))</span> <span class="c1">// Parse error at (line 1, column 2):</span>
+                        <span class="c1">//</span>
+                        <span class="c1">// 12</span>
+                        <span class="c1">//  ^</span>
+                        <span class="c1">// Expected a letter</span>
 </code></pre></div>
-<p>Here's an additional example to demonstrate the motivation behind making this parser in the first place. While writing a TOML parser, this parser ended up being written (non-functions here &mdash; including <code>newline</code>, as TOML has its own idea of what a newline is &mdash; are just parsers defined in other parts of the code and aren't important for understanding the point):</p>
-<div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">mlBasicBody</span> <span class="o">=</span> <span class="nx">join</span><span class="p">(</span><span class="nx">seq</span><span class="p">(</span>
-  <span class="nx">value</span><span class="p">(</span><span class="nx">opt</span><span class="p">(</span><span class="nx">newline</span><span class="p">),</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
-  <span class="nx">join</span><span class="p">(</span><span class="nx">many</span><span class="p">(</span><span class="nx">mlbContent</span><span class="p">)),</span>
-  <span class="nx">join</span><span class="p">(</span><span class="nx">many</span><span class="p">(</span><span class="nx">join</span><span class="p">(</span><span class="nx">bseq</span><span class="p">(</span><span class="nx">mlbQuotes</span><span class="p">,</span> <span class="nx">join</span><span class="p">(</span><span class="nx">many1</span><span class="p">(</span><span class="nx">mlbContent</span><span class="p">)))))),</span>
-  <span class="nx">opt</span><span class="p">(</span><span class="nx">mlbQuotes</span><span class="p">),</span>
-<span class="p">))</span>
-</code></pre></div>
-<p>This not-otherwise-complex parser includes five <code>join</code> parsers. This is necessary because one of the side effects of <code>join</code> is that it eliminates an array by turning it into a string. Without <code>join</code>, this parser would produce a three-level nested array, which is hard to pick string parts out of.</p>
-<p>At least until <code>flat</code> made it easy. It will turn that three-level nested array into a single-level array, which eliminates the need for <em>all</em> of the internal <code>join</code>s. That same parser currently looks like this.</p>
-<div class="highlight"><pre><span></span><code><span class="kr">const</span> <span class="nx">mlBasicBody</span> <span class="o">=</span> <span class="nx">join</span><span class="p">(</span><span class="nx">flat</span><span class="p">(</span><span class="nx">seq</span><span class="p">(</span>
-  <span class="nx">value</span><span class="p">(</span><span class="nx">opt</span><span class="p">(</span><span class="nx">newline</span><span class="p">),</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
-  <span class="nx">many</span><span class="p">(</span><span class="nx">mlbContent</span><span class="p">),</span>
-  <span class="nx">many</span><span class="p">(</span><span class="nx">bseq</span><span class="p">(</span><span class="nx">mlbQuotes</span><span class="p">,</span> <span class="nx">many1</span><span class="p">(</span><span class="nx">mlbContent</span><span class="p">))),</span>
-  <span class="nx">opt</span><span class="p">(</span><span class="nx">mlbQuotes</span><span class="p">),</span>
-<span class="p">)))</span>
-</code></pre></div>
-<p>Now there is a single <code>join</code> at the very top, and with the internal <code>join</code>s gone, the intent of the code is much clearer.</p>
 <h4 id="parameters">Parameters</h4>
 <ul>
-<li><code>p</code>: The parser that is applied, which must return an array.</li>
-<li><code>m</code>: The optional expected error message that will take the place of the default error message.</li>
+<li><code>p</code>: The parser that is applied.</li>
+<li><code>m</code>: The expected error message that will take the place of whatever error message is generated by <code>p</code>.</li>
 </ul>
 <h4 id="success">Success</h4>
 <ul>
-<li>Succeeds if <code>p</code> succeeds. Returns the resulting array's elements flattened into a single-level array.</li>
+<li>Succeeds if <code>p</code> succeeds. Returns <code>p</code>'s result.</li>
 </ul>
 <h4 id="failure">Failure</h4>
 <ul>
-<li>Fails if <code>p</code> fails.</li>
+<li>Fails if <code>p</code> fails. The error message wil become <a href="../../tools/expected/"><code>expected(m)</code></a>.</li>
 </ul>
 <h4 id="fatal-failure">Fatal Failure</h4>
 <ul>
@@ -2137,14 +2133,12 @@
 <h4 id="throws">Throws</h4>
 <ul>
 <li>Throws an error if <code>p</code> is not a parser.</li>
-<li>Throws an error if <code>p</code> succeeds but does not return an array.</li>
-<li>Throws an error if <code>m</code> exists and is not a string.</li>
+<li>Throws an error if <code>m</code> is not a string.</li>
 </ul>
 <h4 id="see-also">See Also</h4>
 <ul>
 <li><a href="../../types/parser/"><code>Parser</code></a></li>
-<li><a href="../join/"><code>join</code></a></li>
-<li><a href="../map/"><code>map</code></a></li>
+<li><a href="../../tools/expected/"><code>expected</code></a>.</li>
 </ul>
                 
               
@@ -2164,7 +2158,7 @@
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
         
-          <a href="../first/" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../lassoc1/" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-footer-nav__button md-icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
             </div>
@@ -2173,19 +2167,19 @@
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                first
+                lassoc1
               </div>
             </div>
           </a>
         
         
-          <a href="../fourth/" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../left/" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-footer-nav__title">
               <div class="md-ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                fourth
+                left
               </div>
             </div>
             <div class="md-footer-nav__button md-icon">
