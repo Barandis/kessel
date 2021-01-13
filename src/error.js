@@ -562,6 +562,17 @@ export function show(line, length, colno, maxWidth, indent = 0) {
 }
 
 /**
+ * Remove duplicates from an array. This is meant for strings (error
+ * messages) though it would also work with primitives.
+ *
+ * @param {string[]} array The array of strings to dedupe.
+ * @returns {string[]} The same array, but with no duplicate strings.
+ */
+function dedupe(array) {
+  return [...new Set(array)]
+}
+
+/**
  * Formats a set of nested (or compound) error messages.
  *
  * @param {(NestedError[]|CompoundError[])} nesteds An array of either
@@ -584,7 +595,7 @@ function formatNested(nesteds, tabSize, maxWidth, indent) {
       : `\n${sp}The parser backtracked after:\n\n`
     return label + format(n.errors, index, view, tabSize, maxWidth, indent + 2)
   })
-  return nestedMsgs.join('')
+  return dedupe(nestedMsgs).join('')
 }
 
 /**
@@ -688,10 +699,10 @@ export function format(
   const display = show(line, length, colno, maxWidth, indent)
   const generic = errors.find(error => error.type === ErrorType.Generic)
   const unexpected = errors.find(error => error.type === ErrorType.Unexpected)
-  const expected = commaSeparate(
+  const expected = commaSeparate(dedupe(
     errors.filter(error => error.type === ErrorType.Expected)
       .map(error => error.label),
-  )
+  ))
 
   const nested = errors.filter(error => error.type === ErrorType.Nested)
   const compound = errors.filter(error => error.type === ErrorType.Compound)
