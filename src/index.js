@@ -57,7 +57,6 @@ export {
   alt,
   def,
   empty,
-  label,
   not,
   opt,
   peek,
@@ -89,6 +88,9 @@ export {
   third,
   value,
 } from './combinators/chaining'
+export {
+  label,
+} from './combinators/misc'
 export {
   between,
   block,
