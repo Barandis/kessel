@@ -60,6 +60,7 @@ nav:
       - buntil: parsers/buntil.md
       - chain: parsers/chain.md
       - char: parsers/char.md
+      - clean: parsers/clean.md
       - count: parsers/count.md
       - def: parsers/def.md
       - digit: parsers/digit.md
@@ -80,6 +81,7 @@ nav:
       - lassoc: parsers/lassoc.md
       - lassoc1: parsers/lassoc1.md
       - label: parsers/label.md
+      - lazy: parsers/lazy.md
       - left: parsers/left.md
       - letter: parsers/letter.md
       - lower: parsers/lower.md

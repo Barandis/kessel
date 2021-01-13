@@ -90,12 +90,13 @@ export {
   value,
 } from './combinators/chaining'
 export {
+  block,
   label,
   lazy,
+  skip,
 } from './combinators/misc'
 export {
   between,
-  block,
   count,
   endby,
   endby1,
@@ -111,7 +112,6 @@ export {
   sepby,
   sepby1,
   seq,
-  skip,
   until,
 } from './combinators/sequence'
 
