@@ -77,6 +77,7 @@ export {
 export {
   apply,
   chain,
+  clean,
   fifth,
   first,
   flat,
@@ -90,6 +91,7 @@ export {
 } from './combinators/chaining'
 export {
   label,
+  lazy,
 } from './combinators/misc'
 export {
   between,

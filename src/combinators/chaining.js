@@ -85,6 +85,35 @@ export const flat = (p, m) => parser(ctx => {
 })
 
 /**
+ * Creates a parser that will execute `p` and return `p`'s result with
+ * all `null` or `undefined` elements removed. This requires that `p`
+ * returns an array, and an error will be thrown if it does not.
+ *
+ * @param {Parser} p A parser that is expected to return an array.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
+ * @returns {Parser} A parser that executes `p` and returns the array
+ *     that `p` returns with `null` and `undefined` values stripped.
+ */
+export const clean = (p, m) => parser(ctx => {
+  const hasM = m != null
+
+  ASSERT && assertParser('clean', p, argParFormatter(1, hasM))
+  ASSERT && hasM && assertString('clean', m, argStrFormatter(2, true))
+
+  const [pctx, pres] = p(ctx)
+  if (pres.status !== Ok) {
+    const fn = replyFn(pres.status === Fatal)
+    return fn(pctx, ferror(m, pres.errors))
+  }
+
+  const v = pres.value
+  ASSERT && assertArray('clean', v, formatter('argument to return an array'))
+
+  return okReply(pctx, v.filter(x => x != null))
+})
+
+/**
  * A parser that executes `p` but, on success, returns `x` instead.
  *
  * @param {Parser} p The parser to apply. Its result is ignored.

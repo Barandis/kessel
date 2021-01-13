@@ -4,10 +4,13 @@
 // https://opensource.org/licenses/MIT
 
 import {
+  argFnFormatter,
   argParFormatter,
   argStrFormatter,
+  assertFunction,
   assertParser,
   assertString,
+  formatter,
 } from 'kessel/assert'
 import { failReply, parser, Status } from 'kessel/core'
 import { expected } from 'kessel/error'
@@ -45,3 +48,36 @@ export const label = (p, m) => parser(ctx => {
   const [prep, [pctx, pres]] = dup(p(ctx))
   return pres.status !== Fail ? prep : failReply(pctx, expected(m))
 })
+
+/**
+ * Creates a parser that runs a parser-producing function when it's
+ * execucted. It then executes that parser and returns its result.
+ *
+ * This is useful for defining recursive parsers, as defining a parser
+ * with a factory calling itself will always blow up the stack as the
+ * factory calls itself infinitely many times. `lazy` defers the call to
+ * the factory until the parser is executed and knows that it *needs*
+ * another parser from that factory. Assuming that there is a case when
+ * the parser would not call for another parser, the factory calls will
+ * terminate and no infinite loop will occur.
+ *
+ * @param {function():Parser} fn A parser-producing factory function.
+ * @param {string} [m] The expected error message to use if the parser
+ *     fails.
+ * @returns {Parser} A parser that calls `fn` on execution and executes
+ *     the parser it returns.
+ */
+export const lazy = (fn, m) => {
+  const hasM = m != null
+
+  ASSERT && assertFunction('lazy', fn, argFnFormatter(1, hasM))
+  ASSERT && hasM && assertString('lazy', m, argStrFormatter(2, true))
+
+  return parser(ctx => {
+    const p = fn()
+    ASSERT && assertParser(
+      'lazy', p, formatter('function argument to return a parser'),
+    )
+    return p(ctx)
+  })
+}

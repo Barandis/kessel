@@ -7,6 +7,7 @@ import { opt } from 'kessel/combinators/alternative'
 import {
   apply,
   chain,
+  clean,
   fifth,
   first,
   flat,
@@ -135,6 +136,55 @@ describe('Chaining and piping combinators', () => {
         status: Fail,
       })
       tfail(flat(seq(letter(), digit()), 'a letter and a digit'), 'ab', {
+        expected: 'a letter and a digit',
+        status: Fatal,
+      })
+    })
+  })
+
+  describe('clean', () => {
+    it('throws if its first argument is not a parser', () => {
+      terror(clean(0), '', '[clean]: expected argument to be a parser; found 0')
+      terror(
+        clean(0, 'test'),
+        '',
+        '[clean]: expected first argument to be a parser; found 0',
+      )
+    })
+    it('throws if its second argument exists and is not a string', () => {
+      terror(
+        clean(any(), 0),
+        '',
+        '[clean]: expected second argument to be a string; found 0',
+      )
+    })
+    it('throws if its argument does not return an array', () => {
+      terror(
+        clean(any()),
+        'a',
+        '[clean]: expected argument to return an array; found "a"',
+      )
+    })
+    it('removes null or undefined values from a parser result', () => {
+      const parser = seq(letter(), opt(digit()), letter())
+      tpass(parser, 'ab', ['a', null, 'b'])
+      tpass(clean(parser), 'ab', ['a', 'b'])
+      tpass(clean(parser, 'a clean array'), 'ab', ['a', 'b'])
+    })
+    it('fails if its contained parser fails', () => {
+      tfail(clean(many1(any())), '', {
+        expected: 'any character',
+        status: Fail,
+      })
+      tfail(clean(seq(letter(), digit())), 'ab', {
+        expected: 'a digit',
+        status: Fatal,
+      })
+      tfail(clean(many1(any()), 'a character'), '', {
+        expected: 'a character',
+        status: Fail,
+      })
+      tfail(clean(seq(letter(), digit()), 'a letter and a digit'), 'ab', {
         expected: 'a letter and a digit',
         status: Fatal,
       })
