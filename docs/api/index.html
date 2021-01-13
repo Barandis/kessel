@@ -539,6 +539,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#table-9-miscellaneous-combinators" class="md-nav__link">
+    Table 9: Miscellaneous combinators
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -553,22 +560,22 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#table-9-running-parsers" class="md-nav__link">
-    Table 9: Running parsers
+  <a href="#table-10-running-parsers" class="md-nav__link">
+    Table 10: Running parsers
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#table-10-error-generation" class="md-nav__link">
-    Table 10: Error generation
+  <a href="#table-11-error-generation" class="md-nav__link">
+    Table 11: Error generation
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#table-11-authoring-parsers" class="md-nav__link">
-    Table 11: Authoring parsers
+  <a href="#table-12-authoring-parsers" class="md-nav__link">
+    Table 12: Authoring parsers
   </a>
   
 </li>
@@ -895,7 +902,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../parsers/clean.md" class="md-nav__link">
+    <a href="../parsers/clean/" class="md-nav__link">
       clean
     </a>
   </li>
@@ -1147,7 +1154,7 @@
 
 
   <li class="md-nav__item">
-    <a href="../parsers/lazy.md" class="md-nav__link">
+    <a href="../parsers/lazy/" class="md-nav__link">
       lazy
     </a>
   </li>
@@ -2183,6 +2190,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#table-9-miscellaneous-combinators" class="md-nav__link">
+    Table 9: Miscellaneous combinators
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2197,22 +2211,22 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#table-9-running-parsers" class="md-nav__link">
-    Table 9: Running parsers
+  <a href="#table-10-running-parsers" class="md-nav__link">
+    Table 10: Running parsers
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#table-10-error-generation" class="md-nav__link">
-    Table 10: Error generation
+  <a href="#table-11-error-generation" class="md-nav__link">
+    Table 11: Error generation
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#table-11-authoring-parsers" class="md-nav__link">
-    Table 11: Authoring parsers
+  <a href="#table-12-authoring-parsers" class="md-nav__link">
+    Table 12: Authoring parsers
   </a>
   
 </li>
@@ -2477,20 +2491,12 @@
 <td>Executes two parsers in order and returns the result of the second one.</td>
 </tr>
 <tr>
-<td><a href="../parsers/block/"><code>block</code></a></td>
-<td>Runs a generator function. The generator can <code>yield</code> parsers, whose results will be returned as the result of the <code>yield</code> expressions. Returns the result of the generator.</td>
-</tr>
-<tr>
 <td><a href="../parsers/many/"><code>many</code></a></td>
 <td>Executes a parser zero or more times until it fails, returning all of the results in an array.</td>
 </tr>
 <tr>
 <td><a href="../parsers/many1/"><code>many1</code></a></td>
 <td>Executes a parser one or more times until it fails, returning all of the results in an array.</td>
-</tr>
-<tr>
-<td><a href="../parsers/skip/"><code>skip</code></a></td>
-<td>Executes a parser and discards the result.</td>
 </tr>
 <tr>
 <td><a href="../parsers/sepby/"><code>sepby</code></a></td>
@@ -2574,10 +2580,6 @@
 <tr>
 <td><a href="../parsers/not/"><code>not</code></a></td>
 <td>Executes a parser and succeeds without consuming input if that parser fails.</td>
-</tr>
-<tr>
-<td><a href="../parsers/label/"><code>label</code></a></td>
-<td>Provides an alternative error message if its contained parser fails.</td>
 </tr>
 </tbody>
 </table>
@@ -2693,11 +2695,42 @@
 <td><a href="../parsers/flat/"><code>flat</code></a></td>
 <td>Executes a parser and returns its resulting array with all sub-arrays flattened into a single-level array.</td>
 </tr>
+<tr>
+<td><a href="../parsers/clean/"><code>clean</code></a></td>
+<td>Executes a parser and returns its resulting array with <code>null</code> and <code>undefined</code> values filtered out.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="table-9-miscellaneous-combinators">Table 9: Miscellaneous combinators</h3>
+<table>
+<thead>
+<tr>
+<th>Parser</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../parsers/block/"><code>block</code></a></td>
+<td>Runs a generator function. The generator can <code>yield</code> parsers, whose results will be returned as the result of the <code>yield</code> expressions. Returns the result of the generator.</td>
+</tr>
+<tr>
+<td><a href="../parsers/skip/"><code>skip</code></a></td>
+<td>Executes a parser and discards the result.</td>
+</tr>
+<tr>
+<td><a href="../parsers/label/"><code>label</code></a></td>
+<td>Provides an alternative error message if its contained parser fails.</td>
+</tr>
+<tr>
+<td><a href="../parsers/lazy/"><code>lazy</code></a></td>
+<td>Defers the execution of a parser factory until parsers are executed; allows definition of recursive parsers.</td>
+</tr>
 </tbody>
 </table>
 <h2 id="tools">Tools</h2>
 <p>Tools provide ways to run parsers and ways to write new parsers (if <a href="../parsers/block/"><code>block</code></a> isn't good enough). Regular users will use the functions in Table 10, but those in Tables 11 and 12 are going to be of interest only to parser authors.</p>
-<h3 id="table-9-running-parsers">Table 9: Running parsers</h3>
+<h3 id="table-10-running-parsers">Table 10: Running parsers</h3>
 <table>
 <thead>
 <tr>
@@ -2732,7 +2765,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="table-10-error-generation">Table 10: Error generation</h3>
+<h3 id="table-11-error-generation">Table 11: Error generation</h3>
 <table>
 <thead>
 <tr>
@@ -2779,7 +2812,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="table-11-authoring-parsers">Table 11: Authoring parsers</h3>
+<h3 id="table-12-authoring-parsers">Table 12: Authoring parsers</h3>
 <table>
 <thead>
 <tr>

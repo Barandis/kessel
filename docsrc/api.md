@@ -85,10 +85,8 @@ Additionally, parsers are often said to *return* a value or to have a value as a
 | [`seq`](parsers/seq.md) | Executes a series of parsers in order, returning their results in an array. |
 | [`left`](parsers/left.md) | Executes two parsers in order and returns the result of the first one. |
 | [`right`](parsers/right.md) | Executes two parsers in order and returns the result of the second one. |
-| [`block`](parsers/block.md) | Runs a generator function. The generator can `yield` parsers, whose results will be returned as the result of the `yield` expressions. Returns the result of the generator. |
 | [`many`](parsers/many.md) | Executes a parser zero or more times until it fails, returning all of the results in an array. |
 | [`many1`](parsers/many1.md) | Executes a parser one or more times until it fails, returning all of the results in an array. |
-| [`skip`](parsers/skip.md) | Executes a parser and discards the result. |
 | [`sepby`](parsers/sepby.md) | Executes a content parser zero or more times with an application of a separator parser between each. Returns the content parser results. |
 | [`sepby1`](parsers/sepby1.md) | Executes a content parser one or more times with an application of a separator parser between each. Returns the content parser results. |
 | [`endby`](parsers/endby.md) | Executes a content parser zero or more times with an application of a separator parser between each and optionally at the end. Returns the content parser results. |
@@ -112,7 +110,6 @@ Additionally, parsers are often said to *return* a value or to have a value as a
 | [`peek`](parsers/peek.md) | Executes a parser and returns its result without consuming input. |
 | [`empty`](parsers/empty.md) | Executes a parser and fails if the parser succeeds but consumes input. |
 | [`not`](parsers/not.md) | Executes a parser and succeeds without consuming input if that parser fails. |
-| [`label`](parsers/label.md) | Provides an alternative error message if its contained parser fails. |
 
 ### Table 7: Backtracking combinators
 
@@ -146,12 +143,23 @@ Additionally, parsers are often said to *return* a value or to have a value as a
 | [`fifth`](parsers/fifth.md) | Executes a parser and returns the fifth element of the resulting array. |
 | [`join`](parsers/join.md) | Executes a parser and returns its resulting array elements joined together into a string. |
 | [`flat`](parsers/flat.md) | Executes a parser and returns its resulting array with all sub-arrays flattened into a single-level array. |
+| [`clean`](parsers/clean.md) | Executes a parser and returns its resulting array with `null` and `undefined` values filtered out. |
+
+
+### Table 9: Miscellaneous combinators
+
+| Parser | Description |
+|--------|-------------|
+| [`block`](parsers/block.md) | Runs a generator function. The generator can `yield` parsers, whose results will be returned as the result of the `yield` expressions. Returns the result of the generator. |
+| [`skip`](parsers/skip.md) | Executes a parser and discards the result. |
+| [`label`](parsers/label.md) | Provides an alternative error message if its contained parser fails. |
+| [`lazy`](parsers/lazy.md) | Defers the execution of a parser factory until parsers are executed; allows definition of recursive parsers. |
 
 ## Tools
 
 Tools provide ways to run parsers and ways to write new parsers (if [`block`](parsers/block.md) isn't good enough). Regular users will use the functions in Table 10, but those in Tables 11 and 12 are going to be of interest only to parser authors.
 
-### Table 9: Running parsers
+### Table 10: Running parsers
 
 | Function | Description |
 |----------|-------------|
@@ -162,7 +170,7 @@ Tools provide ways to run parsers and ways to write new parsers (if [`block`](pa
 | [`failure`](tools/failure.md) | Returns the error message from a parser result if it failed. |
 | [`run`](tools/run.md) | Executes a parser and either returns a successful result or throws an error. |
 
-### Table 10: Error generation
+### Table 11: Error generation
 
 | Function | Description |
 |----------|-------------|
@@ -176,7 +184,7 @@ Tools provide ways to run parsers and ways to write new parsers (if [`block`](pa
 | [`formatErrors`](tools/formaterrors.md) | Generates an error message out of a parser context and result. |
 | [`getPosition`](tools/getposition.md) | Determines the line/column position of a given context. |
 
-### Table 11: Authoring parsers
+### Table 12: Authoring parsers
 
 | Function | Description |
 |----------|-------------|
