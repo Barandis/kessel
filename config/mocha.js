@@ -6,6 +6,3 @@
  */
 
 require('@babel/register')
-
-global.ASSERT = true
-global.DEBUG = true
