@@ -10,7 +10,6 @@ const path = require('path')
 module.exports = {
   entry: './src/index.js',
   output: {
-    path: path.join(__dirname, 'lib'),
     library: 'kessel',
     libraryTarget: 'umd',
     globalObject: 'this',

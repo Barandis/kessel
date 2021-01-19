@@ -448,3 +448,17 @@ export function nerror(m, ctx, errors) {
 export function berror(cond, m, ctx, errors) {
   return cond ? nerror(m, ctx, errors) : ferror(m, errors)
 }
+
+export function hex(value, digits = 2) {
+  return value == null
+    ? 'null'
+    : ('0'.repeat(digits) + value.toString(16).toUpperCase()).substr(-digits)
+}
+
+export function displayHex(view, start, length) {
+  const bytes = []
+  for (const i of range(start, Math.min(start + length, view.byteLength))) {
+    bytes.push(hex(view.getUint8(i)))
+  }
+  return bytes.join(' ')
+}

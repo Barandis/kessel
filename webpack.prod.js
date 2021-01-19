@@ -18,12 +18,14 @@ const banner = fs.readFileSync(path.resolve(__dirname, 'LICENSE'), 'utf8')
 module.exports = merge(common, {
   mode: 'production',
   output: {
+    path: path.join(__dirname, 'lib'),
     filename: 'kessel.min.js',
   },
   plugins: [
     new webpack.BannerPlugin({ banner, entryOnly: true }),
     new webpack.DefinePlugin({
-      'ASSERT': true,
+      'ASSERT': JSON.stringify(true),
+      'DEBUG': JSON.stringify(true),
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
     }),
   ],

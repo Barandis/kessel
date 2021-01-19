@@ -37,13 +37,15 @@ const { Ok } = Status
  * @returns {Parser} A parser that reads a character and executes `fn`
  *     on it when applied to input.
  */
-const charParser = fn => parser(ctx => {
-  const { index, view } = ctx
-  if (index >= view.byteLength) return failReply(ctx)
+function charParser(fn) {
+  return parser(ctx => {
+    const { index, view } = ctx
+    if (index >= view.byteLength) return failReply(ctx)
 
-  const { width, next } = nextChar(index, view)
-  return fn(next) ? okReply(ctx, next, index + width) : failReply(ctx)
-})
+    const { width, next } = nextChar(index, view)
+    return fn(next) ? okReply(ctx, next, index + width) : failReply(ctx)
+  })
+}
 
 /**
  * A parser that reads a single character from input and succeeds if
@@ -57,17 +59,19 @@ const charParser = fn => parser(ctx => {
  * @returns {Parser} A parser that will succeed if `c` is the next
  *     character in the input.
  */
-export const char = (c, m) => parser(ctx => {
+export function char(c, m) {
   const hasM = m != null
 
-  ASSERT && assertChar('char', c, argCharFormatter(1, hasM))
-  ASSERT && hasM && assertString('char', m, argStrFormatter(2, true))
+  assertChar('char', c, argCharFormatter(1, hasM))
+  if (hasM) assertString('char', m, argStrFormatter(2, true))
 
-  const [crep, [cctx, cres]] = dup(charParser(ch => c === ch)(ctx))
-  return cres.status === Ok
-    ? crep
-    : failReply(cctx, ferror(m, expecteds.char(c)))
-})
+  return parser(ctx => {
+    const [crep, [cctx, cres]] = dup(charParser(ch => c === ch)(ctx))
+    return cres.status === Ok
+      ? crep
+      : failReply(cctx, ferror(m, expecteds.char(c)))
+  })
+}
 
 /**
  * A parser that reads a single character from input and succeeds if
@@ -82,19 +86,21 @@ export const char = (c, m) => parser(ctx => {
  * @returns {Parser} A parser that will succeed if `c` (or its
  *     other-cased counterpart) is the next character in the input.
  */
-export const ichar = (c, m) => parser(ctx => {
+export function ichar(c, m) {
   const hasM = m != null
 
-  ASSERT && assertChar('ichar', c, argCharFormatter(1, hasM))
-  ASSERT && hasM && assertString('ichar', m, argStrFormatter(2, true))
+  assertChar('ichar', c, argCharFormatter(1, hasM))
+  if (hasM) assertString('ichar', m, argStrFormatter(2, true))
 
-  const [crep, [cctx, cres]] = dup(charParser(
-    ch => c.toLowerCase() === ch.toLowerCase(),
-  )(ctx))
-  return cres.status === Ok
-    ? crep
-    : failReply(cctx, ferror(m, expecteds.ichar(c)))
-})
+  return parser(ctx => {
+    const [crep, [cctx, cres]] = dup(charParser(
+      ch => c.toLowerCase() === ch.toLowerCase(),
+    )(ctx))
+    return cres.status === Ok
+      ? crep
+      : failReply(cctx, ferror(m, expecteds.ichar(c)))
+  })
+}
 
 /**
  * A parser that reads a single character and passes it to the provided
@@ -116,16 +122,18 @@ export const ichar = (c, m) => parser(ctx => {
  * @returns {Parser} A parser that reads a character and executes `fn`
  *     on it when applied to input.
  */
-export const satisfy = (fn, m) => parser(ctx => {
+export function satisfy(fn, m) {
   const hasM = m != null
 
-  ASSERT && assertFunction('satisfy', fn, argFnFormatter(1, hasM))
-  ASSERT && hasM && assertString('satisfy', m, argStrFormatter(2, true))
+  assertFunction('satisfy', fn, argFnFormatter(1, hasM))
+  if (hasM) assertString('satisfy', m, argStrFormatter(2, true))
 
-  const [crep, [cctx, cres]] = dup(charParser(fn)(ctx))
-  if (cres.status === Ok) return crep
-  return failReply(cctx, ferror(m, cres.errors))
-})
+  return parser(ctx => {
+    const [crep, [cctx, cres]] = dup(charParser(fn)(ctx))
+    if (cres.status === Ok) return crep
+    return failReply(cctx, ferror(m, cres.errors))
+  })
+}
 
 /**
  * A parser that reads a single character and determines whether it is
@@ -145,19 +153,19 @@ export const satisfy = (fn, m) => parser(ctx => {
  * @returns {Parser} A parser that will succeed if the next input
  *     character is between `start` and `end` (inclusive).
  */
-export const range = (s, e, m) => parser(ctx => {
-  const hasM = m != null
+export function range(s, e, m) {
+  assertChar('range', s, argCharFormatter(1, true))
+  assertChar('range', e, argCharFormatter(2, true))
+  if (m != null) assertString('range', m, argStrFormatter(3, true))
 
-  ASSERT && assertChar('range', s, argCharFormatter(1, true))
-  ASSERT && assertChar('range', e, argCharFormatter(2, true))
-  ASSERT && hasM && assertString('range', m, argStrFormatter(3, true))
-
-  const fn = c => c >= s && c <= e
-  const [crep, [cctx, cres]] = dup(charParser(fn)(ctx))
-  return cres.status === Ok
-    ? crep
-    : failReply(cctx, ferror(m, expecteds.range(s, e)))
-})
+  return parser(ctx => {
+    const fn = c => c >= s && c <= e
+    const [crep, [cctx, cres]] = dup(charParser(fn)(ctx))
+    return cres.status === Ok
+      ? crep
+      : failReply(cctx, ferror(m, expecteds.range(s, e)))
+  })
+}
 
 /**
  * A parser that reads a single input character and then succeeds with
@@ -167,19 +175,19 @@ export const range = (s, e, m) => parser(ctx => {
  *     fails.
  * @returns {Parser} A parser that matches any character.
  */
-export const any = m => parser(ctx => {
-  const hasM = m != null
+export function any(m) {
+  if (m != null) assertString('any', m, argStrFormatter())
 
-  ASSERT && hasM && assertString('any', m, argStrFormatter())
+  return parser(ctx => {
+    const { index, view } = ctx
+    if (index >= view.byteLength) {
+      return failReply(ctx, ferror(m, expecteds.any))
+    }
 
-  const { index, view } = ctx
-  if (index >= view.byteLength) {
-    return failReply(ctx, ferror(m, expecteds.any))
-  }
-
-  const { width, next } = nextChar(index, view)
-  return okReply(ctx, next, index + width)
-})
+    const { width, next } = nextChar(index, view)
+    return okReply(ctx, next, index + width)
+  })
+}
 
 /**
  * A parser that reads one character and succeeds if that character does
@@ -190,16 +198,16 @@ export const any = m => parser(ctx => {
  *     fails.
  * @returns {Parser} A parser that matches the end of input.
  */
-export const eof = m => parser(ctx => {
-  const hasM = m != null
+export function eof(m) {
+  if (m != null) assertString('eof', m, argStrFormatter())
 
-  ASSERT && hasM && assertString('eof', m, argStrFormatter())
-
-  const { index, view } = ctx
-  return index >= view.byteLength
-    ? okReply(ctx, null)
-    : failReply(ctx, ferror(m, expecteds.eof))
-})
+  return parser(ctx => {
+    const { index, view } = ctx
+    return index >= view.byteLength
+      ? okReply(ctx, null)
+      : failReply(ctx, ferror(m, expecteds.eof))
+  })
+}
 
 /**
  * A parser that reads a character and compares it against each of the
@@ -215,23 +223,25 @@ export const eof = m => parser(ctx => {
  * @returns {Parser} A parser that succeeds if the next character is one
  *     of the characters in `chars`.
  */
-export const oneof = (cs, m) => parser(ctx => {
+export function oneof(cs, m) {
   const hasM = m != null
 
-  ASSERT && assertStringOrArray('oneof', cs, argStrArrFormatter(1, hasM))
-  ASSERT && hasM && assertString('oneof', m, argStrFormatter(2, true))
+  assertStringOrArray('oneof', cs, argStrArrFormatter(1, hasM))
+  if (hasM) assertString('oneof', m, argStrFormatter(2, true))
 
-  const arr = [...cs]
-  const { index, view } = ctx
-  if (index >= view.byteLength) {
-    return failReply(ctx, ferror(m, expecteds.oneof(arr)))
-  }
-  const { width, next } = nextChar(index, view)
+  return parser(ctx => {
+    const arr = [...cs]
+    const { index, view } = ctx
+    if (index >= view.byteLength) {
+      return failReply(ctx, ferror(m, expecteds.oneof(arr)))
+    }
+    const { width, next } = nextChar(index, view)
 
-  return arr.includes(next)
-    ? okReply(ctx, next, index + width)
-    : failReply(ctx, ferror(m, expecteds.oneof(arr)))
-})
+    return arr.includes(next)
+      ? okReply(ctx, next, index + width)
+      : failReply(ctx, ferror(m, expecteds.oneof(arr)))
+  })
+}
 
 /**
  * A parser that reads a character and compares it against each of the
@@ -247,23 +257,25 @@ export const oneof = (cs, m) => parser(ctx => {
  * @returns {Parser} A parser that succeeds if the next character is not
  *     one of the characters in `chars`.
  */
-export const noneof = (cs, m) => parser(ctx => {
+export function noneof(cs, m) {
   const hasM = m != null
 
-  ASSERT && assertStringOrArray('noneof', cs, argStrArrFormatter(1, hasM))
-  ASSERT && hasM && assertString('noneof', m, argStrFormatter(2, true))
+  assertStringOrArray('noneof', cs, argStrArrFormatter(1, hasM))
+  if (hasM) assertString('noneof', m, argStrFormatter(2, true))
 
-  const arr = [...cs]
-  const { index, view } = ctx
-  if (index >= view.byteLength) {
-    return failReply(ctx, ferror(m, expecteds.noneof(arr)))
-  }
-  const { width, next } = nextChar(index, view)
+  return parser(ctx => {
+    const arr = [...cs]
+    const { index, view } = ctx
+    if (index >= view.byteLength) {
+      return failReply(ctx, ferror(m, expecteds.noneof(arr)))
+    }
+    const { width, next } = nextChar(index, view)
 
-  return arr.includes(next)
-    ? failReply(ctx, ferror(m, expecteds.noneof(arr)))
-    : okReply(ctx, next, index + width)
-})
+    return arr.includes(next)
+      ? failReply(ctx, ferror(m, expecteds.noneof(arr)))
+      : okReply(ctx, next, index + width)
+  })
+}
 
 /**
  * A parser that reads a character and succeeds with that character if
@@ -274,15 +286,17 @@ export const noneof = (cs, m) => parser(ctx => {
  * @returns {Parser} A parser that succeeds if the next character is a
  *     digit.
  */
-export const digit = m => parser(ctx => {
-  const hasM = m != null
+export function digit(m) {
+  if (m != null) assertString('digit', m, argStrFormatter())
 
-  ASSERT && hasM && assertString('digit', m, argStrFormatter())
-
-  const fn = c => c >= '0' && c <= '9'
-  const [crep, [cctx, cres]] = dup(charParser(fn)(ctx))
-  return cres.status === Ok ? crep : failReply(cctx, ferror(m, expecteds.digit))
-})
+  return parser(ctx => {
+    const fn = c => c >= '0' && c <= '9'
+    const [crep, [cctx, cres]] = dup(charParser(fn)(ctx))
+    return cres.status === Ok
+      ? crep
+      : failReply(cctx, ferror(m, expecteds.digit))
+  })
+}
 
 /**
  * A parser that reads a character and succeeds with that character if
@@ -293,17 +307,19 @@ export const digit = m => parser(ctx => {
  * @returns {Parser} A parser that succeeds if the next character is a
  *     hexadecimal digit.
  */
-export const hex = m => parser(ctx => {
-  const hasM = m != null
+export function hex(m) {
+  if (m != null) assertString('hex', m, argStrFormatter())
 
-  ASSERT && hasM && assertString('hex', m, argStrFormatter())
-
-  const fn = c => c >= '0' && c <= '9'
+  return parser(ctx => {
+    const fn = c => c >= '0' && c <= '9'
     || c >= 'a' && c <= 'f'
     || c >= 'A' && c <= 'F'
-  const [crep, [cctx, cres]] = dup(charParser(fn)(ctx))
-  return cres.status === Ok ? crep : failReply(cctx, ferror(m, expecteds.hex))
-})
+    const [crep, [cctx, cres]] = dup(charParser(fn)(ctx))
+    return cres.status === Ok
+      ? crep
+      : failReply(cctx, ferror(m, expecteds.hex))
+  })
+}
 
 /**
  * A parser that reads a character and succeeds with that character if
@@ -314,15 +330,17 @@ export const hex = m => parser(ctx => {
  * @returns {Parser} A parser that succeeds if the next character is an
  *     octal digit.
  */
-export const octal = m => parser(ctx => {
-  const hasM = m != null
+export function octal(m) {
+  if (m != null) assertString('octal', m, argStrFormatter())
 
-  ASSERT && hasM && assertString('octal', m, argStrFormatter())
-
-  const fn = c => c >= '0' && c <= '7'
-  const [crep, [cctx, cres]] = dup(charParser(fn)(ctx))
-  return cres.status === Ok ? crep : failReply(cctx, ferror(m, expecteds.octal))
-})
+  return parser(ctx => {
+    const fn = c => c >= '0' && c <= '7'
+    const [crep, [cctx, cres]] = dup(charParser(fn)(ctx))
+    return cres.status === Ok
+      ? crep
+      : failReply(cctx, ferror(m, expecteds.octal))
+  })
+}
 
 /**
  * A parser that reads a character and succeeds with that character if
@@ -333,17 +351,17 @@ export const octal = m => parser(ctx => {
  * @returns {Parser} A parser that succeeds if the next character is a
  *     letter.
  */
-export const letter = m => parser(ctx => {
-  const hasM = m != null
+export function letter(m) {
+  if (m != null) assertString('letter', m, argStrFormatter())
 
-  ASSERT && hasM && assertString('letter', m, argStrFormatter())
-
-  const fn = c => c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z'
-  const [crep, [cctx, cres]] = dup(charParser(fn)(ctx))
-  return cres.status === Ok
-    ? crep
-    : failReply(cctx, ferror(m, expecteds.letter))
-})
+  return parser(ctx => {
+    const fn = c => c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z'
+    const [crep, [cctx, cres]] = dup(charParser(fn)(ctx))
+    return cres.status === Ok
+      ? crep
+      : failReply(cctx, ferror(m, expecteds.letter))
+  })
+}
 
 /**
  * A parser that reads a character and succeeds with that character if
@@ -354,17 +372,19 @@ export const letter = m => parser(ctx => {
  * @returns {Parser} A parser that succeeds if the next character is an
  *     alphanumeric character.
  */
-export const alpha = m => parser(ctx => {
-  const hasM = m != null
+export function alpha(m) {
+  if (m != null) assertString('alpha', m, argStrFormatter())
 
-  ASSERT && hasM && assertString('alpha', m, argStrFormatter())
-
-  const fn = c => c >= 'a' && c <= 'z'
-    || c >= 'A' && c <= 'Z'
-    || c >= '0' && c <= '9'
-  const [crep, [cctx, cres]] = dup(charParser(fn)(ctx))
-  return cres.status === Ok ? crep : failReply(cctx, ferror(m, expecteds.alpha))
-})
+  return parser(ctx => {
+    const fn = c => c >= 'a' && c <= 'z'
+      || c >= 'A' && c <= 'Z'
+      || c >= '0' && c <= '9'
+    const [crep, [cctx, cres]] = dup(charParser(fn)(ctx))
+    return cres.status === Ok
+      ? crep
+      : failReply(cctx, ferror(m, expecteds.alpha))
+  })
+}
 
 /**
  * A parser that reads a character and succeeds with that character if
@@ -375,15 +395,17 @@ export const alpha = m => parser(ctx => {
  * @returns {Parser} A parser that succeeds if the next character is an
  *     uppercase letter.
  */
-export const upper = m => parser(ctx => {
-  const hasM = m != null
+export function upper(m) {
+  if (m != null) assertString('upper', m, argStrFormatter())
 
-  ASSERT && hasM && assertString('upper', m, argStrFormatter())
-
-  const fn = c => c >= 'A' && c <= 'Z'
-  const [crep, [cctx, cres]] = dup(charParser(fn)(ctx))
-  return cres.status === Ok ? crep : failReply(cctx, ferror(m, expecteds.upper))
-})
+  return parser(ctx => {
+    const fn = c => c >= 'A' && c <= 'Z'
+    const [crep, [cctx, cres]] = dup(charParser(fn)(ctx))
+    return cres.status === Ok
+      ? crep
+      : failReply(cctx, ferror(m, expecteds.upper))
+  })
+}
 
 /**
  * A parser that reads a character and succeeds with that character if
@@ -394,12 +416,14 @@ export const upper = m => parser(ctx => {
  * @returns {Parser} A parser that succeeds if the next character is a
  *     lowercase letter.
  */
-export const lower = m => parser(ctx => {
-  const hasM = m != null
+export function lower(m) {
+  if (m != null) assertString('lower', m, argStrFormatter())
 
-  ASSERT && hasM && assertString('lower', m, argStrFormatter())
-
-  const fn = c => c >= 'a' && c <= 'z'
-  const [crep, [cctx, cres]] = dup(charParser(fn)(ctx))
-  return cres.status === Ok ? crep : failReply(cctx, ferror(m, expecteds.lower))
-})
+  return parser(ctx => {
+    const fn = c => c >= 'a' && c <= 'z'
+    const [crep, [cctx, cres]] = dup(charParser(fn)(ctx))
+    return cres.status === Ok
+      ? crep
+      : failReply(cctx, ferror(m, expecteds.lower))
+  })
+}

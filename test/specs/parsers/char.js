@@ -26,41 +26,41 @@ describe('Character parsers', () => {
   describe('char', () => {
     it('throws if something other than a single char is passed', () => {
       terror(
-        char(0),
+        () => char(0),
         '',
         '[char]: expected argument to be a one-character string; found 0',
       )
       terror(
-        char({}),
+        () => char({}),
         '',
         '[char]: expected argument to be a one-character string; found {}',
       )
       terror(
-        char('ab'),
+        () => char('ab'),
         '',
         '[char]: expected argument to be a one-character string; found "ab"',
       )
       terror(
-        char(() => {}),
+        () => char(() => {}),
         '',
         '[char]: expected argument to be a one-character string; '
           + 'found function',
       )
       terror(
-        char(),
+        () => char(),
         '',
         '[char]: expected argument to be a one-character string; '
           + 'found undefined',
       )
       terror(
-        char(0, 'test'),
+        () => char(0, 'test'),
         '',
         '[char]: expected first argument to be a one-character string; found 0',
       )
     })
     it('throws if second argument exists and is not a string', () => {
       terror(
-        char('a', 0),
+        () => char('a', 0),
         '',
         '[char]: expected second argument to be a string; found 0',
       )
@@ -150,22 +150,22 @@ describe('Character parsers', () => {
   describe('ichar', () => {
     it('throws if something other than a single char is passed', () => {
       terror(
-        ichar(0),
+        () => ichar(0),
         '',
         '[ichar]: expected argument to be a one-character string; found 0',
       )
       terror(
-        ichar({}),
+        () => ichar({}),
         '',
         '[ichar]: expected argument to be a one-character string; found {}',
       )
       terror(
-        ichar('ab'),
+        () => ichar('ab'),
         '',
         '[ichar]: expected argument to be a one-character string; found "ab"',
       )
       terror(
-        ichar(0, 'test'),
+        () => ichar(0, 'test'),
         '',
         '[ichar]: expected first argument to be a one-character string; '
           + 'found 0',
@@ -173,7 +173,7 @@ describe('Character parsers', () => {
     })
     it('throws if second argument exists and is not a string', () => {
       terror(
-        ichar('a', 0),
+        () => ichar('a', 0),
         '',
         '[ichar]: expected second argument to be a string; found 0',
       )
@@ -265,29 +265,29 @@ describe('Character parsers', () => {
 
     it('throws if a non-function is passed in', () => {
       terror(
-        satisfy(0),
+        () => satisfy(0),
         '',
         '[satisfy]: expected argument to be a function; found 0',
       )
       terror(
-        satisfy({}),
+        () => satisfy({}),
         '',
         '[satisfy]: expected argument to be a function; found {}',
       )
       terror(
-        satisfy(Symbol.for('test')),
+        () => satisfy(Symbol.for('test')),
         '',
         '[satisfy]: expected argument to be a function; found Symbol(test)',
       )
       terror(
-        satisfy(0, 'test'),
+        () => satisfy(0, 'test'),
         '',
         '[satisfy]: expected first argument to be a function; found 0',
       )
     })
     it('throws if second argument exists and is not a string', () => {
       terror(
-        satisfy(fn, 0),
+        () => satisfy(fn, 0),
         '',
         '[satisfy]: expected second argument to be a string; found 0',
       )
@@ -321,7 +321,7 @@ describe('Character parsers', () => {
   describe('range', () => {
     it('throws if the first argument is not a character', () => {
       terror(
-        range(0, '9'),
+        () => range(0, '9'),
         '',
         '[range]: expected first argument to be a one-character string; '
           + 'found 0',
@@ -329,7 +329,7 @@ describe('Character parsers', () => {
     })
     it('throws if the second argument is not a character', () => {
       terror(
-        range('0', 9),
+        () => range('0', 9),
         '',
         '[range]: expected second argument to be a one-character string; '
           + 'found 9',
@@ -337,7 +337,7 @@ describe('Character parsers', () => {
     })
     it('throws if the third argument exists and is not a string', () => {
       terror(
-        range('0', '9', 0),
+        () => range('0', '9', 0),
         '',
         '[range]: expected third argument to be a string; found 0',
       )
@@ -370,7 +370,9 @@ describe('Character parsers', () => {
 
   describe('any', () => {
     it('throws if its argument exists and is not a string', () => {
-      terror(any(0), '', '[any]: expected argument to be a string; found 0')
+      terror(
+        () => any(0), '', '[any]: expected argument to be a string; found 0',
+      )
     })
     it('results in the next 1-byte character', () => {
       tpass(any(), 'Onomatopoeia', { result: 'O', index: 1 })
@@ -396,7 +398,9 @@ describe('Character parsers', () => {
 
   describe('eof', () => {
     it('throws if its argument exists and is not a string', () => {
-      terror(eof(0), '', '[eof]: expected argument to be a string; found 0')
+      terror(
+        () => eof(0), '', '[eof]: expected argument to be a string; found 0',
+      )
     })
     it('fails if there are any remaining 1-byte characters', () => {
       tfail(eof(), 'Onomatopoeia', 'end of input')
@@ -423,13 +427,13 @@ describe('Character parsers', () => {
   describe('oneof', () => {
     it('throws if the argument is not a string or an array', () => {
       terror(
-        oneof(0),
+        () => oneof(0),
         '',
         '[oneof]: expected argument to be a string or an array of characters; '
           + 'found 0',
       )
       terror(
-        oneof(0, 'test'),
+        () => oneof(0, 'test'),
         '',
         '[oneof]: expected first argument to be a string or an array of '
           + 'characters; found 0',
@@ -437,13 +441,13 @@ describe('Character parsers', () => {
     })
     it('throws if the argument is an array of non-character strings', () => {
       terror(
-        oneof(['te', 'st']),
+        () => oneof(['te', 'st']),
         '',
         '[oneof]: expected argument to be a string or an array of characters; '
           + 'found ["te","st"]',
       )
       terror(
-        oneof(['', 'a']),
+        () => oneof(['', 'a']),
         '',
         '[oneof]: expected argument to be a string or an array of characters; '
           + 'found ["","a"]',
@@ -451,7 +455,7 @@ describe('Character parsers', () => {
     })
     it('throws if the argument is an array of non-strings', () => {
       terror(
-        oneof([0, 1, 2]),
+        () => oneof([0, 1, 2]),
         '',
         '[oneof]: expected argument to be a string or an array of characters; '
           + 'found [0,1,2]',
@@ -459,7 +463,7 @@ describe('Character parsers', () => {
     })
     it('throws if the second argument exists and is not a string', () => {
       terror(
-        oneof('abc', 0),
+        () => oneof('abc', 0),
         '',
         '[oneof]: expected second argument to be a string; found 0',
       )
@@ -513,13 +517,13 @@ describe('Character parsers', () => {
   describe('noneof', () => {
     it('throws if the argument is not a string or an array', () => {
       terror(
-        noneof(0),
+        () => noneof(0),
         '',
         '[noneof]: expected argument to be a string or an array of characters; '
           + 'found 0',
       )
       terror(
-        noneof(0, 'test'),
+        () => noneof(0, 'test'),
         '',
         '[noneof]: expected first argument to be a string or an array of '
           + 'characters; found 0',
@@ -527,13 +531,13 @@ describe('Character parsers', () => {
     })
     it('throws if the argument is an array of non-character strings', () => {
       terror(
-        noneof(['te', 'st']),
+        () => noneof(['te', 'st']),
         '',
         '[noneof]: expected argument to be a string or an array of characters; '
           + 'found ["te","st"]',
       )
       terror(
-        noneof(['', 'a']),
+        () => noneof(['', 'a']),
         '',
         '[noneof]: expected argument to be a string or an array of characters; '
           + 'found ["","a"]',
@@ -541,7 +545,7 @@ describe('Character parsers', () => {
     })
     it('throws if the argument is an array of non-strings', () => {
       terror(
-        noneof([0, 1, 2]),
+        () => noneof([0, 1, 2]),
         '',
         '[noneof]: expected argument to be a string or an array of characters; '
           + 'found [0,1,2]',
@@ -549,7 +553,7 @@ describe('Character parsers', () => {
     })
     it('throws if the second argument exists and is not a string', () => {
       terror(
-        noneof('abc', 0),
+        () => noneof('abc', 0),
         '',
         '[noneof]: expected second argument to be a string; found 0',
       )
@@ -602,7 +606,11 @@ describe('Character parsers', () => {
 
   describe('digit', () => {
     it('throws if its argument exists and is not a string', () => {
-      terror(digit(0), '', '[digit]: expected argument to be a string; found 0')
+      terror(
+        () => digit(0),
+        '',
+        '[digit]: expected argument to be a string; found 0',
+      )
     })
     it('succeeds on any single decimal digit', () => {
       tpass(digit(), '123', '1')
@@ -620,7 +628,9 @@ describe('Character parsers', () => {
 
   describe('hex', () => {
     it('throws if its argument exists and is not a string', () => {
-      terror(hex(0), '', '[hex]: expected argument to be a string; found 0')
+      terror(
+        () => hex(0), '', '[hex]: expected argument to be a string; found 0',
+      )
     })
     it('succeeds on any single decimal digit', () => {
       tpass(hex(), '123', '1')
@@ -639,7 +649,11 @@ describe('Character parsers', () => {
 
   describe('octal', () => {
     it('throws if its argument exists and is not a string', () => {
-      terror(octal(0), '', '[octal]: expected argument to be a string; found 0')
+      terror(
+        () => octal(0),
+        '',
+        '[octal]: expected argument to be a string; found 0',
+      )
     })
     it('succeeds on any single octal digit', () => {
       tpass(octal(), '123', '1')
@@ -658,8 +672,11 @@ describe('Character parsers', () => {
 
   describe('letter', () => {
     it('throws if its argument exists and is not a string', () => {
-      terror(letter(0), '', '[letter]: expected argument to be a string; '
-        + 'found 0')
+      terror(
+        () => letter(0),
+        '',
+        '[letter]: expected argument to be a string; found 0',
+      )
     })
     it('succeeds on uppercase letters', () => {
       tpass(letter(), 'A', 'A')
@@ -685,7 +702,11 @@ describe('Character parsers', () => {
 
   describe('alpha', () => {
     it('throws if its argument exists and is not a string', () => {
-      terror(alpha(0), '', '[alpha]: expected argument to be a string; found 0')
+      terror(
+        () => alpha(0),
+        '',
+        '[alpha]: expected argument to be a string; found 0',
+      )
     })
     it('succeeds on uppercase letters', () => {
       tpass(alpha(), 'A', 'A')
@@ -711,7 +732,11 @@ describe('Character parsers', () => {
 
   describe('upper', () => {
     it('throws if its argument exists and is not a string', () => {
-      terror(upper(0), '', '[upper]: expected argument to be a string; found 0')
+      terror(
+        () => upper(0),
+        '',
+        '[upper]: expected argument to be a string; found 0',
+      )
     })
     it('succeeds on uppercase letters', () => {
       tpass(upper(), 'A', 'A')
@@ -737,7 +762,11 @@ describe('Character parsers', () => {
 
   describe('lower', () => {
     it('throws if its argument exists and is not a string', () => {
-      terror(lower(0), '', '[lower]: expected argument to be a string; found 0')
+      terror(
+        () => lower(0),
+        '',
+        '[lower]: expected argument to be a string; found 0',
+      )
     })
     it('fails on uppercase letters', () => {
       tfail(lower(), 'A', 'a lowercase letter')

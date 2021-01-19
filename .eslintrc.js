@@ -10,6 +10,7 @@ module.exports = {
   },
   globals: {
     ASSERT: 'readonly',
+    DEBUG: 'readonly',
   },
   extends: ['eslint:recommended', 'plugin:import/errors'],
   parser: 'babel-eslint',
