@@ -35,7 +35,7 @@ const { Ok } = Status
  *     the predicate function.
  */
 function stringParser(length, fn) {
-  return parser(ctx => {
+  return ctx => {
     if (length < 1) return okReply(ctx, '')
 
     const { index, view } = ctx
@@ -45,7 +45,7 @@ function stringParser(length, fn) {
     return charLength(next) !== length || !fn(next)
       ? failReply(ctx)
       : okReply(ctx, next, index + width)
-  })
+  }
 }
 
 /**

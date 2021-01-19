@@ -102,7 +102,7 @@ export function regex(r, m) {
   assertStringOrRegExp('regex', r, argStrRegFormatter(1, hasM))
   if (hasM) assertString('regex', m, argStrFormatter(2, true))
 
-  return parser(ctx => {
+  return ctx => {
   // First, convert to a regular expression if it's a string
     let regex = typeof r === 'string' ? new RegExp(r) : r
 
@@ -118,7 +118,7 @@ export function regex(r, m) {
     return rres.status === Ok
       ? rrep
       : failReply(rctx, ferror(m, expecteds.regex(regex)))
-  })
+  }
 }
 
 /**

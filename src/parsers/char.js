@@ -38,13 +38,13 @@ const { Ok } = Status
  *     on it when applied to input.
  */
 function charParser(fn) {
-  return parser(ctx => {
+  return ctx => {
     const { index, view } = ctx
     if (index >= view.byteLength) return failReply(ctx)
 
     const { width, next } = nextChar(index, view)
     return fn(next) ? okReply(ctx, next, index + width) : failReply(ctx)
-  })
+  }
 }
 
 /**
