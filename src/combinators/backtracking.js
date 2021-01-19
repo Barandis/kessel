@@ -50,28 +50,31 @@ const { Ok, Fail, Fatal } = Status
  * @returns {Parser} A parser that cannot fail fatally. If its contained
  *     parser fails fatally, this one will instead fail non-fatally.
  */
-export const attempt = (p, m) => parser(ctx => {
+export function attempt(p, m) {
   const hasM = m != null
 
-  ASSERT && assertParser('attempt', p, argParFormatter(1, hasM))
-  ASSERT && hasM && assertString('attempt', m, argStrFormatter(2, true))
+  assertParser('attempt', p, argParFormatter(1, hasM))
+  if (hasM) assertString('attempt', m, argStrFormatter(2, true))
 
-  const index = ctx.index
+  return parser(ctx => {
+    const index = ctx.index
 
-  const [prep, [pctx, pres]] = dup(p(ctx))
-  if (pres.status === Ok) return prep
-  if (pres.status === Fatal || pctx.index !== index) {
-    return failReply(pctx, nerror(m, pctx, pres.errors), index)
-  }
-  if (hasM) {
-    if (pres.errors.length === 1 && pres.errors[0].type === ErrorType.Nested) {
-      const { ctx, errors } = pres.errors[0]
-      return failReply(pctx, compound(m, ctx, errors), index)
+    const [prep, [pctx, pres]] = dup(p(ctx))
+    if (pres.status === Ok) return prep
+    if (pres.status === Fatal || pctx.index !== index) {
+      return failReply(pctx, nerror(m, pctx, pres.errors), index)
     }
-    return failReply(pctx, expected(m), index)
-  }
-  return failReply(pctx, pres.errors, index)
-})
+    if (hasM) {
+      if (pres.errors.length === 1
+          && pres.errors[0].type === ErrorType.Nested) {
+        const { ctx, errors } = pres.errors[0]
+        return failReply(pctx, compound(m, ctx, errors), index)
+      }
+      return failReply(pctx, expected(m), index)
+    }
+    return failReply(pctx, pres.errors, index)
+  })
+}
 
 /**
  * A parser that implements a sequence. Each supplied parser is executed
@@ -91,14 +94,15 @@ export const attempt = (p, m) => parser(ctx => {
  * @returns {Parser} A parser that executes the supplied parsers one at
  *     a time, in order, and fails if any of those parsers fail.
  */
-export const bseq = (...args) => {
+export function bseq(...args) {
   const ps = args.slice()
   const m = typeof ps[ps.length - 1] === 'string' ? ps.pop() : null
 
-  return parser(ctx => {
-    ASSERT && ps.forEach((p, i) =>
-      assertParser('bseq', p, argParFormatter(i + 1, args.length > 1)))
+  ps.forEach((p, i) => assertParser(
+    'bseq', p, argParFormatter(i + 1, args.length > 1),
+  ))
 
+  return parser(ctx => {
     const values = []
     const index = ctx.index
     let context = ctx
@@ -141,34 +145,34 @@ export const bseq = (...args) => {
  *     the supplied function, and use that function's return value as a
  *     second parser to execute.
  */
-export const bchain = (p, fn, m) => parser(ctx => {
-  const hasM = m != null
+export function bchain(p, fn, m) {
+  assertParser('bchain', p, argParFormatter(1, true))
+  assertFunction('bchain', fn, argFnFormatter(2, true))
+  if (m != null) assertString('bchain', m, argStrFormatter(3, true))
 
-  ASSERT && assertParser('bchain', p, argParFormatter(1, true))
-  ASSERT && assertFunction('bchain', fn, argFnFormatter(2, true))
-  ASSERT && hasM && assertString('bchain', m, argStrFormatter(3, true))
+  return parser(ctx => {
+    const index = ctx.index
 
-  const index = ctx.index
+    const [pctx, pres] = p(ctx)
+    if (pres.status !== Ok) {
+      const fn = replyFn(pres.status === Fatal)
+      return fn(pctx, ferror(m, pres.errors))
+    }
 
-  const [pctx, pres] = p(ctx)
-  if (pres.status !== Ok) {
-    const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, ferror(m, pres.errors))
-  }
+    const q = fn(pres.value)
+    assertParser(
+      'bchain', q, formatter('second argument to return a parser'),
+    )
 
-  const q = fn(pres.value)
-  ASSERT && assertParser(
-    'bchain', q, formatter('second argument to return a parser'),
-  )
+    const [qrep, [qctx, qres]] = dup(q(pctx))
+    if (qres.status === Ok) return qrep
 
-  const [qrep, [qctx, qres]] = dup(q(pctx))
-  if (qres.status === Ok) return qrep
-
-  const errors = merge(pres.errors, qres.errors)
-  if (qres.status === Fatal) return fatalReply(qctx, ferror(m, errors))
-  const error = berror(qctx.index !== index, m, qctx, errors)
-  return failReply(qctx, error, index)
-})
+    const errors = merge(pres.errors, qres.errors)
+    if (qres.status === Fatal) return fatalReply(qctx, ferror(m, errors))
+    const error = berror(qctx.index !== index, m, qctx, errors)
+    return failReply(qctx, error, index)
+  })
+}
 
 /**
  * A parser that applies the value returned by `q` to the function
@@ -185,35 +189,35 @@ export const bchain = (p, fn, m) => parser(ctx => {
  *     the return value of the function returned by `q` when the value
  *     returned by `p` is passed into it.
  */
-export const bapply = (p, q, m) => parser(ctx => {
-  const hasM = m != null
+export function bapply(p, q, m) {
+  assertParser('bapply', p, argParFormatter(1, true))
+  assertParser('bapply', q, argParFormatter(2, true))
+  if (m != null) assertString('bapply', m, argStrFormatter(3, true))
 
-  ASSERT && assertParser('bapply', p, argParFormatter(1, true))
-  ASSERT && assertParser('bapply', q, argParFormatter(2, true))
-  ASSERT && hasM && assertString('bapply', m, argStrFormatter(3, true))
+  return parser(ctx => {
+    const index = ctx.index
 
-  const index = ctx.index
+    const [pctx, pres] = p(ctx)
+    if (pres.status !== Ok) {
+      const fn = replyFn(pres.status === Fatal)
+      return fn(pctx, ferror(m, pres.errors))
+    }
 
-  const [pctx, pres] = p(ctx)
-  if (pres.status !== Ok) {
-    const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, ferror(m, pres.errors))
-  }
+    const [qctx, qres] = q(pctx)
+    const errors = merge(pres.errors, qres.errors)
+    if (qres.status === Fatal) return fatalReply(qctx, ferror(m, errors))
+    if (qres.status === Fail) {
+      const error = berror(qctx.index !== index, m, qctx, errors)
+      return failReply(qctx, error, index)
+    }
 
-  const [qctx, qres] = q(pctx)
-  const errors = merge(pres.errors, qres.errors)
-  if (qres.status === Fatal) return fatalReply(qctx, ferror(m, errors))
-  if (qres.status === Fail) {
-    const error = berror(qctx.index !== index, m, qctx, errors)
-    return failReply(qctx, error, index)
-  }
-
-  const fn = qres.value
-  ASSERT && assertFunction(
-    'bapply', fn, formatter('second argument to return a function'),
-  )
-  return okReply(qctx, fn(pres.value))
-})
+    const fn = qres.value
+    assertFunction(
+      'bapply', fn, formatter('second argument to return a function'),
+    )
+    return okReply(qctx, fn(pres.value))
+  })
+}
 
 /**
  * A parser that will apply the parsers `p` and `q` in order and then
@@ -228,30 +232,30 @@ export const bapply = (p, q, m) => parser(ctx => {
  * @returns {Parser} A parser that executes `p` and `q` and returns the
  *     result of the first.
  */
-export const bleft = (p, q, m) => parser(ctx => {
-  const hasM = m != null
+export function bleft(p, q, m) {
+  assertParser('bleft', p, argParFormatter(1, true))
+  assertParser('bleft', q, argParFormatter(2, true))
+  if (m != null) assertString('bleft', m, argStrFormatter(3, true))
 
-  ASSERT && assertParser('bleft', p, argParFormatter(1, true))
-  ASSERT && assertParser('bleft', q, argParFormatter(2, true))
-  ASSERT && hasM && assertString('bleft', m, argStrFormatter(3, true))
+  return parser(ctx => {
+    const index = ctx.index
 
-  const index = ctx.index
+    const [pctx, pres] = p(ctx)
+    if (pres.status !== Ok) {
+      const fn = replyFn(pres.status === Fatal)
+      return fn(pctx, ferror(m, pres.errors))
+    }
 
-  const [pctx, pres] = p(ctx)
-  if (pres.status !== Ok) {
-    const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, ferror(m, pres.errors))
-  }
+    const [qctx, qres] = q(pctx)
+    if (qres.status === Ok) return okReply(qctx, pres.value)
 
-  const [qctx, qres] = q(pctx)
-  if (qres.status === Ok) return okReply(qctx, pres.value)
+    const errors = merge(pres.errors, qres.errors)
+    if (qres.status === Fatal) return fatalReply(qctx, ferror(m, errors))
 
-  const errors = merge(pres.errors, qres.errors)
-  if (qres.status === Fatal) return fatalReply(qctx, ferror(m, errors))
-
-  const error = berror(qctx.index !== index, m, qctx, errors)
-  return failReply(qctx, error, index)
-})
+    const error = berror(qctx.index !== index, m, qctx, errors)
+    return failReply(qctx, error, index)
+  })
+}
 
 /**
  * A parser that will apply the parsers `p` and `q` in order and then
@@ -266,30 +270,30 @@ export const bleft = (p, q, m) => parser(ctx => {
  * @returns {Parser} A parser that executes `p` and `q` and returns the
  *     result of the second.
  */
-export const bright = (p, q, m) => parser(ctx => {
-  const hasM = m != null
+export function bright(p, q, m) {
+  assertParser('bright', p, argParFormatter(1, true))
+  assertParser('bright', q, argParFormatter(2, true))
+  if (m != null) assertString('bright', m, argStrFormatter(3, true))
 
-  ASSERT && assertParser('bright', p, argParFormatter(1, true))
-  ASSERT && assertParser('bright', q, argParFormatter(2, true))
-  ASSERT && hasM && assertString('bright', m, argStrFormatter(3, true))
+  return parser(ctx => {
+    const index = ctx.index
 
-  const index = ctx.index
+    const [pctx, pres] = p(ctx)
+    if (pres.status !== Ok) {
+      const fn = replyFn(pres.status === Fatal)
+      return fn(pctx, ferror(m, pres.errors))
+    }
 
-  const [pctx, pres] = p(ctx)
-  if (pres.status !== Ok) {
-    const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, ferror(m, pres.errors))
-  }
+    const [qrep, [qctx, qres]] = dup(q(pctx))
+    if (qres.status === Ok) return qrep
 
-  const [qrep, [qctx, qres]] = dup(q(pctx))
-  if (qres.status === Ok) return qrep
+    const errors = merge(pres.errors, qres.errors)
+    if (qres.status === Fatal) return fatalReply(qctx, ferror(m, errors))
 
-  const errors = merge(pres.errors, qres.errors)
-  if (qres.status === Fatal) return fatalReply(qctx, ferror(m, errors))
-
-  const error = berror(qctx.index !== index, m, qctx, errors)
-  return failReply(qctx, error, index)
-})
+    const error = berror(qctx.index !== index, m, qctx, errors)
+    return failReply(qctx, error, index)
+  })
+}
 
 /**
  * A parser that executes the supplied parser `n` times, collecting the
@@ -305,29 +309,29 @@ export const bright = (p, q, m) => parser(ctx => {
  * @returns {Parser} A parser that executes `p` `n` times and results in
  *     an array of all of the successful results of `p`.
  */
-export const bcount = (p, n, m) => parser(ctx => {
-  const hasM = m != null
+export function bcount(p, n, m) {
+  assertParser('bcount', p, argParFormatter(1, true))
+  assertNumber('bcount', n, argNumFormatter(2, true))
+  if (m != null) assertString('bcount', m, argStrFormatter(3, true))
 
-  ASSERT && assertParser('bcount', p, argParFormatter(1, true))
-  ASSERT && assertNumber('bcount', n, argNumFormatter(2, true))
-  ASSERT && hasM && assertString('bcount', m, argStrFormatter(3, true))
+  return parser(ctx => {
+    const index = ctx.index
+    const values = []
+    let context = ctx
 
-  const index = ctx.index
-  const values = []
-  let context = ctx
-
-  for (const _ of range(n)) {
-    const [pctx, pres] = p(context)
-    context = pctx
-    if (pres.status === Fatal) return fatalReply(pctx, ferror(m, pres.errors))
-    if (pres.status === Fail) {
-      const error = berror(pctx.index !== index, m, pctx, pres.errors)
-      return failReply(pctx, error, index)
+    for (const _ of range(n)) {
+      const [pctx, pres] = p(context)
+      context = pctx
+      if (pres.status === Fatal) return fatalReply(pctx, ferror(m, pres.errors))
+      if (pres.status === Fail) {
+        const error = berror(pctx.index !== index, m, pctx, pres.errors)
+        return failReply(pctx, error, index)
+      }
+      values.push(pres.value)
     }
-    values.push(pres.value)
-  }
-  return okReply(context, values)
-})
+    return okReply(context, values)
+  })
+}
 
 /**
  * A parser which executes a content parser zero or more times until an
@@ -347,36 +351,36 @@ export const bcount = (p, n, m) => parser(ctx => {
  * @returns {Parser} A parser which will execute `e` and then `p` zero
  *     or more times until `e` succeeds.
  */
-export const buntil = (p, e, m) => parser(ctx => {
-  const hasM = m != null
+export function buntil(p, e, m) {
+  assertParser('buntil', p, argParFormatter(1, true))
+  assertParser('buntil', e, argParFormatter(2, true))
+  if (m != null) assertString('buntil', m, argStrFormatter(3, true))
 
-  ASSERT && assertParser('buntil', p, argParFormatter(1, true))
-  ASSERT && assertParser('buntil', e, argParFormatter(2, true))
-  ASSERT && hasM && assertString('buntil', m, argStrFormatter(3, true))
+  return parser(ctx => {
+    const index = ctx.index
+    const values = []
+    let context = ctx
 
-  const index = ctx.index
-  const values = []
-  let context = ctx
+    while (true) {
+      const [ectx, eres] = e(context)
+      context = ectx
+      if (eres.status === Fatal) return fatalReply(ectx, ferror(m, eres.errors))
+      if (eres.status === Ok) break
 
-  while (true) {
-    const [ectx, eres] = e(context)
-    context = ectx
-    if (eres.status === Fatal) return fatalReply(ectx, ferror(m, eres.errors))
-    if (eres.status === Ok) break
-
-    const [pctx, pres] = p(context)
-    context = pctx
-    if (pres.status === Fatal) return fatalReply(pctx, ferror(m, pres.errors))
-    if (pres.status === Fail) {
-      const error = berror(
-        pctx.index !== index, m, pctx, merge(pres.errors, eres.errors),
-      )
-      return failReply(pctx, error, index)
+      const [pctx, pres] = p(context)
+      context = pctx
+      if (pres.status === Fatal) return fatalReply(pctx, ferror(m, pres.errors))
+      if (pres.status === Fail) {
+        const error = berror(
+          pctx.index !== index, m, pctx, merge(pres.errors, eres.errors),
+        )
+        return failReply(pctx, error, index)
+      }
+      values.push(pres.value)
     }
-    values.push(pres.value)
-  }
-  return okReply(context, values)
-})
+    return okReply(context, values)
+  })
+}
 
 /**
  * A parser that executes a block of code in the form of a generator
@@ -397,40 +401,42 @@ export const buntil = (p, e, m) => parser(ctx => {
  *     executes parsers as they are yielded, and results in the return
  *     value of the generator.
  */
-export const bblock = (g, m) => parser(ctx => {
+export function bblock(g, m) {
   const hasM = m != null
 
-  ASSERT && assertGenFunction('bblock', g, argGenFormatter(1, hasM))
-  ASSERT && hasM && assertString('bblock', m, argStrFormatter(2, true))
+  assertGenFunction('bblock', g, argGenFormatter(1, hasM))
+  if (hasM) assertString('bblock', m, argStrFormatter(2, true))
 
-  const gen = g()
-  const index = ctx.index
-  let errors = []
-  let nextValue
-  let context = ctx
-  let i = 0
+  return parser(ctx => {
+    const gen = g()
+    const index = ctx.index
+    let errors = []
+    let nextValue
+    let context = ctx
+    let i = 0
 
-  while (true) {
-    const { value, done } = gen.next(nextValue)
-    if (done) return okReply(context, value)
+    while (true) {
+      const { value, done } = gen.next(nextValue)
+      if (done) return okReply(context, value)
 
-    ASSERT && assertParser('bblock', value, v => `expected ${
-      wordinal(i + 1)
-    } yield to be to a parser; found ${stringify(v)}`)
+      assertParser('bblock', value, v => `expected ${
+        wordinal(i + 1)
+      } yield to be to a parser; found ${stringify(v)}`)
 
-    const [pctx, pres] = value(context)
-    context = pctx
-    errors = pres.errors?.length ? merge(errors, pres.errors) : []
+      const [pctx, pres] = value(context)
+      context = pctx
+      errors = pres.errors?.length ? merge(errors, pres.errors) : []
 
-    if (pres.status === Fatal) return fatalReply(pctx, ferror(m, errors))
-    if (pres.status === Fail) {
-      const error = berror(pctx.index !== index, m, pctx, errors)
-      return failReply(pctx, error, index)
+      if (pres.status === Fatal) return fatalReply(pctx, ferror(m, errors))
+      if (pres.status === Fail) {
+        const error = berror(pctx.index !== index, m, pctx, errors)
+        return failReply(pctx, error, index)
+      }
+      nextValue = pres.value
+      i++
     }
-    nextValue = pres.value
-    i++
-  }
-})
+  })
+}
 
 /**
  * A parser that executes its parsers in sequence and passes those
@@ -452,17 +458,15 @@ export const bblock = (g, m) => parser(ctx => {
  *     feed the results to its function, and result in the function's
  *     return value.
  */
-export const bpipe = (...args) => {
+export function bpipe(...args) {
   const ps = args.slice()
   const m = typeof ps[ps.length - 1] === 'string' ? ps.pop() : null
   const fn = ps.pop()
 
-  return parser(ctx => {
-    ASSERT && ps.forEach((p, i) => assertParser(
-      'bpipe', p, argParFormatter(i + 1, true),
-    ))
-    ASSERT && assertFunction('bpipe', fn, argFnFormatter(ps.length + 1, true))
+  ps.forEach((p, i) => assertParser('bpipe', p, argParFormatter(i + 1, true)))
+  assertFunction('bpipe', fn, argFnFormatter(ps.length + 1, true))
 
+  return parser(ctx => {
     const index = ctx.index
     const values = []
     let context = ctx
@@ -499,39 +503,39 @@ export const bpipe = (...args) => {
  * @returns {Parser} A parser which executes `s`, `p`, and `e` in
  *     order and then returns the result of `p`.
  */
-export const bbetween = (s, e, p, m) => parser(ctx => {
-  const hasM = m != null
+export function bbetween(s, e, p, m) {
+  assertParser('bbetween', s, argParFormatter(1, true))
+  assertParser('bbetween', e, argParFormatter(2, true))
+  assertParser('bbetween', p, argParFormatter(3, true))
+  if (m != null) assertString('bbetween', m, argStrFormatter(4, true))
 
-  ASSERT && assertParser('bbetween', s, argParFormatter(1, true))
-  ASSERT && assertParser('bbetween', e, argParFormatter(2, true))
-  ASSERT && assertParser('bbetween', p, argParFormatter(3, true))
-  ASSERT && hasM && assertString('bbetween', m, argStrFormatter(4, true))
+  return parser(ctx => {
+    const index = ctx.index
 
-  const index = ctx.index
+    const [sctx, sres] = s(ctx)
+    if (sres.status !== Ok) {
+      const fn = replyFn(sres.status === Fatal)
+      return fn(sctx, ferror(m, sres.errors))
+    }
 
-  const [sctx, sres] = s(ctx)
-  if (sres.status !== Ok) {
-    const fn = replyFn(sres.status === Fatal)
-    return fn(sctx, ferror(m, sres.errors))
-  }
+    const [pctx, pres] = p(sctx)
+    const errors = pres.errors?.length ? merge(sres.errors, pres.errors) : []
+    if (pres.status === Fatal) return fatalReply(pctx, ferror(m, errors))
+    if (pres.status === Fail) {
+      const error = berror(pctx.index !== index, m, pctx, errors)
+      return failReply(pctx, error, index)
+    }
 
-  const [pctx, pres] = p(sctx)
-  const errors = pres.errors?.length ? merge(sres.errors, pres.errors) : []
-  if (pres.status === Fatal) return fatalReply(pctx, ferror(m, errors))
-  if (pres.status === Fail) {
-    const error = berror(pctx.index !== index, m, pctx, errors)
-    return failReply(pctx, error, index)
-  }
-
-  const [ectx, eres] = e(pctx)
-  if (eres.status === Fatal) {
-    return fatalReply(ectx, ferror(m, merge(errors, eres.errors)))
-  }
-  if (eres.status === Fail) {
-    const error = berror(
-      ectx.index !== index, m, ectx, merge(errors, eres.errors),
-    )
-    return failReply(ectx, error, index)
-  }
-  return okReply(ectx, pres.value)
-})
+    const [ectx, eres] = e(pctx)
+    if (eres.status === Fatal) {
+      return fatalReply(ectx, ferror(m, merge(errors, eres.errors)))
+    }
+    if (eres.status === Fail) {
+      const error = berror(
+        ectx.index !== index, m, ectx, merge(errors, eres.errors),
+      )
+      return failReply(ectx, error, index)
+    }
+    return okReply(ectx, pres.value)
+  })
+}

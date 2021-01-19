@@ -30,16 +30,18 @@ const { Fail, Fatal } = Status
 describe('Chaining and piping combinators', () => {
   describe('join', () => {
     it('throws if its first argument is not a parser', () => {
-      terror(join(0), '', '[join]: expected argument to be a parser; found 0')
       terror(
-        join(0, 'test'),
+        () => join(0), '', '[join]: expected argument to be a parser; found 0',
+      )
+      terror(
+        () => join(0, 'test'),
         '',
         '[join]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument exists and is not a string', () => {
       terror(
-        join(any(), 0),
+        () => join(any(), 0),
         '',
         '[join]: expected second argument to be a string; found 0',
       )
@@ -85,16 +87,18 @@ describe('Chaining and piping combinators', () => {
     const parserm = flat(parser, 'something weird')
 
     it('throws if its first argument is not a parser', () => {
-      terror(flat(0), '', '[flat]: expected argument to be a parser; found 0')
       terror(
-        flat(0, 'test'),
+        () => flat(0), '', '[flat]: expected argument to be a parser; found 0',
+      )
+      terror(
+        () => flat(0, 'test'),
         '',
         '[flat]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument exists and is not a string', () => {
       terror(
-        flat(any(), 0),
+        () => flat(any(), 0),
         '',
         '[flat]: expected second argument to be a string; found 0',
       )
@@ -144,16 +148,20 @@ describe('Chaining and piping combinators', () => {
 
   describe('clean', () => {
     it('throws if its first argument is not a parser', () => {
-      terror(clean(0), '', '[clean]: expected argument to be a parser; found 0')
       terror(
-        clean(0, 'test'),
+        () => clean(0),
+        '',
+        '[clean]: expected argument to be a parser; found 0',
+      )
+      terror(
+        () => clean(0, 'test'),
         '',
         '[clean]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument exists and is not a string', () => {
       terror(
-        clean(any(), 0),
+        () => clean(any(), 0),
         '',
         '[clean]: expected second argument to be a string; found 0',
       )
@@ -194,14 +202,14 @@ describe('Chaining and piping combinators', () => {
   describe('value', () => {
     it('throws if its first argument is not a parser', () => {
       terror(
-        value(0),
+        () => value(0),
         '',
         '[value]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its third argument exists and is not a string', () => {
       terror(
-        value(any(), 0, 0),
+        () => value(any(), 0, 0),
         '',
         '[value]: expected third argument to be a string; found 0',
       )
@@ -220,21 +228,21 @@ describe('Chaining and piping combinators', () => {
   describe('nth', () => {
     it('throws if its first argument is not a parser', () => {
       terror(
-        nth(0, 1),
+        () => nth(0, 1),
         '',
         '[nth]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a number', () => {
       terror(
-        nth(many(any()), '1'),
+        () => nth(many(any()), '1'),
         '',
         '[nth]: expected second argument to be a number; found "1"',
       )
     })
     it('throws if its third argument exists and is not a string', () => {
       terror(
-        nth(many(any()), 1, 0),
+        () => nth(many(any()), 1, 0),
         '',
         '[nth]: expected third argument to be a string; found 0',
       )
@@ -257,16 +265,20 @@ describe('Chaining and piping combinators', () => {
 
   describe('first', () => {
     it('throws if its argument is not a parser', () => {
-      terror(first(0), '', '[first]: expected argument to be a parser; found 0')
       terror(
-        first(0, 'test'),
+        () => first(0),
+        '',
+        '[first]: expected argument to be a parser; found 0',
+      )
+      terror(
+        () => first(0, 'test'),
         '',
         '[first]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument exists and is not a string', () => {
       terror(
-        first(any(), 0),
+        () => first(any(), 0),
         '',
         '[first]: expected second argument to be a string; found 0',
       )
@@ -291,19 +303,19 @@ describe('Chaining and piping combinators', () => {
   describe('second', () => {
     it('throws if its argument is not a parser', () => {
       terror(
-        second(0),
+        () => second(0),
         '',
         '[second]: expected argument to be a parser; found 0',
       )
       terror(
-        second(0, 'test'),
+        () => second(0, 'test'),
         '',
         '[second]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument exists and is not a string', () => {
       terror(
-        second(any(), 0),
+        () => second(any(), 0),
         '',
         '[second]: expected second argument to be a string; found 0',
       )
@@ -327,16 +339,20 @@ describe('Chaining and piping combinators', () => {
 
   describe('third', () => {
     it('throws if its argument is not a parser', () => {
-      terror(third(0), '', '[third]: expected argument to be a parser; found 0')
       terror(
-        third(0, 'test'),
+        () => third(0),
+        '',
+        '[third]: expected argument to be a parser; found 0',
+      )
+      terror(
+        () => third(0, 'test'),
         '',
         '[third]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument exists and is not a string', () => {
       terror(
-        third(any(), 0),
+        () => third(any(), 0),
         '',
         '[third]: expected second argument to be a string; found 0',
       )
@@ -361,19 +377,19 @@ describe('Chaining and piping combinators', () => {
   describe('fourth', () => {
     it('throws if its argument is not a parser', () => {
       terror(
-        fourth(0),
+        () => fourth(0),
         '',
         '[fourth]: expected argument to be a parser; found 0',
       )
       terror(
-        fourth(0, 'test'),
+        () => fourth(0, 'test'),
         '',
         '[fourth]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument exists and is not a string', () => {
       terror(
-        fourth(any(), 0),
+        () => fourth(any(), 0),
         '',
         '[fourth]: expected second argument to be a string; found 0',
       )
@@ -397,16 +413,20 @@ describe('Chaining and piping combinators', () => {
 
   describe('fifth', () => {
     it('throws if its argument is not a parser', () => {
-      terror(fifth(0), '', '[fifth]: expected argument to be a parser; found 0')
       terror(
-        fifth(0, 'test'),
+        () => fifth(0),
+        '',
+        '[fifth]: expected argument to be a parser; found 0',
+      )
+      terror(
+        () => fifth(0, 'test'),
         '',
         '[fifth]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument exists and is not a string', () => {
       terror(
-        fifth(any(), 0),
+        () => fifth(any(), 0),
         '',
         '[fifth]: expected second argument to be a string; found 0',
       )
@@ -431,21 +451,21 @@ describe('Chaining and piping combinators', () => {
   describe('map', () => {
     it('throws if its first argument is not a parser', () => {
       terror(
-        map(0, x => x),
+        () => map(0, x => x),
         '',
         '[map]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a function', () => {
       terror(
-        map(any(), 0),
+        () => map(any(), 0),
         '',
         '[map]: expected second argument to be a function; found 0',
       )
     })
     it('throws if its third argument exists and is not a string', () => {
       terror(
-        map(any(), x => x, 0),
+        () => map(any(), x => x, 0),
         '',
         '[map]: expected third argument to be a string; found 0',
       )
@@ -482,21 +502,21 @@ describe('Chaining and piping combinators', () => {
   describe('apply', () => {
     it('throws if its first argument is not a parser', () => {
       terror(
-        apply(0, any()),
+        () => apply(0, any()),
         '',
         '[apply]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
-        apply(any(), 0),
+        () => apply(any(), 0),
         '',
         '[apply]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its third argument exists and is not a string', () => {
       terror(
-        apply(any(), any(), 0),
+        () => apply(any(), any(), 0),
         '',
         '[apply]: expected third argument to be a string; found 0',
       )
@@ -547,21 +567,21 @@ describe('Chaining and piping combinators', () => {
   describe('chain', () => {
     it('throws if its first argument is not a parser', () => {
       terror(
-        chain(0, x => x),
+        () => chain(0, x => x),
         '',
         '[chain]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a function', () => {
       terror(
-        chain(any(), 0),
+        () => chain(any(), 0),
         '',
         '[chain]: expected second argument to be a function; found 0',
       )
     })
     it('throws if its third argument exists and is not a string', () => {
       terror(
-        chain(any(), x => x, 0),
+        () => chain(any(), x => x, 0),
         '',
         '[chain]: expected third argument to be a string; found 0',
       )

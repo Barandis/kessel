@@ -20,14 +20,14 @@ describe('Miscellaneous combinators', () => {
   describe('label', () => {
     it('throws if its first argument is not a parser', () => {
       terror(
-        label(0, 'test'),
+        () => label(0, 'test'),
         '',
         '[label]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a string', () => {
       terror(
-        label(letter()),
+        () => label(letter()),
         '',
         '[label]: expected second argument to be a string; found undefined',
       )
@@ -103,23 +103,23 @@ describe('Miscellaneous combinators', () => {
 
     it('throws if its first argument is not a generator function', () => {
       terror(
-        block(0),
+        () => block(0),
         '',
         '[block]: expected argument to be a generator function; found 0',
       )
       terror(
-        block(() => {}),
+        () => block(() => {}),
         '',
         '[block]: expected argument to be a generator function; found function',
       )
       terror(
-        block(0, 'test'),
+        () => block(0, 'test'),
         '',
         '[block]: expected first argument to be a generator function; found 0',
       )
     })
     it('throws if its second argument exists and is not a string', () => {
-      terror(
+      () => terror(
         block(function *() { yield 1 }, 0),
         '',
         '[block]: expected second argument to be a string; found 0',
@@ -211,16 +211,18 @@ describe('Miscellaneous combinators', () => {
 
   describe('skip', () => {
     it('throws if its first argument is not a parser', () => {
-      terror(skip(0), '', '[skip]: expected argument to be a parser; found 0')
       terror(
-        skip(0, 'test'),
+        () => skip(0), '', '[skip]: expected argument to be a parser; found 0',
+      )
+      terror(
+        () => skip(0, 'test'),
         '',
         '[skip]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument exists and is not a parser', () => {
       terror(
-        skip(any(), 0),
+        () => skip(any(), 0),
         '',
         '[skip]: expected second argument to be a string; found 0',
       )

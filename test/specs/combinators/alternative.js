@@ -36,12 +36,12 @@ describe('Alternative and conditional combinators', () => {
 
     it('throws if any of its arguments are not parsers', () => {
       terror(
-        alt(any(), 0),
+        () => alt(any(), 0),
         'abc',
         '[alt]: expected second argument to be a parser; found 0',
       )
       terror(
-        alt(any(), letter(), () => letter()),
+        () => alt(any(), letter(), () => letter()),
         'abc',
         '[alt]: expected third argument to be a parser; found function',
       )
@@ -49,7 +49,7 @@ describe('Alternative and conditional combinators', () => {
     it('does not throw if the last argument only is a string', () => {
       tpass(alt(any(), 'test'), 'abc', 'a')
       terror(
-        alt(any(), 'test', letter()),
+        () => alt(any(), 'test', letter()),
         'abc',
         '[alt]: expected second argument to be a parser; found "test"',
       )
@@ -70,16 +70,18 @@ describe('Alternative and conditional combinators', () => {
 
   describe('opt', () => {
     it('throws if its argument is not a parser', () => {
-      terror(opt(0), '', '[opt]: expected argument to be a parser; found 0')
       terror(
-        opt(0, 'test'),
+        () => opt(0), '', '[opt]: expected argument to be a parser; found 0',
+      )
+      terror(
+        () => opt(0, 'test'),
         '',
         '[opt]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument exists and is not a string', () => {
       terror(
-        opt(letter(), 0),
+        () => opt(letter(), 0),
         '',
         '[opt]: expected second argument to be a string; found 0',
       )
@@ -116,14 +118,14 @@ describe('Alternative and conditional combinators', () => {
   describe('def', () => {
     it('throws if its first argument is not a parser', () => {
       terror(
-        def(0),
+        () => def(0),
         '',
         '[def]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its third argument exists and is not a string', () => {
       terror(
-        def(letter(), 0, 0),
+        () => def(letter(), 0, 0),
         '',
         '[def]: expected third argument to be a string; found 0',
       )
@@ -154,19 +156,19 @@ describe('Alternative and conditional combinators', () => {
 
     it('throws if its first argument is not a parser', () => {
       terror(
-        peek(0),
+        () => peek(0),
         '',
         '[peek]: expected argument to be a parser; found 0',
       )
       terror(
-        peek(0, 'test'),
+        () => peek(0, 'test'),
         '',
         '[peek]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument exists and is not a string', () => {
       terror(
-        peek(letter(), 0),
+        () => peek(letter(), 0),
         '',
         '[peek]: expected second argument to be a string; found 0',
       )
@@ -188,19 +190,19 @@ describe('Alternative and conditional combinators', () => {
   describe('empty', () => {
     it('throws if its argument is not a parser', () => {
       terror(
-        empty(0),
+        () => empty(0),
         '',
         '[empty]: expected argument to be a parser; found 0',
       )
       terror(
-        empty(0, 'test'),
+        () => empty(0, 'test'),
         '',
         '[empty]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument exists and is not a string', () => {
       terror(
-        empty(many(letter()), 0),
+        () => empty(many(letter()), 0),
         '',
         '[empty]: expected second argument to be a string; found 0',
       )
@@ -248,19 +250,19 @@ describe('Alternative and conditional combinators', () => {
   describe('not', () => {
     it('throws if its first argument is not a parser', () => {
       terror(
-        not(0),
+        () => not(0),
         '',
         '[not]: expected argument to be a parser; found 0',
       )
       terror(
-        not(0, 'test'),
+        () => not(0, 'test'),
         '',
         '[not]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument exists and is not a string', () => {
       terror(
-        not(many(letter()), 0),
+        () => not(many(letter()), 0),
         '',
         '[not]: expected second argument to be a string; found 0',
       )

@@ -36,23 +36,25 @@ const { Ok, Fatal } = Status
  *     string made from joining the elements of the array of strings
  *     returned by `p`.
  */
-export const join = (p, m) => parser(ctx => {
+export function join(p, m) {
   const hasM = m != null
 
-  ASSERT && assertParser('join', p, argParFormatter(1, hasM))
-  ASSERT && hasM && assertString('join', m, argStrFormatter(2, true))
+  assertParser('join', p, argParFormatter(1, hasM))
+  if (hasM) assertString('join', m, argStrFormatter(2, true))
 
-  const [pctx, pres] = p(ctx)
-  if (pres.status !== Ok) {
-    const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, ferror(m, pres.errors))
-  }
+  return parser(ctx => {
+    const [pctx, pres] = p(ctx)
+    if (pres.status !== Ok) {
+      const fn = replyFn(pres.status === Fatal)
+      return fn(pctx, ferror(m, pres.errors))
+    }
 
-  const v = pres.value
-  ASSERT && assertArray('join', v, formatter('argument to return an array'))
+    const v = pres.value
+    assertArray('join', v, formatter('argument to return an array'))
 
-  return okReply(pctx, v.join(''))
-})
+    return okReply(pctx, v.join(''))
+  })
+}
 
 /**
  * A parser which will execute `p` and return its result with all
@@ -66,23 +68,25 @@ export const join = (p, m) => parser(ctx => {
  *     single-level array made by flattening the elements of the array
  *     returned by `p`.
  */
-export const flat = (p, m) => parser(ctx => {
+export function flat(p, m) {
   const hasM = m != null
 
-  ASSERT && assertParser('flat', p, argParFormatter(1, hasM))
-  ASSERT && hasM && assertString('flat', m, argStrFormatter(2, true))
+  assertParser('flat', p, argParFormatter(1, hasM))
+  if (hasM) assertString('flat', m, argStrFormatter(2, true))
 
-  const [pctx, pres] = p(ctx)
-  if (pres.status !== Ok) {
-    const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, ferror(m, pres.errors))
-  }
+  return parser(ctx => {
+    const [pctx, pres] = p(ctx)
+    if (pres.status !== Ok) {
+      const fn = replyFn(pres.status === Fatal)
+      return fn(pctx, ferror(m, pres.errors))
+    }
 
-  const v = pres.value
-  ASSERT && assertArray('flat', v, formatter('argument to return an array'))
+    const v = pres.value
+    assertArray('flat', v, formatter('argument to return an array'))
 
-  return okReply(pctx, v.flat(Infinity))
-})
+    return okReply(pctx, v.flat(Infinity))
+  })
+}
 
 /**
  * Creates a parser that will execute `p` and return `p`'s result with
@@ -95,23 +99,25 @@ export const flat = (p, m) => parser(ctx => {
  * @returns {Parser} A parser that executes `p` and returns the array
  *     that `p` returns with `null` and `undefined` values stripped.
  */
-export const clean = (p, m) => parser(ctx => {
+export function clean(p, m) {
   const hasM = m != null
 
-  ASSERT && assertParser('clean', p, argParFormatter(1, hasM))
-  ASSERT && hasM && assertString('clean', m, argStrFormatter(2, true))
+  assertParser('clean', p, argParFormatter(1, hasM))
+  if (hasM) assertString('clean', m, argStrFormatter(2, true))
 
-  const [pctx, pres] = p(ctx)
-  if (pres.status !== Ok) {
-    const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, ferror(m, pres.errors))
-  }
+  return parser(ctx => {
+    const [pctx, pres] = p(ctx)
+    if (pres.status !== Ok) {
+      const fn = replyFn(pres.status === Fatal)
+      return fn(pctx, ferror(m, pres.errors))
+    }
 
-  const v = pres.value
-  ASSERT && assertArray('clean', v, formatter('argument to return an array'))
+    const v = pres.value
+    assertArray('clean', v, formatter('argument to return an array'))
 
-  return okReply(pctx, v.filter(x => x != null))
-})
+    return okReply(pctx, v.filter(x => x != null))
+  })
+}
 
 /**
  * A parser that executes `p` but, on success, returns `x` instead.
@@ -124,19 +130,19 @@ export const clean = (p, m) => parser(ctx => {
  * @returns {Parser} A parser that will apply `p` but return `x` on
  *     success.
  */
-export const value = (p, x, m) => parser(ctx => {
-  const hasM = m != null
+export function value(p, x, m) {
+  assertParser('value', p, argParFormatter(1, true))
+  if (m != null) assertString('value', m, argStrFormatter(3, true))
 
-  ASSERT && assertParser('value', p, argParFormatter(1, true))
-  ASSERT && hasM && assertString('value', m, argStrFormatter(3, true))
-
-  const [pctx, pres] = p(ctx)
-  if (pres.status !== Ok) {
-    const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, ferror(m, pres.errors))
-  }
-  return okReply(pctx, x)
-})
+  return parser(ctx => {
+    const [pctx, pres] = p(ctx)
+    if (pres.status !== Ok) {
+      const fn = replyFn(pres.status === Fatal)
+      return fn(pctx, ferror(m, pres.errors))
+    }
+    return okReply(pctx, x)
+  })
+}
 
 /**
  * A parser that returns the `n`th element of array-producing parser
@@ -149,26 +155,24 @@ export const value = (p, x, m) => parser(ctx => {
  * @returns {Parser} A parser whose result is the `n`th element of the
  *     result of `p`.
  */
-export const nth = (p, n, m) => parser(ctx => {
-  const hasM = m != null
+export function nth(p, n, m) {
+  assertParser('nth', p, argParFormatter(1, true))
+  assertNumber('nth', n, argNumFormatter(2, true))
+  if (m != null) assertString('nth', m, argStrFormatter(3, true))
 
-  ASSERT && assertParser('nth', p, argParFormatter(1, true))
-  ASSERT && assertNumber('nth', n, argNumFormatter(2, true))
-  ASSERT && hasM && assertString('nth', m, argStrFormatter(3, true))
+  return parser(ctx => {
+    const [pctx, pres] = p(ctx)
+    if (pres.status !== Ok) {
+      const fn = replyFn(pres.status === Fatal)
+      return fn(pctx, ferror(m, pres.errors))
+    }
 
-  const [pctx, pres] = p(ctx)
-  if (pres.status !== Ok) {
-    const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, ferror(m, pres.errors))
-  }
+    const v = pres.value
+    assertArray('nth', v, formatter('first argument to return an array'))
 
-  const v = pres.value
-  ASSERT && assertArray(
-    'nth', v, formatter('first argument to return an array'),
-  )
-
-  return okReply(pctx, v[n])
-})
+    return okReply(pctx, v[n])
+  })
+}
 
 /**
  * A parser that returns the first element of array-producing parser
@@ -180,23 +184,25 @@ export const nth = (p, n, m) => parser(ctx => {
  * @returns {Parser} A parser whose result is the first element of the
  *     result of `p`.
  */
-export const first = (p, m) => parser(ctx => {
+export function first(p, m) {
   const hasM = m != null
 
-  ASSERT && assertParser('first', p, argParFormatter(1, hasM))
-  ASSERT && hasM && assertString('first', m, argStrFormatter(2, true))
+  assertParser('first', p, argParFormatter(1, hasM))
+  if (hasM) assertString('first', m, argStrFormatter(2, true))
 
-  const [pctx, pres] = p(ctx)
-  if (pres.status !== Ok) {
-    const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, ferror(m, pres.errors))
-  }
+  return parser(ctx => {
+    const [pctx, pres] = p(ctx)
+    if (pres.status !== Ok) {
+      const fn = replyFn(pres.status === Fatal)
+      return fn(pctx, ferror(m, pres.errors))
+    }
 
-  const v = pres.value
-  ASSERT && assertArray('first', v, formatter('argument to return an array'))
+    const v = pres.value
+    assertArray('first', v, formatter('argument to return an array'))
 
-  return okReply(pctx, v[0])
-})
+    return okReply(pctx, v[0])
+  })
+}
 
 /**
  * A parser that returns the second element of array-producing parser
@@ -208,23 +214,25 @@ export const first = (p, m) => parser(ctx => {
  * @returns {Parser} A parser whose result is the second element of the
  *     result of `p`.
  */
-export const second = (p, m) => parser(ctx => {
+export function second(p, m) {
   const hasM = m != null
 
-  ASSERT && assertParser('second', p, argParFormatter(1, hasM))
-  ASSERT && hasM && assertString('second', m, argStrFormatter(2, true))
+  assertParser('second', p, argParFormatter(1, hasM))
+  if (hasM) assertString('second', m, argStrFormatter(2, true))
 
-  const [pctx, pres] = p(ctx)
-  if (pres.status !== Ok) {
-    const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, ferror(m, pres.errors))
-  }
+  return parser(ctx => {
+    const [pctx, pres] = p(ctx)
+    if (pres.status !== Ok) {
+      const fn = replyFn(pres.status === Fatal)
+      return fn(pctx, ferror(m, pres.errors))
+    }
 
-  const v = pres.value
-  ASSERT && assertArray('second', v, formatter('argument to return an array'))
+    const v = pres.value
+    assertArray('second', v, formatter('argument to return an array'))
 
-  return okReply(pctx, v[1])
-})
+    return okReply(pctx, v[1])
+  })
+}
 
 /**
  * A parser that returns the third element of array-producing parser
@@ -236,23 +244,25 @@ export const second = (p, m) => parser(ctx => {
  * @returns {Parser} A parser whose result is the third element of the
  *     result of `p`.
  */
-export const third = (p, m) => parser(ctx => {
+export function third(p, m) {
   const hasM = m != null
 
-  ASSERT && assertParser('third', p, argParFormatter(1, hasM))
-  ASSERT && hasM && assertString('third', m, argStrFormatter(2, true))
+  assertParser('third', p, argParFormatter(1, hasM))
+  if (hasM) assertString('third', m, argStrFormatter(2, true))
 
-  const [pctx, pres] = p(ctx)
-  if (pres.status !== Ok) {
-    const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, ferror(m, pres.errors))
-  }
+  return parser(ctx => {
+    const [pctx, pres] = p(ctx)
+    if (pres.status !== Ok) {
+      const fn = replyFn(pres.status === Fatal)
+      return fn(pctx, ferror(m, pres.errors))
+    }
 
-  const v = pres.value
-  ASSERT && assertArray('third', v, formatter('argument to return an array'))
+    const v = pres.value
+    assertArray('third', v, formatter('argument to return an array'))
 
-  return okReply(pctx, v[2])
-})
+    return okReply(pctx, v[2])
+  })
+}
 
 /**
  * A parser that returns the fourth element of array-producing parser
@@ -264,23 +274,25 @@ export const third = (p, m) => parser(ctx => {
  * @returns {Parser} A parser whose result is the fourth element of the
  *     result of `p`.
  */
-export const fourth = (p, m) => parser(ctx => {
+export function fourth(p, m) {
   const hasM = m != null
 
-  ASSERT && assertParser('fourth', p, argParFormatter(1, hasM))
-  ASSERT && hasM && assertString('fourth', m, argStrFormatter(2, true))
+  assertParser('fourth', p, argParFormatter(1, hasM))
+  if (hasM) assertString('fourth', m, argStrFormatter(2, true))
 
-  const [pctx, pres] = p(ctx)
-  if (pres.status !== Ok) {
-    const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, ferror(m, pres.errors))
-  }
+  return parser(ctx => {
+    const [pctx, pres] = p(ctx)
+    if (pres.status !== Ok) {
+      const fn = replyFn(pres.status === Fatal)
+      return fn(pctx, ferror(m, pres.errors))
+    }
 
-  const v = pres.value
-  ASSERT && assertArray('fourth', v, formatter('argument to return an array'))
+    const v = pres.value
+    assertArray('fourth', v, formatter('argument to return an array'))
 
-  return okReply(pctx, v[3])
-})
+    return okReply(pctx, v[3])
+  })
+}
 
 /**
  * A parser that returns the fifth element of array-producing parser
@@ -292,23 +304,25 @@ export const fourth = (p, m) => parser(ctx => {
  * @returns {Parser} A parser whose result is the fifth element of the
  *     result of `p`.
  */
-export const fifth = (p, m) => parser(ctx => {
+export function fifth(p, m) {
   const hasM = m != null
 
-  ASSERT && assertParser('fifth', p, argParFormatter(1, hasM))
-  ASSERT && hasM && assertString('fifth', m, argStrFormatter(2, true))
+  assertParser('fifth', p, argParFormatter(1, hasM))
+  if (hasM) assertString('fifth', m, argStrFormatter(2, true))
 
-  const [pctx, pres] = p(ctx)
-  if (pres.status !== Ok) {
-    const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, ferror(m, pres.errors))
-  }
+  return parser(ctx => {
+    const [pctx, pres] = p(ctx)
+    if (pres.status !== Ok) {
+      const fn = replyFn(pres.status === Fatal)
+      return fn(pctx, ferror(m, pres.errors))
+    }
 
-  const v = pres.value
-  ASSERT && assertArray('fifth', v, formatter('argument to return an array'))
+    const v = pres.value
+    assertArray('fifth', v, formatter('argument to return an array'))
 
-  return okReply(pctx, v[4])
-})
+    return okReply(pctx, v[4])
+  })
+}
 
 /**
  * A parser that applies the supplied parser and passes its result to
@@ -328,20 +342,20 @@ export const fifth = (p, m) => parser(ctx => {
  *     pass the result to the supplied function, and succeed with that
  *     return value as its result.
  */
-export const map = (p, fn, m) => parser(ctx => {
-  const hasM = m != null
+export function map(p, fn, m) {
+  assertParser('map', p, argParFormatter(1, true))
+  assertFunction('map', fn, argFnFormatter(2, true))
+  if (m != null) assertString('map', m, argStrFormatter(3, true))
 
-  ASSERT && assertParser('map', p, argParFormatter(1, true))
-  ASSERT && assertFunction('map', fn, argFnFormatter(2, true))
-  ASSERT && hasM && assertString('map', m, argStrFormatter(3, true))
-
-  const [pctx, pres] = p(ctx)
-  if (pres.status !== Ok) {
-    const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, ferror(m, pres.errors))
-  }
-  return okReply(pctx, fn(pres.value))
-})
+  return parser(ctx => {
+    const [pctx, pres] = p(ctx)
+    if (pres.status !== Ok) {
+      const fn = replyFn(pres.status === Fatal)
+      return fn(pctx, ferror(m, pres.errors))
+    }
+    return okReply(pctx, fn(pres.value))
+  })
+}
 
 /**
  * A parser that applies the value returned by `q` to the function
@@ -362,33 +376,33 @@ export const map = (p, fn, m) => parser(ctx => {
  *     the return value of the function returned by `q` when the value
  *     returned by `p` is passed into it.
  */
-export const apply = (p, q, m) => parser(ctx => {
-  const hasM = m != null
+export function apply(p, q, m) {
+  assertParser('apply', p, argParFormatter(1, true))
+  assertParser('apply', q, argParFormatter(2, true))
+  if (m != null) assertString('apply', m, argStrFormatter(3, true))
 
-  ASSERT && assertParser('apply', p, argParFormatter(1, true))
-  ASSERT && assertParser('apply', q, argParFormatter(2, true))
-  ASSERT && hasM && assertString('apply', m, argStrFormatter(3, true))
+  return parser(ctx => {
+    const index = ctx.index
 
-  const index = ctx.index
+    const [pctx, pres] = p(ctx)
+    if (pres.status !== Ok) {
+      const fn = replyFn(pres.status === Fatal)
+      return fn(pctx, ferror(m, pres.errors))
+    }
 
-  const [pctx, pres] = p(ctx)
-  if (pres.status !== Ok) {
-    const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, ferror(m, pres.errors))
-  }
+    const [qctx, qres] = q(pctx)
+    if (qres.status !== Ok) {
+      const fn = replyFn(qres.status === Fatal || qctx.index !== index)
+      return fn(qctx, ferror(m, merge(pres.errors, qres.errors)))
+    }
 
-  const [qctx, qres] = q(pctx)
-  if (qres.status !== Ok) {
-    const fn = replyFn(qres.status === Fatal || qctx.index !== index)
-    return fn(qctx, ferror(m, merge(pres.errors, qres.errors)))
-  }
-
-  const fn = qres.value
-  ASSERT && assertFunction(
-    'apply', fn, formatter('second argument to return a function'),
-  )
-  return okReply(qctx, fn(pres.value))
-})
+    const fn = qres.value
+    assertFunction(
+      'apply', fn, formatter('second argument to return a function'),
+    )
+    return okReply(qctx, fn(pres.value))
+  })
+}
 
 /**
  * A parser that chains the result after applying its contained parser
@@ -413,30 +427,28 @@ export const apply = (p, q, m) => parser(ctx => {
  *     pass the result to the supplied function, and use that function's
  *     return value as a second parser to apply the input to.
  */
-export const chain = (p, fn, m) => parser(ctx => {
-  const hasM = m != null
+export function chain(p, fn, m) {
+  assertParser('chain', p, argParFormatter(1, true))
+  assertFunction('chain', fn, argFnFormatter(2, true))
+  if (m != null) assertString('chain', m, argStrFormatter(3, true))
 
-  ASSERT && assertParser('chain', p, argParFormatter(1, true))
-  ASSERT && assertFunction('chain', fn, argFnFormatter(2, true))
-  ASSERT && hasM && assertString('chain', m, argStrFormatter(3, true))
+  return parser(ctx => {
+    const index = ctx.index
 
-  const index = ctx.index
+    const [pctx, pres] = p(ctx)
+    if (pres.status !== Ok) {
+      const fn = replyFn(pres.status === Fatal)
+      return fn(pctx, ferror(m, pres.errors))
+    }
 
-  const [pctx, pres] = p(ctx)
-  if (pres.status !== Ok) {
-    const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, ferror(m, pres.errors))
-  }
+    const q = fn(pres.value)
+    assertParser('chain', q, formatter('second argument to return a parser'))
 
-  const q = fn(pres.value)
-  ASSERT && assertParser(
-    'chain', q, formatter('second argument to return a parser'),
-  )
-
-  const [qrep, [qctx, qres]] = dup(q(pctx))
-  if (qres.status !== Ok) {
-    const fn = replyFn(qres.status === Fatal || qctx.index !== index)
-    return fn(qctx, ferror(m, merge(pres.errors, qres.errors)))
-  }
-  return qrep
-})
+    const [qrep, [qctx, qres]] = dup(q(pctx))
+    if (qres.status !== Ok) {
+      const fn = replyFn(qres.status === Fatal || qctx.index !== index)
+      return fn(qctx, ferror(m, merge(pres.errors, qres.errors)))
+    }
+    return qrep
+  })
+}

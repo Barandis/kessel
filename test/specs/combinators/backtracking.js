@@ -35,19 +35,19 @@ describe('Backtracking and error handling combinators', () => {
   describe('attempt', () => {
     it('throws if its first argument is not a parser', () => {
       terror(
-        attempt(0),
+        () => attempt(0),
         '',
         '[attempt]: expected argument to be a parser; found 0',
       )
       terror(
-        attempt(0, 'test'),
+        () => attempt(0, 'test'),
         '',
         '[attempt]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument exists and is not a string', () => {
       terror(
-        attempt(any(), 0),
+        () => attempt(any(), 0),
         '',
         '[attempt]: expected second argument to be a string; found 0',
       )
@@ -116,12 +116,12 @@ describe('Backtracking and error handling combinators', () => {
 
     it('throws if any of its arguments is not a parser', () => {
       terror(
-        bseq(any(), 0),
+        () => bseq(any(), 0),
         '',
         '[bseq]: expected second argument to be a parser; found 0',
       )
       terror(
-        bseq(any(), letter(), digit(), {}),
+        () => bseq(any(), letter(), digit(), {}),
         '',
         '[bseq]: expected fourth argument to be a parser; found {}',
       )
@@ -190,21 +190,21 @@ describe('Backtracking and error handling combinators', () => {
   describe('bchain', () => {
     it('throws if its first argument is not a parser', () => {
       terror(
-        bchain(0, x => x),
+        () => bchain(0, x => x),
         '',
         '[bchain]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a function', () => {
       terror(
-        bchain(any(), 0),
+        () => bchain(any(), 0),
         '',
         '[bchain]: expected second argument to be a function; found 0',
       )
     })
     it('throws if its third argument exists and is not a string', () => {
       terror(
-        bchain(any(), x => x, 0),
+        () => bchain(any(), x => x, 0),
         '',
         '[bchain]: expected third argument to be a string; found 0',
       )
@@ -297,21 +297,21 @@ describe('Backtracking and error handling combinators', () => {
   describe('bapply', () => {
     it('throws if its first argument is not a parser', () => {
       terror(
-        bapply(0, any()),
+        () => bapply(0, any()),
         '',
         '[bapply]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
-        bapply(any(), 0),
+        () => bapply(any(), 0),
         '',
         '[bapply]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its third argument exists and is not a string', () => {
       terror(
-        bapply(any(), any(), 0),
+        () => bapply(any(), any(), 0),
         '',
         '[bapply]: expected third argument to be a string; found 0',
       )
@@ -387,21 +387,21 @@ describe('Backtracking and error handling combinators', () => {
   describe('bleft', () => {
     it('throws if its first argument is not a parser', () => {
       terror(
-        bleft(0, any()),
+        () => bleft(0, any()),
         '',
         '[bleft]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
-        bleft(any(), 0),
+        () => bleft(any(), 0),
         '',
         '[bleft]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its third argument exists and is not a string', () => {
       terror(
-        bleft(any(), any(), 0),
+        () => bleft(any(), any(), 0),
         '',
         '[bleft]: expected third argument to be a string; found 0',
       )
@@ -473,21 +473,21 @@ describe('Backtracking and error handling combinators', () => {
   describe('bright', () => {
     it('throws if its first argument is not a parser', () => {
       terror(
-        bright(0, any()),
+        () => bright(0, any()),
         '',
         '[bright]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
-        bright(any(), 0),
+        () => bright(any(), 0),
         '',
         '[bright]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its third argument exists and is not a string', () => {
       terror(
-        bright(any(), any(), 0),
+        () => bright(any(), any(), 0),
         '',
         '[bright]: expected third argument to be a string; found 0',
       )
@@ -559,21 +559,21 @@ describe('Backtracking and error handling combinators', () => {
   describe('bcount', () => {
     it('throws if its first argument is not a parser', () => {
       terror(
-        bcount(0, 5),
+        () => bcount(0, 5),
         '',
         '[bcount]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a number', () => {
       terror(
-        bcount(any(), '3'),
+        () => bcount(any(), '3'),
         '',
         '[bcount]: expected second argument to be a number; found "3"',
       )
     })
     it('throws if its third argument exists and is not a string', () => {
       terror(
-        bcount(any(), 3, 0),
+        () => bcount(any(), 3, 0),
         '',
         '[bcount]: expected third argument to be a string; found 0',
       )
@@ -627,21 +627,21 @@ describe('Backtracking and error handling combinators', () => {
   describe('buntil', () => {
     it('throws if its first argument is not a parser', () => {
       terror(
-        buntil(0, any()),
+        () => buntil(0, any()),
         '',
         '[buntil]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
-        buntil(any(), 0),
+        () => buntil(any(), 0),
         '',
         '[buntil]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its third argument exist and is not a parser', () => {
       terror(
-        buntil(any(), any(), 0),
+        () => buntil(any(), any(), 0),
         '',
         '[buntil]: expected third argument to be a string; found 0',
       )
@@ -713,25 +713,25 @@ describe('Backtracking and error handling combinators', () => {
 
     it('throws if its first argument is not a generator function', () => {
       terror(
-        bblock(0),
+        () => bblock(0),
         '',
         '[bblock]: expected argument to be a generator function; found 0',
       )
       terror(
-        bblock(() => {}),
+        () => bblock(() => {}),
         '',
         '[bblock]: expected argument to be a generator function; '
           + 'found function',
       )
       terror(
-        bblock(0, 'test'),
+        () => bblock(0, 'test'),
         '',
         '[bblock]: expected first argument to be a generator function; found 0',
       )
     })
     it('throws if its second argument exists and is not a string', () => {
       terror(
-        bblock(function *() { yield 1 }, 0),
+        () => bblock(function *() { yield 1 }, 0),
         '',
         '[bblock]: expected second argument to be a string; found 0',
       )
@@ -822,19 +822,19 @@ describe('Backtracking and error handling combinators', () => {
   describe('bpipe', () => {
     it('throws if its last argument is not a function', () => {
       terror(
-        bpipe(any(), any(), 0),
+        () => bpipe(any(), any(), 0),
         '',
         '[bpipe]: expected third argument to be a function; found 0',
       )
       terror(
-        bpipe(any(), any(), any(), any()),
+        () => bpipe(any(), any(), any(), any()),
         '',
         '[bpipe]: expected fourth argument to be a function; found parser',
       )
     })
     it('throws if string last arg is not preceded by a function', () => {
       terror(
-        bpipe(any(), any(), any(), 'test'),
+        () => bpipe(any(), any(), any(), 'test'),
         '',
         '[bpipe]: expected third argument to be a function; found parser',
       )
@@ -919,28 +919,28 @@ describe('Backtracking and error handling combinators', () => {
 
     it('throws if its first argument is not a parser', () => {
       terror(
-        bbetween(0, any(), any()),
+        () => bbetween(0, any(), any()),
         '',
         '[bbetween]: expected first argument to be a parser; found 0',
       )
     })
     it('throws if its second argument is not a parser', () => {
       terror(
-        bbetween(any(), 0, any()),
+        () => bbetween(any(), 0, any()),
         '',
         '[bbetween]: expected second argument to be a parser; found 0',
       )
     })
     it('throws if its third argument is not a parser', () => {
       terror(
-        bbetween(any(), any(), 0),
+        () => bbetween(any(), any(), 0),
         '',
         '[bbetween]: expected third argument to be a parser; found 0',
       )
     })
     it('throws if its fourth argument exists and is not a string', () => {
       terror(
-        bbetween(any(), any(), any(), 0),
+        () => bbetween(any(), any(), any(), 0),
         '',
         '[bbetween]: expected fourth argument to be a string; found 0',
       )

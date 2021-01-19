@@ -43,13 +43,15 @@ const { Ok, Fail, Fatal } = Status
  * @returns {Parser} A new parser that exeuctes the same as `p` but
  *     provides `m` as an error message when it fails.
  */
-export const label = (p, m) => parser(ctx => {
-  ASSERT && assertParser('label', p, argParFormatter(1, true))
-  ASSERT && assertString('label', m, argStrFormatter(2, true))
+export function label(p, m) {
+  assertParser('label', p, argParFormatter(1, true))
+  assertString('label', m, argStrFormatter(2, true))
 
-  const [prep, [pctx, pres]] = dup(p(ctx))
-  return pres.status !== Fail ? prep : failReply(pctx, expected(m))
-})
+  return parser(ctx => {
+    const [prep, [pctx, pres]] = dup(p(ctx))
+    return pres.status !== Fail ? prep : failReply(pctx, expected(m))
+  })
+}
 
 /**
  * Creates a parser that runs a parser-producing function when it's
@@ -69,15 +71,15 @@ export const label = (p, m) => parser(ctx => {
  * @returns {Parser} A parser that calls `fn` on execution and executes
  *     the parser it returns.
  */
-export const lazy = (fn, m) => {
+export function lazy(fn, m) {
   const hasM = m != null
 
-  ASSERT && assertFunction('lazy', fn, argFnFormatter(1, hasM))
-  ASSERT && hasM && assertString('lazy', m, argStrFormatter(2, true))
+  assertFunction('lazy', fn, argFnFormatter(1, hasM))
+  if (hasM) assertString('lazy', m, argStrFormatter(2, true))
 
   return parser(ctx => {
     const p = fn()
-    ASSERT && assertParser(
+    assertParser(
       'lazy', p, formatter('function argument to return a parser'),
     )
     return p(ctx)
@@ -109,39 +111,41 @@ export const lazy = (fn, m) => {
  *     executes parsers as they are yielded, and results in the return
  *     value of the generator.
  */
-export const block = (g, m) => parser(ctx => {
+export function block(g, m) {
   const hasM = m != null
 
-  ASSERT && assertGenFunction('block', g, argGenFormatter(1, hasM))
-  ASSERT && hasM && assertString('block', m, argStrFormatter(2, true))
+  assertGenFunction('block', g, argGenFormatter(1, hasM))
+  if (hasM) assertString('block', m, argStrFormatter(2, true))
 
-  const gen = g()
-  const index = ctx.index
-  let errors = ferror(m, [])
-  let nextValue
-  let context = ctx
-  let i = 0
+  return parser(ctx => {
+    const gen = g()
+    const index = ctx.index
+    let errors = ferror(m, [])
+    let nextValue
+    let context = ctx
+    let i = 0
 
-  while (true) {
-    const { value, done } = gen.next(nextValue)
-    if (done) return okReply(context, value)
+    while (true) {
+      const { value, done } = gen.next(nextValue)
+      if (done) return okReply(context, value)
 
-    ASSERT && assertParser('block', value, v => `expected ${
-      wordinal(i + 1)
-    } yield to be to a parser; found ${stringify(v)}`)
+      assertParser('block', value, v => `expected ${
+        wordinal(i + 1)
+      } yield to be to a parser; found ${stringify(v)}`)
 
-    const [pctx, pres] = value(context)
-    context = pctx
-    if (!hasM) errors = pres.errors?.length ? merge(errors, pres.errors) : []
+      const [pctx, pres] = value(context)
+      context = pctx
+      if (!hasM) errors = pres.errors?.length ? merge(errors, pres.errors) : []
 
-    if (pres.status !== Ok) {
-      const fn = replyFn(pres.status === Fatal || pctx.index !== index)
-      return fn(pctx, errors)
+      if (pres.status !== Ok) {
+        const fn = replyFn(pres.status === Fatal || pctx.index !== index)
+        return fn(pctx, errors)
+      }
+      nextValue = pres.value
+      i++
     }
-    nextValue = pres.value
-    i++
-  }
-})
+  })
+}
 
 /**
  * A parser that executes `p` and discards any successful result while
@@ -153,16 +157,18 @@ export const block = (g, m) => parser(ctx => {
  * @returns {Parser} A parser that will consume input as `p` does on
  *     success, but will produce no result.
  */
-export const skip = (p, m) => parser(ctx => {
+export function skip(p, m) {
   const hasM = m != null
 
-  ASSERT && assertParser('skip', p, argParFormatter(1, hasM))
-  ASSERT && hasM && assertString('skip', m, argStrFormatter(2, true))
+  assertParser('skip', p, argParFormatter(1, hasM))
+  if (hasM) assertString('skip', m, argStrFormatter(2, true))
 
-  const [pctx, pres] = p(ctx)
-  if (pres.status !== Ok) {
-    const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, ferror(m, pres.errors))
-  }
-  return okReply(pctx, null)
-})
+  return parser(ctx => {
+    const [pctx, pres] = p(ctx)
+    if (pres.status !== Ok) {
+      const fn = replyFn(pres.status === Fatal)
+      return fn(pctx, ferror(m, pres.errors))
+    }
+    return okReply(pctx, null)
+  })
+}

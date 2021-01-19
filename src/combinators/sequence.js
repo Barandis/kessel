@@ -42,16 +42,13 @@ function loopMessage(name) {
  * @returns {Parser} A parser that executes the supplied parsers one at
  *     a time, in order, and fails if any of those parsers fail.
  */
-export const seq = (...args) => {
+export function seq(...args) {
   const ps = args.slice()
   const m = typeof args[args.length - 1] === 'string' ? ps.pop() : null
 
+  ps.forEach((p, i) => assertParser('seq', p, argParFormatter(i + 1, true)))
+
   return parser(ctx => {
-    const hasM = m != null
-
-    ASSERT && ps.forEach((p, i) =>
-      assertParser('seq', p, argParFormatter(i + 1, true)))
-
     const values = []
     const index = ctx.index
     let errors = ferror(m, [])
@@ -60,7 +57,9 @@ export const seq = (...args) => {
     for (const p of ps) {
       const [pctx, pres] = p(context)
       context = pctx
-      if (!hasM) errors = pres.errors?.length ? merge(errors, pres.errors) : []
+      if (m == null) {
+        errors = pres.errors?.length ? merge(errors, pres.errors) : []
+      }
 
       if (pres.status !== Ok) {
         const fn = replyFn(pres.status === Fatal || context.index !== index)
@@ -87,28 +86,28 @@ export const seq = (...args) => {
  * @returns {Parser} A parser that executes `p` and `q` and returns the
  *     result of `p`.
  */
-export const left = (p, q, m) => parser(ctx => {
-  const hasM = m != null
+export function left(p, q, m) {
+  assertParser('left', p, argParFormatter(1, true))
+  assertParser('left', q, argParFormatter(2, true))
+  if (m != null) assertString('left', m, argStrFormatter(3, true))
 
-  ASSERT && assertParser('left', p, argParFormatter(1, true))
-  ASSERT && assertParser('left', q, argParFormatter(2, true))
-  ASSERT && hasM && assertString('left', m, argStrFormatter(3, true))
+  return parser(ctx => {
+    const index = ctx.index
 
-  const index = ctx.index
+    const [pctx, pres] = p(ctx)
+    if (pres.status !== Status.Ok) {
+      const fn = pres.status === Fatal ? fatalReply : failReply
+      return fn(pctx, ferror(m, pres.errors))
+    }
 
-  const [pctx, pres] = p(ctx)
-  if (pres.status !== Status.Ok) {
-    const fn = pres.status === Fatal ? fatalReply : failReply
-    return fn(pctx, ferror(m, pres.errors))
-  }
-
-  const [qctx, qres] = q(pctx)
-  if (qres.status !== Ok) {
-    const fn = replyFn(qres.status === Fatal || qctx.index !== index)
-    return fn(qctx, ferror(m, merge(pres.errors, qres.errors)))
-  }
-  return okReply(qctx, pres.value)
-})
+    const [qctx, qres] = q(pctx)
+    if (qres.status !== Ok) {
+      const fn = replyFn(qres.status === Fatal || qctx.index !== index)
+      return fn(qctx, ferror(m, merge(pres.errors, qres.errors)))
+    }
+    return okReply(qctx, pres.value)
+  })
+}
 
 /**
  * A parser that executes the parsers `p` and `q` in order and returns
@@ -125,28 +124,28 @@ export const left = (p, q, m) => parser(ctx => {
  * @returns {Parser} A parser that executes both contained parsers and
  *     results in the value of the second.
  */
-export const right = (p, q, m) => parser(ctx => {
-  const hasM = m != null
+export function right(p, q, m) {
+  assertParser('right', p, argParFormatter(1, true))
+  assertParser('right', q, argParFormatter(2, true))
+  if (m != null) assertString('right', m, argStrFormatter(3, true))
 
-  ASSERT && assertParser('right', p, argParFormatter(1, true))
-  ASSERT && assertParser('right', q, argParFormatter(2, true))
-  ASSERT && hasM && assertString('right', m, argStrFormatter(3, true))
+  return parser(ctx => {
+    const index = ctx.index
 
-  const index = ctx.index
+    const [pctx, pres] = p(ctx)
+    if (pres.status !== Status.Ok) {
+      const fn = replyFn(pres.status === Fatal)
+      return fn(pctx, ferror(m, pres.errors))
+    }
 
-  const [pctx, pres] = p(ctx)
-  if (pres.status !== Status.Ok) {
-    const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, ferror(m, pres.errors))
-  }
-
-  const [qrep, [qctx, qres]] = dup(q(pctx))
-  if (qres.status !== Ok) {
-    const fn = replyFn(qctx.status === Fatal || qctx.index !== index)
-    return fn(qctx, ferror(m, merge(pres.errors, qres.errors)))
-  }
-  return qrep
-})
+    const [qrep, [qctx, qres]] = dup(q(pctx))
+    if (qres.status !== Ok) {
+      const fn = replyFn(qctx.status === Fatal || qctx.index !== index)
+      return fn(qctx, ferror(m, merge(pres.errors, qres.errors)))
+    }
+    return qrep
+  })
+}
 
 /**
  * A parser that executes `p` zero or more times until it fails,
@@ -162,26 +161,28 @@ export const right = (p, q, m) => parser(ctx => {
  *     repeatedly until it fails. Its result will be an array of the
  *     successful results from the contained parser.
  */
-export const many = (p, m) => parser(ctx => {
+export function many(p, m) {
   const hasM = m != null
 
-  ASSERT && assertParser('many', p, argParFormatter(1, hasM))
-  ASSERT && hasM && assertString('many', m, argStrFormatter(2, true))
+  assertParser('many', p, argParFormatter(1, hasM))
+  if (hasM) assertString('many', m, argStrFormatter(2, true))
 
-  const values = []
-  let context = ctx
+  return parser(ctx => {
+    const values = []
+    let context = ctx
 
-  while (true) {
-    const [pctx, pres] = p(context)
-    context = pctx
+    while (true) {
+      const [pctx, pres] = p(context)
+      context = pctx
 
-    if (pres.status === Fatal) return fatalReply(pctx, ferror(m, pres.errors))
-    if (pres.status === Fail) break
-    values.push(pres.value)
-    if (context.index >= context.view.byteLength) break
-  }
-  return okReply(context, values)
-})
+      if (pres.status === Fatal) return fatalReply(pctx, ferror(m, pres.errors))
+      if (pres.status === Fail) break
+      values.push(pres.value)
+      if (context.index >= context.view.byteLength) break
+    }
+    return okReply(context, values)
+  })
+}
 
 /**
  * A parser that executes `p` one or more times until it fails,
@@ -197,32 +198,34 @@ export const many = (p, m) => parser(ctx => {
  *     repeatedly until it fails. Its result will be an array of the
  *     successful results from the contained parser.
  */
-export const many1 = (p, m) => parser(ctx => {
+export function many1(p, m) {
   const hasM = m != null
 
-  ASSERT && assertParser('many1', p, argParFormatter(1, hasM))
-  ASSERT && hasM && assertString('many1', m, argStrFormatter(2, true))
+  assertParser('many1', p, argParFormatter(1, hasM))
+  if (hasM) assertString('many1', m, argStrFormatter(2, true))
 
-  const [pctx, pres] = p(ctx)
-  if (pres.status !== Ok) {
-    const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, ferror(m, pres.errors))
-  }
+  return parser(ctx => {
+    const [pctx, pres] = p(ctx)
+    if (pres.status !== Ok) {
+      const fn = replyFn(pres.status === Fatal)
+      return fn(pctx, ferror(m, pres.errors))
+    }
 
-  let context = pctx
-  const values = [pres.value]
+    let context = pctx
+    const values = [pres.value]
 
-  while (true) {
-    const [pctx, pres] = p(context)
-    context = pctx
+    while (true) {
+      const [pctx, pres] = p(context)
+      context = pctx
 
-    if (pres.status === Fatal) return fatalReply(pctx, ferror(m, pres.errors))
-    if (pres.status === Fail) break
-    values.push(pres.value)
-    if (context.index >= context.view.byteLength) break
-  }
-  return okReply(context, values)
-})
+      if (pres.status === Fatal) return fatalReply(pctx, ferror(m, pres.errors))
+      if (pres.status === Fail) break
+      values.push(pres.value)
+      if (context.index >= context.view.byteLength) break
+    }
+    return okReply(context, values)
+  })
+}
 
 /**
  * A parser that executes `p` zero or more times, executing `s` in
@@ -244,40 +247,40 @@ export const many1 = (p, m) => parser(ctx => {
  * @returns {Parser} A parser that results in an array of all of the
  *     content parser results, discarding the separator parser results.
  */
-export const sepby = (p, s, m) => parser(ctx => {
-  const hasM = m != null
+export function sepby(p, s, m) {
+  assertParser('sepby', p, argParFormatter(1, true))
+  assertParser('sepby', s, argParFormatter(2, true))
+  if (m != null) assertString('sepby', m, argStrFormatter(3, true))
 
-  ASSERT && assertParser('sepby', p, argParFormatter(1, true))
-  ASSERT && assertParser('sepby', s, argParFormatter(2, true))
-  ASSERT && hasM && assertString('sepby', m, argStrFormatter(3, true))
+  return parser(ctx => {
+    let index = ctx.index
 
-  let index = ctx.index
-
-  const [pctx, pres] = p(ctx)
-  if (pres.status === Fatal) return fatalReply(pctx, ferror(m, pres.errors))
-  if (pres.status === Fail) return okReply(pctx, [])
-
-  const values = [pres.value]
-  let context = pctx
-
-  while (true) {
-    index = context.index
-
-    const [sctx, sres] = s(context)
-    context = sctx
-    if (sres.status === Fatal) return fatalReply(sctx, ferror(m, sres.errors))
-    if (sres.status === Fail) break
-
-    const [pctx, pres] = p(context)
-    context = pctx
+    const [pctx, pres] = p(ctx)
     if (pres.status === Fatal) return fatalReply(pctx, ferror(m, pres.errors))
-    if (pres.status === Fail) break
+    if (pres.status === Fail) return okReply(pctx, [])
 
-    if (context.index === index) throw new TypeError(loopMessage('sepby'))
-    values.push(pres.value)
-  }
-  return okReply(context, values, index)
-})
+    const values = [pres.value]
+    let context = pctx
+
+    while (true) {
+      index = context.index
+
+      const [sctx, sres] = s(context)
+      context = sctx
+      if (sres.status === Fatal) return fatalReply(sctx, ferror(m, sres.errors))
+      if (sres.status === Fail) break
+
+      const [pctx, pres] = p(context)
+      context = pctx
+      if (pres.status === Fatal) return fatalReply(pctx, ferror(m, pres.errors))
+      if (pres.status === Fail) break
+
+      if (context.index === index) throw new TypeError(loopMessage('sepby'))
+      values.push(pres.value)
+    }
+    return okReply(context, values, index)
+  })
+}
 
 /**
  * A parser that executes `p` one or more times, executing `s` in
@@ -299,42 +302,42 @@ export const sepby = (p, s, m) => parser(ctx => {
  * @returns {Parser} A parser that results in an array of all of the
  *     content parser results, discarding the separator parser results.
  */
-export const sepby1 = (p, s, m) => parser(ctx => {
-  const hasM = m != null
+export function sepby1(p, s, m) {
+  assertParser('sepby1', p, argParFormatter(1, true))
+  assertParser('sepby1', s, argParFormatter(2, true))
+  if (m != null) assertString('sepby1', m, argStrFormatter(3, true))
 
-  ASSERT && assertParser('sepby1', p, argParFormatter(1, true))
-  ASSERT && assertParser('sepby1', s, argParFormatter(2, true))
-  ASSERT && hasM && assertString('sepby1', m, argStrFormatter(3, true))
+  return parser(ctx => {
+    let index = ctx.index
 
-  let index = ctx.index
+    const [pctx, pres] = p(ctx)
+    if (pres.status !== Ok) {
+      const fn = replyFn(pres.status === Fatal)
+      return fn(pctx, ferror(m, pres.errors))
+    }
 
-  const [pctx, pres] = p(ctx)
-  if (pres.status !== Ok) {
-    const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, ferror(m, pres.errors))
-  }
+    const values = [pres.value]
+    let context = pctx
 
-  const values = [pres.value]
-  let context = pctx
+    while (true) {
+      index = context.index
 
-  while (true) {
-    index = context.index
+      const [sctx, sres] = s(context)
+      context = sctx
+      if (sres.status === Fatal) return fatalReply(sctx, ferror(m, sres.errors))
+      if (sres.status === Fail) break
 
-    const [sctx, sres] = s(context)
-    context = sctx
-    if (sres.status === Fatal) return fatalReply(sctx, ferror(m, sres.errors))
-    if (sres.status === Fail) break
+      const [pctx, pres] = p(context)
+      context = pctx
+      if (pres.status === Fatal) return fatalReply(pctx, ferror(m, pres.errors))
+      if (pres.status === Fail) break
 
-    const [pctx, pres] = p(context)
-    context = pctx
-    if (pres.status === Fatal) return fatalReply(pctx, ferror(m, pres.errors))
-    if (pres.status === Fail) break
-
-    if (context.index === index) throw new TypeError(loopMessage('sepby1'))
-    values.push(pres.value)
-  }
-  return okReply(context, values, index)
-})
+      if (context.index === index) throw new TypeError(loopMessage('sepby1'))
+      values.push(pres.value)
+    }
+    return okReply(context, values, index)
+  })
+}
 
 /**
  * A parser that executes `p` zero or more times, executing `s` in
@@ -356,40 +359,40 @@ export const sepby1 = (p, s, m) => parser(ctx => {
  * @returns {Parser} A parser that results in an array of all of the
  *     content parser results, discarding the separator parser results.
  */
-export const endby = (p, s, m) => parser(ctx => {
-  const hasM = m != null
+export function endby(p, s, m) {
+  assertParser('endby', p, argParFormatter(1, true))
+  assertParser('endby', s, argParFormatter(2, true))
+  if (m != null) assertString('endby', m, argStrFormatter(3, true))
 
-  ASSERT && assertParser('endby', p, argParFormatter(1, true))
-  ASSERT && assertParser('endby', s, argParFormatter(2, true))
-  ASSERT && hasM && assertString('endby', m, argStrFormatter(3, true))
+  return parser(ctx => {
+    let index = ctx.index
 
-  let index = ctx.index
-
-  const [pctx, pres] = p(ctx)
-  if (pres.status === Fatal) return fatalReply(pctx, ferror(m, pres.errors))
-  if (pres.status === Fail) return okReply(pctx, [])
-
-  const values = [pres.value]
-  let context = pctx
-
-  while (true) {
-    index = context.index
-
-    const [sctx, sres] = s(context)
-    context = sctx
-    if (sres.status === Fatal) return fatalReply(sctx, ferror(m, sres.errors))
-    if (sres.status === Fail) break
-
-    const [pctx, pres] = p(context)
-    context = pctx
+    const [pctx, pres] = p(ctx)
     if (pres.status === Fatal) return fatalReply(pctx, ferror(m, pres.errors))
-    if (pres.status === Fail) break
+    if (pres.status === Fail) return okReply(pctx, [])
 
-    if (context.index === index) throw new TypeError(loopMessage('endby'))
-    values.push(pres.value)
-  }
-  return okReply(context, values)
-})
+    const values = [pres.value]
+    let context = pctx
+
+    while (true) {
+      index = context.index
+
+      const [sctx, sres] = s(context)
+      context = sctx
+      if (sres.status === Fatal) return fatalReply(sctx, ferror(m, sres.errors))
+      if (sres.status === Fail) break
+
+      const [pctx, pres] = p(context)
+      context = pctx
+      if (pres.status === Fatal) return fatalReply(pctx, ferror(m, pres.errors))
+      if (pres.status === Fail) break
+
+      if (context.index === index) throw new TypeError(loopMessage('endby'))
+      values.push(pres.value)
+    }
+    return okReply(context, values)
+  })
+}
 
 /**
  * A parser that executes `p` one or more times, executing `s` in
@@ -411,42 +414,42 @@ export const endby = (p, s, m) => parser(ctx => {
  * @returns {Parser} A parser that results in an array of all of the
  *     content parser results, discarding the separator parser results.
  */
-export const endby1 = (p, s, m) => parser(ctx => {
-  const hasM = m != null
+export function endby1(p, s, m) {
+  assertParser('endby1', p, argParFormatter(1, true))
+  assertParser('endby1', s, argParFormatter(2, true))
+  if (m != null) assertString('endby1', m, argStrFormatter(3, true))
 
-  ASSERT && assertParser('endby1', p, argParFormatter(1, true))
-  ASSERT && assertParser('endby1', s, argParFormatter(2, true))
-  ASSERT && hasM && assertString('endby1', m, argStrFormatter(3, true))
+  return parser(ctx => {
+    let index = ctx.index
 
-  let index = ctx.index
+    const [pctx, pres] = p(ctx)
+    if (pres.status !== Ok) {
+      const fn = replyFn(pres.status === Fatal)
+      return fn(pctx, ferror(m, pres.errors))
+    }
 
-  const [pctx, pres] = p(ctx)
-  if (pres.status !== Ok) {
-    const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, ferror(m, pres.errors))
-  }
+    const values = [pres.value]
+    let context = pctx
 
-  const values = [pres.value]
-  let context = pctx
+    while (true) {
+      index = context.index
 
-  while (true) {
-    index = context.index
+      const [sctx, sres] = s(context)
+      context = sctx
+      if (sres.status === Fatal) return fatalReply(sctx, ferror(m, sres.errors))
+      if (sres.status === Fail) break
 
-    const [sctx, sres] = s(context)
-    context = sctx
-    if (sres.status === Fatal) return fatalReply(sctx, ferror(m, sres.errors))
-    if (sres.status === Fail) break
+      const [pctx, pres] = p(context)
+      context = pctx
+      if (pres.status === Fatal) return fatalReply(pctx, ferror(m, pres.errors))
+      if (pres.status === Fail) break
 
-    const [pctx, pres] = p(context)
-    context = pctx
-    if (pres.status === Fatal) return fatalReply(pctx, ferror(m, pres.errors))
-    if (pres.status === Fail) break
-
-    if (context.index === index) throw new TypeError(loopMessage('endby1'))
-    values.push(pres.value)
-  }
-  return okReply(context, values)
-})
+      if (context.index === index) throw new TypeError(loopMessage('endby1'))
+      values.push(pres.value)
+    }
+    return okReply(context, values)
+  })
+}
 
 /**
  * A parser that executes the supplied parser `n` times, collecting the
@@ -462,28 +465,28 @@ export const endby1 = (p, s, m) => parser(ctx => {
  * @returns {Parser} A parser that executes `p` `n` times and results in
  *     an array of all of the successful results of `p`.
  */
-export const count = (p, n, m) => parser(ctx => {
-  const hasM = m != null
+export function count(p, n, m) {
+  assertParser('count', p, argParFormatter(1, true))
+  assertNumber('count', n, argNumFormatter(2, true))
+  if (m != null) assertString('count', m, argStrFormatter(3, true))
 
-  ASSERT && assertParser('count', p, argParFormatter(1, true))
-  ASSERT && assertNumber('count', n, argNumFormatter(2, true))
-  ASSERT && hasM && assertString('count', m, argStrFormatter(3, true))
+  return parser(ctx => {
+    const index = ctx.index
+    const values = []
+    let context = ctx
 
-  const index = ctx.index
-  const values = []
-  let context = ctx
-
-  for (const _ of range(n)) {
-    const [pctx, pres] = p(context)
-    context = pctx
-    if (pres.status !== Ok) {
-      const fn = replyFn(pres.status === Fatal || pctx.index !== index)
-      return fn(pctx, ferror(m, pres.errors))
+    for (const _ of range(n)) {
+      const [pctx, pres] = p(context)
+      context = pctx
+      if (pres.status !== Ok) {
+        const fn = replyFn(pres.status === Fatal || pctx.index !== index)
+        return fn(pctx, ferror(m, pres.errors))
+      }
+      values.push(pres.value)
     }
-    values.push(pres.value)
-  }
-  return okReply(context, values)
-})
+    return okReply(context, values)
+  })
+}
 
 /**
  * A parser which executes its start, content, and end parsers in order
@@ -501,38 +504,38 @@ export const count = (p, n, m) => parser(ctx => {
  * @returns {Parser} A parser which applies its parsers in the correct
  *     order and then results in the result of its content parser.
  */
-export const between = (s, e, p, m) => parser(ctx => {
-  const hasM = m != null
+export function between(s, e, p, m) {
+  assertParser('between', s, argParFormatter(1, true))
+  assertParser('between', e, argParFormatter(2, true))
+  assertParser('between', p, argParFormatter(3, true))
+  if (m != null) assertString('between', m, argStrFormatter(4, true))
 
-  ASSERT && assertParser('between', s, argParFormatter(1, true))
-  ASSERT && assertParser('between', e, argParFormatter(2, true))
-  ASSERT && assertParser('between', p, argParFormatter(3, true))
-  ASSERT && hasM && assertString('between', m, argStrFormatter(4, true))
+  return parser(ctx => {
+    const index = ctx.index
 
-  const index = ctx.index
+    const [sctx, sres] = s(ctx)
+    if (sres.status !== Ok) {
+      const fn = replyFn(sres.status === Fatal)
+      return fn(sctx, ferror(m, sres.errors))
+    }
 
-  const [sctx, sres] = s(ctx)
-  if (sres.status !== Ok) {
-    const fn = replyFn(sres.status === Fatal)
-    return fn(sctx, ferror(m, sres.errors))
-  }
+    const [pctx, pres] = p(sctx)
+    const errors = ferror(
+      m, pres.errors?.length ? merge(sres.errors, pres.errors) : [],
+    )
+    if (pres.status !== Ok) {
+      const fn = replyFn(pres.status === Fatal || pctx.index !== index)
+      return fn(pctx, errors)
+    }
 
-  const [pctx, pres] = p(sctx)
-  const errors = ferror(
-    m, pres.errors?.length ? merge(sres.errors, pres.errors) : [],
-  )
-  if (pres.status !== Ok) {
-    const fn = replyFn(pres.status === Fatal || pctx.index !== index)
-    return fn(pctx, errors)
-  }
-
-  const [ectx, eres] = e(pctx)
-  if (eres.status !== Ok) {
-    const fn = replyFn(eres.status === Fatal || ectx.index !== index)
-    return fn(ectx, ferror(m, merge(errors, eres.errors)))
-  }
-  return okReply(ectx, pres.value)
-})
+    const [ectx, eres] = e(pctx)
+    if (eres.status !== Ok) {
+      const fn = replyFn(eres.status === Fatal || ectx.index !== index)
+      return fn(ectx, ferror(m, merge(errors, eres.errors)))
+    }
+    return okReply(ectx, pres.value)
+  })
+}
 
 /**
  * A parser which executes a content parser zero or more times until an
@@ -552,34 +555,34 @@ export const between = (s, e, p, m) => parser(ctx => {
  * @returns {Parser} A parser which will execute `p` zero or more times
  *     until `e` succeeds.
  */
-export const until = (p, e, m) => parser(ctx => {
-  const hasM = m != null
+export function until(p, e, m) {
+  assertParser('until', p, argParFormatter(1, true))
+  assertParser('until', e, argParFormatter(2, true))
+  if (m != null) assertString('until', m, argStrFormatter(3, true))
 
-  ASSERT && assertParser('until', p, argParFormatter(1, true))
-  ASSERT && assertParser('until', e, argParFormatter(2, true))
-  ASSERT && hasM && assertString('until', m, argStrFormatter(3, true))
+  return parser(ctx => {
+    const index = ctx.index
+    const values = []
+    let context = ctx
 
-  const index = ctx.index
-  const values = []
-  let context = ctx
+    while (true) {
+      const [ectx, eres] = e(context)
+      context = ectx
+      if (eres.status === Fatal) return fatalReply(ectx, ferror(m, eres.errors))
+      if (eres.status === Ok) break
 
-  while (true) {
-    const [ectx, eres] = e(context)
-    context = ectx
-    if (eres.status === Fatal) return fatalReply(ectx, ferror(m, eres.errors))
-    if (eres.status === Ok) break
-
-    const [pctx, pres] = p(context)
-    context = pctx
-    if (pres.status === Fatal) return fatalReply(pctx, ferror(m, pres.errors))
-    if (pres.status === Fail) {
-      const fn = replyFn(pctx.index !== index)
-      return fn(pctx, ferror(m, merge(pres.errors, eres.errors)))
+      const [pctx, pres] = p(context)
+      context = pctx
+      if (pres.status === Fatal) return fatalReply(pctx, ferror(m, pres.errors))
+      if (pres.status === Fail) {
+        const fn = replyFn(pctx.index !== index)
+        return fn(pctx, ferror(m, merge(pres.errors, eres.errors)))
+      }
+      values.push(pres.value)
     }
-    values.push(pres.value)
-  }
-  return okReply(context, values)
-})
+    return okReply(context, values)
+  })
+}
 
 /**
  * A parser that executes its parsers in sequence and passes those
@@ -611,19 +614,15 @@ export const until = (p, e, m) => parser(ctx => {
  *     feed the results to its function, and result in the function's
  *     return value.
  */
-export const pipe = (...args) => {
+export function pipe(...args) {
   const ps = args.slice()
   const m = typeof args[args.length - 1] === 'string' ? ps.pop() : null
   const fn = ps.pop()
 
+  ps.forEach((p, i) => assertParser('pipe', p, argParFormatter(i + 1, true)))
+  assertFunction('pipe', fn, argFnFormatter(ps.length + 1, true))
+
   return parser(ctx => {
-    const hasM = m != null
-
-    ASSERT && ps.forEach((p, i) => assertParser(
-      'pipe', p, argParFormatter(i + 1, true),
-    ))
-    ASSERT && assertFunction('pipe', fn, argFnFormatter(ps.length + 1, true))
-
     const index = ctx.index
     const values = []
     let context = ctx
@@ -632,7 +631,9 @@ export const pipe = (...args) => {
     for (const p of ps) {
       const [pctx, pres] = p(context)
       context = pctx
-      if (!hasM) errors = pres.errors?.length ? merge(errors, pres.errors) : []
+      if (m == null) {
+        errors = pres.errors?.length ? merge(errors, pres.errors) : []
+      }
 
       if (pres.status !== Ok) {
         const fn = replyFn(pres.status === Fatal || pctx.index !== index)
@@ -682,48 +683,48 @@ function opFormatter(ord) {
  *     applying the functions from `o` left associtively to the values
  *     that result from `p`.
  */
-export const lassoc = (p, o, x, m) => parser(ctx => {
-  const hasM = m != null
+export function lassoc(p, o, x, m) {
+  assertParser('lassoc', p, argParFormatter(1, true))
+  assertParser('lassoc', o, argParFormatter(2, true))
+  if (m != null) assertString('lassoc', m, argStrFormatter(4, true))
 
-  ASSERT && assertParser('lassoc', p, argParFormatter(1, true))
-  ASSERT && assertParser('lassoc', o, argParFormatter(2, true))
-  ASSERT && hasM && assertString('lassoc', m, argStrFormatter(4, true))
-
-  const [pctx, pres] = p(ctx)
-  if (pres.status === Fatal) return fatalReply(pctx, ferror(m, pres.errors))
-  if (pres.status === Fail) return okReply(pctx, x)
-
-  const values = [pres.value]
-  const ops = []
-  let context = pctx
-  let index = context.index
-  let i = 0
-
-  while (true) {
-    const [octx, ores] = o(context)
-    context = octx
-    if (ores.status === Fatal) return fatalReply(octx, ferror(m, ores.errors))
-    if (ores.status === Fail) break
-
-    const [pctx, pres] = p(context)
-    context = pctx
+  return parser(ctx => {
+    const [pctx, pres] = p(ctx)
     if (pres.status === Fatal) return fatalReply(pctx, ferror(m, pres.errors))
-    if (pres.status === Fail) break
+    if (pres.status === Fail) return okReply(pctx, x)
 
-    ASSERT && assertFunction('lassoc', ores.value, opFormatter(wordinal(i + 1)))
+    const values = [pres.value]
+    const ops = []
+    let context = pctx
+    let index = context.index
+    let i = 0
 
-    ops.push(ores.value)
-    values.push(pres.value)
-    index = context.index
-    i++
-  }
+    while (true) {
+      const [octx, ores] = o(context)
+      context = octx
+      if (ores.status === Fatal) return fatalReply(octx, ferror(m, ores.errors))
+      if (ores.status === Fail) break
 
-  let value = values[0]
-  for (const i of range(ops.length)) {
-    value = ops[i](value, values[i + 1])
-  }
-  return okReply(context, value, index)
-})
+      const [pctx, pres] = p(context)
+      context = pctx
+      if (pres.status === Fatal) return fatalReply(pctx, ferror(m, pres.errors))
+      if (pres.status === Fail) break
+
+      assertFunction('lassoc', ores.value, opFormatter(wordinal(i + 1)))
+
+      ops.push(ores.value)
+      values.push(pres.value)
+      index = context.index
+      i++
+    }
+
+    let value = values[0]
+    for (const i of range(ops.length)) {
+      value = ops[i](value, values[i + 1])
+    }
+    return okReply(context, value, index)
+  })
+}
 
 /**
  * A parser that parses one or more applications of `p`, each separated
@@ -746,52 +747,50 @@ export const lassoc = (p, o, x, m) => parser(ctx => {
  *     applying the functions from `o` left associtively to the values
  *     that result from `p`.
  */
-export const lassoc1 = (p, o, m) => parser(ctx => {
-  const hasM = m != null
+export function lassoc1(p, o, m) {
+  assertParser('lassoc1', p, argParFormatter(1, true))
+  assertParser('lassoc1', o, argParFormatter(2, true))
+  if (m != null) assertString('lassoc1', m, argStrFormatter(3, true))
 
-  ASSERT && assertParser('lassoc1', p, argParFormatter(1, true))
-  ASSERT && assertParser('lassoc1', o, argParFormatter(2, true))
-  ASSERT && hasM && assertString('lassoc1', m, argStrFormatter(3, true))
+  return parser(ctx => {
+    const [pctx, pres] = p(ctx)
+    if (pres.status !== Ok) {
+      const fn = replyFn(pres.status === Fatal)
+      return fn(pctx, ferror(m, pres.errors))
+    }
 
-  const [pctx, pres] = p(ctx)
-  if (pres.status !== Ok) {
-    const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, ferror(m, pres.errors))
-  }
+    const values = [pres.value]
+    const ops = []
+    let context = pctx
+    let index = context.index
+    let i = 0
 
-  const values = [pres.value]
-  const ops = []
-  let context = pctx
-  let index = context.index
-  let i = 0
+    while (true) {
+      const [octx, ores] = o(context)
+      context = octx
+      if (ores.status === Fatal) return fatalReply(octx, ferror(m, ores.errors))
+      if (ores.status === Fail) break
 
-  while (true) {
-    const [octx, ores] = o(context)
-    context = octx
-    if (ores.status === Fatal) return fatalReply(octx, ferror(m, ores.errors))
-    if (ores.status === Fail) break
+      const [pctx, pres] = p(context)
+      context = pctx
+      if (pres.status === Fatal) return fatalReply(pctx, ferror(m, pres.errors))
+      if (pres.status === Fail) break
 
-    const [pctx, pres] = p(context)
-    context = pctx
-    if (pres.status === Fatal) return fatalReply(pctx, ferror(m, pres.errors))
-    if (pres.status === Fail) break
+      assertFunction('lassoc1', ores.value, opFormatter(wordinal(i + 1)))
 
-    ASSERT && assertFunction(
-      'lassoc1', ores.value, opFormatter(wordinal(i + 1)),
-    )
+      ops.push(ores.value)
+      values.push(pres.value)
+      index = context.index
+      i++
+    }
 
-    ops.push(ores.value)
-    values.push(pres.value)
-    index = context.index
-    i++
-  }
-
-  let value = values[0]
-  for (const i of range(ops.length)) {
-    value = ops[i](value, values[i + 1])
-  }
-  return okReply(context, value, index)
-})
+    let value = values[0]
+    for (const i of range(ops.length)) {
+      value = ops[i](value, values[i + 1])
+    }
+    return okReply(context, value, index)
+  })
+}
 
 /**
  * A parser that parses zero or more applications of `p`, each separated
@@ -817,48 +816,48 @@ export const lassoc1 = (p, o, m) => parser(ctx => {
  *     applying the functions from `o` right associtively to the values
  *     that result from `p`.
  */
-export const rassoc = (p, o, x, m) => parser(ctx => {
-  const hasM = m != null
+export function rassoc(p, o, x, m) {
+  assertParser('rassoc', p, argParFormatter(1, true))
+  assertParser('rassoc', o, argParFormatter(2, true))
+  if (m != null) assertString('rassoc', m, argStrFormatter(4, true))
 
-  ASSERT && assertParser('rassoc', p, argParFormatter(1, true))
-  ASSERT && assertParser('rassoc', o, argParFormatter(2, true))
-  ASSERT && hasM && assertString('rassoc', m, argStrFormatter(4, true))
-
-  const [pctx, pres] = p(ctx)
-  if (pres.status === Fatal) return fatalReply(pctx, ferror(m, pres.errors))
-  if (pres.status === Fail) return okReply(pctx, x)
-
-  const values = [pres.value]
-  const ops = []
-  let context = pctx
-  let index = context.index
-  let i = 0
-
-  while (true) {
-    const [octx, ores] = o(context)
-    context = octx
-    if (ores.status === Fatal) return fatalReply(octx, ferror(m, ores.errors))
-    if (ores.status === Fail) break
-
-    const [pctx, pres] = p(context)
-    context = pctx
+  return parser(ctx => {
+    const [pctx, pres] = p(ctx)
     if (pres.status === Fatal) return fatalReply(pctx, ferror(m, pres.errors))
-    if (pres.status === Fail) break
+    if (pres.status === Fail) return okReply(pctx, x)
 
-    ASSERT && assertFunction('rassoc', ores.value, opFormatter(wordinal(i + 1)))
+    const values = [pres.value]
+    const ops = []
+    let context = pctx
+    let index = context.index
+    let i = 0
 
-    ops.push(ores.value)
-    values.push(pres.value)
-    index = context.index
-    i++
-  }
+    while (true) {
+      const [octx, ores] = o(context)
+      context = octx
+      if (ores.status === Fatal) return fatalReply(octx, ferror(m, ores.errors))
+      if (ores.status === Fail) break
 
-  let value = values[values.length - 1]
-  for (const i of range(ops.length - 1, -1)) {
-    value = ops[i](values[i], value)
-  }
-  return okReply(context, value, index)
-})
+      const [pctx, pres] = p(context)
+      context = pctx
+      if (pres.status === Fatal) return fatalReply(pctx, ferror(m, pres.errors))
+      if (pres.status === Fail) break
+
+      assertFunction('rassoc', ores.value, opFormatter(wordinal(i + 1)))
+
+      ops.push(ores.value)
+      values.push(pres.value)
+      index = context.index
+      i++
+    }
+
+    let value = values[values.length - 1]
+    for (const i of range(ops.length - 1, -1)) {
+      value = ops[i](values[i], value)
+    }
+    return okReply(context, value, index)
+  })
+}
 
 /**
  * A parser that parses one or more applications of `p`, each separated
@@ -881,49 +880,47 @@ export const rassoc = (p, o, x, m) => parser(ctx => {
  *     applying the functions from `o` right associtively to the values
  *     that result from `p`.
  */
-export const rassoc1 = (p, o, m) => parser(ctx => {
-  const hasM = m != null
+export function rassoc1(p, o, m) {
+  assertParser('rassoc1', p, argParFormatter(1, true))
+  assertParser('rassoc1', o, argParFormatter(2, true))
+  if (m != null) assertString('rassoc1', m, argStrFormatter(3, true))
 
-  ASSERT && assertParser('rassoc1', p, argParFormatter(1, true))
-  ASSERT && assertParser('rassoc1', o, argParFormatter(2, true))
-  ASSERT && hasM && assertString('rassoc1', m, argStrFormatter(3, true))
+  return parser(ctx => {
+    const [pctx, pres] = p(ctx)
+    if (pres.status !== Ok) {
+      const fn = replyFn(pres.status === Fatal)
+      return fn(pctx, ferror(m, pres.errors))
+    }
 
-  const [pctx, pres] = p(ctx)
-  if (pres.status !== Ok) {
-    const fn = replyFn(pres.status === Fatal)
-    return fn(pctx, ferror(m, pres.errors))
-  }
+    const values = [pres.value]
+    const ops = []
+    let context = pctx
+    let index = context.index
+    let i = 0
 
-  const values = [pres.value]
-  const ops = []
-  let context = pctx
-  let index = context.index
-  let i = 0
+    while (true) {
+      const [octx, ores] = o(context)
+      context = octx
+      if (ores.status === Fatal) return fatalReply(octx, ferror(m, ores.errors))
+      if (ores.status === Fail) break
 
-  while (true) {
-    const [octx, ores] = o(context)
-    context = octx
-    if (ores.status === Fatal) return fatalReply(octx, ferror(m, ores.errors))
-    if (ores.status === Fail) break
+      const [pctx, pres] = p(context)
+      context = pctx
+      if (pres.status === Fatal) return fatalReply(pctx, ferror(m, pres.errors))
+      if (pres.status === Fail) break
 
-    const [pctx, pres] = p(context)
-    context = pctx
-    if (pres.status === Fatal) return fatalReply(pctx, ferror(m, pres.errors))
-    if (pres.status === Fail) break
+      assertFunction('rassoc1', ores.value, opFormatter(wordinal(i + 1)))
 
-    ASSERT && assertFunction(
-      'rassoc1', ores.value, opFormatter(wordinal(i + 1)),
-    )
+      ops.push(ores.value)
+      values.push(pres.value)
+      index = context.index
+      i++
+    }
 
-    ops.push(ores.value)
-    values.push(pres.value)
-    index = context.index
-    i++
-  }
-
-  let value = values[values.length - 1]
-  for (const i of range(ops.length - 1, -1)) {
-    value = ops[i](values[i], value)
-  }
-  return okReply(context, value, index)
-})
+    let value = values[values.length - 1]
+    for (const i of range(ops.length - 1, -1)) {
+      value = ops[i](values[i], value)
+    }
+    return okReply(context, value, index)
+  })
+}
