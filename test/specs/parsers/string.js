@@ -9,16 +9,18 @@ import { terror, tfail, tpass } from 'test/helper'
 describe('String parsers', () => {
   describe('str', () => {
     it('throws if its first argument is not a string', () => {
-      terror(str(0), '', '[str]: expected argument to be a string; found 0')
       terror(
-        str(0, 'test'),
+        () => str(0), '', '[str]: expected argument to be a string; found 0',
+      )
+      terror(
+        () => str(0, 'test'),
         '',
         '[str]: expected first argument to be a string; found 0',
       )
     })
     it('throws if its second argument exists and is not a string', () => {
       terror(
-        str('test', 0),
+        () => str('test', 0),
         '',
         '[str]: expected second argument to be a string; found 0',
       )
@@ -118,16 +120,18 @@ describe('String parsers', () => {
 
   describe('istr', () => {
     it('throws if its argument is not a string', () => {
-      terror(istr(0), '', '[istr]: expected argument to be a string; found 0')
       terror(
-        istr(0, 'test'),
+        () => istr(0), '', '[istr]: expected argument to be a string; found 0',
+      )
+      terror(
+        () => istr(0, 'test'),
         '',
         '[istr]: expected first argument to be a string; found 0',
       )
     })
     it('throws if its second argument exists and is not a string', () => {
       terror(
-        istr('test', 0),
+        () => istr('test', 0),
         '',
         '[istr]: expected second argument to be a string; found 0',
       )
@@ -243,19 +247,19 @@ describe('String parsers', () => {
   describe('anystr', () => {
     it('throws if its first argument is not a number', () => {
       terror(
-        anystr('0'),
+        () => anystr('0'),
         '',
         '[anystr]: expected argument to be a number; found "0"',
       )
       terror(
-        anystr('0', 'test'),
+        () => anystr('0', 'test'),
         '',
         '[anystr]: expected first argument to be a number; found "0"',
       )
     })
     it('throws if its second argument exists and is not a string', () => {
       terror(
-        anystr(0, 0),
+        () => anystr(0, 0),
         '',
         '[anystr]: expected second argument to be a string; found 0',
       )

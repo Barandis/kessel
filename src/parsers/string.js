@@ -34,17 +34,19 @@ const { Ok } = Status
  * @returns {Parser} A parser that succeeds if the read string passes
  *     the predicate function.
  */
-const stringParser = (length, fn) => parser(ctx => {
-  if (length < 1) return okReply(ctx, '')
+function stringParser(length, fn) {
+  return parser(ctx => {
+    if (length < 1) return okReply(ctx, '')
 
-  const { index, view } = ctx
-  if (index >= view.byteLength) return failReply(ctx)
+    const { index, view } = ctx
+    if (index >= view.byteLength) return failReply(ctx)
 
-  const { width, next } = nextChars(index, view, length)
-  return charLength(next) !== length || !fn(next)
-    ? failReply(ctx)
-    : okReply(ctx, next, index + width)
-})
+    const { width, next } = nextChars(index, view, length)
+    return charLength(next) !== length || !fn(next)
+      ? failReply(ctx)
+      : okReply(ctx, next, index + width)
+  })
+}
 
 /**
  * A parser that reads a string from the current location in the input
@@ -62,19 +64,21 @@ const stringParser = (length, fn) => parser(ctx => {
  * @returns {Parser} A parser that will succeed if the supplied string
  *     matches the next characters in the input.
  */
-export const str = (s, m) => parser(ctx => {
+export function str(s, m) {
   const hasM = m != null
 
-  ASSERT && assertString('str', s, argStrFormatter(1, hasM))
-  ASSERT && hasM && assertString('str', m, argStrFormatter(2, true))
+  assertString('str', s, argStrFormatter(1, hasM))
+  if (hasM) assertString('str', m, argStrFormatter(2, true))
 
-  const [srep, [sctx, sres]] = dup(stringParser(
-    charLength(s), chars => s === chars,
-  )(ctx))
-  return sres.status === Ok
-    ? srep
-    : failReply(sctx, ferror(m, expecteds.str(s)))
-})
+  return parser(ctx => {
+    const [srep, [sctx, sres]] = dup(stringParser(
+      charLength(s), chars => s === chars,
+    )(ctx))
+    return sres.status === Ok
+      ? srep
+      : failReply(sctx, ferror(m, expecteds.str(s)))
+  })
+}
 
 /**
  * A parser that reads a string from the current location in the input
@@ -91,19 +95,21 @@ export const str = (s, m) => parser(ctx => {
  * @returns {Parser} A parser that will succeed if the supplied string
  *     case-insensitively matches the next characters in the input.
  */
-export const istr = (s, m) => parser(ctx => {
+export function istr(s, m) {
   const hasM = m != null
 
-  ASSERT && assertString('istr', s, argStrFormatter(1, hasM))
-  ASSERT && hasM && assertString('istr', m, argStrFormatter(2, true))
+  assertString('istr', s, argStrFormatter(1, hasM))
+  if (hasM) assertString('istr', m, argStrFormatter(2, true))
 
-  const [srep, [sctx, sres]] = dup(stringParser(
-    charLength(s), chars => s.toLowerCase() === chars.toLowerCase(),
-  )(ctx))
-  return sres.status === Ok
-    ? srep
-    : failReply(sctx, ferror(m, expecteds.istr(s)))
-})
+  return parser(ctx => {
+    const [srep, [sctx, sres]] = dup(stringParser(
+      charLength(s), chars => s.toLowerCase() === chars.toLowerCase(),
+    )(ctx))
+    return sres.status === Ok
+      ? srep
+      : failReply(sctx, ferror(m, expecteds.istr(s)))
+  })
+}
 
 /**
  * A parser that reads the remainder of the input text and results in
@@ -112,11 +118,13 @@ export const istr = (s, m) => parser(ctx => {
  * @returns {Parser} A parser that will always succeed and returns the
  *     remainder of the input.
  */
-export const all = () => parser(ctx => {
-  const { index, view } = ctx
-  const width = view.byteLength - index
-  return okReply(ctx, viewToString(index, width, view), index + width)
-})
+export function all() {
+  return parser(ctx => {
+    const { index, view } = ctx
+    const width = view.byteLength - index
+    return okReply(ctx, viewToString(index, width, view), index + width)
+  })
+}
 
 /**
  * A parser that reads a certain number of characters, using them (as a
@@ -129,14 +137,16 @@ export const all = () => parser(ctx => {
  * @returns {Parser} A parser that reads that many characters and joins
  *     them into a string for its result.
  */
-export const anystr = (n, m) => parser(ctx => {
+export function anystr(n, m) {
   const hasM = m != null
 
-  ASSERT && assertNumber('anystr', n, argNumFormatter(1, hasM))
-  ASSERT && hasM && assertString('anystr', m, argStrFormatter(2, true))
+  assertNumber('anystr', n, argNumFormatter(1, hasM))
+  if (hasM) assertString('anystr', m, argStrFormatter(2, true))
 
-  const [srep, [sctx, sres]] = dup(stringParser(n, () => true)(ctx))
-  return sres.status === Ok
-    ? srep
-    : failReply(sctx, ferror(m, expecteds.anystr(n)))
-})
+  return parser(ctx => {
+    const [srep, [sctx, sres]] = dup(stringParser(n, () => true)(ctx))
+    return sres.status === Ok
+      ? srep
+      : failReply(sctx, ferror(m, expecteds.anystr(n)))
+  })
+}
