@@ -24,13 +24,13 @@ describe('Regular expression parsers', () => {
   describe('regex', () => {
     it('throws if argument is not a string or regex', () => {
       terror(
-        regex(0),
+        () => regex(0),
         '',
         '[regex]: expected argument to be a string or a regular expression; '
           + 'found 0',
       )
       terror(
-        regex(0, 'test'),
+        () => regex(0, 'test'),
         '',
         '[regex]: expected first argument to be a string or a regular '
           + 'expression; found 0',
@@ -38,7 +38,7 @@ describe('Regular expression parsers', () => {
     })
     it('throws if second argument exists and is not a string', () => {
       terror(
-        regex(/abc/, 0),
+        () => regex(/abc/, 0),
         '',
         '[regex]: expected second argument to be a string; found 0',
       )
@@ -96,7 +96,7 @@ describe('Regular expression parsers', () => {
   describe('uletter', () => {
     it('throws if it has a non-string argument', () => {
       terror(
-        uletter(0),
+        () => uletter(0),
         '',
         '[uletter]: expected argument to be a string; found 0',
       )
@@ -194,7 +194,7 @@ describe('Regular expression parsers', () => {
   describe('ualpha', () => {
     it('throws if it has a non-string argument', () => {
       terror(
-        ualpha(0),
+        () => ualpha(0),
         '',
         '[ualpha]: expected argument to be a string; found 0',
       )
@@ -292,7 +292,7 @@ describe('Regular expression parsers', () => {
   describe('uupper', () => {
     it('throws if it has a non-string argument', () => {
       terror(
-        uupper(0),
+        () => uupper(0),
         '',
         '[uupper]: expected argument to be a string; found 0',
       )
@@ -389,7 +389,7 @@ describe('Regular expression parsers', () => {
   describe('ulower', () => {
     it('throws if it has a non-string argument', () => {
       terror(
-        ulower(0),
+        () => ulower(0),
         '',
         '[ulower]: expected argument to be a string; found 0',
       )
@@ -483,7 +483,7 @@ describe('Regular expression parsers', () => {
 
   describe('space', () => {
     it('throws if it has a non-string argument', () => {
-      terror(space(0), '', 'expected argument to be a string; found 0')
+      () => terror(space(0), '', 'expected argument to be a string; found 0')
     })
     it('succeeds on a single instance of conventional whitespace', () => {
       tpass(space(), '\t', '\t')
@@ -542,7 +542,7 @@ describe('Regular expression parsers', () => {
   describe('uspace', () => {
     it('throws if it has a non-string argument', () => {
       terror(
-        uspace(0),
+        () => uspace(0),
         '',
         '[uspace]: expected argument to be a string; found 0',
       )
@@ -670,7 +670,7 @@ describe('Regular expression parsers', () => {
 
   describe('spaces1', () => {
     it('throws if it has a non-string argument', () => {
-      terror(spaces1(0), '', 'expected argument to be a string; found 0')
+      () => terror(spaces1(0), '', 'expected argument to be a string; found 0')
     })
     it('fails if no whitespace is found', () => {
       tfail(spaces1(), '', 'one or more whitespace characters')
@@ -718,7 +718,7 @@ describe('Regular expression parsers', () => {
   describe('uspaces1', () => {
     it('throws if it has a non-string argument', () => {
       terror(
-        uspaces1(0),
+        () => uspaces1(0),
         '',
         '[uspaces1]: expected argument to be a string; found 0',
       )
@@ -766,7 +766,7 @@ describe('Regular expression parsers', () => {
   describe('newline', () => {
     it('throws if it has a non-string argument', () => {
       terror(
-        newline(0),
+        () => newline(0),
         '',
         '[newline]: expected argument to be a string; found 0',
       )
@@ -792,7 +792,7 @@ describe('Regular expression parsers', () => {
   describe('unewline', () => {
     it('throws if it has a non-string argument', () => {
       terror(
-        unewline(0),
+        () => unewline(0),
         '',
         '[unewline]: expected argument to be a string; found 0',
       )

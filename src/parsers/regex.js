@@ -61,15 +61,17 @@ const reUnewline = /^(?:\r\n|[\r\n\u0085\u2028\u2029])/u
  *     expression against the input at its current position and succeeds
  *     if a match is found.
  */
-const regexParser = re => parser(ctx => {
-  const { index, view } = ctx
-  const rest = viewToString(index, view.byteLength - index, view)
+function regexParser(re) {
+  return parser(ctx => {
+    const { index, view } = ctx
+    const rest = viewToString(index, view.byteLength - index, view)
 
-  const match = rest.match(re)
-  return match
-    ? okReply(ctx, match[0], index + stringToView(match[0]).byteLength)
-    : failReply(ctx)
-})
+    const match = rest.match(re)
+    return match
+      ? okReply(ctx, match[0], index + stringToView(match[0]).byteLength)
+      : failReply(ctx)
+  })
+}
 
 /**
  * A parser that attempts to match the supplied regular expression to
@@ -94,28 +96,30 @@ const regexParser = re => parser(ctx => {
  *     expression against the input at its current position and succeeds
  *     if a match is found.
  */
-export const regex = (r, m) => parser(ctx => {
+export function regex(r, m) {
   const hasM = m != null
 
-  ASSERT && assertStringOrRegExp('regex', r, argStrRegFormatter(1, hasM))
-  ASSERT && hasM && assertString('regex', m, argStrFormatter(2, true))
+  assertStringOrRegExp('regex', r, argStrRegFormatter(1, hasM))
+  if (hasM) assertString('regex', m, argStrFormatter(2, true))
 
+  return parser(ctx => {
   // First, convert to a regular expression if it's a string
-  let regex = typeof r === 'string' ? new RegExp(r) : r
+    let regex = typeof r === 'string' ? new RegExp(r) : r
 
-  // Next, make sure the regular expression starts with a ^ anchor
-  const { source, flags } = regex
-  const reanchor = source[0] !== '^'
-  if (reanchor) {
-    const newSource = '^' + source
-    regex = new RegExp(newSource, flags)
-  }
+    // Next, make sure the regular expression starts with a ^ anchor
+    const { source, flags } = regex
+    const reanchor = source[0] !== '^'
+    if (reanchor) {
+      const newSource = '^' + source
+      regex = new RegExp(newSource, flags)
+    }
 
-  const [rrep, [rctx, rres]] = dup(regexParser(regex)(ctx))
-  return rres.status === Ok
-    ? rrep
-    : failReply(rctx, ferror(m, expecteds.regex(regex)))
-})
+    const [rrep, [rctx, rres]] = dup(regexParser(regex)(ctx))
+    return rres.status === Ok
+      ? rrep
+      : failReply(rctx, ferror(m, expecteds.regex(regex)))
+  })
+}
 
 /**
  * A parser that reads a character and succeeds with that character if
@@ -127,16 +131,16 @@ export const regex = (r, m) => parser(ctx => {
  * @returns {Parser} A parser that succeeds if the next character is a
  *     letter.
  */
-export const uletter = m => parser(ctx => {
-  const hasM = m != null
+export function uletter(m) {
+  if (m != null) assertString('uletter', m, argStrFormatter())
 
-  ASSERT && hasM && assertString('uletter', m, argStrFormatter())
-
-  const [rrep, [rctx, rres]] = dup(regexParser(reLetter)(ctx))
-  return rres.status === Ok
-    ? rrep
-    : failReply(rctx, ferror(m, expecteds.uletter))
-})
+  return parser(ctx => {
+    const [rrep, [rctx, rres]] = dup(regexParser(reLetter)(ctx))
+    return rres.status === Ok
+      ? rrep
+      : failReply(rctx, ferror(m, expecteds.uletter))
+  })
+}
 
 /**
  * A parser that reads a character and succeeds with that character if
@@ -148,16 +152,16 @@ export const uletter = m => parser(ctx => {
  * @returns {Parser} A parser that succeeds if the next character is an
  *     alphanumeric character.
  */
-export const ualpha = m => parser(ctx => {
-  const hasM = m != null
+export function ualpha(m) {
+  if (m != null) assertString('ualpha', m, argStrFormatter())
 
-  ASSERT && hasM && assertString('ualpha', m, argStrFormatter())
-
-  const [rrep, [rctx, rres]] = dup(regexParser(reAlpha)(ctx))
-  return rres.status === Ok
-    ? rrep
-    : failReply(rctx, ferror(m, expecteds.ualpha))
-})
+  return parser(ctx => {
+    const [rrep, [rctx, rres]] = dup(regexParser(reAlpha)(ctx))
+    return rres.status === Ok
+      ? rrep
+      : failReply(rctx, ferror(m, expecteds.ualpha))
+  })
+}
 
 /**
  * A parser that reads a character and succeeds with that character if
@@ -170,16 +174,16 @@ export const ualpha = m => parser(ctx => {
  * @returns {Parser} A parser that succeeds if the next character is an
  *     uppercase letter.
  */
-export const uupper = m => parser(ctx => {
-  const hasM = m != null
+export function uupper(m) {
+  if (m != null) assertString('uupper', m, argStrFormatter())
 
-  ASSERT && hasM && assertString('uupper', m, argStrFormatter())
-
-  const [rrep, [rctx, rres]] = dup(regexParser(reUpper)(ctx))
-  return rres.status === Ok
-    ? rrep
-    : failReply(rctx, ferror(m, expecteds.uupper))
-})
+  return parser(ctx => {
+    const [rrep, [rctx, rres]] = dup(regexParser(reUpper)(ctx))
+    return rres.status === Ok
+      ? rrep
+      : failReply(rctx, ferror(m, expecteds.uupper))
+  })
+}
 
 /**
  * A parser that reads a character and succeeds with that character if
@@ -191,16 +195,16 @@ export const uupper = m => parser(ctx => {
  * @returns {Parser} A parser that succeeds if the next character is a
  *     lowercase letter.
  */
-export const ulower = m => parser(ctx => {
-  const hasM = m != null
+export function ulower(m) {
+  if (m != null) assertString('ulower', m, argStrFormatter())
 
-  ASSERT && hasM && assertString('ulower', m, argStrFormatter())
-
-  const [rrep, [rctx, rres]] = dup(regexParser(reLower)(ctx))
-  return rres.status === Ok
-    ? rrep
-    : failReply(rctx, ferror(m, expecteds.ulower))
-})
+  return parser(ctx => {
+    const [rrep, [rctx, rres]] = dup(regexParser(reLower)(ctx))
+    return rres.status === Ok
+      ? rrep
+      : failReply(rctx, ferror(m, expecteds.ulower))
+  })
+}
 
 /**
  * A parser that reads a character and succeeds with that character if
@@ -213,14 +217,16 @@ export const ulower = m => parser(ctx => {
  * @returns {Parser} A parser that succeeds if the next character is an
  *     ASCII whitespace character.
  */
-export const space = m => parser(ctx => {
-  const hasM = m != null
+export function space(m) {
+  if (m != null) assertString('space', m, argStrFormatter())
 
-  ASSERT && hasM && assertString('space', m, argStrFormatter())
-
-  const [rrep, [rctx, rres]] = dup(regexParser(reSpace)(ctx))
-  return rres.status === Ok ? rrep : failReply(rctx, ferror(m, expecteds.space))
-})
+  return parser(ctx => {
+    const [rrep, [rctx, rres]] = dup(regexParser(reSpace)(ctx))
+    return rres.status === Ok
+      ? rrep
+      : failReply(rctx, ferror(m, expecteds.space))
+  })
+}
 
 /**
  * A parser that reads a character and succeeds with that character if
@@ -235,16 +241,16 @@ export const space = m => parser(ctx => {
  * @returns {Parser} A parser that succeeds if the next character is a
  *     Unicode whitespace character.
  */
-export const uspace = m => parser(ctx => {
-  const hasM = m != null
+export function uspace(m) {
+  if (m != null) assertString('uspace', m, argStrFormatter())
 
-  ASSERT && hasM && assertString('uspace', m, argStrFormatter())
-
-  const [rrep, [rctx, rres]] = dup(regexParser(reUspace)(ctx))
-  return rres.status === Ok
-    ? rrep
-    : failReply(rctx, ferror(m, expecteds.uspace))
-})
+  return parser(ctx => {
+    const [rrep, [rctx, rres]] = dup(regexParser(reUspace)(ctx))
+    return rres.status === Ok
+      ? rrep
+      : failReply(rctx, ferror(m, expecteds.uspace))
+  })
+}
 
 /**
  * A parser that reads zero or more whitespace characters (space, `\t`,
@@ -256,10 +262,12 @@ export const uspace = m => parser(ctx => {
  * @returns {Parser} A parser that always succeeds and skips over any
  *     number of ASCII whitespace characters.
  */
-export const spaces = () => parser(ctx => {
-  const [rctx, _] = regexParser(reSpaces)(ctx)
-  return okReply(rctx, null)
-})
+export function spaces() {
+  return parser(ctx => {
+    const [rctx, _] = regexParser(reSpaces)(ctx)
+    return okReply(rctx, null)
+  })
+}
 
 /**
  * A parser that reads zero or more Unicode whitespace characters at the
@@ -271,10 +279,12 @@ export const spaces = () => parser(ctx => {
  * @returns {Parser} A parser that always succeeds and skips over any
  *     number of Unicode whitespace characters.
  */
-export const uspaces = () => parser(ctx => {
-  const [rctx, _] = regexParser(reUspaces)(ctx)
-  return okReply(rctx, null)
-})
+export function uspaces() {
+  return parser(ctx => {
+    const [rctx, _] = regexParser(reUspaces)(ctx)
+    return okReply(rctx, null)
+  })
+}
 
 /**
  * A parser that reads one or more whitespace characters (space, `\t`,
@@ -287,16 +297,16 @@ export const uspaces = () => parser(ctx => {
  * @returns {Parser} A parser that skips one or more ASCII whitespace
  *     characters.
  */
-export const spaces1 = m => parser(ctx => {
-  const hasM = m != null
+export function spaces1(m) {
+  if (m != null) assertString('spaces1', m, argStrFormatter())
 
-  ASSERT && hasM && assertString('spaces1', m, argStrFormatter())
-
-  const [rctx, rres] = regexParser(reSpaces1)(ctx)
-  return rres.status === Ok
-    ? okReply(rctx, null)
-    : failReply(rctx, ferror(m, expecteds.spaces1))
-})
+  return parser(ctx => {
+    const [rctx, rres] = regexParser(reSpaces1)(ctx)
+    return rres.status === Ok
+      ? okReply(rctx, null)
+      : failReply(rctx, ferror(m, expecteds.spaces1))
+  })
+}
 
 /**
  * A parser that reads one or more Unicode whitespace characters at the
@@ -309,16 +319,16 @@ export const spaces1 = m => parser(ctx => {
  * @returns {Parser} A parser that skips one or more Unicode whitespace
  *     characters.
  */
-export const uspaces1 = m => parser(ctx => {
-  const hasM = m != null
+export function uspaces1(m) {
+  if (m != null) assertString('uspaces1', m, argStrFormatter())
 
-  ASSERT && hasM && assertString('uspaces1', m, argStrFormatter())
-
-  const [rctx, rres] = regexParser(reUspaces1)(ctx)
-  return rres.status === Ok
-    ? okReply(rctx, null)
-    : failReply(rctx, ferror(m, expecteds.uspaces1))
-})
+  return parser(ctx => {
+    const [rctx, rres] = regexParser(reUspaces1)(ctx)
+    return rres.status === Ok
+      ? okReply(rctx, null)
+      : failReply(rctx, ferror(m, expecteds.uspaces1))
+  })
+}
 
 /**
  * A parser that reads a character and succeeds if the next character is
@@ -339,16 +349,16 @@ export const uspaces1 = m => parser(ctx => {
  * @returns {Parser} A parser that succeeds if the next character is an
  *     ASCII newline.
  */
-export const newline = m => parser(ctx => {
-  const hasM = m != null
+export function newline(m) {
+  if (m != null) assertString('newline', m, argStrFormatter())
 
-  ASSERT && hasM && assertString('newline', m, argStrFormatter())
-
-  const [rrep, [rctx, rres]] = dup(regexParser(reNewline)(ctx))
-  return rres.status === Ok
-    ? rrep
-    : failReply(rctx, ferror(m, expecteds.newline))
-})
+  return parser(ctx => {
+    const [rrep, [rctx, rres]] = dup(regexParser(reNewline)(ctx))
+    return rres.status === Ok
+      ? rrep
+      : failReply(rctx, ferror(m, expecteds.newline))
+  })
+}
 
 /**
  * A parser that reads a character and succeeds if the next character is
@@ -374,13 +384,13 @@ export const newline = m => parser(ctx => {
  * @returns {Parser} A parser that succeeds if the next character is a
  *     Unicode newline.
  */
-export const unewline = m => parser(ctx => {
-  const hasM = m != null
+export function unewline(m) {
+  if (m != null) assertString('unewline', m, argStrFormatter())
 
-  ASSERT && hasM && assertString('unewline', m, argStrFormatter())
-
-  const [rrep, [rctx, rres]] = dup(regexParser(reUnewline)(ctx))
-  return rres.status === Ok
-    ? rrep
-    : failReply(rctx, ferror(m, expecteds.unewline))
-})
+  return parser(ctx => {
+    const [rrep, [rctx, rres]] = dup(regexParser(reUnewline)(ctx))
+    return rres.status === Ok
+      ? rrep
+      : failReply(rctx, ferror(m, expecteds.unewline))
+  })
+}
