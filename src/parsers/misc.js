@@ -16,7 +16,9 @@ import { generic } from 'kessel/error'
  * @returns {Parser} A parser that automatically fails with the supplied
  *     error message.
  */
-export const fail = m => parser(ctx => failReply(ctx, generic(m)))
+export function fail(m) {
+  return parser(ctx => failReply(ctx, generic(m)))
+}
 
 /**
  * A parser that fails without consuming input, setting the generic
@@ -27,7 +29,9 @@ export const fail = m => parser(ctx => failReply(ctx, generic(m)))
  * @returns {Parser} A parser that automatically fails fatally with the
  *     supplied error message.
  */
-export const fatal = m => parser(ctx => fatalReply(ctx, generic(m)))
+export function fatal(m) {
+  return parser(ctx => fatalReply(ctx, generic(m)))
+}
 
 /**
  * A parser which always succeeds with the supplied value.
@@ -42,4 +46,6 @@ export const fatal = m => parser(ctx => fatalReply(ctx, generic(m)))
  * @param {*} x The value will result when this parser is applied.
  * @returns {Parser} A parser that always succeeds with `value`.
  */
-export const always = x => parser(ctx => okReply(ctx, x))
+export function always(x) {
+  return parser(ctx => okReply(ctx, x))
+}
